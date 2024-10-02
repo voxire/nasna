@@ -12,8 +12,10 @@ import {
 import { Timestamp } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 function AddMember() {
+  const { t } = useTranslation(); // Initialize translation function
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [nationalID, setNationalID] = useState("");
@@ -59,10 +61,10 @@ function AddMember() {
       setAidUrgency("");
       setConsentGiven(false);
 
-      toast("Member added successfully!", { type: "success" });
+      toast(t("toast.memberAddedSuccess"), { type: "success" });
       navigate("/");
     } else {
-      toast("Please fill in all required fields", { type: "error" });
+      toast(t("toast.fillRequiredFields"), { type: "error" });
     }
   };
 
@@ -103,6 +105,7 @@ function AddMember() {
         alignItems: "center",
         justifyContent: "center",
         padding: "24px",
+        paddingTop: "0px",
         maxWidth: "600px",
         margin: "0 auto",
       }}
@@ -115,11 +118,11 @@ function AddMember() {
           marginTop: "40px",
         }}
       >
-        Add Member Information
+        {t("title")}
       </Typography>
 
       <TextField
-        label="Full Name"
+        label={t("fullName")}
         value={fullName}
         onChange={(e) => setFullName(e.target.value)}
         fullWidth
@@ -127,7 +130,7 @@ function AddMember() {
       />
 
       <TextField
-        label="Phone Number"
+        label={t("phoneNumber")}
         value={phoneNumber}
         onChange={(e) => setPhoneNumber(e.target.value)}
         fullWidth
@@ -136,7 +139,7 @@ function AddMember() {
       />
 
       <TextField
-        label="National ID (Optional)"
+        label={t("nationalID")}
         value={nationalID}
         onChange={(e) => setNationalID(e.target.value)}
         fullWidth
@@ -144,7 +147,7 @@ function AddMember() {
       />
 
       <TextField
-        label="Number of People in Household"
+        label={t("householdSize")}
         value={householdSize}
         onChange={(e) => setHouseholdSize(e.target.value)}
         fullWidth
@@ -155,7 +158,7 @@ function AddMember() {
       {householdMembers.map((member, index) => (
         <Box key={index} sx={{ marginBottom: "16px" }}>
           <TextField
-            label={`Household Member ${index + 1} Name`}
+            label={t(`householdMemberName`, { index: index + 1 })}
             value={member.name}
             onChange={(e) =>
               handleHouseholdChange(index, "name", e.target.value)
@@ -164,7 +167,7 @@ function AddMember() {
             margin="normal"
           />
           <TextField
-            label="Age"
+            label={t("age")}
             value={member.age}
             onChange={(e) =>
               handleHouseholdChange(index, "age", e.target.value)
@@ -174,7 +177,7 @@ function AddMember() {
             type="number"
           />
           <TextField
-            label="Relationship to Primary"
+            label={t("relationship")}
             value={member.relationship}
             onChange={(e) =>
               handleHouseholdChange(index, "relationship", e.target.value)
@@ -184,7 +187,7 @@ function AddMember() {
           />
           <TextField
             select
-            label="Gender"
+            label={t("gender")}
             value={member.gender}
             onChange={(e) =>
               handleHouseholdChange(index, "gender", e.target.value)
@@ -192,19 +195,19 @@ function AddMember() {
             fullWidth
             margin="normal"
           >
-            <MenuItem value="Male">Male</MenuItem>
-            <MenuItem value="Female">Female</MenuItem>
-            <MenuItem value="Other">Other/Non-Binary</MenuItem>
+            <MenuItem value="Male">{t("genderOptions.male")}</MenuItem>{" "}
+            <MenuItem value="Female">{t("genderOptions.female")}</MenuItem>
+            <MenuItem value="Other">{t("genderOptions.other")}</MenuItem>
           </TextField>
         </Box>
       ))}
 
       <Button onClick={addHouseholdMember} sx={{ marginBottom: "16px" }}>
-        Add Another Household Member
+        {t("addAnotherHouseholdMember")}
       </Button>
 
       <TextField
-        label="Current Address"
+        label={t("currentAddress")}
         value={currentAddress}
         onChange={(e) => setCurrentAddress(e.target.value)}
         fullWidth
@@ -212,7 +215,7 @@ function AddMember() {
       />
 
       <Typography variant="h6" sx={{ marginTop: "16px" }}>
-        Special Needs
+        {t("specialNeeds")}
       </Typography>
       {specialNeedsOptions.map((need) => (
         <FormControlLabel
@@ -233,7 +236,7 @@ function AddMember() {
       ))}
 
       <Typography variant="h6" sx={{ marginTop: "16px" }}>
-        Immediate Needs
+        {t("immediateNeeds")}
       </Typography>
       {immediateNeedsOptions.map((need) => (
         <FormControlLabel
@@ -255,15 +258,19 @@ function AddMember() {
 
       <TextField
         select
-        label="Urgency of Aid"
+        label={t("aidUrgency")}
         value={aidUrgency}
         onChange={(e) => setAidUrgency(e.target.value)}
         fullWidth
         margin="normal"
       >
-        <MenuItem value="Immediate">Immediate</MenuItem>
-        <MenuItem value="Within a few days">Within a few days</MenuItem>
-        <MenuItem value="No urgent need">No urgent need</MenuItem>
+        <MenuItem value="Immediate">{t("urgencyOptions.immediate")}</MenuItem>
+        <MenuItem value="Within a few days">
+          {t("urgencyOptions.withinFewDays")}
+        </MenuItem>
+        <MenuItem value="No urgent need">
+          {t("urgencyOptions.noUrgentNeed")}
+        </MenuItem>
       </TextField>
 
       <FormControlLabel
@@ -273,7 +280,7 @@ function AddMember() {
             onChange={(e) => setConsentGiven(e.target.checked)}
           />
         }
-        label="I give consent to share my data with aid organizations"
+        label={t("consent")}
       />
 
       <Box
@@ -297,7 +304,7 @@ function AddMember() {
             }
           }}
         >
-          Submit
+          {t("submit")}
         </Button>
       </Box>
     </Box>

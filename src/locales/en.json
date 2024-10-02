@@ -1,0 +1,42 @@
+{
+  "title": "Fill in a Request",
+  "fullName": "Full Name",
+  "phoneNumber": "Phone Number",
+  "nationalID": "National ID (Optional)",
+  "householdSize": "Number of People in Household",
+  "householdMemberName": "Household Member {{index}} Name",
+  "age": "Age",
+  "relationship": "Relationship to Primary",
+  "gender": "Gender",
+  "addAnotherHouseholdMember": "Add Another Household Member",
+  "currentAddress": "Current Address",
+  "specialNeeds": "Special Needs",
+  "immediateNeeds": "Immediate Needs",
+  "aidUrgency": "Urgency of Aid",
+  "consent": "I give consent to share my data with aid organizations",
+  "submit": "Submit",
+  "urgencyOptions": {
+    "immediate": "Immediate",
+    "withinFewDays": "Within a few days",
+    "noUrgentNeed": "No urgent need"
+  },
+  "specialNeedsOptions": [
+    "Pregnancy",
+    "Chronic Illness",
+    "Disability",
+    "Infants/Toddlers",
+    "Elderly"
+  ],
+  "immediateNeedsOptions": [
+    "Food",
+    "Water",
+    "Shelter Materials",
+    "Hygiene Products",
+    "Medical Supplies",
+    "Clothing"
+  ],
+  "toast": {
+    "memberAddedSuccess": "Member added successfully!",
+    "fillRequiredFields": "Please fill in all required fields"
+  }
+}

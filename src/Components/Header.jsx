@@ -1,13 +1,22 @@
-import React, { useState, useEffect} from "react";
-import { AppBar, Toolbar, Typography, Button } from "@mui/material";
-
+import React, { useState, useEffect } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Menu,
+  MenuItem,
+  IconButton,
+} from "@mui/material";
 import { auth } from "../firebase";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignOut, faHome, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faSignOut, faGlobe } from "@fortawesome/free-solid-svg-icons";
+import { selectLanguage } from "../services/i18next";
 
 function Header() {
   const [user, setUser] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const isMobile = false;
 
   useEffect(() => {
@@ -19,6 +28,11 @@ function Header() {
   }, []);
 
   const notify = () => toast("Logged out!", { type: "success" });
+
+  const handleLanguageChange = (lng) => {
+    selectLanguage(lng);
+    setAnchorEl(null);
+  };
 
   return (
     <AppBar position="static">
@@ -39,59 +53,32 @@ function Header() {
             width="35px"
             height="35px"
             style={{ marginRight: "10px", filter: "invert(1)" }}
-          />{" "}
-          [App Name]
+          />
+          Nasna
         </Typography>
-        {user && (
-          <div style={{ display: "flex", gap: "10px" }}>
-            {window.location.pathname !== "/" && (
-              <Button
-                color="secondary"
-                href="/"
-                variant="contained"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                }}
-              >
-                {isMobile ? null : "Home"}
-                <FontAwesomeIcon icon={faHome} />
-              </Button>
-            )}
-            {window.location.pathname !== "/add-member" && (
-              <Button
-                color="secondary"
-                href="/add-member"
-                variant="contained"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                }}
-              >
-                {isMobile ? null : "Add Member"}
-                <FontAwesomeIcon icon={faPlus} />
-              </Button>
-            )}
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => {
-                notify();
-                auth.signOut();
-              }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-              }}
-            >
-              {isMobile ? null : "Logout"}
-              <FontAwesomeIcon icon={faSignOut} />
-            </Button>
-          </div>
-        )}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <IconButton
+            onClick={(event) => setAnchorEl(event.currentTarget)}
+            color="inherit"
+          >
+            <FontAwesomeIcon icon={faGlobe} />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
+          >
+            <MenuItem onClick={() => handleLanguageChange("en")}>
+              English
+            </MenuItem>
+            <MenuItem onClick={() => handleLanguageChange("ar")}>
+              Arabic
+            </MenuItem>
+            <MenuItem onClick={() => handleLanguageChange("fr")}>
+              French
+            </MenuItem>
+          </Menu>
+        </div>
       </Toolbar>
     </AppBar>
   );

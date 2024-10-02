@@ -4,10 +4,13 @@ import { CssBaseline, CircularProgress, Box } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 import PrivateRoute from "./Components/PrivateRoute";
-import { AuthProvider } from "./context/AuthContext";
+// import { AuthProvider } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./Components/Header";
+
+import { I18nextProvider } from "react-i18next";
+import i18next from "./services/i18next";
 
 // Lazy load components
 const Members = lazy(() => import("./Components/Members"));
@@ -79,65 +82,67 @@ const theme = createTheme({
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <ToastContainer />
-      <CssBaseline />
-      {/* <AuthProvider> */}
-      <Router>
-        <Header />
-        <div
-          style={{
-            backgroundColor: "#FAFAFA",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
+      <I18nextProvider i18n={i18next}>
+        <ToastContainer />
+        <CssBaseline />
+        {/* <AuthProvider> */}
+        <Router>
+          <Header />
           <div
             style={{
-              maxWidth: "1200px",
-              width: "100%",
+              backgroundColor: "#FAFAFA",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
           >
-            <Suspense
-              fallback={
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    minHeight: "80vh",
-                  }}
-                >
-                  <CircularProgress color="secondary" />
-                </Box>
-              }
+            <div
+              style={{
+                maxWidth: "1200px",
+                width: "100%",
+              }}
             >
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <PrivateRoute>
-                      <AddMember />
-                    </PrivateRoute>
-                  }
-                />
+              <Suspense
+                fallback={
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      minHeight: "80vh",
+                    }}
+                  >
+                    <CircularProgress color="secondary" />
+                  </Box>
+                }
+              >
+                <Routes>
+                  <Route
+                    path="/"
+                    element={
+                      <PrivateRoute>
+                        <AddMember />
+                      </PrivateRoute>
+                    }
+                  />
 
-                {/* Ignore the two below */}
-                <Route path="/sign-in" element={<SignIn />} />
-                <Route
-                  path="/"
-                  element={
-                    <PrivateRoute>
-                      <Members />
-                    </PrivateRoute>
-                  }
-                />
-              </Routes>
-            </Suspense>
+                  {/* Ignore the two below */}
+                  <Route path="/sign-in" element={<SignIn />} />
+                  <Route
+                    path="/"
+                    element={
+                      <PrivateRoute>
+                        <Members />
+                      </PrivateRoute>
+                    }
+                  />
+                </Routes>
+              </Suspense>
+            </div>
           </div>
-        </div>
-      </Router>
-      {/* </AuthProvider> */}
+        </Router>
+        {/* </AuthProvider> */}
+      </I18nextProvider>
     </ThemeProvider>
   );
 }
