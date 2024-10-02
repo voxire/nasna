@@ -102,8 +102,6 @@ function AddMember() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
         padding: "24px",
         paddingTop: "0px",
         maxWidth: "600px",
