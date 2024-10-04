@@ -195,7 +195,6 @@ function AddMember() {
           >
             <MenuItem value="Male">{t("genderOptions.male")}</MenuItem>{" "}
             <MenuItem value="Female">{t("genderOptions.female")}</MenuItem>
-            <MenuItem value="Other">{t("genderOptions.other")}</MenuItem>
           </TextField>
         </Box>
       ))}
