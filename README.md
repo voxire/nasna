@@ -1,4 +1,4 @@
-Notes to be done:
+## Notes to be done:
 
 * Arabic Verion
 * adjust the design (to be more user*friendly)
@@ -7,7 +7,7 @@ Notes to be done:
 * check the obligatroy and optional fields
 * Write a Disclaimer
 
-adjust the design:
+## adjust the design:
 
 * remove names of the household members
 * add age ranges
@@ -23,7 +23,7 @@ adjust the design:
 
 * in Househould info: add message to guide user to what to do
 
-Check everything missing:
+## Check everything missing:
 
 * Info about if there is a person with disability in the household
 * active working household members
