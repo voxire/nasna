@@ -9,8 +9,8 @@ Notes to be done:
 
 adjust the design:
 
-- remove names of the household members
-- add age ranges
+* remove names of the household members
+* add age ranges
 - remove add household member button
 - remove relationship to primary
 - make national id obligatroy
