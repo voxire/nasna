@@ -21,8 +21,7 @@ adjust the design:
 * building
 * floor
 
-* in Househould info
-    ** add message to guide user to what to do
+* in Househould info: add message to guide user to what to do
 
 Check everything missing:
 
