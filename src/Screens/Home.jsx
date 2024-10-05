@@ -43,29 +43,50 @@ function Home() {
   const navigate = useNavigate();
 
   const handleAddMember = async () => {
-    if (fullName && phoneNumber && nationalID && emailAddress) {
-      await db.collection("members").add({
-        fullName,
-        phoneNumber,
-        nationalID,
-        emailAddress,
-        gender,
-        currentGovernorate,
-        previousGovernorate,
-        street,
-        building,
-        floor,
-        ageRanges,
-        specialNeeds,
-        needs,
-        aidUrgency,
-        consentGiven,
-        comments,
-        registrationDate: Timestamp.fromDate(new Date()),
-      });
+    if (
+      fullName &&
+      phoneNumber &&
+      nationalID &&
+      currentGovernorate &&
+      previousGovernorate &&
+      street &&
+      building &&
+      floor &&
+      ageRanges["0-3"] &&
+      ageRanges["4-12"] &&
+      ageRanges["13-18"] &&
+      ageRanges["19-60"] &&
+      ageRanges["60+"] &&
+      specialNeeds.length &&
+      needs.length &&
+      aidUrgency
+    ) {
+      if (consentGiven) {
+        await db.collection("members").add({
+          fullName,
+          phoneNumber,
+          nationalID,
+          emailAddress,
+          gender,
+          currentGovernorate,
+          previousGovernorate,
+          street,
+          building,
+          floor,
+          ageRanges,
+          specialNeeds,
+          needs,
+          aidUrgency,
+          consentGiven,
+          comments,
+          registrationDate: Timestamp.fromDate(new Date()),
+        });
 
-      toast(t("toast.memberAddedSuccess"), { type: "success" });
-      navigate("/confirmation");
+        toast(t("toast.memberAddedSuccess"), { type: "success" });
+        navigate("/confirmation");
+      } else {
+        toast(t("toast.consentRequired"), { type: "error" });
+      }
     } else {
       toast(t("toast.fillRequiredFields"), { type: "error" });
     }
@@ -205,7 +226,25 @@ function Home() {
           alignItems: "center",
         }}
       >
-        <Button onClick={() => setPage(2)} variant="contained">
+        <Button
+          onClick={() => {
+            if (
+              fullName &&
+              phoneNumber &&
+              nationalID &&
+              currentGovernorate &&
+              previousGovernorate &&
+              street &&
+              building &&
+              floor
+            ) {
+              setPage(2);
+            } else {
+              toast(t("toast.fillRequiredFields"), { type: "error" });
+            }
+          }}
+          variant="contained"
+        >
           {t("Continue")}
         </Button>
       </Box>
@@ -270,7 +309,7 @@ function Home() {
                   setSpecialNeeds(
                     e.target.checked
                       ? [...specialNeeds, need]
-                      : specialNeeds.filter((n) => n !== need)
+                      : specialNeeds.filter((n) => n !== need),
                   )
                 }
               />
@@ -297,7 +336,7 @@ function Home() {
                   setNeeds(
                     e.target.checked
                       ? [...needs, need]
-                      : needs.filter((n) => n !== need)
+                      : needs.filter((n) => n !== need),
                   )
                 }
               />
@@ -366,7 +405,7 @@ function Home() {
         flexDirection: "column",
         padding: "24px",
         paddingTop: "30px",
-        paddingBottom: "100px",
+        paddingBottom: "150px",
         maxWidth: "600px",
         margin: "0 auto",
       }}
