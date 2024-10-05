@@ -13,9 +13,10 @@ import { I18nextProvider } from "react-i18next";
 import i18next from "./services/i18next";
 
 // Lazy load components
-const Members = lazy(() => import("./Components/Members"));
-const AddMember = lazy(() => import("./Components/AddMember"));
+const Submissions = lazy(() => import("./Screens/Submissions"));
+const Home = lazy(() => import("./Screens/Home"));
 const SignIn = lazy(() => import("./Components/SignIn"));
+const Confirmation = lazy(() => import("./Screens/Confirmation"));
 
 const theme = createTheme({
   palette: {
@@ -117,25 +118,19 @@ function App() {
                 }
               >
                 <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/confirmation" element={<Confirmation />} />
                   <Route
-                    path="/"
+                    path="/members"
                     element={
                       <PrivateRoute>
-                        <AddMember />
+                        <Submissions />
                       </PrivateRoute>
                     }
                   />
 
                   {/* Ignore the two below */}
                   <Route path="/sign-in" element={<SignIn />} />
-                  <Route
-                    path="/"
-                    element={
-                      <PrivateRoute>
-                        <Members />
-                      </PrivateRoute>
-                    }
-                  />
                 </Routes>
               </Suspense>
             </div>

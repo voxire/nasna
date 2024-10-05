@@ -35,7 +35,7 @@ function Header() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="sticky">
       <Toolbar>
         <Typography
           variant="h6"
