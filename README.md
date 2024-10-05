@@ -22,7 +22,7 @@ adjust the design:
 * floor
 
 * in Househould info
-** add message to guide user to what to do
+    ** add message to guide user to what to do
 
 Check everything missing:
 
