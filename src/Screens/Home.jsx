@@ -196,8 +196,15 @@ function Home() {
           fullWidth
           margin="normal"
         >
-          <MenuItem value="Governorate 1">{t("Governorate 1")}</MenuItem>
-          <MenuItem value="Governorate 2">{t("Governorate 2")}</MenuItem>
+          <MenuItem value="Governorate 1">{t("Beirut")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("Mount Lebanon")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("North Lebanon")}</MenuItem>
+          <MenuItem value="Governorate 1">{t("Nabatieh")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("Tyre")}</MenuItem>
+          <MenuItem value="Governorate 1">{t("Saida")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("Beqaa")}</MenuItem>
+          <MenuItem value="Governorate 1">{t("Baalbek")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("Akkar")}</MenuItem>
         </TextField>
 
         <TextField
@@ -208,8 +215,15 @@ function Home() {
           fullWidth
           margin="normal"
         >
-          <MenuItem value="Governorate 1">{t("Governorate 1")}</MenuItem>
-          <MenuItem value="Governorate 2">{t("Governorate 2")}</MenuItem>
+          <MenuItem value="Governorate 1">{t("Beirut")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("Mount Lebanon")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("North Lebanon")}</MenuItem>
+          <MenuItem value="Governorate 1">{t("Nabatieh")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("Tyre")}</MenuItem>
+          <MenuItem value="Governorate 1">{t("Saida")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("Beqaa")}</MenuItem>
+          <MenuItem value="Governorate 1">{t("Baalbek")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("Akkar")}</MenuItem>
         </TextField>
 
         <TextField
