@@ -309,7 +309,7 @@ function Home() {
                   setSpecialNeeds(
                     e.target.checked
                       ? [...specialNeeds, need]
-                      : specialNeeds.filter((n) => n !== need),
+                      : specialNeeds.filter((n) => n !== need)
                   )
                 }
               />
@@ -336,7 +336,7 @@ function Home() {
                   setNeeds(
                     e.target.checked
                       ? [...needs, need]
-                      : needs.filter((n) => n !== need),
+                      : needs.filter((n) => n !== need)
                   )
                 }
               />
