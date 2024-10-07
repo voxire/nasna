@@ -27,3 +27,20 @@
 * Info about if there is a person with disability in the household
 * active working household members
 * natoinality
+
+
+#Tasks
+##Rami:
+. [] Arabic Verion
+. [] French Version
+. [] Governments + Cities
+
+##Mohamad:
+. [] adjust the design (to be more user*friendly)
+. [] check the obligatroy and optional fields
+. [] Fix the confirmation page to not allow the user to navigate back.
+. [] Filters
+
+##Abed:
+. [] Logo
+. [] Design

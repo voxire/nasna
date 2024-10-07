@@ -26,6 +26,7 @@ function Home() {
   const [street, setStreet] = useState("");
   const [building, setBuilding] = useState("");
   const [floor, setFloor] = useState("");
+  const [city, setCity] = useState("");
   const [ageRanges, setAgeRanges] = useState({
     "0-3": 0,
     "4-12": 0,
@@ -70,6 +71,7 @@ function Home() {
           gender,
           currentGovernorate,
           previousGovernorate,
+          city,
           street,
           building,
           floor,
@@ -93,10 +95,9 @@ function Home() {
   };
 
   const pageOne = () => (
-  
-  <Box>
-    {/* Disclaimer */}
-<Box
+    <Box>
+      {/* Disclaimer */}
+      <Box
         sx={{
           backgroundColor: "#fff3cd",
           padding: "16px",
@@ -106,13 +107,16 @@ function Home() {
         }}
       >
         <Typography variant="body1" color="textSecondary">
-          This platform helps connect those in need with government and NGO assistance. While we don't directly provide aid, the information you share will help ensure support like food, shelter, and medical supplies reaches you. Your data will be handled with care and only shared with trusted organizations to coordinate aid effectively.
+          This platform helps connect those in need with government and NGO
+          assistance. While we don't directly provide aid, the information you
+          share will help ensure support like food, shelter, and medical
+          supplies reaches you. Your data will be handled with care and only
+          shared with trusted organizations to coordinate aid effectively.
         </Typography>
       </Box>
       <Typography variant="h4" component="h1" gutterBottom>
         {t("Address Details")}
       </Typography>
-
 
       {/* Section 1: Personal Information */}
       <Box
@@ -207,6 +211,14 @@ function Home() {
           <MenuItem value="Governorate 1">{t("Governorate 1")}</MenuItem>
           <MenuItem value="Governorate 2">{t("Governorate 2")}</MenuItem>
         </TextField>
+
+        <TextField
+          label={t("City")}
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
 
         <TextField
           label={t("Street")}
@@ -325,7 +337,7 @@ function Home() {
                   setSpecialNeeds(
                     e.target.checked
                       ? [...specialNeeds, need]
-                      : specialNeeds.filter((n) => n !== need)
+                      : specialNeeds.filter((n) => n !== need),
                   )
                 }
               />
@@ -352,7 +364,7 @@ function Home() {
                   setNeeds(
                     e.target.checked
                       ? [...needs, need]
-                      : needs.filter((n) => n !== need)
+                      : needs.filter((n) => n !== need),
                   )
                 }
               />

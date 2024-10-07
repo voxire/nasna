@@ -2,7 +2,7 @@
   "title": "Fill in a Request",
   "fullName": "Full Name",
   "phoneNumber": "Phone Number",
-  "nationalID": "National ID (Optional)",
+  "nationalID": "National ID",
   "householdSize": "Number of People in Household",
   "householdMemberName": "Household Member {{index}} Name",
   "age": "Age",

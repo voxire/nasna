@@ -1,1 +1,42 @@
-{}
+{
+  "title": "Remplir une demande",
+  "fullName": "Nom complet",
+  "phoneNumber": "Numéro de téléphone",
+  "nationalID": "Numéro d'identité nationale",
+  "householdSize": "Nombre de personnes dans le foyer",
+  "householdMemberName": "Nom du membre du foyer {{index}}",
+  "age": "Âge",
+  "relationship": "Relation avec le principal",
+  "gender": "Genre",
+  "addAnotherHouseholdMember": "Ajouter un autre membre du foyer",
+  "currentAddress": "Adresse actuelle",
+  "specialNeeds": "Besoins spéciaux",
+  "immediateNeeds": "Besoins immédiats",
+  "aidUrgency": "Urgence de l'aide",
+  "consent": "Je donne mon consentement pour partager mes données avec les organisations d'aide",
+  "submit": "Soumettre",
+  "urgencyOptions": {
+    "immediate": "Immédiat",
+    "withinFewDays": "Dans quelques jours",
+    "noUrgentNeed": "Pas de besoin urgent"
+  },
+  "specialNeedsOptions": [
+    "Grossesse",
+    "Maladie chronique",
+    "Handicap",
+    "Nourrissons/Jeunes enfants",
+    "Personnes âgées"
+  ],
+  "immediateNeedsOptions": [
+    "Nourriture",
+    "Eau",
+    "Matériaux d'abri",
+    "Produits d'hygiène",
+    "Fournitures médicales",
+    "Vêtements"
+  ],
+  "toast": {
+    "memberAddedSuccess": "Membre ajouté avec succès!",
+    "fillRequiredFields": "Veuillez remplir tous les champs obligatoires"
+  }
+}
