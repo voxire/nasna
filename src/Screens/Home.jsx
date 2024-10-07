@@ -93,10 +93,26 @@ function Home() {
   };
 
   const pageOne = () => (
-    <Box>
+  
+  <Box>
+    {/* Disclaimer */}
+<Box
+        sx={{
+          backgroundColor: "#fff3cd",
+          padding: "16px",
+          borderRadius: "8px",
+          marginBottom: "16px",
+          border: "1px solid #ffeeba",
+        }}
+      >
+        <Typography variant="body1" color="textSecondary">
+          This platform helps connect those in need with government and NGO assistance. While we don't directly provide aid, the information you share will help ensure support like food, shelter, and medical supplies reaches you. Your data will be handled with care and only shared with trusted organizations to coordinate aid effectively.
+        </Typography>
+      </Box>
       <Typography variant="h4" component="h1" gutterBottom>
         {t("Address Details")}
       </Typography>
+
 
       {/* Section 1: Personal Information */}
       <Box
