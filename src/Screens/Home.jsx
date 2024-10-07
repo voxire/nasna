@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [nationalID, setNationalID] = useState("");
@@ -381,6 +381,7 @@ function Home() {
         paddingBottom: "150px",
         maxWidth: "600px",
         margin: "0 auto",
+        direction: i18n.language === "ar" ? "rtl" : "ltr",
       }}
     >
       {page === 1 ? pageOne() : pageTwo()}
