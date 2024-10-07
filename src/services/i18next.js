@@ -32,9 +32,8 @@ export const selectLanguage = (language) => {
     i18next.changeLanguage(language);
     localStorage.setItem("language", language);
   } else {
-    language = "en";
-    i18next.changeLanguage(language);
-    localStorage.setItem("language", language);
+    i18next.changeLanguage("en");
+    localStorage.setItem("language", "en");
   }
 };
 

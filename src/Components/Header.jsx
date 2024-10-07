@@ -9,9 +9,8 @@ import {
   IconButton,
 } from "@mui/material";
 import { auth } from "../firebase";
-import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignOut, faGlobe } from "@fortawesome/free-solid-svg-icons";
+import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 import { selectLanguage } from "../services/i18next";
 
 function Header() {
@@ -27,10 +26,16 @@ function Header() {
     return () => unsubscribe();
   }, []);
 
-  const notify = () => toast("Logged out!", { type: "success" });
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem("language");
+    if (savedLanguage) {
+      selectLanguage(savedLanguage);
+    }
+  }, []);
 
   const handleLanguageChange = (lng) => {
     selectLanguage(lng);
+    console.log("Language changed to: " + lng);
     setAnchorEl(null);
   };
 
