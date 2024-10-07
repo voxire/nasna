@@ -1,42 +1,33 @@
 {
-  "title": "Fill in a Request",
-  "fullName": "Full Name",
-  "phoneNumber": "Phone Number",
-  "nationalID": "National ID",
-  "householdSize": "Number of People in Household",
-  "householdMemberName": "Household Member {{index}} Name",
-  "age": "Age",
-  "relationship": "Relationship to Primary",
-  "gender": "Gender",
-  "addAnotherHouseholdMember": "Add Another Household Member",
-  "currentAddress": "Current Address",
-  "specialNeeds": "Special Needs",
-  "immediateNeeds": "Immediate Needs",
-  "aidUrgency": "Urgency of Aid",
-  "consent": "I give consent to share my data with aid organizations",
-  "submit": "Submit",
-  "urgencyOptions": {
-    "immediate": "Immediate",
-    "withinFewDays": "Within a few days",
-    "noUrgentNeed": "No urgent need"
-  },
-  "specialNeedsOptions": [
-    "Pregnancy",
-    "Chronic Illness",
-    "Disability",
-    "Infants/Toddlers",
-    "Elderly"
-  ],
-  "immediateNeedsOptions": [
-    "Food",
-    "Water",
-    "Shelter Materials",
-    "Hygiene Products",
-    "Medical Supplies",
-    "Clothing"
-  ],
-  "toast": {
-    "memberAddedSuccess": "Member added successfully!",
-    "fillRequiredFields": "Please fill in all required fields"
+  "home": {
+    "toast": {
+      "memberAddedSuccess": "Member added successfully!",
+      "consentRequired": "Consent is required to proceed.",
+      "fillRequiredFields": "Please fill out all required fields."
+    },
+    "disclaimer": "Please fill out the information below accurately.",
+    "addressDetails": "Address Details",
+    "personalInformation": "Personal Information",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "nationalID": "National ID",
+    "emailAddress": "Email Address",
+    "gender": "Gender",
+    "currentGovernorate": "Current Governorate",
+    "previousGovernorate": "Previous Governorate",
+    "city": "City",
+    "street": "Street",
+    "building": "Building",
+    "floor": "Floor",
+    "continue": "Continue",
+    "householdAndNeedsDetails": "Household and Needs Details",
+    "householdInformation": "Household Information",
+    "numberOfPeopleInHousehold": "Number of People in Household",
+    "ageRanges": "Age Ranges",
+    "numberOfMembers": "Number of Members",
+    "consent": "I give my consent to proceed.",
+    "comments": "Comments",
+    "back": "Back",
+    "submit": "Submit"
   }
 }

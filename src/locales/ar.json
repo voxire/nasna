@@ -1,42 +1,33 @@
 {
-  "title": "املأ طلبًا",
-  "fullName": "الاسم الكامل",
-  "phoneNumber": "رقم الهاتف",
-  "nationalID": "رقم الهوية الوطنية",
-  "householdSize": "عدد الأفراد في الأسرة",
-  "householdMemberName": "اسم فرد الأسرة {{index}}",
-  "age": "العمر",
-  "relationship": "العلاقة مع الشخص الرئيسي",
-  "gender": "الجنس",
-  "addAnotherHouseholdMember": "إضافة فرد آخر من الأسرة",
-  "currentAddress": "العنوان الحالي",
-  "specialNeeds": "احتياجات خاصة",
-  "immediateNeeds": "احتياجات فورية",
-  "aidUrgency": "مدى استعجال المساعدة",
-  "consent": "أوافق على مشاركة بياناتي مع منظمات الإغاثة",
-  "submit": "إرسال",
-  "urgencyOptions": {
-    "immediate": "فوري",
-    "withinFewDays": "خلال بضعة أيام",
-    "noUrgentNeed": "لا توجد حاجة عاجلة"
-  },
-  "specialNeedsOptions": [
-    "الحمل",
-    "مرض مزمن",
-    "إعاقة",
-    "رضّع/أطفال صغار",
-    "كبار السن"
-  ],
-  "immediateNeedsOptions": [
-    "طعام",
-    "ماء",
-    "مواد مأوى",
-    "منتجات النظافة",
-    "إمدادات طبية",
-    "ملابس"
-  ],
-  "toast": {
-    "memberAddedSuccess": "تمت إضافة الفرد بنجاح!",
-    "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة"
+  "home": {
+    "toast": {
+      "memberAddedSuccess": "تمت إضافة العضو بنجاح!",
+      "consentRequired": "الموافقة مطلوبة للمتابعة.",
+      "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة."
+    },
+    "disclaimer": "يرجى ملء المعلومات أدناه بدقة.",
+    "addressDetails": "تفاصيل العنوان",
+    "personalInformation": "المعلومات الشخصية",
+    "fullName": "الاسم الكامل",
+    "phoneNumber": "رقم الهاتف",
+    "nationalID": "الهوية الوطنية",
+    "emailAddress": "عنوان البريد الإلكتروني",
+    "gender": "الجنس",
+    "currentGovernorate": "المحافظة الحالية",
+    "previousGovernorate": "المحافظة السابقة",
+    "city": "المدينة",
+    "street": "الشارع",
+    "building": "البناء",
+    "floor": "الطابق",
+    "continue": "متابعة",
+    "householdAndNeedsDetails": "تفاصيل الأسرة والاحتياجات",
+    "householdInformation": "معلومات الأسرة",
+    "numberOfPeopleInHousehold": "عدد الأشخاص في الأسرة",
+    "ageRanges": "فئات العمر",
+    "numberOfMembers": "عدد الأعضاء",
+    "consent": "أوافق على المتابعة.",
+    "comments": "التعليقات",
+    "back": "رجوع",
+    "submit": "إرسال"
   }
 }

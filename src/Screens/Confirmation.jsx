@@ -1,7 +1,10 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 function Confirmation() {
+  const { t } = useTranslation();
+
   return (
     <Box
       sx={{
@@ -15,13 +18,13 @@ function Confirmation() {
       }}
     >
       <Typography variant="h4" component="h1" gutterBottom>
-        Thank You!
+        {t("confirmation.thankYou")}
       </Typography>
       <Typography variant="h6" component="p" gutterBottom>
-        Your submission has been received successfully.
+        {t("confirmation.submissionReceived")}
       </Typography>
       <Typography variant="body1" component="p" gutterBottom>
-        We appreciate your participation and support.
+        {t("confirmation.appreciation")}
       </Typography>
     </Box>
   );

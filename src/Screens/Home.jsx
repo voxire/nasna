@@ -41,6 +41,8 @@ function Home() {
   const [comments, setComments] = useState("");
   const [page, setPage] = useState(1);
 
+  const [numberOfPeopleInHousehold, setNumberOfPeopleInHousehold] = useState(0);
+
   const navigate = useNavigate();
 
   const handleAddMember = async () => {
@@ -84,13 +86,13 @@ function Home() {
           registrationDate: Timestamp.fromDate(new Date()),
         });
 
-        toast(t("toast.memberAddedSuccess"), { type: "success" });
+        toast(t("home.toast.memberAddedSuccess"), { type: "success" });
         navigate("/confirmation");
       } else {
-        toast(t("toast.consentRequired"), { type: "error" });
+        toast(t("home.toast.consentRequired"), { type: "error" });
       }
     } else {
-      toast(t("toast.fillRequiredFields"), { type: "error" });
+      toast(t("home.toast.fillRequiredFields"), { type: "error" });
     }
   };
 
@@ -107,15 +109,11 @@ function Home() {
         }}
       >
         <Typography variant="body1" color="textSecondary">
-          This platform helps connect those in need with government and NGO
-          assistance. While we don't directly provide aid, the information you
-          share will help ensure support like food, shelter, and medical
-          supplies reaches you. Your data will be handled with care and only
-          shared with trusted organizations to coordinate aid effectively.
+          {t("home.disclaimer")}
         </Typography>
       </Box>
       <Typography variant="h4" component="h1" gutterBottom>
-        {t("Address Details")}
+        {t("home.addressDetails")}
       </Typography>
 
       {/* Section 1: Personal Information */}
@@ -127,10 +125,10 @@ function Home() {
           marginBottom: "16px",
         }}
       >
-        <Typography variant="h6">{t("Personal Information")}</Typography>
+        <Typography variant="h6">{t("home.personalInformation")}</Typography>
 
         <TextField
-          label={t("Full Name")}
+          label={t("home.fullName")}
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           fullWidth
@@ -138,7 +136,7 @@ function Home() {
         />
 
         <TextField
-          label={t("Phone Number")}
+          label={t("home.phoneNumber")}
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
           fullWidth
@@ -147,7 +145,7 @@ function Home() {
         />
 
         <TextField
-          label={t("National ID")}
+          label={t("home.nationalID")}
           value={nationalID}
           onChange={(e) => setNationalID(e.target.value)}
           fullWidth
@@ -155,7 +153,7 @@ function Home() {
         />
 
         <TextField
-          label={t("Email Address")}
+          label={t("home.emailAddress")}
           value={emailAddress}
           onChange={(e) => setEmailAddress(e.target.value)}
           fullWidth
@@ -165,15 +163,15 @@ function Home() {
 
         <TextField
           select
-          label={t("Gender")}
+          label={t("home.gender")}
           value={gender}
           onChange={(e) => setGender(e.target.value)}
           fullWidth
           margin="normal"
         >
-          <MenuItem value="Male">{t("Male")}</MenuItem>
-          <MenuItem value="Female">{t("Female")}</MenuItem>
-          <MenuItem value="Other">{t("Other")}</MenuItem>
+          <MenuItem value="Male">{t("home.male")}</MenuItem>
+          <MenuItem value="Female">{t("home.female")}</MenuItem>
+          <MenuItem value="Other">{t("home.other")}</MenuItem>
         </TextField>
       </Box>
 
@@ -186,34 +184,34 @@ function Home() {
           marginBottom: "16px",
         }}
       >
-        <Typography variant="h6">{t("Location Details")}</Typography>
+        <Typography variant="h6">{t("home.locationDetails")}</Typography>
 
         <TextField
           select
-          label={t("Current Governorate")}
+          label={t("home.currentGovernorate")}
           value={currentGovernorate}
           onChange={(e) => setCurrentGovernorate(e.target.value)}
           fullWidth
           margin="normal"
         >
-          <MenuItem value="Governorate 1">{t("Governorate 1")}</MenuItem>
-          <MenuItem value="Governorate 2">{t("Governorate 2")}</MenuItem>
+          <MenuItem value="Governorate 1">{t("home.governorate1")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("home.governorate2")}</MenuItem>
         </TextField>
 
         <TextField
           select
-          label={t("Previous Governorate")}
+          label={t("home.previousGovernorate")}
           value={previousGovernorate}
           onChange={(e) => setPreviousGovernorate(e.target.value)}
           fullWidth
           margin="normal"
         >
-          <MenuItem value="Governorate 1">{t("Governorate 1")}</MenuItem>
-          <MenuItem value="Governorate 2">{t("Governorate 2")}</MenuItem>
+          <MenuItem value="Governorate 1">{t("home.governorate1")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("home.governorate2")}</MenuItem>
         </TextField>
 
         <TextField
-          label={t("City")}
+          label={t("home.city")}
           value={city}
           onChange={(e) => setCity(e.target.value)}
           fullWidth
@@ -221,7 +219,7 @@ function Home() {
         />
 
         <TextField
-          label={t("Street")}
+          label={t("home.street")}
           value={street}
           onChange={(e) => setStreet(e.target.value)}
           fullWidth
@@ -229,7 +227,7 @@ function Home() {
         />
 
         <TextField
-          label={t("Building")}
+          label={t("home.building")}
           value={building}
           onChange={(e) => setBuilding(e.target.value)}
           fullWidth
@@ -237,7 +235,7 @@ function Home() {
         />
 
         <TextField
-          label={t("Floor")}
+          label={t("home.floor")}
           value={floor}
           onChange={(e) => setFloor(e.target.value)}
           fullWidth
@@ -268,12 +266,12 @@ function Home() {
             ) {
               setPage(2);
             } else {
-              toast(t("toast.fillRequiredFields"), { type: "error" });
+              toast(t("home.toast.fillRequiredFields"), { type: "error" });
             }
           }}
           variant="contained"
         >
-          {t("Continue")}
+          {t("home.continue")}
         </Button>
       </Box>
     </Box>
@@ -282,7 +280,7 @@ function Home() {
   const pageTwo = () => (
     <Box>
       <Typography variant="h4" component="h1" gutterBottom>
-        {t("Household and Needs Details")}
+        {t("home.householdAndNeedsDetails")}
       </Typography>
 
       {/* Section 3: Household Details */}
@@ -294,107 +292,31 @@ function Home() {
           marginBottom: "16px",
         }}
       >
-        <Typography variant="h6">{t("Household Information")}</Typography>
+        <Typography variant="h6">{t("home.householdInformation")}</Typography>
 
+        <TextField
+          label={t("home.numberOfPeopleInHousehold")}
+          value={numberOfPeopleInHousehold}
+          onChange={(e) => setNumberOfPeopleInHousehold(e.target.value)}
+          fullWidth
+          margin="normal"
+          type="number"
+        />
+
+        <Typography variant="body1">{t("home.ageRanges")}</Typography>
         {Object.keys(ageRanges).map((range) => (
           <TextField
             key={range}
-            label={`${range} ${t("Years")}`}
+            label={`${range} (${t("home.numberOfMembers")})`}
             value={ageRanges[range]}
             onChange={(e) =>
-              setAgeRanges({ ...ageRanges, [range]: Number(e.target.value) })
+              setAgeRanges({ ...ageRanges, [range]: e.target.value })
             }
             fullWidth
             margin="normal"
             type="number"
           />
         ))}
-      </Box>
-
-      {/* Section 4: Needs and Aid */}
-      <Box
-        sx={{
-          backgroundColor: "#f5f5f5",
-          padding: "16px",
-          borderRadius: "8px",
-          marginBottom: "16px",
-        }}
-      >
-        <Typography variant="h6">{t("Special Needs")}</Typography>
-        {[
-          "Pregnancy",
-          "Chronic Illness",
-          "Disability",
-          "Infants/Toddlers",
-          "Elderly",
-        ].map((need) => (
-          <FormControlLabel
-            key={need}
-            control={
-              <Checkbox
-                checked={specialNeeds.includes(need)}
-                onChange={(e) =>
-                  setSpecialNeeds(
-                    e.target.checked
-                      ? [...specialNeeds, need]
-                      : specialNeeds.filter((n) => n !== need),
-                  )
-                }
-              />
-            }
-            label={t(need)}
-          />
-        ))}
-
-        <Typography variant="h6">{t("Immediate Needs")}</Typography>
-        {[
-          "Food",
-          "Water",
-          "Shelter Materials",
-          "Hygiene Products",
-          "Medical Supplies",
-          "Clothing",
-        ].map((need) => (
-          <FormControlLabel
-            key={need}
-            control={
-              <Checkbox
-                checked={needs.includes(need)}
-                onChange={(e) =>
-                  setNeeds(
-                    e.target.checked
-                      ? [...needs, need]
-                      : needs.filter((n) => n !== need),
-                  )
-                }
-              />
-            }
-            label={t(need)}
-          />
-        ))}
-
-        <TextField
-          select
-          label={t("Urgency of Aid")}
-          value={aidUrgency}
-          onChange={(e) => setAidUrgency(e.target.value)}
-          fullWidth
-          margin="normal"
-        >
-          <MenuItem value="High">{t("High")}</MenuItem>
-          <MenuItem value="Medium">{t("Medium")}</MenuItem>
-          <MenuItem value="Low">{t("Low")}</MenuItem>
-        </TextField>
-
-        <TextField
-          label={t("Comments")}
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-          fullWidth
-          margin="normal"
-          multiline
-          rows={4}
-        />
 
         <FormControlLabel
           control={
@@ -403,24 +325,31 @@ function Home() {
               onChange={(e) => setConsentGiven(e.target.checked)}
             />
           }
-          label={t("I give consent for my data to be processed")}
+          label={t("home.consent")}
+        />
+        <TextField
+          label={t("home.comments")}
+          value={comments}
+          onChange={(e) => setComments(e.target.value)}
+          fullWidth
+          margin="normal"
+          multiline
+          rows={4}
         />
       </Box>
 
       <Box
         sx={{
           display: "flex",
-          marginTop: "16px",
-          gap: 2,
-          justifyContent: "flex-end",
+          justifyContent: "space-between",
           alignItems: "center",
         }}
       >
         <Button onClick={() => setPage(1)} variant="outlined">
-          {t("Back")}
+          {t("home.back")}
         </Button>
         <Button onClick={handleAddMember} variant="contained">
-          {t("Submit")}
+          {t("home.submit")}
         </Button>
       </Box>
     </Box>
