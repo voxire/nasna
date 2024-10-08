@@ -23,6 +23,7 @@
     "nationalID": "الهوية الوطنية",
     "emailAddress": "عنوان البريد الإلكتروني",
     "gender": "الجنس",
+    "locationDetails":"تفاصيل مكانك",
     "currentGovernorate": "المحافظة الحالية",
     "previousGovernorate": "المحافظة السابقة",
     "city": "المدينة",

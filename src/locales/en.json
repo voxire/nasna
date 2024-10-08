@@ -23,6 +23,7 @@
     "nationalID": "National ID",
     "emailAddress": "Email Address",
     "gender": "Gender",
+    "locationDetails":"Location Details",
     "currentGovernorate": "Current Governorate",
     "previousGovernorate": "Previous Governorate",
     "city": "City",
