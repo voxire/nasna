@@ -216,7 +216,7 @@ function Home() {
           margin="normal"
         >
           <MenuItem value="Governorate 1">{t("home.governorate1")}</MenuItem>
-          <MenuItem value="Governorate 2">{t("home.governorate2")}</MenuItem>
+           <MenuItem value="Governorate 2">{t("home.governorate2")}</MenuItem>
           <MenuItem value="Governorate 3">{t("home.governorate3")}</MenuItem>
           <MenuItem value="Governorate 4">{t("home.governorate4")}</MenuItem>
           <MenuItem value="Governorate 5">{t("home.governorate5")}</MenuItem>
