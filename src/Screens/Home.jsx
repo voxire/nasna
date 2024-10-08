@@ -142,7 +142,6 @@ function Home() {
           fullWidth
           margin="normal"
           type="tel"
-          
         />
 
         <TextField
@@ -172,7 +171,6 @@ function Home() {
         >
           <MenuItem value="Male">{t("home.male")}</MenuItem>
           <MenuItem value="Female">{t("home.female")}</MenuItem>
-          <MenuItem value="Other">{t("home.other")}</MenuItem>
         </TextField>
       </Box>
 
@@ -216,7 +214,7 @@ function Home() {
           margin="normal"
         >
           <MenuItem value="Governorate 1">{t("home.governorate1")}</MenuItem>
-           <MenuItem value="Governorate 2">{t("home.governorate2")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("home.governorate2")}</MenuItem>
           <MenuItem value="Governorate 3">{t("home.governorate3")}</MenuItem>
           <MenuItem value="Governorate 4">{t("home.governorate4")}</MenuItem>
           <MenuItem value="Governorate 5">{t("home.governorate5")}</MenuItem>
@@ -334,6 +332,91 @@ function Home() {
             type="number"
           />
         ))}
+      </Box>
+      {/* Section 4: Needs and Aid */}
+      <Box
+        sx={{
+          backgroundColor: "#f5f5f5",
+          padding: "16px",
+          borderRadius: "8px",
+          marginBottom: "16px",
+        }}
+      >
+        <Typography variant="h6">{t("Special Needs")}</Typography>
+        {[
+          "Pregnancy",
+          "Chronic Illness",
+          "Disability",
+          "Infants/Toddlers",
+          "Elderly",
+        ].map((need) => (
+          <FormControlLabel
+            key={need}
+            control={
+              <Checkbox
+                checked={specialNeeds.includes(need)}
+                onChange={(e) =>
+                  setSpecialNeeds(
+                    e.target.checked
+                      ? [...specialNeeds, need]
+                      : specialNeeds.filter((n) => n !== need),
+                  )
+                }
+              />
+            }
+            label={t(need)}
+          />
+        ))}
+
+        <Typography variant="h6">{t("Immediate Needs")}</Typography>
+        {[
+          "Food",
+          "Water",
+          "Shelter Materials",
+          "Hygiene Products",
+          "Medical Supplies",
+          "Clothing",
+        ].map((need) => (
+          <FormControlLabel
+            key={need}
+            control={
+              <Checkbox
+                checked={needs.includes(need)}
+                onChange={(e) =>
+                  setNeeds(
+                    e.target.checked
+                      ? [...needs, need]
+                      : needs.filter((n) => n !== need),
+                  )
+                }
+              />
+            }
+            label={t(need)}
+          />
+        ))}
+
+        <TextField
+          select
+          label={t("Urgency of Aid")}
+          value={aidUrgency}
+          onChange={(e) => setAidUrgency(e.target.value)}
+          fullWidth
+          margin="normal"
+        >
+          <MenuItem value="High">{t("High")}</MenuItem>
+          <MenuItem value="Medium">{t("Medium")}</MenuItem>
+          <MenuItem value="Low">{t("Low")}</MenuItem>
+        </TextField>
+
+        <TextField
+          label={t("Comments")}
+          value={comments}
+          onChange={(e) => setComments(e.target.value)}
+          fullWidth
+          margin="normal"
+          multiline
+          rows={4}
+        />
 
         <FormControlLabel
           control={
@@ -342,16 +425,7 @@ function Home() {
               onChange={(e) => setConsentGiven(e.target.checked)}
             />
           }
-          label={t("home.consent")}
-        />
-        <TextField
-          label={t("home.comments")}
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-          fullWidth
-          margin="normal"
-          multiline
-          rows={4}
+          label={t("I give consent for my data to be processed")}
         />
       </Box>
 
