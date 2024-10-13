@@ -12,11 +12,14 @@ import { auth } from "../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 import { selectLanguage } from "../services/i18next";
+import { faInfo } from "@fortawesome/free-solid-svg-icons/faInfo";
+import { useNavigate } from "react-router-dom";
 
 function Header() {
   const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const isMobile = false;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -62,6 +65,14 @@ function Header() {
           Nasna
         </Typography>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <IconButton
+            onClick={() => {
+              navigate("/about");
+            }}
+            color="inherit"
+          >
+            <FontAwesomeIcon icon={faInfo} />
+          </IconButton>
           <IconButton
             onClick={(event) => setAnchorEl(event.currentTarget)}
             color="inherit"

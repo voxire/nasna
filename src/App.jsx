@@ -17,6 +17,7 @@ const Submissions = lazy(() => import("./Screens/Submissions"));
 const Home = lazy(() => import("./Screens/Home"));
 const SignIn = lazy(() => import("./Components/SignIn"));
 const Confirmation = lazy(() => import("./Screens/Confirmation"));
+const About = lazy(() => import("./Screens/About"));
 
 const theme = createTheme({
   palette: {
@@ -128,6 +129,7 @@ function App() {
                       </PrivateRoute>
                     }
                   />
+                  <Route path="/about" element={<About />} />
 
                   {/* Ignore the two below */}
                   <Route path="/sign-in" element={<SignIn />} />
