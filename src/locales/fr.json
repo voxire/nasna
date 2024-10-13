@@ -44,10 +44,10 @@
   },
 
   "about": {
-    "titles": {
+    "title": {
     "aboutUs": "À Propos de Nous",
-    "ourMission": "Notre Mission",
-    "ourVision": "Notre Vision",
+    "mission": "Notre Mission",
+    "vision": "Notre Vision",
     "joinUs": "Rejoignez-Nous"
 },
     "description": "Cette plateforme aide à connecter ceux qui en ont besoin avec l'assistance gouvernementale et des ONG. Bien que nous ne fournissions pas directement d'aide, les informations que vous partagez aideront à garantir que le soutien, comme la nourriture, l'hébergement et les fournitures médicales, vous parvienne. Vos données seront traitées avec soin et ne seront partagées qu'avec des organisations de confiance pour coordonner efficacement l'aide.",
