@@ -5,6 +5,26 @@
       "consentRequired": "Le consentement est requis pour continuer.",
       "fillRequiredFields": "Veuillez remplir tous les champs requis."
     },
+    "needs": {
+    "special": {
+        "title": "Besoins Spéciaux",
+        "need1": "Grossesse",
+        "need2": "Handicap",
+        "need3": "Maladie Chronique",
+        "need4": "Personnes Agées",
+        "need5": "Parent Isolé",
+        "need6": "Bébés/Jeunes Enfants"
+    },
+    "immediate": {
+        "title": "Besoins Immédiats",
+        "need1": "Nourriture",
+        "need2": "Eau",
+        "need3": "Matériaux de Logement",
+        "need4": "Produits d'Hygiène",
+        "need5": "Fournitures Médicales",
+        "need6": "Vêtements"
+    }
+},
     "governorate1": "Beyrouth",
     "governorate2": "Mont-Liban",
     "governorate3": "Baabda",

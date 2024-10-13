@@ -5,6 +5,26 @@
       "consentRequired": "Consent is required to proceed.",
       "fillRequiredFields": "Please fill out all required fields."
     },
+    "needs": {
+      "special": {
+        "title": "Special Needs",
+        "need1": "Pregnancy",
+        "need2": "Disability",
+        "need3": "Chronic Illness",
+        "need4": "Elderly",
+        "need5": "Single Parent",
+        "need6": "Infants/Toddlers"
+      },
+      "immediate": {
+        "title": "Immediate Needs",
+        "need1": "Food",
+        "need2": "Water",
+        "need3": "Shelter Materials",
+        "need4": "Hygiene Products",
+        "need5": "Medical Supplies",
+        "need6": "Clothing"
+      }
+    },
     "governorate1": "Beirut",
     "governorate2": "Mount Lebanon",
     "governorate3": "Baabdat",
@@ -41,7 +61,11 @@
     "consent": "I give my consent to proceed.",
     "comments": "Comments",
     "back": "Back",
-    "submit": "Submit"
+    "submit": "Submit",
+    "aidUrgency": "Urgency of Aid",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
   },
 
   "about": {

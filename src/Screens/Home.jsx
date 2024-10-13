@@ -342,13 +342,14 @@ function Home() {
           marginBottom: "16px",
         }}
       >
-        <Typography variant="h6">{t("Special Needs")}</Typography>
+        <Typography variant="h6">{t("home.needs.special.title")}</Typography>
         {[
-          "Pregnancy",
-          "Chronic Illness",
-          "Disability",
-          "Infants/Toddlers",
-          "Elderly",
+          t("home.needs.special.need1"),
+          t("home.needs.special.need2"),
+          t("home.needs.special.need3"),
+          t("home.needs.special.need4"),
+          t("home.needs.special.need5"),
+          t("home.needs.special.need6")
         ].map((need) => (
           <FormControlLabel
             key={need}
@@ -368,14 +369,14 @@ function Home() {
           />
         ))}
 
-        <Typography variant="h6">{t("Immediate Needs")}</Typography>
+        <Typography variant="h6">{t("home.needs.immediate.title")}</Typography>
         {[
-          "Food",
-          "Water",
-          "Shelter Materials",
-          "Hygiene Products",
-          "Medical Supplies",
-          "Clothing",
+          t("home.needs.immediate.need1"),
+          t("home.needs.immediate.need2"),
+          t("home.needs.immediate.need3"),
+          t("home.needs.immediate.need4"),
+          t("home.needs.immediate.need5"),
+          t("home.needs.immediate.need6")
         ].map((need) => (
           <FormControlLabel
             key={need}
@@ -397,19 +398,19 @@ function Home() {
 
         <TextField
           select
-          label={t("Urgency of Aid")}
+          label={t("home.aidUrgency")}
           value={aidUrgency}
           onChange={(e) => setAidUrgency(e.target.value)}
           fullWidth
           margin="normal"
         >
-          <MenuItem value="High">{t("High")}</MenuItem>
-          <MenuItem value="Medium">{t("Medium")}</MenuItem>
-          <MenuItem value="Low">{t("Low")}</MenuItem>
+          <MenuItem value="High">{t("home.high")}</MenuItem>
+          <MenuItem value="Medium">{t("home.medium")}</MenuItem>
+          <MenuItem value="Low">{t("home.low")}</MenuItem>
         </TextField>
 
         <TextField
-          label={t("Comments")}
+          label={t("home.comments")}
           value={comments}
           onChange={(e) => setComments(e.target.value)}
           fullWidth
@@ -425,7 +426,7 @@ function Home() {
               onChange={(e) => setConsentGiven(e.target.checked)}
             />
           }
-          label={t("I give consent for my data to be processed")}
+          label={t("home.consent")}
         />
       </Box>
 
