@@ -41,5 +41,18 @@
     "comments": "Commentaires",
     "back": "Retour",
     "submit": "Soumettre"
-  }
+  },
+
+  "about": {
+    "titles": {
+    "aboutUs": "À Propos de Nous",
+    "ourMission": "Notre Mission",
+    "ourVision": "Notre Vision",
+    "joinUs": "Rejoignez-Nous"
+},
+    "description": "Cette plateforme aide à connecter ceux qui en ont besoin avec l'assistance gouvernementale et des ONG. Bien que nous ne fournissions pas directement d'aide, les informations que vous partagez aideront à garantir que le soutien, comme la nourriture, l'hébergement et les fournitures médicales, vous parvienne. Vos données seront traitées avec soin et ne seront partagées qu'avec des organisations de confiance pour coordonner efficacement l'aide.",
+    "mission": "Notre mission est de fournir une plateforme qui relie les personnes dans le besoin avec l'assistance gouvernementale et des ONG. Nous visons à garantir que le soutien, comme la nourriture, l'hébergement et les fournitures médicales, atteigne ceux qui en ont le plus besoin.",
+    "vision": "Notre vision est de créer un monde où chacun a accès au soutien dont il a besoin pour prospérer. Nous croyons qu'en connectant ceux qui en ont besoin avec les bonnes ressources, nous pouvons faire une différence dans la vie des personnes à travers le monde.",
+    "joinUs": "Si vous êtes une ONG cherchant à atteindre ceux qui en ont besoin ou un individu à la recherche d'assistance, Nasna est là pour vous aider. Ensemble, nous pouvons favoriser une communauté de soutien et de résilience en ces temps difficiles. Merci de faire partie de notre mission de connecter et d'élever ceux qui sont touchés par la crise au Liban."
+}
 }
