@@ -185,25 +185,7 @@ function Home() {
       >
         <Typography variant="h6">{t("home.locationDetails")}</Typography>
 
-        <TextField
-          select
-          label={t("home.currentGovernorate")}
-          value={currentGovernorate}
-          onChange={(e) => setCurrentGovernorate(e.target.value)}
-          fullWidth
-          margin="normal"
-        >
-          <MenuItem value="Governorate 1">{t("home.governorate1")}</MenuItem>
-          <MenuItem value="Governorate 2">{t("home.governorate2")}</MenuItem>
-          <MenuItem value="Governorate 3">{t("home.governorate3")}</MenuItem>
-          <MenuItem value="Governorate 4">{t("home.governorate4")}</MenuItem>
-          <MenuItem value="Governorate 5">{t("home.governorate5")}</MenuItem>
-          <MenuItem value="Governorate 6">{t("home.governorate6")}</MenuItem>
-          <MenuItem value="Governorate 7">{t("home.governorate7")}</MenuItem>
-          <MenuItem value="Governorate 8">{t("home.governorate8")}</MenuItem>
-          <MenuItem value="Governorate 9">{t("home.governorate9")}</MenuItem>
-          <MenuItem value="Governorate 10">{t("home.governorate10")}</MenuItem>
-        </TextField>
+       
 
         <TextField
           select
@@ -224,7 +206,26 @@ function Home() {
           <MenuItem value="Governorate 9">{t("home.governorate9")}</MenuItem>
           <MenuItem value="Governorate 10">{t("home.governorate10")}</MenuItem>
         </TextField>
-
+        
+        <TextField
+          select
+          label={t("home.currentGovernorate")}
+          value={currentGovernorate}
+          onChange={(e) => setCurrentGovernorate(e.target.value)}
+          fullWidth
+          margin="normal"
+        >
+          <MenuItem value="Governorate 1">{t("home.governorate1")}</MenuItem>
+          <MenuItem value="Governorate 2">{t("home.governorate2")}</MenuItem>
+          <MenuItem value="Governorate 3">{t("home.governorate3")}</MenuItem>
+          <MenuItem value="Governorate 4">{t("home.governorate4")}</MenuItem>
+          <MenuItem value="Governorate 5">{t("home.governorate5")}</MenuItem>
+          <MenuItem value="Governorate 6">{t("home.governorate6")}</MenuItem>
+          <MenuItem value="Governorate 7">{t("home.governorate7")}</MenuItem>
+          <MenuItem value="Governorate 8">{t("home.governorate8")}</MenuItem>
+          <MenuItem value="Governorate 9">{t("home.governorate9")}</MenuItem>
+          <MenuItem value="Governorate 10">{t("home.governorate10")}</MenuItem>
+        </TextField>
         <TextField
           label={t("home.city")}
           value={city}
