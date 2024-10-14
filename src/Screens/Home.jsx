@@ -55,11 +55,11 @@ function Home() {
       street &&
       building &&
       floor &&
-      ageRanges["0-3"] &&
-      ageRanges["4-12"] &&
-      ageRanges["13-18"] &&
-      ageRanges["19-60"] &&
-      ageRanges["60+"] &&
+      ageRanges["0-3"] !== undefined &&
+      ageRanges["4-12"] !== undefined &&
+      ageRanges["13-18"] !== undefined &&
+      ageRanges["19-60"] !== undefined &&
+      ageRanges["60+"] !== undefined &&
       specialNeeds.length &&
       needs.length &&
       aidUrgency
@@ -349,7 +349,7 @@ function Home() {
           t("home.needs.special.need3"),
           t("home.needs.special.need4"),
           t("home.needs.special.need5"),
-          t("home.needs.special.need6")
+          t("home.needs.special.need6"),
         ].map((need) => (
           <FormControlLabel
             key={need}
@@ -360,7 +360,7 @@ function Home() {
                   setSpecialNeeds(
                     e.target.checked
                       ? [...specialNeeds, need]
-                      : specialNeeds.filter((n) => n !== need),
+                      : specialNeeds.filter((n) => n !== need)
                   )
                 }
               />
@@ -376,7 +376,7 @@ function Home() {
           t("home.needs.immediate.need3"),
           t("home.needs.immediate.need4"),
           t("home.needs.immediate.need5"),
-          t("home.needs.immediate.need6")
+          t("home.needs.immediate.need6"),
         ].map((need) => (
           <FormControlLabel
             key={need}
@@ -387,7 +387,7 @@ function Home() {
                   setNeeds(
                     e.target.checked
                       ? [...needs, need]
-                      : needs.filter((n) => n !== need),
+                      : needs.filter((n) => n !== need)
                   )
                 }
               />
