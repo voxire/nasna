@@ -60,9 +60,8 @@ function Header() {
             alt="gym logo"
             width="35px"
             height="35px"
-            style={{ marginRight: "10px", filter: "invert(1)" }}
+            style={{ marginRight: "10px" }}
           />
-          Nasna
         </Typography>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <IconButton
