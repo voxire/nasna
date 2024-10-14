@@ -68,6 +68,12 @@
     "low": "Bas"
   },
 
+  "confirmation": {
+    "thankYou": "Merci d'avoir soumis vos informations !",
+    "submissionRecieved": "Votre soumission a été reçue et sera examinée par notre équipe.",
+    "appreciation": "Nous apprécions votre confiance en nous et nous ferons de notre mieux pour vous connecter au soutien dont vous avez besoin."
+  },
+
   "about": {
     "title": {
       "aboutUs": "À Propos de Nous",
