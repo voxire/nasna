@@ -22,7 +22,8 @@ const About = lazy(() => import("./Screens/About"));
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#4A90E2",
+      main: "#12a89d",
+      contrastText: "#FFFFFF",
     },
     secondary: {
       main: "#AEDFF7",
