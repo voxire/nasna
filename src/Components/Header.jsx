@@ -43,7 +43,10 @@ function Header() {
   };
 
   return (
-    <AppBar position="sticky">
+    <AppBar
+      position="sticky"
+      sx={{ backgroundColor: "#f9f9f9", color: "#0f0f0f" }}
+    >
       <Toolbar>
         <Typography
           variant="h6"
@@ -76,7 +79,7 @@ function Header() {
             onClick={(event) => setAnchorEl(event.currentTarget)}
             color="inherit"
           >
-            <FontAwesomeIcon icon={faLanguage}  style={{color: "#0f0f0f",}} />
+            <FontAwesomeIcon icon={faLanguage} style={{ color: "#0f0f0f" }} />
           </IconButton>
           <Menu
             anchorEl={anchorEl}
