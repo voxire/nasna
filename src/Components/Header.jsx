@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { auth } from "../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGlobe } from "@fortawesome/free-solid-svg-icons";
+import { faGlobe, faLanguage } from "@fortawesome/free-solid-svg-icons";
 import { selectLanguage } from "../services/i18next";
 import { faInfo } from "@fortawesome/free-solid-svg-icons/faInfo";
 import { useNavigate } from "react-router-dom";
@@ -56,11 +56,11 @@ function Header() {
           }}
         >
           <img
-            src="/logo.png"
-            alt="gym logo"
-            width="35px"
-            height="35px"
-            style={{ marginRight: "10px" }}
+            src="/Nasna Logo.png"
+            alt="Nasna logo"
+            width="150px"
+            height="100%"
+            style={{ margin: "0px" }}
           />
         </Typography>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -76,7 +76,7 @@ function Header() {
             onClick={(event) => setAnchorEl(event.currentTarget)}
             color="inherit"
           >
-            <FontAwesomeIcon icon={faGlobe} />
+            <FontAwesomeIcon icon={faLanguage}  style={{color: "#0f0f0f",}} />
           </IconButton>
           <Menu
             anchorEl={anchorEl}
