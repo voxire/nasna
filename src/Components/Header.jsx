@@ -73,7 +73,7 @@ function Header() {
             }}
             color="inherit"
           >
-            <FontAwesomeIcon icon={faInfo} />
+            <FontAwesomeIcon icon={faInfo}  style={{color: "#0f0f0f",}} />
           </IconButton>
           <IconButton
             onClick={(event) => setAnchorEl(event.currentTarget)}
