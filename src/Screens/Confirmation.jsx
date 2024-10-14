@@ -21,7 +21,7 @@ function Confirmation() {
         {t("confirmation.thankYou")}
       </Typography>
       <Typography variant="h6" component="p" gutterBottom>
-        {t("confirmation.submissionReceived")}
+        {t("confirmation.submissionRecieved")}
       </Typography>
       <Typography variant="body1" component="p" gutterBottom>
         {t("confirmation.appreciation")}

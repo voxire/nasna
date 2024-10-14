@@ -68,6 +68,12 @@
     "low": "Low"
   },
 
+  "confirmation" :{
+    "thankYou": "Thank you for submitting your information!",
+    "submissionRecieved": "Your submission has been received and will be reviewed by our team.",
+    "appreciation": "We appreciate your trust in us and will do our best to connect you with the support you need."
+  },
+
   "about": {
     "title": {
       "aboutUs": "About Us",
