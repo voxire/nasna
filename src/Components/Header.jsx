@@ -10,13 +10,8 @@ import {
 } from "@mui/material";
 import { auth } from "../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faGlobe,
-  faInfoCircle,
-  faLanguage,
-} from "@fortawesome/free-solid-svg-icons";
+import { faInfoCircle, faLanguage } from "@fortawesome/free-solid-svg-icons";
 import { selectLanguage } from "../services/i18next";
-import { faInfo } from "@fortawesome/free-solid-svg-icons/faInfo";
 import { useNavigate } from "react-router-dom";
 
 function Header() {
@@ -49,7 +44,7 @@ function Header() {
   return (
     <AppBar
       position="sticky"
-      sx={{ backgroundColor: "#f9f9f9", color: "#0f0f0f" }}
+      sx={{ backgroundColor: "#f9f9f9", color: "#12a89d" }}
     >
       <Toolbar>
         <Typography
@@ -77,13 +72,13 @@ function Header() {
             }}
             color="inherit"
           >
-            <FontAwesomeIcon icon={faInfoCircle} style={{ color: "#0f0f0f" }} />
+            <FontAwesomeIcon icon={faInfoCircle} style={{ color: "#12a89d" }} />
           </IconButton>
           <IconButton
             onClick={(event) => setAnchorEl(event.currentTarget)}
             color="inherit"
           >
-            <FontAwesomeIcon icon={faLanguage} style={{ color: "#0f0f0f" }} />
+            <FontAwesomeIcon icon={faLanguage} style={{ color: "#12a89d" }} />
           </IconButton>
           <Menu
             anchorEl={anchorEl}

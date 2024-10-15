@@ -13,7 +13,7 @@ function About() {
         display: "flex",
         flexDirection: "column",
         py: 3, // Padding on the y-axis
-        minHeight: "85dvh",
+        minHeight: "86dvh",
       }}
     >
       <Typography variant="h4" gutterBottom>

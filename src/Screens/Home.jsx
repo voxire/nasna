@@ -460,6 +460,25 @@ function Home() {
         direction: i18n.language === "ar" ? "rtl" : "ltr",
       }}
     >
+      {/* Progress Bar */}
+      <Box
+        sx={{
+          width: "100%",
+          backgroundColor: "#e0e0e0",
+          borderRadius: "4px",
+          overflow: "hidden",
+          marginBottom: "16px",
+        }}
+      >
+        <Box
+          sx={{
+            width: page === 1 ? "50%" : "100%",
+            backgroundColor: "#12a89d",
+            height: "8px",
+            transition: "width 0.3s ease",
+          }}
+        />
+      </Box>
       {page === 1 ? pageOne() : pageTwo()}
     </Box>
   );
