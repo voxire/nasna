@@ -12,7 +12,7 @@ function About() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        py: 3, // Padding on the y-axis
+        py: 3,
         minHeight: "86dvh",
       }}
     >

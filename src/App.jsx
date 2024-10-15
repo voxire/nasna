@@ -7,11 +7,9 @@ import PrivateRoute from "./Components/PrivateRoute";
 // import { AuthProvider } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Header from "./Components/Header";
 
 import { I18nextProvider } from "react-i18next";
 import i18next from "./services/i18next";
-import Footer from "./Components/Footer";
 import Public from "./Layout/Public";
 
 // Lazy load components
