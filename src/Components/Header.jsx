@@ -10,7 +10,11 @@ import {
 } from "@mui/material";
 import { auth } from "../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGlobe, faLanguage } from "@fortawesome/free-solid-svg-icons";
+import {
+  faGlobe,
+  faInfoCircle,
+  faLanguage,
+} from "@fortawesome/free-solid-svg-icons";
 import { selectLanguage } from "../services/i18next";
 import { faInfo } from "@fortawesome/free-solid-svg-icons/faInfo";
 import { useNavigate } from "react-router-dom";
@@ -61,7 +65,7 @@ function Header() {
           <img
             src="/Nasna Logo.png"
             alt="Nasna logo"
-            width="150px"
+            width="140px"
             height="100%"
             style={{ margin: "0px" }}
           />
@@ -73,7 +77,7 @@ function Header() {
             }}
             color="inherit"
           >
-            <FontAwesomeIcon icon={faInfo}  style={{color: "#0f0f0f",}} />
+            <FontAwesomeIcon icon={faInfoCircle} style={{ color: "#0f0f0f" }} />
           </IconButton>
           <IconButton
             onClick={(event) => setAnchorEl(event.currentTarget)}

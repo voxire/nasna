@@ -11,6 +11,7 @@ import Header from "./Components/Header";
 
 import { I18nextProvider } from "react-i18next";
 import i18next from "./services/i18next";
+import Footer from "./Components/Footer";
 
 // Lazy load components
 const Submissions = lazy(() => import("./Screens/Submissions"));
@@ -123,7 +124,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/confirmation" element={<Confirmation />} />
                   <Route
-                    path="/members"
+                    path="/submissions"
                     element={
                       <PrivateRoute>
                         <Submissions />
@@ -134,10 +135,14 @@ function App() {
 
                   {/* Ignore the two below */}
                   <Route path="/sign-in" element={<SignIn />} />
+
+                  <Route path="*" element={<Home />} />
                 </Routes>
               </Suspense>
             </div>
           </div>
+
+          <Footer />
         </Router>
         {/* </AuthProvider> */}
       </I18nextProvider>

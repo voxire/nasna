@@ -185,8 +185,6 @@ function Home() {
       >
         <Typography variant="h6">{t("home.locationDetails")}</Typography>
 
-       
-
         <TextField
           select
           label={t("home.previousGovernorate")}
@@ -195,18 +193,18 @@ function Home() {
           fullWidth
           margin="normal"
         >
-          <MenuItem value="Governorate 1">{t("home.governorate1")}</MenuItem>
-          <MenuItem value="Governorate 2">{t("home.governorate2")}</MenuItem>
-          <MenuItem value="Governorate 3">{t("home.governorate3")}</MenuItem>
-          <MenuItem value="Governorate 4">{t("home.governorate4")}</MenuItem>
-          <MenuItem value="Governorate 5">{t("home.governorate5")}</MenuItem>
-          <MenuItem value="Governorate 6">{t("home.governorate6")}</MenuItem>
-          <MenuItem value="Governorate 7">{t("home.governorate7")}</MenuItem>
-          <MenuItem value="Governorate 8">{t("home.governorate8")}</MenuItem>
-          <MenuItem value="Governorate 9">{t("home.governorate9")}</MenuItem>
-          <MenuItem value="Governorate 10">{t("home.governorate10")}</MenuItem>
+          <MenuItem value="Beirut">{t("home.governorate1")}</MenuItem>
+          <MenuItem value="Mount Lebanon">{t("home.governorate2")}</MenuItem>
+          <MenuItem value="Baabdat">{t("home.governorate3")}</MenuItem>
+          <MenuItem value="North Lebanon">{t("home.governorate4")}</MenuItem>
+          <MenuItem value="Akkar">{t("home.governorate5")}</MenuItem>
+          <MenuItem value="Baalbek">{t("home.governorate6")}</MenuItem>
+          <MenuItem value="Beqaa">{t("home.governorate7")}</MenuItem>
+          <MenuItem value="Tyre">{t("home.governorate8")}</MenuItem>
+          <MenuItem value="Saida">{t("home.governorate9")}</MenuItem>
+          <MenuItem value="Nabatiyeh">{t("home.governorate10")}</MenuItem>
         </TextField>
-        
+
         <TextField
           select
           label={t("home.currentGovernorate")}
@@ -215,16 +213,16 @@ function Home() {
           fullWidth
           margin="normal"
         >
-          <MenuItem value="Governorate 1">{t("home.governorate1")}</MenuItem>
-          <MenuItem value="Governorate 2">{t("home.governorate2")}</MenuItem>
-          <MenuItem value="Governorate 3">{t("home.governorate3")}</MenuItem>
-          <MenuItem value="Governorate 4">{t("home.governorate4")}</MenuItem>
-          <MenuItem value="Governorate 5">{t("home.governorate5")}</MenuItem>
-          <MenuItem value="Governorate 6">{t("home.governorate6")}</MenuItem>
-          <MenuItem value="Governorate 7">{t("home.governorate7")}</MenuItem>
-          <MenuItem value="Governorate 8">{t("home.governorate8")}</MenuItem>
-          <MenuItem value="Governorate 9">{t("home.governorate9")}</MenuItem>
-          <MenuItem value="Governorate 10">{t("home.governorate10")}</MenuItem>
+          <MenuItem value="Beirut">{t("home.governorate1")}</MenuItem>
+          <MenuItem value="Mount Lebanon">{t("home.governorate2")}</MenuItem>
+          <MenuItem value="Baabdat">{t("home.governorate3")}</MenuItem>
+          <MenuItem value="North Lebanon">{t("home.governorate4")}</MenuItem>
+          <MenuItem value="Akkar">{t("home.governorate5")}</MenuItem>
+          <MenuItem value="Baalbek">{t("home.governorate6")}</MenuItem>
+          <MenuItem value="Beqaa">{t("home.governorate7")}</MenuItem>
+          <MenuItem value="Tyre">{t("home.governorate8")}</MenuItem>
+          <MenuItem value="Saida">{t("home.governorate9")}</MenuItem>
+          <MenuItem value="Nabatiyeh">{t("home.governorate10")}</MenuItem>
         </TextField>
         <TextField
           label={t("home.city")}
