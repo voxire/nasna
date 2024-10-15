@@ -87,10 +87,10 @@ function App() {
     <ThemeProvider theme={theme}>
       <I18nextProvider i18n={i18next}>
         <ToastContainer
-          position="top-right"
-          autoClose={3000}
+          position="top-left"
+          autoClose={100000}
           limit={1}
-          style={{ maxWidth: "400px", left: "6%", top: "10px", margin: "0" }}
+          style={{ maxWidth: "400px", right: "20px", top: "10px", margin: "0" }}
         />
         <CssBaseline />
         {/* <AuthProvider> */}
