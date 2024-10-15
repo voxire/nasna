@@ -12,6 +12,7 @@ import Header from "./Components/Header";
 import { I18nextProvider } from "react-i18next";
 import i18next from "./services/i18next";
 import Footer from "./Components/Footer";
+import Public from "./Layout/Public";
 
 // Lazy load components
 const Submissions = lazy(() => import("./Screens/Submissions"));
@@ -91,58 +92,76 @@ function App() {
         <CssBaseline />
         {/* <AuthProvider> */}
         <Router>
-          <Header />
-          <div
-            style={{
-              backgroundColor: "#FAFAFA",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <div
-              style={{
-                maxWidth: "1200px",
-                width: "100%",
-              }}
-            >
-              <Suspense
-                fallback={
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      minHeight: "80vh",
-                    }}
-                  >
-                    <CircularProgress color="secondary" />
-                  </Box>
-                }
+          <Suspense
+            fallback={
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  minHeight: "80vh",
+                }}
               >
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/confirmation" element={<Confirmation />} />
-                  <Route
-                    path="/submissions"
-                    element={
-                      <PrivateRoute>
-                        <Submissions />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route path="/about" element={<About />} />
+                <CircularProgress color="primary" />
+              </Box>
+            }
+          >
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <Public>
+                    <Home />
+                  </Public>
+                }
+              />
+              <Route
+                path="/confirmation"
+                element={
+                  <Public>
+                    <Confirmation />
+                  </Public>
+                }
+              />
+              <Route
+                path="/submissions"
+                element={
+                  <PrivateRoute>
+                    <Submissions />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/about"
+                element={
+                  <Public>
+                    <About />
+                  </Public>
+                }
+              />
 
-                  {/* Ignore the two below */}
-                  <Route path="/sign-in" element={<SignIn />} />
+              {/* Ignore the two below */}
+              <Route path="/sign-in" element={<SignIn />} />
 
-                  <Route path="*" element={<Home />} />
-                </Routes>
-              </Suspense>
-            </div>
-          </div>
-
-          <Footer />
+              <Route
+                path="*"
+                element={
+                  <Public>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        minHeight: "87.8vh",
+                      }}
+                    >
+                      <h1>Page Not Found</h1>
+                    </div>
+                  </Public>
+                }
+              />
+            </Routes>
+          </Suspense>
         </Router>
         {/* </AuthProvider> */}
       </I18nextProvider>

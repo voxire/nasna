@@ -9,3 +9,8 @@
   -moz-osx-font-smoothing: grayscale;
   background-color: #fafafa;
 }
+
+* {
+  padding: 0;
+  margin: 0;
+}

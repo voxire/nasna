@@ -142,6 +142,7 @@ function Home() {
           fullWidth
           margin="normal"
           type="tel"
+          placeholder="eg. 78874095"
         />
 
         <TextField

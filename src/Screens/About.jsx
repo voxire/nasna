@@ -1,30 +1,49 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { Box, Typography, Container } from "@mui/material";
 
 function About() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+
   return (
-    <div>
-      <h1>{t("about.title.aboutUs")}</h1>
-      <p className="about-description">
+    <Container
+      component="section"
+      maxWidth="lg"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        py: 3, // Padding on the y-axis
+        minHeight: "85dvh",
+      }}
+    >
+      <Typography variant="h4" gutterBottom>
+        {t("about.title.aboutUs")}
+      </Typography>
+      <Typography variant="body1" paragraph>
         {t("about.description")}
-      </p>
+      </Typography>
 
-      <h1>{t("about.title.mission")}</h1>
-      <p className="about-mission">
+      <Typography variant="h4" gutterBottom>
+        {t("about.title.mission")}
+      </Typography>
+      <Typography variant="body1" paragraph>
         {t("about.mission")}
-      </p>
+      </Typography>
 
-      <h1>{t("about.title.vision")}</h1>
-      <p className="about-vision">
+      <Typography variant="h4" gutterBottom>
+        {t("about.title.vision")}
+      </Typography>
+      <Typography variant="body1" paragraph>
         {t("about.vision")}
-      </p>
+      </Typography>
 
-       <h1>{t("about.title.joinUs")}</h1>
-      <p className="about-join">
+      <Typography variant="h4" gutterBottom>
+        {t("about.title.joinUs")}
+      </Typography>
+      <Typography variant="body1" paragraph>
         {t("about.joinUs")}
-      </p>
-    </div>
+      </Typography>
+    </Container>
   );
 }
 
