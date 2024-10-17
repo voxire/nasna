@@ -16,7 +16,7 @@ function Public({ children }) {
       >
         <div
           style={{
-            maxWidth: "1200px",
+            maxWidth: "1500px",
             width: "100%",
           }}
         >

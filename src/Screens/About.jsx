@@ -1,49 +1,55 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Box, Typography, Container } from "@mui/material";
+import { Box, Typography, Link } from "@mui/material";
 
 function About() {
   const { t } = useTranslation();
 
   return (
-    <Container
+    <Box
       component="section"
-      maxWidth="lg"
       sx={{
+        width: "100vw", 
+        minHeight: "10vh", 
+        backgroundImage: 'url("/public/nabatiye.jpg")', 
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        position: "relative",
         display: "flex",
-        flexDirection: "column",
-        py: 3,
-        minHeight: "86dvh",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#fff",
       }}
     >
-      <Typography variant="h4" gutterBottom>
-        {t("about.title.aboutUs")}
-      </Typography>
-      <Typography variant="body1" paragraph>
-        {t("about.description")}
-      </Typography>
+      <Box
+        sx={{
+          position: "absolute",
+          inset: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.5)", 
+        }}
+      />
 
-      <Typography variant="h4" gutterBottom>
-        {t("about.title.mission")}
-      </Typography>
-      <Typography variant="body1" paragraph>
-        {t("about.mission")}
-      </Typography>
+      <Box
+        sx={{
+          position: "relative",
+          zIndex: 1,
+          textAlign: "center",
+          p: 4,
+        }}
+      >
+        <Typography variant="h3" gutterBottom>
+          {t("about.title.aboutUs")}
+        </Typography>
 
-      <Typography variant="h4" gutterBottom>
-        {t("about.title.vision")}
-      </Typography>
-      <Typography variant="body1" paragraph>
-        {t("about.vision")}
-      </Typography>
-
-      <Typography variant="h4" gutterBottom>
-        {t("about.title.joinUs")}
-      </Typography>
-      <Typography variant="body1" paragraph>
-        {t("about.joinUs")}
-      </Typography>
-    </Container>
+        <Typography variant="body1" paragraph>
+          <Link href="/" color="inherit" underline="hover">
+            {t("home")}
+          </Link>{" "}
+          / {t("about.title.aboutUs")}
+        </Typography>
+      </Box>
+    </Box>
   );
 }
 

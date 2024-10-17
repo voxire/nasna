@@ -40,7 +40,9 @@ function Header() {
     console.log("Language changed to: " + lng);
     setAnchorEl(null);
   };
-
+  const handleClickAbout = () => {
+    window.location.href = '/about'; 
+  };
   return (
     <AppBar
       position="sticky"
@@ -62,7 +64,8 @@ function Header() {
             alt="Nasna logo"
             width="140px"
             height="100%"
-            style={{ margin: "0px" }}
+            style={{ margin: "0px" , cursor: 'pointer' }}
+            onClick={handleClickAbout}
           />
         </Typography>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
