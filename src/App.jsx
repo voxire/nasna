@@ -30,48 +30,6 @@ const theme = createTheme({
     },
   },
   components: {
-    // MuiOutlinedInput: {
-    //   styleOverrides: {
-    //     root: {
-    //       "& fieldset": {
-    //         borderColor: "white",
-    //       },
-    //       "&:hover fieldset": {
-    //         borderColor: "#F9E400 !important",
-    //       },
-    //       "&.Mui-focused fieldset": {
-    //         borderColor: "FAFAFA !important",
-    //       },
-    //     },
-    //     input: {
-    //       color: "white",
-    //     },
-    //   },
-    // },
-    // MuiInputLabel: {
-    //   styleOverrides: {
-    //     root: {
-    //       color: "white",
-    //       "&.Mui-focused": {
-    //         color: "white",
-    //       },
-    //     },
-    //   },
-    // },
-    // MuiInputAdornment: {
-    //   styleOverrides: {
-    //     root: {
-    //       color: "#F9E400",
-    //     },
-    //   },
-    // },
-    // MuiSvgIcon: {
-    //   styleOverrides: {
-    //     root: {
-    //       color: "#F9E400 !important",
-    //     },
-    //   },
-    // },
     MuiTableCell: {
       styleOverrides: {
         root: {
