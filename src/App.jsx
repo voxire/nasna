@@ -1,132 +1,56 @@
-import { Suspense, lazy } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { CssBaseline, CircularProgress, Box } from "@mui/material";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-
+import React, { Suspense, lazy } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { CircularProgress, Box } from "@mui/material";
 import PrivateRoute from "./Components/PrivateRoute";
-// import { AuthProvider } from "./context/AuthContext";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-import { I18nextProvider } from "react-i18next";
-import i18next from "./services/i18next";
 import Public from "./Layout/Public";
-
-// Lazy load components
-const Submissions = lazy(() => import("./Screens/Submissions"));
-const Home = lazy(() => import("./Screens/Home"));
-const SignIn = lazy(() => import("./Components/SignIn"));
-const Confirmation = lazy(() => import("./Screens/Confirmation"));
-const About = lazy(() => import("./Screens/About"));
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#12a89d",
-      contrastText: "#FFFFFF",
-    },
-    secondary: {
-      main: "#AEDFF7",
-    },
-  },
-  components: {
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          borderBottom: "1px solid #424242",
-        },
-      },
-    },
-  },
-});
+import ScrollToTop from "./Components/ScrollToTop";
+import PublicRoutes from "./Routes/PublicRoutes";
+import AuthRoutes from "./Routes/AuthRoutes";
+import AdminRoutes from "./Routes/AdminRoutes";
+import NotFound from "./Components/NotFound/NotFound";
+import NGORoutes from "./Routes/NGORoutes";
 
 function App() {
+  const location = useLocation();
+
   return (
-    <ThemeProvider theme={theme}>
-      <I18nextProvider i18n={i18next}>
-        <ToastContainer
-          position="top-left"
-          autoClose={100000}
-          limit={1}
-          style={{ maxWidth: "400px", right: "20px", top: "10px", margin: "0" }}
-        />
-        <CssBaseline />
-        {/* <AuthProvider> */}
-        <Router>
-          <Suspense
-            fallback={
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  minHeight: "80vh",
-                }}
-              >
-                <CircularProgress color="primary" />
-              </Box>
-            }
+    <React.Fragment>
+      <ScrollToTop />
+      <Suspense
+        fallback={
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "80vh",
+            }}
           >
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <Public>
-                    <Home />
-                  </Public>
-                }
-              />
-              <Route
-                path="/confirmation"
-                element={
-                  <Public>
-                    <Confirmation />
-                  </Public>
-                }
-              />
-              <Route
-                path="/submissions"
-                element={
-                  <PrivateRoute>
-                    <Submissions />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/about"
-                element={
-                  <Public>
-                    <About />
-                  </Public>
-                }
-              />
+            <CircularProgress color="primary" />
+          </Box>
+        }
+      >
+        <Routes key={location.pathname} location={location}>
+          {PublicRoutes.map((route, index) => (
+            <Route key={index} path={route.path} element={route.element} />
+          ))}
 
-              {/* Ignore the two below */}
-              <Route path="/sign-in" element={<SignIn />} />
+          {AuthRoutes.map((route, index) => (
+            <Route key={index} path={route.path} element={route.element} />
+          ))}
 
-              <Route
-                path="*"
-                element={
-                  <Public>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        minHeight: "87.8vh",
-                      }}
-                    >
-                      <h1>Page Not Found</h1>
-                    </div>
-                  </Public>
-                }
-              />
-            </Routes>
-          </Suspense>
-        </Router>
-        {/* </AuthProvider> */}
-      </I18nextProvider>
-    </ThemeProvider>
+          {AdminRoutes.map((route, index) => (
+            <Route key={index} path={route.path} element={route.element} />
+          ))}
+
+          {NGORoutes.map((route, index) => (
+            <Route key={index} path={route.path} element={route.element} />
+          ))}
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </React.Fragment>
   );
 }
 

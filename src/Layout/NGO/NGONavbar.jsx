@@ -8,13 +8,13 @@ import {
   MenuItem,
   IconButton,
 } from "@mui/material";
-import { auth } from "../firebase";
+import { auth } from "../../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   // faInfoCircle,
   faLanguage,
 } from "@fortawesome/free-solid-svg-icons";
-import { selectLanguage } from "../services/i18next";
+import { selectLanguage } from "../../services/i18next";
 import { useNavigate } from "react-router-dom";
 
 function Header() {

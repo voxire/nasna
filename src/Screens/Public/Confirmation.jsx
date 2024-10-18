@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import Lottie from "lottie-react";
-import animationData from "../../public/animation/Nasna.json"; // Adjust the path as needed
+import animationData from "../../../public/animation/Nasna.json"; // Adjust the path as needed
 
 function Confirmation() {
   const { t } = useTranslation();

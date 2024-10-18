@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { db } from "../firebase";
+import { db } from "../../firebase";
 import {
   TextField,
   Button,
@@ -8,11 +8,14 @@ import {
   MenuItem,
   Checkbox,
   FormControlLabel,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Timestamp } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import NasnaSnackBar from "../../Components/NasnaSnackBar";
 
 function Home() {
   const { t, i18n } = useTranslation();
@@ -43,9 +46,27 @@ function Home() {
 
   const [numberOfPeopleInHousehold, setNumberOfPeopleInHousehold] = useState(0);
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
   const navigate = useNavigate();
 
+  const getTotalAgeGroupCount = () => {
+    return Object.values(ageRanges).reduce(
+      (acc, count) => acc + Number(count),
+      0
+    );
+  };
+
   const handleAddMember = async () => {
+    const totalAgeGroupCount = getTotalAgeGroupCount();
+
+    if (totalAgeGroupCount > numberOfPeopleInHousehold) {
+      toast(t("home.toast.invalidNumberOfPeople"), { type: "error" });
+      return;
+    }
+
     if (
       fullName &&
       phoneNumber &&
@@ -92,7 +113,9 @@ function Home() {
         toast(t("home.toast.consentRequired"), { type: "error" });
       }
     } else {
-      toast(t("home.toast.fillRequiredFields"), { type: "error" });
+      setSnackbarMessage(t("home.toast.fillRequiredFields"));
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
@@ -281,7 +304,9 @@ function Home() {
             ) {
               setPage(2);
             } else {
-              toast(t("home.toast.fillRequiredFields"), { type: "error" });
+              setSnackbarMessage(t("home.toast.fillRequiredFields"));
+              setSnackbarSeverity("error");
+              setSnackbarOpen(true);
             }
           }}
           variant="contained"
@@ -479,6 +504,12 @@ function Home() {
           }}
         />
       </Box>
+      <NasnaSnackBar
+        open={snackbarOpen}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
+        onClose={() => setSnackbarOpen(false)}
+      />
       {page === 1 ? pageOne() : pageTwo()}
     </Box>
   );

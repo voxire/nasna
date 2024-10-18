@@ -68,7 +68,7 @@
     "low": "Low"
   },
 
-  "confirmation" :{
+  "confirmation": {
     "thankYou": "Thank you for submitting your information!",
     "submissionRecieved": "Your submission has been received and will be reviewed by our team.",
     "appreciation": "We appreciate your trust in us and will do our best to connect you with the support you need."
@@ -85,5 +85,7 @@
     "mission": "Our mission is to provide a platform that connects those in need with government and NGO assistance. We aim to ensure that support like food, shelter, and medical supplies reaches those who need it most.",
     "vision": "Our vision is to create a world where everyone has access to the support they need to thrive. We believe that by connecting those in need with the right resources, we can make a difference in the lives of people around the world.",
     "joinUs": "If you are an NGO looking to reach those in need or an individual seeking assistance, Nasna is here to help. Together, we can foster a community of support and resilience during these challenging times. Thank you for being a part of our mission to connect and uplift those affected by the crisis in Lebanon."
-  }
+  },
+
+  "NotFound": "Page Not Found"
 }

@@ -19,8 +19,8 @@ export const resources = {
 
 i18next.use(initReactI18next).init({
   resources,
-  lng: "en",
-  fallbackLng: "fr",
+  lng: "ar",
+  fallbackLng: "en",
   compatibilityJSON: "v3",
   interpolation: {
     escapeValue: false,
@@ -32,8 +32,8 @@ export const selectLanguage = (language) => {
     i18next.changeLanguage(language);
     localStorage.setItem("language", language);
   } else {
-    i18next.changeLanguage("en");
-    localStorage.setItem("language", "en");
+    i18next.changeLanguage("ar");
+    localStorage.setItem("language", "ar");
   }
 };
 
