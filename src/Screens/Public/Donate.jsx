@@ -80,7 +80,7 @@ function Donate() {
       sx={{
         p: 4,
         textAlign: "center",
-        width: "1200px",
+        maxWidth: "1200px",
         margin: "0 auto",
         minHeight: "80vh",
         display: "flex",

@@ -12,22 +12,39 @@ import {
   Box,
   Button,
 } from "@mui/material";
+import { auth } from "../../firebase"; // Import Firebase auth
 
 function Submissions() {
   const [members, setMembers] = useState([]);
+  const [isVerified, setIsVerified] = useState(true);
+  const userUid = auth.currentUser?.uid;
 
   useEffect(() => {
     const fetchMembers = async () => {
-      const membersCollection = await db.collection("submissions").get();
-      const membersData = membersCollection.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setMembers(membersData);
+      if (!userUid) {
+        return; // Exit if user is not logged in
+      }
+
+      // Check if the NGO is validated
+      const memberDoc = await db.collection("members").doc(userUid).get();
+      if (memberDoc.exists) {
+        const memberData = memberDoc.data();
+        console.log(memberDoc.data());
+        setIsVerified(memberData.validated);
+
+        if (memberData.validated) {
+          const membersCollection = await db.collection("submissions").get();
+          const membersData = membersCollection.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setMembers(membersData);
+        }
+      }
     };
 
     fetchMembers();
-  }, []);
+  }, [userUid]);
 
   const downloadCSV = () => {
     const csvRows = [];
@@ -122,28 +139,38 @@ function Submissions() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {members.map((member) => (
-              <TableRow key={member.id}>
-                <TableCell>{member.fullName}</TableCell>
-                <TableCell>{member.phoneNumber}</TableCell>
-                <TableCell>{member.nationalID}</TableCell>
-                <TableCell>{member.emailAddress}</TableCell>
-                <TableCell>{member.gender}</TableCell>
-                <TableCell>{member.currentGovernorate}</TableCell>
-                <TableCell>{member.previousGovernorate}</TableCell>
-                <TableCell>{member.street}</TableCell>
-                <TableCell>{member.building}</TableCell>
-                <TableCell>{member.floor}</TableCell>
-                <TableCell>{JSON.stringify(member.ageRanges)}</TableCell>{" "}
-                <TableCell>{member.specialNeeds.join(", ")}</TableCell>{" "}
-                <TableCell>{member.needs.join(", ")}</TableCell>{" "}
-                <TableCell>{member.aidUrgency}</TableCell>
-                <TableCell>{member.comments}</TableCell>
-                <TableCell>
-                  {member.registrationDate?.toDate().toLocaleDateString()}
-                </TableCell>{" "}
+            {isVerified ? (
+              members.map((member) => (
+                <TableRow key={member.id}>
+                  <TableCell>{member.fullName}</TableCell>
+                  <TableCell>{member.phoneNumber}</TableCell>
+                  <TableCell>{member.nationalID}</TableCell>
+                  <TableCell>{member.emailAddress}</TableCell>
+                  <TableCell>{member.gender}</TableCell>
+                  <TableCell>{member.currentGovernorate}</TableCell>
+                  <TableCell>{member.previousGovernorate}</TableCell>
+                  <TableCell>{member.street}</TableCell>
+                  <TableCell>{member.building}</TableCell>
+                  <TableCell>{member.floor}</TableCell>
+                  <TableCell>{JSON.stringify(member.ageRanges)}</TableCell>
+                  <TableCell>{member.specialNeeds.join(", ")}</TableCell>
+                  <TableCell>{member.needs.join(", ")}</TableCell>
+                  <TableCell>{member.aidUrgency}</TableCell>
+                  <TableCell>{member.comments}</TableCell>
+                  <TableCell>
+                    {member.registrationDate?.toDate().toLocaleDateString()}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={16} align="center">
+                  <Typography variant="body1">
+                    Your account is being verified. Please check back later.
+                  </Typography>
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>

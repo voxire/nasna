@@ -6,6 +6,7 @@ const Dashboard = React.lazy(() => import("../Screens/Admin/Dashboard"));
 const AdminSubmissions = React.lazy(() =>
   import("../Screens/Admin/AdminSubmissions")
 );
+const Members = React.lazy(() => import("../Screens/Admin/Members"));
 
 const AdminRoutes = [
   {
@@ -21,6 +22,14 @@ const AdminRoutes = [
     element: (
       <Admin>
         <AdminSubmissions />
+      </Admin>
+    ),
+  },
+  {
+    path: "/manage/ngos",
+    element: (
+      <Admin>
+        <Members />
       </Admin>
     ),
   },

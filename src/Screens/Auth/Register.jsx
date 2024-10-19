@@ -8,9 +8,11 @@ import {
   Checkbox,
   Typography,
 } from "@mui/material";
-import NasnaSnackBar from "../../Components/NasnaSnackBar";
+import NasnaSnackBar from "../../components/NasnaSnackBar";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     contactPersonName: "",
@@ -103,18 +105,21 @@ function Register() {
         formData.password
       );
 
-      await db.collection("submissions").add({
-        uid: userCredential.user.uid,
-        ...formData,
-        isAdmin: false,
-        validated: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      await db
+        .collection("members")
+        .doc(userCredential.user.uid)
+        .set({
+          uid: userCredential.user.uid,
+          ...formData,
+          isAdmin: false,
+          validated: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
 
       setSnackbar({
         open: true,
-        message: "Registration successful! Welcome to the NGO platform.",
+        message: "Registration successful!",
         severity: "success",
       });
 
@@ -134,6 +139,8 @@ function Register() {
         consentGiven: false,
         socialMediaLinks: [""],
       });
+
+      navigate("/ngo/submissions");
     } catch (error) {
       console.error("Error registering NGO: ", error);
       setSnackbar({
