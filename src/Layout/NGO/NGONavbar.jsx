@@ -10,17 +10,13 @@ import {
 } from "@mui/material";
 import { auth } from "../../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  // faInfoCircle,
-  faLanguage,
-} from "@fortawesome/free-solid-svg-icons";
+import { faLanguage } from "@fortawesome/free-solid-svg-icons";
 import { selectLanguage } from "../../services/i18next";
 import { useNavigate } from "react-router-dom";
 
 function Header() {
   const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  const isMobile = false;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,8 +39,20 @@ function Header() {
     console.log("Language changed to: " + lng);
     setAnchorEl(null);
   };
+
   const handleClickAbout = () => {
     window.location.href = "/";
+  };
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      console.log("User logged out successfully");
+      // Optionally, you can navigate to the login page after logout
+      navigate("/auth/login");
+    } catch (error) {
+      console.error("Error logging out: ", error);
+    }
   };
 
   return (
@@ -53,7 +61,6 @@ function Header() {
       sx={{
         backgroundColor: "#f9f9f9",
         color: "#12a89d",
-        // boxShadow: "1px 1px 5px #ccc",
       }}
     >
       <Toolbar>
@@ -77,14 +84,15 @@ function Header() {
           />
         </Typography>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {/* <IconButton
-            onClick={() => {
-              navigate("/about");
-            }}
-            color="inherit"
-          >
-            <FontAwesomeIcon icon={faInfoCircle} style={{ color: "#12a89d" }} />
-          </IconButton> */}
+          {user && (
+            <Button
+              color="inherit"
+              onClick={handleLogout}
+              sx={{ marginLeft: "10px" }}
+            >
+              Logout
+            </Button>
+          )}
           <IconButton
             onClick={(event) => setAnchorEl(event.currentTarget)}
             color="inherit"

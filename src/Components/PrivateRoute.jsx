@@ -1,12 +1,39 @@
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { auth } from "../firebase";
+import { Box, CircularProgress } from "@mui/material";
 
 function PrivateRoute({ children }) {
-  // const { currentUser } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  // if (!currentUser) {
-  //   return <Navigate to="/sign-in" />;
-  // }
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
+
+  if (!currentUser) {
+    return <Navigate to="/auth/login" />;
+  }
 
   return children;
 }

@@ -23,7 +23,7 @@ function Login() {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/ngo/dashboard");
+      navigate("/ngo/submissions");
     } catch (error) {
       handleFirebaseError(error);
     } finally {

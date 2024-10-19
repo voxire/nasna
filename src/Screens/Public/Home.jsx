@@ -86,7 +86,7 @@ function Home() {
       aidUrgency
     ) {
       if (consentGiven) {
-        await db.collection("members").add({
+        await db.collection("submissions").add({
           fullName,
           phoneNumber,
           nationalID,

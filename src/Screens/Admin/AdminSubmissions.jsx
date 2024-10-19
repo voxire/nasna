@@ -33,7 +33,7 @@ function AdminSubmissions() {
 
   useEffect(() => {
     const fetchMembers = async () => {
-      const membersCollection = await db.collection("members").get();
+      const membersCollection = await db.collection("submissions").get();
       const membersData = membersCollection.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -63,7 +63,7 @@ function AdminSubmissions() {
 
   const confirmDelete = async () => {
     try {
-      await db.collection("members").doc(memberToDelete).delete();
+      await db.collection("submissions").doc(memberToDelete).delete();
       setMembers(members.filter((member) => member.id !== memberToDelete));
       setConfirmDeleteOpen(false);
     } catch (err) {
@@ -74,7 +74,7 @@ function AdminSubmissions() {
   const handleSaveEdit = async () => {
     try {
       await db
-        .collection("members")
+        .collection()
         .doc(editMember.id)
         .update({
           ...editMember,

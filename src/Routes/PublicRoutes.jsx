@@ -5,6 +5,7 @@ import Public from "../Layout/Public";
 const Home = lazy(() => import("../Screens/Public/Home"));
 const About = lazy(() => import("../Screens/Public/About"));
 const Confirmation = lazy(() => import("../Screens/Public/Confirmation"));
+const Donate = lazy(() => import("../Screens/Public/Donate"));
 
 const PublicRoutes = [
   {
@@ -28,6 +29,14 @@ const PublicRoutes = [
     element: (
       <Public>
         <Confirmation />
+      </Public>
+    ),
+  },
+  {
+    path: "/donate",
+    element: (
+      <Public>
+        <Donate />
       </Public>
     ),
   },

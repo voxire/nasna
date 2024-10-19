@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, Container, Link, Stack } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -7,9 +7,21 @@ import {
   faFileAlt,
   faSignInAlt,
   faHandHoldingHeart,
+  faChartBar,
 } from "@fortawesome/free-solid-svg-icons";
+import { auth } from "../firebase";
 
 function Footer() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <Box
       component="footer"
@@ -36,15 +48,22 @@ function Footer() {
             <FontAwesomeIcon icon={faFileAlt} style={{ marginRight: 8 }} />
             Policy
           </Link>
-          <Link href="/auth/login" color="inherit" underline="none">
-            <FontAwesomeIcon icon={faSignInAlt} style={{ marginRight: 8 }} />
-            NGO Login
-          </Link>
+          {user?.email ? (
+            <Link href="/ngo/submissions" color="inherit" underline="none">
+              <FontAwesomeIcon icon={faChartBar} style={{ marginRight: 8 }} />
+              Dashboard
+            </Link>
+          ) : (
+            <Link href="/auth/login" color="inherit" underline="none">
+              <FontAwesomeIcon icon={faSignInAlt} style={{ marginRight: 8 }} />
+              NGO Login
+            </Link>
+          )}
           <Link href="/feedback" color="inherit" underline="none">
             <FontAwesomeIcon icon={faCommentDots} style={{ marginRight: 8 }} />
             Feedback
           </Link>
-          <Link href="/feedback" color="inherit" underline="none">
+          <Link href="/donate" color="inherit" underline="none">
             <FontAwesomeIcon
               icon={faHandHoldingHeart}
               style={{ marginRight: 8 }}

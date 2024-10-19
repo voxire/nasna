@@ -21,7 +21,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const submissionsSnapshot = await db.collection("members").get();
+        const submissionsSnapshot = await db.collection("submissions").get();
         setsubmissions(submissionsSnapshot.size);
 
         const businessesSnapshot = await db.collection("businesses").get();

@@ -18,7 +18,7 @@ function Submissions() {
 
   useEffect(() => {
     const fetchMembers = async () => {
-      const membersCollection = await db.collection("members").get();
+      const membersCollection = await db.collection("submissions").get();
       const membersData = membersCollection.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
