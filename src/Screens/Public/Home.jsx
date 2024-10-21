@@ -60,6 +60,9 @@ function Home() {
   };
 
   const handleAddMember = async () => {
+    const trimmedPhoneNumber = phoneNumber.trim();
+    const trimmedNationalID = nationalID.trim();
+
     const totalAgeGroupCount = getTotalAgeGroupCount();
 
     if (totalAgeGroupCount > numberOfPeopleInHousehold) {
@@ -69,8 +72,8 @@ function Home() {
 
     if (
       fullName &&
-      phoneNumber &&
-      nationalID &&
+      trimmedPhoneNumber &&
+      trimmedNationalID &&
       currentGovernorate &&
       previousGovernorate &&
       street &&
@@ -86,29 +89,48 @@ function Home() {
       aidUrgency
     ) {
       if (consentGiven) {
-        await db.collection("submissions").add({
-          fullName,
-          phoneNumber,
-          nationalID,
-          emailAddress,
-          gender,
-          currentGovernorate,
-          previousGovernorate,
-          city,
-          street,
-          building,
-          floor,
-          ageRanges,
-          specialNeeds,
-          needs,
-          aidUrgency,
-          consentGiven,
-          comments,
-          registrationDate: Timestamp.fromDate(new Date()),
-        });
+        try {
+          const phoneQuerySnapshot = await db
+            .collection("submissions")
+            .where("phoneNumber", "==", trimmedPhoneNumber)
+            .get();
+          const nationalIDQuerySnapshot = await db
+            .collection("submissions")
+            .where("nationalID", "==", trimmedNationalID)
+            .get();
 
-        toast(t("home.toast.memberAddedSuccess"), { type: "success" });
-        navigate("/confirmation");
+          if (!phoneQuerySnapshot.empty || !nationalIDQuerySnapshot.empty) {
+            toast(t("home.toast.duplicateSubmission"), { type: "error" });
+            return;
+          }
+
+          await db.collection("submissions").add({
+            fullName,
+            phoneNumber: trimmedPhoneNumber,
+            nationalID: trimmedNationalID,
+            emailAddress,
+            gender,
+            currentGovernorate,
+            previousGovernorate,
+            city,
+            street,
+            building,
+            floor,
+            ageRanges,
+            specialNeeds,
+            needs,
+            aidUrgency,
+            consentGiven,
+            comments,
+            registrationDate: Timestamp.fromDate(new Date()),
+          });
+
+          toast(t("home.toast.memberAddedSuccess"), { type: "success" });
+          navigate("/confirmation");
+        } catch (error) {
+          console.error("Error adding member:", error);
+          toast(t("home.toast.errorAddingMember"), { type: "error" });
+        }
       } else {
         toast(t("home.toast.consentRequired"), { type: "error" });
       }
