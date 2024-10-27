@@ -22,7 +22,9 @@ const NGORoutes = [
     path: "/agent/create",
     element: (
       <PrivateRoute>
-        <CreateSubmission />
+        <Private>
+          <CreateSubmission />
+        </Private>
       </PrivateRoute>
     ),
   },

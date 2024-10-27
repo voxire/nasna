@@ -17,8 +17,10 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 function Submissions() {
+  const navigate = useNavigate();
   const [members, setMembers] = useState([]);
   const [filteredMembers, setFilteredMembers] = useState([]);
   const [isVerified, setIsVerified] = useState(true);
@@ -33,7 +35,16 @@ function Submissions() {
 
   useEffect(() => {
     const fetchMembers = async () => {
-      if (!userUid) return;
+      if (!userUid) navigate("/auth/login");
+
+      const role = localStorage.getItem("userRole");
+      if (role !== "member") {
+        if (role === "agent") {
+          navigate("/agent/create");
+          return;
+        }
+        navigate("/");
+      }
 
       const memberDoc = await db.collection("members").doc(userUid).get();
       if (memberDoc.exists) {

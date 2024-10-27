@@ -1,4 +1,3 @@
-// src/userSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../firebase';
@@ -11,6 +10,7 @@ export const loginUser = createAsyncThunk(
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const uid = userCredential.user.uid;
 
+
             const userDocRef = doc(db, 'members', uid);
             const userDoc = await getDoc(userDocRef);
 
@@ -18,7 +18,12 @@ export const loginUser = createAsyncThunk(
                 throw new Error('User data not found in members collection.');
             }
 
-            return { uid, ...userDoc.data() };
+            const userData = userDoc.data();
+            const role = userData.role;
+
+            localStorage.setItem('userRole', role);
+
+            return { uid, role, ...userData };
         } catch (error) {
             return rejectWithValue(error.message || error.code);
         }
@@ -36,7 +41,10 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         logout: (state) => {
-            state = initialState;
+            state.user = null;
+            state.loading = false;
+            state.error = null;
+            localStorage.removeItem('userRole');
         },
     },
     extraReducers: (builder) => {

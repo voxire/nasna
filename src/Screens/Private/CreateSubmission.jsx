@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { db, auth } from "../../firebase";
 import {
   Box,
@@ -11,8 +11,10 @@ import {
 } from "@mui/material";
 import { Timestamp } from "firebase/firestore";
 import { useSnackBar } from "../../Components/NasnaSnackBar";
+import { useNavigate } from "react-router-dom";
 
 function CreateSubmission() {
+  const navigate = useNavigate();
   const { showSnackbar } = useSnackBar();
   const [formData, setFormData] = useState({
     fullName: "",
@@ -62,6 +64,21 @@ function CreateSubmission() {
       [name]: checked,
     }));
   };
+
+  useEffect(() => {
+    const checkRole = () => {
+      const role = localStorage.getItem("userRole");
+      if (role !== "agent") {
+        if (role === "member") {
+          navigate("/ngo/submissions");
+          return;
+        }
+        navigate("/");
+      }
+    };
+
+    checkRole();
+  }, []);
 
   const handleAddMember = async (e) => {
     e.preventDefault();
