@@ -8,6 +8,7 @@ import {
   faSignInAlt,
   faHandHoldingHeart,
   faChartBar,
+  faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { auth } from "../firebase";
 
@@ -56,8 +57,21 @@ function Footer() {
           ) : (
             <Link href="/auth/login" color="inherit" underline="none">
               <FontAwesomeIcon icon={faSignInAlt} style={{ marginRight: 8 }} />
-              NGO Login
+              Sign In
             </Link>
+          )}
+
+          {!user?.email && (
+            <>
+              <Link href="/auth/register" color="inherit" underline="none">
+                <FontAwesomeIcon icon={faUserPlus} style={{ marginRight: 8 }} />
+                Register NGO/Initiative
+              </Link>
+              <Link href="/auth/agent" color="inherit" underline="none">
+                <FontAwesomeIcon icon={faUserPlus} style={{ marginRight: 8 }} />
+                Become an agent
+              </Link>
+            </>
           )}
           <Link href="/feedback" color="inherit" underline="none">
             <FontAwesomeIcon icon={faCommentDots} style={{ marginRight: 8 }} />

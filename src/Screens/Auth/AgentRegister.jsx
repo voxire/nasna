@@ -8,25 +8,20 @@ import {
   Checkbox,
   Typography,
 } from "@mui/material";
-import NasnaSnackBar from "../../Components/NasnaSnackBar";
 import { useNavigate } from "react-router-dom";
+import NasnaSnackBar from "../../Components/NasnaSnackBar";
 
-function Register() {
+function AgentRegister() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
-    contactPersonName: "",
     email: "",
     password: "",
     confirmPassword: "",
     phoneNumber: "",
-    areaOfOperation: "",
-    kindOfHelp: "",
-    initiativeOrNgo: "",
-    numberOfVolunteers: "",
-    isOfficiallyRegistered: false,
+    agency: "",
+    role: "agent",
     consentGiven: false,
-    socialMediaLinks: [""],
   });
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({
@@ -48,32 +43,6 @@ function Register() {
     setFormData((prev) => ({
       ...prev,
       [name]: checked,
-    }));
-  };
-
-  const handleSocialMediaChange = (index, value) => {
-    const updatedLinks = [...formData.socialMediaLinks];
-    updatedLinks[index] = value;
-    setFormData((prev) => ({
-      ...prev,
-      socialMediaLinks: updatedLinks,
-    }));
-  };
-
-  const addSocialMediaLink = () => {
-    setFormData((prev) => ({
-      ...prev,
-      socialMediaLinks: [...prev.socialMediaLinks, ""],
-    }));
-  };
-
-  const removeSocialMediaLink = (index) => {
-    const updatedLinks = formData.socialMediaLinks.filter(
-      (_, i) => i !== index
-    );
-    setFormData((prev) => ({
-      ...prev,
-      socialMediaLinks: updatedLinks,
     }));
   };
 
@@ -106,12 +75,12 @@ function Register() {
       );
 
       await db
-        .collection("members")
+        .collection("agents")
         .doc(userCredential.user.uid)
         .set({
           uid: userCredential.user.uid,
           ...formData,
-          isAdmin: false,
+          role: "agent",
           validated: false,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -119,33 +88,28 @@ function Register() {
 
       setSnackbar({
         open: true,
-        message: "Registration successful!",
+        message: "Agent registration successful!",
         severity: "success",
       });
 
       // Reset the form after successful registration
       setFormData({
         name: "",
-        contactPersonName: "",
         email: "",
         password: "",
         confirmPassword: "",
         phoneNumber: "",
-        areaOfOperation: "",
-        kindOfHelp: "",
-        initiativeOrNgo: "",
-        numberOfVolunteers: "",
-        isOfficiallyRegistered: false,
+        agency: "",
+        role: "agent",
         consentGiven: false,
-        socialMediaLinks: [""],
       });
 
-      navigate("/ngo/submissions");
+      navigate("/agent/dashboard");
     } catch (error) {
-      console.error("Error registering NGO: ", error);
+      console.error("Error registering agent: ", error);
       setSnackbar({
         open: true,
-        message: "Error registering NGO. Please try again.",
+        message: "Error registering agent. Please try again.",
         severity: "error",
       });
     } finally {
@@ -170,22 +134,13 @@ function Register() {
       }}
     >
       <Typography variant="h4" component="h1" gutterBottom>
-        Register as an NGO/Initiative
+        Register as an Agent
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
-          label="Organization Name"
+          label="Full Name"
           name="name"
           value={formData.name}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Contact Person Name"
-          name="contactPersonName"
-          value={formData.contactPersonName}
           onChange={handleChange}
           fullWidth
           required
@@ -231,82 +186,14 @@ function Register() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Area of Operation"
-          name="areaOfOperation"
-          value={formData.areaOfOperation}
+          label="Agency/Organization"
+          name="agency"
+          value={formData.agency}
           onChange={handleChange}
           fullWidth
           required
           sx={{ mb: 2 }}
         />
-        <TextField
-          label="Type of Help Offered"
-          name="kindOfHelp"
-          value={formData.kindOfHelp}
-          onChange={handleChange}
-          fullWidth
-          multiline
-          rows={3}
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Initiative or NGO"
-          name="initiativeOrNgo"
-          value={formData.initiativeOrNgo}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Number of Volunteers"
-          name="numberOfVolunteers"
-          type="number"
-          value={formData.numberOfVolunteers}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              name="isOfficiallyRegistered"
-              checked={formData.isOfficiallyRegistered}
-              onChange={handleCheckboxChange}
-            />
-          }
-          label="Is Officially Registered"
-          sx={{ mb: 2 }}
-        />
-        <Typography variant="h6" gutterBottom>
-          Social Media Links
-        </Typography>
-        {formData.socialMediaLinks.map((link, index) => (
-          <Box
-            key={index}
-            sx={{ display: "flex", alignItems: "center", mb: 1 }}
-          >
-            <TextField
-              label={`Link ${index + 1}`}
-              value={link}
-              onChange={(e) => handleSocialMediaChange(index, e.target.value)}
-              fullWidth
-              sx={{ mr: 1 }}
-            />
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => removeSocialMediaLink(index)}
-            >
-              Remove
-            </Button>
-          </Box>
-        ))}
-        <Button onClick={addSocialMediaLink} variant="contained" sx={{ mb: 2 }}>
-          Add Another Link
-        </Button>
         <FormControlLabel
           control={
             <Checkbox
@@ -339,4 +226,4 @@ function Register() {
   );
 }
 
-export default Register;
+export default AgentRegister;

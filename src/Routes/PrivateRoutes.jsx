@@ -2,7 +2,10 @@ import React, { lazy } from "react";
 import PrivateRoute from "../Components/PrivateRoute";
 import NGOContainer from "../Layout/NGO/NGOContainer";
 
-const Submissions = lazy(() => import("../Screens/NGO/Submissions"));
+const Submissions = lazy(() => import("../Screens/Private/Submissions"));
+const CreateSubmission = lazy(() =>
+  import("../Screens/Private/CreateSubmission")
+);
 
 const NGORoutes = [
   {
@@ -12,6 +15,14 @@ const NGORoutes = [
         <NGOContainer>
           <Submissions />
         </NGOContainer>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/agent/create",
+    element: (
+      <PrivateRoute>
+        <CreateSubmission />
       </PrivateRoute>
     ),
   },
