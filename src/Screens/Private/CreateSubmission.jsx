@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { db, auth } from "../../firebase";
+import { auth, db } from "../../firebase";
 import {
   Box,
   TextField,
@@ -9,17 +9,17 @@ import {
   Typography,
   MenuItem,
 } from "@mui/material";
-import { Timestamp } from "firebase/firestore";
-import { useSnackBar } from "../../Components/NasnaSnackBar";
+import { Timestamp, collection, addDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function CreateSubmission() {
   const navigate = useNavigate();
-  const { showSnackbar } = useSnackBar();
+  const { user } = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     phoneNumber: "",
-    nationalID: "",
     emailAddress: "",
     gender: "",
     currentGovernorate: "",
@@ -38,16 +38,39 @@ function CreateSubmission() {
     specialNeeds: [],
     needs: [],
     aidUrgency: "",
-    consentGiven: false,
+    consentGiven: true,
     comments: "",
     numberOfPeopleInHousehold: 0,
   });
-  const [loading, setLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+
+  const userUid = auth.currentUser?.uid;
+
+  useEffect(() => {
+    console.log(user);
+
+    if (!userUid) {
+      navigate("/auth/login");
+    }
+  }, []);
+
+  if (!user?.validated) {
+    return (
+      <Box
+        sx={{
+          minHeight: "70vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f5f5f5",
+          textAlign: "center",
+        }}
+      >
+        <Typography variant="h5">
+          Your account is being verified. Please try again later.
+        </Typography>
+      </Box>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,27 +88,12 @@ function CreateSubmission() {
     }));
   };
 
-  useEffect(() => {
-    const checkRole = () => {
-      const role = localStorage.getItem("userRole");
-      if (role !== "agent") {
-        if (role === "member") {
-          navigate("/ngo/submissions");
-          return;
-        }
-        navigate("/");
-      }
-    };
-
-    checkRole();
-  }, []);
-
   const handleAddMember = async (e) => {
     e.preventDefault();
-
     setLoading(true);
+
     try {
-      await db.collection("submissions").add({
+      await addDoc(collection(db, "submissions"), {
         ...formData,
         registrationDate: Timestamp.fromDate(new Date()),
         createdAt: new Date(),
@@ -93,11 +101,9 @@ function CreateSubmission() {
         agent: auth.currentUser?.uid,
       });
 
-      // Reset the form after successful submission
       setFormData({
         fullName: "",
         phoneNumber: "",
-        nationalID: "",
         emailAddress: "",
         gender: "",
         currentGovernorate: "",
@@ -120,10 +126,8 @@ function CreateSubmission() {
         comments: "",
         numberOfPeopleInHousehold: 0,
       });
-
-      showSnackbar("Submission successful!", "success");
     } catch (error) {
-      showSnackbar("Error creating submission. Please try again.", "error");
+      console.error("Error creating submission:", error);
     } finally {
       setLoading(false);
     }
@@ -158,15 +162,6 @@ function CreateSubmission() {
           label="Phone Number"
           name="phoneNumber"
           value={formData.phoneNumber}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="National ID"
-          name="nationalID"
-          value={formData.nationalID}
           onChange={handleChange}
           fullWidth
           required
@@ -264,6 +259,7 @@ function CreateSubmission() {
             key={range}
             label={`${range} (Number of Members)`}
             name={`ageRanges.${range}`}
+            type="number"
             value={formData.ageRanges[range]}
             onChange={(e) =>
               setFormData((prev) => ({
@@ -272,7 +268,6 @@ function CreateSubmission() {
               }))
             }
             fullWidth
-            type="number"
             sx={{ mb: 2 }}
           />
         ))}

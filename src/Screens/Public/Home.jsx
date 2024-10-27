@@ -25,7 +25,6 @@ function Home() {
   const { t, i18n } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [nationalID, setNationalID] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [gender, setGender] = useState("");
   const [currentGovernorate, setCurrentGovernorate] = useState("");
@@ -62,7 +61,6 @@ function Home() {
 
   const handleAddMember = async () => {
     const trimmedPhoneNumber = phoneNumber.trim();
-    const trimmedNationalID = nationalID.trim();
 
     const totalAgeGroupCount = getTotalAgeGroupCount();
 
@@ -74,7 +72,6 @@ function Home() {
     if (
       fullName &&
       trimmedPhoneNumber &&
-      trimmedNationalID &&
       currentGovernorate &&
       previousGovernorate &&
       street &&
@@ -104,7 +101,6 @@ function Home() {
           await addDoc(collection(db, "submissions"), {
             fullName,
             phoneNumber: trimmedPhoneNumber,
-            nationalID: trimmedNationalID,
             emailAddress,
             gender,
             currentGovernorate,
@@ -181,14 +177,6 @@ function Home() {
           margin="normal"
           type="tel"
           placeholder="eg. 78874095"
-        />
-
-        <TextField
-          label={t("home.nationalID")}
-          value={nationalID}
-          onChange={(e) => setNationalID(e.target.value)}
-          fullWidth
-          margin="normal"
         />
 
         <TextField
@@ -310,7 +298,6 @@ function Home() {
             if (
               fullName &&
               phoneNumber &&
-              nationalID &&
               currentGovernorate &&
               previousGovernorate &&
               street &&

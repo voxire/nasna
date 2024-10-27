@@ -10,7 +10,8 @@ import i18next from "./services/i18next";
 import "./styles/index.scss";
 import { BrowserRouter as Router } from "react-router-dom";
 import { Provider } from "react-redux";
-import store from "./redux/store";
+import store, { persistor } from "./redux/store";
+import { PersistGate } from "redux-persist/integration/react";
 import { NasnaSnackBarProvider } from "./Components/NasnaSnackBar";
 
 const theme = createTheme({
@@ -37,27 +38,29 @@ const theme = createTheme({
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <I18nextProvider i18n={i18next}>
-          <NasnaSnackBarProvider>
-            <ToastContainer
-              position="top-left"
-              autoClose={100000}
-              limit={1}
-              style={{
-                maxWidth: "400px",
-                right: "20px",
-                top: "10px",
-                margin: "0",
-              }}
-            />
-            <CssBaseline />
-            <Router>
-              <App />
-            </Router>
-          </NasnaSnackBarProvider>
-        </I18nextProvider>
-      </ThemeProvider>
+      <PersistGate loading={null} persistor={persistor}>
+        <ThemeProvider theme={theme}>
+          <I18nextProvider i18n={i18next}>
+            <NasnaSnackBarProvider>
+              <ToastContainer
+                position="top-left"
+                autoClose={100000}
+                limit={1}
+                style={{
+                  maxWidth: "400px",
+                  right: "20px",
+                  top: "10px",
+                  margin: "0",
+                }}
+              />
+              <CssBaseline />
+              <Router>
+                <App />
+              </Router>
+            </NasnaSnackBarProvider>
+          </I18nextProvider>
+        </ThemeProvider>
+      </PersistGate>
     </Provider>
   </StrictMode>
 );

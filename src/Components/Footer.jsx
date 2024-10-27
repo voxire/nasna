@@ -59,10 +59,10 @@ function Footer() {
             About Us
           </Link>
 
-          <Link href="/policy" color="inherit" underline="none">
+          {/* <Link href="/policy" color="inherit" underline="none">
             <FontAwesomeIcon icon={faFileAlt} style={{ marginRight: 8 }} />
             Policy
-          </Link>
+          </Link> */}
 
           {user?.email ? (
             <>
@@ -108,14 +108,14 @@ function Footer() {
             <FontAwesomeIcon icon={faCommentDots} style={{ marginRight: 8 }} />
             Feedback
           </Link> */}
-
+          {/* 
           <Link href="/donate" color="inherit" underline="none">
             <FontAwesomeIcon
               icon={faHandHoldingHeart}
               style={{ marginRight: 8 }}
             />
             Donate
-          </Link>
+          </Link> */}
         </Stack>
 
         <div className="FooterBottom">

@@ -70,7 +70,7 @@ function Submissions() {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
     const filtered = members.filter((member) =>
-      [member.fullName, member.phoneNumber, member.nationalID].some((field) =>
+      [member.fullName, member.phoneNumber].some((field) =>
         field.toLowerCase().includes(query)
       )
     );
@@ -107,7 +107,6 @@ function Submissions() {
     const headers = [
       "Full Name",
       "Phone Number",
-      "National ID",
       "Email Address",
       "Gender",
       "Current Governorate",
@@ -128,7 +127,6 @@ function Submissions() {
       const row = [
         member.fullName,
         member.phoneNumber,
-        member.nationalID,
         member.emailAddress,
         member.gender,
         member.currentGovernorate,
@@ -228,7 +226,6 @@ function Submissions() {
             <TableRow>
               <TableCell>Full Name</TableCell>
               <TableCell>Phone Number</TableCell>
-              <TableCell>National ID</TableCell>
               <TableCell>Email Address</TableCell>
               <TableCell>Gender</TableCell>
               <TableCell>Current Governorate</TableCell>
@@ -250,7 +247,6 @@ function Submissions() {
                 <TableRow key={member.id}>
                   <TableCell>{member.fullName}</TableCell>
                   <TableCell>{member.phoneNumber}</TableCell>
-                  <TableCell>{member.nationalID}</TableCell>
                   <TableCell>{member.emailAddress}</TableCell>
                   <TableCell>{member.gender}</TableCell>
                   <TableCell>{member.currentGovernorate}</TableCell>

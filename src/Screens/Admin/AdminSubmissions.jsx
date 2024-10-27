@@ -115,7 +115,6 @@ function AdminSubmissions() {
             <TableRow>
               <TableCell>Full Name</TableCell>
               <TableCell>Phone Number</TableCell>
-              <TableCell>National ID</TableCell>
               <TableCell>Email Address</TableCell>
               <TableCell>Gender</TableCell>
               <TableCell>Current Governorate</TableCell>
@@ -137,7 +136,6 @@ function AdminSubmissions() {
               <TableRow key={member.id}>
                 <TableCell>{member.fullName}</TableCell>
                 <TableCell>{member.phoneNumber}</TableCell>
-                <TableCell>{member.nationalID}</TableCell>
                 <TableCell>{member.emailAddress}</TableCell>
                 <TableCell>{member.gender}</TableCell>
                 <TableCell>{member.currentGovernorate}</TableCell>
@@ -205,15 +203,6 @@ function AdminSubmissions() {
             value={editMember.phoneNumber || ""}
             onChange={(e) =>
               setEditMember({ ...editMember, phoneNumber: e.target.value })
-            }
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="National ID"
-            value={editMember.nationalID || ""}
-            onChange={(e) =>
-              setEditMember({ ...editMember, nationalID: e.target.value })
             }
             fullWidth
             margin="normal"
