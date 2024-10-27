@@ -15,7 +15,7 @@ import { Timestamp } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import NasnaSnackBar from "../../Components/NasnaSnackBar";
+import { useSnackBar } from "../../Components/NasnaSnackBar";
 
 function Home() {
   const { t, i18n } = useTranslation();
@@ -46,11 +46,8 @@ function Home() {
 
   const [numberOfPeopleInHousehold, setNumberOfPeopleInHousehold] = useState(0);
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-
   const navigate = useNavigate();
+  const { showSnackbar } = useSnackBar();
 
   const getTotalAgeGroupCount = () => {
     return Object.values(ageRanges).reduce(
@@ -88,22 +85,22 @@ function Home() {
       needs.length &&
       aidUrgency
     ) {
-      if (consentGiven) {
-        try {
-          const phoneQuerySnapshot = await db
-            .collection("submissions")
-            .where("phoneNumber", "==", trimmedPhoneNumber)
-            .get();
-          const nationalIDQuerySnapshot = await db
-            .collection("submissions")
-            .where("nationalID", "==", trimmedNationalID)
-            .get();
+      try {
+        const phoneQuerySnapshot = await db
+          .collection("submissions")
+          .where("phoneNumber", "==", trimmedPhoneNumber)
+          .get();
 
-          if (!phoneQuerySnapshot.empty || !nationalIDQuerySnapshot.empty) {
-            toast(t("home.toast.duplicateSubmission"), { type: "error" });
-            return;
-          }
+        console.log(phoneQuerySnapshot);
+        const nationalIDQuerySnapshot = await db
+          .collection("submissions")
+          .where("nationalID", "==", trimmedNationalID)
+          .get();
 
+        if (!phoneQuerySnapshot.empty || !nationalIDQuerySnapshot.empty) {
+          showSnackbar(t("home.toast.invalidNumberOfPeople"), "error");
+          return;
+        } else {
           await db.collection("submissions").add({
             fullName,
             phoneNumber: trimmedPhoneNumber,
@@ -120,24 +117,20 @@ function Home() {
             specialNeeds,
             needs,
             aidUrgency,
-            consentGiven,
+            consentGiven: true,
             comments,
             registrationDate: Timestamp.fromDate(new Date()),
+            agent: "",
           });
 
-          toast(t("home.toast.memberAddedSuccess"), { type: "success" });
+          showSnackbar(t("home.toast.duplicateSubmission"), "error");
           navigate("/confirmation");
-        } catch (error) {
-          console.error("Error adding member:", error);
-          toast(t("home.toast.errorAddingMember"), { type: "error" });
         }
-      } else {
-        toast(t("home.toast.consentRequired"), { type: "error" });
+      } catch (error) {
+        showSnackbar(t("home.toast.errorAddingMember"), "error");
       }
     } else {
-      setSnackbarMessage(t("home.toast.fillRequiredFields"));
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      showSnackbar(t("home.toast.fillRequiredFields"), "error");
     }
   };
 
@@ -326,9 +319,7 @@ function Home() {
             ) {
               setPage(2);
             } else {
-              setSnackbarMessage(t("home.toast.fillRequiredFields"));
-              setSnackbarSeverity("error");
-              setSnackbarOpen(true);
+              showSnackbar("Please fill in all required fields.", "error");
             }
           }}
           variant="contained"
@@ -466,15 +457,9 @@ function Home() {
           rows={4}
         />
 
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={consentGiven}
-              onChange={(e) => setConsentGiven(e.target.checked)}
-            />
-          }
-          label={t("home.consent")}
-        />
+        <Typography variant="body2" color="textSecondary">
+          {t("home.consent")}
+        </Typography>
       </Box>
 
       <Box
@@ -526,12 +511,6 @@ function Home() {
           }}
         />
       </Box>
-      <NasnaSnackBar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        onClose={() => setSnackbarOpen(false)}
-      />
       {page === 1 ? pageOne() : pageTwo()}
     </Box>
   );

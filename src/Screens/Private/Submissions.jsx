@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../../firebase";
+import { db, auth } from "../../firebase";
 import {
   Table,
   TableBody,
@@ -11,25 +11,33 @@ import {
   Typography,
   Box,
   Button,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
-import { auth } from "../../firebase"; // Import Firebase auth
 
 function Submissions() {
   const [members, setMembers] = useState([]);
+  const [filteredMembers, setFilteredMembers] = useState([]);
   const [isVerified, setIsVerified] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState({
+    governorate: "",
+    gender: "",
+    urgency: "",
+  });
+
   const userUid = auth.currentUser?.uid;
 
   useEffect(() => {
     const fetchMembers = async () => {
-      if (!userUid) {
-        return; // Exit if user is not logged in
-      }
+      if (!userUid) return;
 
-      // Check if the NGO is validated
       const memberDoc = await db.collection("members").doc(userUid).get();
       if (memberDoc.exists) {
         const memberData = memberDoc.data();
-        console.log(memberDoc.data());
         setIsVerified(memberData.validated);
 
         if (memberData.validated) {
@@ -39,12 +47,49 @@ function Submissions() {
             ...doc.data(),
           }));
           setMembers(membersData);
+          setFilteredMembers(membersData);
         }
       }
     };
 
     fetchMembers();
   }, [userUid]);
+
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    const filtered = members.filter((member) =>
+      [member.fullName, member.phoneNumber, member.nationalID].some((field) =>
+        field.toLowerCase().includes(query)
+      )
+    );
+    setFilteredMembers(filtered);
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilter((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const applyFilters = () => {
+    let filtered = members;
+
+    if (filter.governorate) {
+      filtered = filtered.filter(
+        (member) => member.currentGovernorate === filter.governorate
+      );
+    }
+    if (filter.gender) {
+      filtered = filtered.filter((member) => member.gender === filter.gender);
+    }
+    if (filter.urgency) {
+      filtered = filtered.filter(
+        (member) => member.aidUrgency === filter.urgency
+      );
+    }
+
+    setFilteredMembers(filtered);
+  };
 
   const downloadCSV = () => {
     const csvRows = [];
@@ -68,7 +113,7 @@ function Submissions() {
     ];
     csvRows.push(headers.join(","));
 
-    members.forEach((member) => {
+    filteredMembers.forEach((member) => {
       const row = [
         member.fullName,
         member.phoneNumber,
@@ -97,7 +142,6 @@ function Submissions() {
     const link = document.createElement("a");
     link.setAttribute("href", url);
     link.setAttribute("download", "members_data.csv");
-    link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -108,15 +152,66 @@ function Submissions() {
       <Typography variant="h4" component="h1" gutterBottom>
         Members List
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={downloadCSV}
-        sx={{ mb: 2 }}
-      >
-        Download CSV
-      </Button>
-      <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
+
+      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+        <TextField
+          label="Search"
+          value={searchQuery}
+          onChange={handleSearch}
+          placeholder="Search by name, phone, or ID"
+          fullWidth
+        />
+        <FormControl sx={{ minWidth: 120 }}>
+          <InputLabel>Governorate</InputLabel>
+          <Select
+            name="governorate"
+            value={filter.governorate}
+            onChange={handleFilterChange}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="Beirut">Beirut</MenuItem>
+            <MenuItem value="Mount Lebanon">Mount Lebanon</MenuItem>
+            <MenuItem value="North">North</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl sx={{ minWidth: 120 }}>
+          <InputLabel>Gender</InputLabel>
+          <Select
+            name="gender"
+            value={filter.gender}
+            onChange={handleFilterChange}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="Male">Male</MenuItem>
+            <MenuItem value="Female">Female</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl sx={{ minWidth: 120 }}>
+          <InputLabel>Aid Urgency</InputLabel>
+          <Select
+            name="urgency"
+            value={filter.urgency}
+            onChange={handleFilterChange}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="High">High</MenuItem>
+            <MenuItem value="Medium">Medium</MenuItem>
+            <MenuItem value="Low">Low</MenuItem>
+          </Select>
+        </FormControl>
+
+        <Button variant="contained" onClick={applyFilters}>
+          Apply Filters
+        </Button>
+
+        <Button variant="contained" color="primary" onClick={downloadCSV}>
+          Download CSV
+        </Button>
+      </Box>
+
+      <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
@@ -140,7 +235,7 @@ function Submissions() {
           </TableHead>
           <TableBody>
             {isVerified ? (
-              members.map((member) => (
+              filteredMembers.map((member) => (
                 <TableRow key={member.id}>
                   <TableCell>{member.fullName}</TableCell>
                   <TableCell>{member.phoneNumber}</TableCell>
@@ -165,9 +260,7 @@ function Submissions() {
             ) : (
               <TableRow>
                 <TableCell colSpan={16} align="center">
-                  <Typography variant="body1">
-                    Your account is being verified. Please check back later.
-                  </Typography>
+                  Your account is being verified. Please check back later.
                 </TableCell>
               </TableRow>
             )}

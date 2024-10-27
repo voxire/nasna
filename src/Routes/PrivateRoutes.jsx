@@ -1,6 +1,6 @@
 import React, { lazy } from "react";
 import PrivateRoute from "../Components/PrivateRoute";
-import NGOContainer from "../Layout/NGO/NGOContainer";
+import Private from "../Layout/Private";
 
 const Submissions = lazy(() => import("../Screens/Private/Submissions"));
 const CreateSubmission = lazy(() =>
@@ -12,9 +12,9 @@ const NGORoutes = [
     path: "/ngo/submissions",
     element: (
       <PrivateRoute>
-        <NGOContainer>
+        <Private>
           <Submissions />
-        </NGOContainer>
+        </Private>
       </PrivateRoute>
     ),
   },

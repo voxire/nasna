@@ -8,11 +8,13 @@ import {
   Checkbox,
   Typography,
 } from "@mui/material";
-import NasnaSnackBar from "../../Components/NasnaSnackBar";
 import { useNavigate } from "react-router-dom";
+import { useSnackBar } from "../../Components/NasnaSnackBar";
 
 function Register() {
   const navigate = useNavigate();
+  const { showSnackbar } = useSnackBar();
+
   const [formData, setFormData] = useState({
     name: "",
     contactPersonName: "",
@@ -23,17 +25,14 @@ function Register() {
     areaOfOperation: "",
     kindOfHelp: "",
     initiativeOrNgo: "",
+    role: "member",
     numberOfVolunteers: "",
     isOfficiallyRegistered: false,
     consentGiven: false,
     socialMediaLinks: [""],
   });
+
   const [loading, setLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -81,20 +80,12 @@ function Register() {
     e.preventDefault();
 
     if (!formData.consentGiven) {
-      setSnackbar({
-        open: true,
-        message: "You must give consent to register.",
-        severity: "error",
-      });
+      showSnackbar("You must give consent to register.", "error");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setSnackbar({
-        open: true,
-        message: "Passwords do not match.",
-        severity: "error",
-      });
+      showSnackbar("Passwords do not match.", "error");
       return;
     }
 
@@ -117,13 +108,8 @@ function Register() {
           updatedAt: new Date(),
         });
 
-      setSnackbar({
-        open: true,
-        message: "Registration successful!",
-        severity: "success",
-      });
+      await auth.signOut();
 
-      // Reset the form after successful registration
       setFormData({
         name: "",
         contactPersonName: "",
@@ -134,27 +120,22 @@ function Register() {
         areaOfOperation: "",
         kindOfHelp: "",
         initiativeOrNgo: "",
+        role: "member",
         numberOfVolunteers: "",
         isOfficiallyRegistered: false,
         consentGiven: false,
         socialMediaLinks: [""],
       });
 
-      navigate("/ngo/submissions");
+      showSnackbar("Registration successful! Please log in.", "success");
+
+      navigate("/auth/login");
     } catch (error) {
       console.error("Error registering NGO: ", error);
-      setSnackbar({
-        open: true,
-        message: "Error registering NGO. Please try again.",
-        severity: "error",
-      });
+      showSnackbar("Error registering NGO. Please try again.", "error");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   return (
@@ -329,12 +310,6 @@ function Register() {
           {loading ? "Registering..." : "Register"}
         </Button>
       </form>
-      <NasnaSnackBar
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={handleCloseSnackbar}
-      />
     </Box>
   );
 }

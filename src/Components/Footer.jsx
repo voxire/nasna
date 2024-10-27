@@ -35,7 +35,7 @@ function Footer() {
     >
       <Container>
         <Stack
-          direction={{ xs: "column", sm: "row" }}
+          direction={{ xs: "column", sm: "column", md: "row" }}
           spacing={2}
           justifyContent="center"
           alignItems="center"

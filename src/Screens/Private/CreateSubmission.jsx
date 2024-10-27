@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { db } from "../../firebase";
+import { db, auth } from "../../firebase";
 import {
   Box,
   TextField,
@@ -9,12 +9,11 @@ import {
   Typography,
   MenuItem,
 } from "@mui/material";
-import NasnaSnackBar from "../../Components/NasnaSnackBar";
-import { useNavigate } from "react-router-dom";
 import { Timestamp } from "firebase/firestore";
+import { useSnackBar } from "../../Components/NasnaSnackBar";
 
 function CreateSubmission() {
-  const navigate = useNavigate();
+  const { showSnackbar } = useSnackBar();
   const [formData, setFormData] = useState({
     fullName: "",
     phoneNumber: "",
@@ -67,15 +66,6 @@ function CreateSubmission() {
   const handleAddMember = async (e) => {
     e.preventDefault();
 
-    if (!formData.consentGiven) {
-      setSnackbar({
-        open: true,
-        message: "You must give consent to register.",
-        severity: "error",
-      });
-      return;
-    }
-
     setLoading(true);
     try {
       await db.collection("submissions").add({
@@ -83,12 +73,7 @@ function CreateSubmission() {
         registrationDate: Timestamp.fromDate(new Date()),
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
-
-      setSnackbar({
-        open: true,
-        message: "Submission successful!",
-        severity: "success",
+        agent: auth.currentUser?.uid,
       });
 
       // Reset the form after successful submission
@@ -114,26 +99,17 @@ function CreateSubmission() {
         specialNeeds: [],
         needs: [],
         aidUrgency: "",
-        consentGiven: false,
+        consentGiven: true,
         comments: "",
         numberOfPeopleInHousehold: 0,
       });
 
-      navigate("/agent/dashboard");
+      showSnackbar("Submission successful!", "success");
     } catch (error) {
-      console.error("Error creating submission: ", error);
-      setSnackbar({
-        open: true,
-        message: "Error creating submission. Please try again.",
-        severity: "error",
-      });
+      showSnackbar("Error creating submission. Please try again.", "error");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   return (
@@ -329,12 +305,6 @@ function CreateSubmission() {
           {loading ? "Submitting..." : "Submit"}
         </Button>
       </form>
-      <NasnaSnackBar
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={handleCloseSnackbar}
-      />
     </Box>
   );
 }

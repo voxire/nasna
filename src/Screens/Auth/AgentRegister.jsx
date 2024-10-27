@@ -1,34 +1,26 @@
 import React, { useState } from "react";
 import { db, auth } from "../../firebase";
-import {
-  Box,
-  TextField,
-  Button,
-  FormControlLabel,
-  Checkbox,
-  Typography,
-} from "@mui/material";
+import { Box, TextField, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import NasnaSnackBar from "../../Components/NasnaSnackBar";
+import { useSnackBar } from "../../Components/NasnaSnackBar";
+import { useTranslation } from "react-i18next";
 
 function AgentRegister() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const { showSnackbar } = useSnackBar();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
     phoneNumber: "",
-    agency: "",
+    areaOfOperation: "",
     role: "agent",
-    consentGiven: false,
   });
+
   const [loading, setLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,24 +38,37 @@ function AgentRegister() {
     }));
   };
 
+  const handleSocialMediaChange = (index, value) => {
+    const updatedLinks = [...formData.socialMediaLinks];
+    updatedLinks[index] = value;
+    setFormData((prev) => ({
+      ...prev,
+      socialMediaLinks: updatedLinks,
+    }));
+  };
+
+  const addSocialMediaLink = () => {
+    setFormData((prev) => ({
+      ...prev,
+      socialMediaLinks: [...prev.socialMediaLinks, ""],
+    }));
+  };
+
+  const removeSocialMediaLink = (index) => {
+    const updatedLinks = formData.socialMediaLinks.filter(
+      (_, i) => i !== index
+    );
+    setFormData((prev) => ({
+      ...prev,
+      socialMediaLinks: updatedLinks,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.consentGiven) {
-      setSnackbar({
-        open: true,
-        message: "You must give consent to register.",
-        severity: "error",
-      });
-      return;
-    }
-
     if (formData.password !== formData.confirmPassword) {
-      setSnackbar({
-        open: true,
-        message: "Passwords do not match.",
-        severity: "error",
-      });
+      showSnackbar("Passwords do not match.", "error");
       return;
     }
 
@@ -75,50 +80,38 @@ function AgentRegister() {
       );
 
       await db
-        .collection("agents")
+        .collection("members")
         .doc(userCredential.user.uid)
         .set({
           uid: userCredential.user.uid,
           ...formData,
-          role: "agent",
+          isAdmin: false,
           validated: false,
           createdAt: new Date(),
           updatedAt: new Date(),
+          consentGiven: true,
         });
 
-      setSnackbar({
-        open: true,
-        message: "Agent registration successful!",
-        severity: "success",
-      });
+      await auth.signOut();
 
-      // Reset the form after successful registration
       setFormData({
         name: "",
         email: "",
         password: "",
         confirmPassword: "",
         phoneNumber: "",
-        agency: "",
+        areaOfOperation: "",
         role: "agent",
-        consentGiven: false,
       });
 
-      navigate("/agent/dashboard");
+      showSnackbar("Registration successful! Please log in.", "success");
+      navigate("/auth/login");
     } catch (error) {
-      console.error("Error registering agent: ", error);
-      setSnackbar({
-        open: true,
-        message: "Error registering agent. Please try again.",
-        severity: "error",
-      });
+      console.error("Error registering NGO: ", error);
+      showSnackbar("Error registering NGO. Please try again.", "error");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   return (
@@ -134,7 +127,7 @@ function AgentRegister() {
       }}
     >
       <Typography variant="h4" component="h1" gutterBottom>
-        Register as an Agent
+        Become An Agent
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
@@ -186,26 +179,17 @@ function AgentRegister() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Agency/Organization"
-          name="agency"
-          value={formData.agency}
+          label="Area of Operation"
+          name="areaOfOperation"
+          value={formData.areaOfOperation}
           onChange={handleChange}
           fullWidth
           required
           sx={{ mb: 2 }}
         />
-        <FormControlLabel
-          control={
-            <Checkbox
-              name="consentGiven"
-              checked={formData.consentGiven}
-              onChange={handleCheckboxChange}
-              required
-            />
-          }
-          label="I give my consent for this registration."
-          sx={{ mb: 2 }}
-        />
+        <Typography variant="body2" color="textSecondary">
+          {t("home.consent")}
+        </Typography>
         <Button
           type="submit"
           variant="contained"
@@ -216,12 +200,6 @@ function AgentRegister() {
           {loading ? "Registering..." : "Register"}
         </Button>
       </form>
-      <NasnaSnackBar
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={handleCloseSnackbar}
-      />
     </Box>
   );
 }

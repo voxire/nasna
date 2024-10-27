@@ -8,24 +8,19 @@ import {
   MenuItem,
   IconButton,
 } from "@mui/material";
-import { auth } from "../../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLanguage } from "@fortawesome/free-solid-svg-icons";
 import { selectLanguage } from "../../services/i18next";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../../redux/reducers/userSlice";
+import { auth } from "../../firebase";
 
-function Header() {
-  const [user, setUser] = useState(null);
+function PrivateNavbar() {
+  // const user = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem("language");
@@ -36,7 +31,6 @@ function Header() {
 
   const handleLanguageChange = (lng) => {
     selectLanguage(lng);
-    console.log("Language changed to: " + lng);
     setAnchorEl(null);
   };
 
@@ -46,10 +40,10 @@ function Header() {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
-      console.log("User logged out successfully");
-      // Optionally, you can navigate to the login page after logout
-      navigate("/auth/login");
+      auth.signOut().then(() => {
+        dispatch(logout());
+        navigate("/auth/login");
+      });
     } catch (error) {
       console.error("Error logging out: ", error);
     }
@@ -84,15 +78,13 @@ function Header() {
           />
         </Typography>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {user && (
-            <Button
-              color="inherit"
-              onClick={handleLogout}
-              sx={{ marginLeft: "10px" }}
-            >
-              Logout
-            </Button>
-          )}
+          <Button
+            color="inherit"
+            onClick={handleLogout}
+            sx={{ marginLeft: "10px" }}
+          >
+            Logout
+          </Button>
           <IconButton
             onClick={(event) => setAnchorEl(event.currentTarget)}
             color="inherit"
@@ -120,4 +112,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default PrivateNavbar;

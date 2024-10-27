@@ -1,35 +1,25 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebase";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { TextField, Button, Box } from "@mui/material";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import NasnaSnackBar from "../../Components/NasnaSnackBar";
+import { useDispatch, useSelector } from "react-redux";
+import { useSnackBar } from "../../Components/NasnaSnackBar";
+import { loginUser } from "../../redux/reducers/userSlice";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("error");
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, loading } = useSelector((state) => state.user);
+  const { showSnackbar } = useSnackBar();
 
-  const handleSignIn = async () => {
-    if (!email || !password) {
-      showSnackbar("Email and password are required.", "error");
-      return;
+  useEffect(() => {
+    if (user) {
+      navigate(-1);
     }
-
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate("/ngo/submissions");
-    } catch (error) {
-      handleFirebaseError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [user, navigate, location.state]);
 
   const handleFirebaseError = (error) => {
     switch (error.code) {
@@ -51,14 +41,19 @@ function Login() {
     }
   };
 
-  const showSnackbar = (message, severity) => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
-  };
+  const handleSignIn = async () => {
+    if (!email || !password) {
+      showSnackbar("Email and password are required.", "error");
+      return;
+    }
 
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
+    const result = await dispatch(loginUser({ email, password }));
+    if (loginUser.fulfilled.match(result)) {
+      showSnackbar("Login successful!", "success");
+      navigate("/ngo/submissions");
+    } else {
+      handleFirebaseError(result.payload);
+    }
   };
 
   return (
@@ -112,13 +107,6 @@ function Login() {
           {loading ? "Signing In..." : "Sign In"}
         </Button>
       </Box>
-
-      <NasnaSnackBar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        onClose={handleSnackbarClose}
-      />
     </Box>
   );
 }

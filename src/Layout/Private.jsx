@@ -1,10 +1,10 @@
 import React from "react";
-import Navbar from "./NGONavbar";
+import PrivateNavbar from "./Private/PrivateNavbar";
 
-function NGOContainer({ children }) {
+function Private({ children }) {
   return (
     <div>
-      <Navbar />
+      <PrivateNavbar />
       <div
         style={{
           padding: 20,
@@ -16,4 +16,4 @@ function NGOContainer({ children }) {
   );
 }
 
-export default NGOContainer;
+export default Private;
