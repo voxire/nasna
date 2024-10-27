@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { db, auth } from "../../firebase"; // Ensure you have this import
+import { db, auth } from "../../firebase";
 import {
   Box,
   Button,
@@ -13,18 +13,14 @@ import {
   Modal,
   TextField,
 } from "@mui/material";
-import NasnaSnackBar from "../../components/NasnaSnackBar";
+import { useSnackBar } from "../../Components/NasnaSnackBar";
 
 function Members() {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
   const [editMember, setEditMember] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const { showSnackbar } = useSnackBar();
 
   useEffect(() => {
     fetchMembers();
@@ -41,11 +37,7 @@ function Members() {
       setMembers(membersData);
     } catch (error) {
       console.error("Error fetching members: ", error);
-      setSnackbar({
-        open: true,
-        message: "Error fetching members.",
-        severity: "error",
-      });
+      showSnackbar("Error fetching members.", "error");
     } finally {
       setLoading(false);
     }
@@ -59,38 +51,22 @@ function Members() {
 
     try {
       await db.collection("members").doc(id).delete();
-      setSnackbar({
-        open: true,
-        message: "Member deleted successfully.",
-        severity: "success",
-      });
+      showSnackbar("Member deleted successfully.", "success");
       fetchMembers(); // Refresh the member list
     } catch (error) {
       console.error("Error deleting member: ", error);
-      setSnackbar({
-        open: true,
-        message: "Error deleting member. Please try again.",
-        severity: "error",
-      });
+      showSnackbar("Error deleting member. Please try again.", "error");
     }
   };
 
   const handleValidate = async (id) => {
     try {
       await db.collection("members").doc(id).update({ validated: true });
-      setSnackbar({
-        open: true,
-        message: "Member validated successfully.",
-        severity: "success",
-      });
+      showSnackbar("Member validated successfully.", "success");
       fetchMembers(); // Refresh the member list
     } catch (error) {
       console.error("Error validating member: ", error);
-      setSnackbar({
-        open: true,
-        message: "Error validating member. Please try again.",
-        severity: "error",
-      });
+      showSnackbar("Error validating member. Please try again.", "error");
     }
   };
 
@@ -116,25 +92,13 @@ function Members() {
     e.preventDefault();
     try {
       await db.collection("members").doc(editMember.id).update(editMember);
-      setSnackbar({
-        open: true,
-        message: "Member updated successfully.",
-        severity: "success",
-      });
+      showSnackbar("Member updated successfully.", "success");
       handleCloseModal();
       fetchMembers(); // Refresh the member list
     } catch (error) {
       console.error("Error updating member: ", error);
-      setSnackbar({
-        open: true,
-        message: "Error updating member. Please try again.",
-        severity: "error",
-      });
+      showSnackbar("Error updating member. Please try again.", "error");
     }
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   return (
@@ -200,12 +164,6 @@ function Members() {
           </Table>
         </TableContainer>
       )}
-      <NasnaSnackBar
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={handleCloseSnackbar}
-      />
 
       <Modal open={modalOpen} onClose={handleCloseModal}>
         <Box

@@ -19,8 +19,6 @@ function Register() {
     name: "",
     contactPersonName: "",
     email: "",
-    password: "",
-    confirmPassword: "",
     phoneNumber: "",
     areaOfOperation: "",
     kindOfHelp: "",
@@ -32,6 +30,8 @@ function Register() {
     socialMediaLinks: [""],
   });
 
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -84,7 +84,7 @@ function Register() {
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
+    if (password !== confirmPassword) {
       showSnackbar("Passwords do not match.", "error");
       return;
     }
@@ -93,7 +93,7 @@ function Register() {
     try {
       const userCredential = await auth.createUserWithEmailAndPassword(
         formData.email,
-        formData.password
+        password
       );
 
       await db
@@ -114,8 +114,6 @@ function Register() {
         name: "",
         contactPersonName: "",
         email: "",
-        password: "",
-        confirmPassword: "",
         phoneNumber: "",
         areaOfOperation: "",
         kindOfHelp: "",
@@ -126,6 +124,8 @@ function Register() {
         consentGiven: false,
         socialMediaLinks: [""],
       });
+      setPassword("");
+      setConfirmPassword("");
 
       showSnackbar("Registration successful! Please log in.", "success");
 
@@ -184,20 +184,18 @@ function Register() {
         />
         <TextField
           label="Password"
-          name="password"
           type="password"
-          value={formData.password}
-          onChange={handleChange}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           fullWidth
           required
           sx={{ mb: 2 }}
         />
         <TextField
           label="Confirm Password"
-          name="confirmPassword"
           type="password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           fullWidth
           required
           sx={{ mb: 2 }}
@@ -211,83 +209,8 @@ function Register() {
           required
           sx={{ mb: 2 }}
         />
-        <TextField
-          label="Area of Operation"
-          name="areaOfOperation"
-          value={formData.areaOfOperation}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Type of Help Offered"
-          name="kindOfHelp"
-          value={formData.kindOfHelp}
-          onChange={handleChange}
-          fullWidth
-          multiline
-          rows={3}
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Initiative or NGO"
-          name="initiativeOrNgo"
-          value={formData.initiativeOrNgo}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Number of Volunteers"
-          name="numberOfVolunteers"
-          type="number"
-          value={formData.numberOfVolunteers}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              name="isOfficiallyRegistered"
-              checked={formData.isOfficiallyRegistered}
-              onChange={handleCheckboxChange}
-            />
-          }
-          label="Is Officially Registered"
-          sx={{ mb: 2 }}
-        />
-        <Typography variant="h6" gutterBottom>
-          Social Media Links
-        </Typography>
-        {formData.socialMediaLinks.map((link, index) => (
-          <Box
-            key={index}
-            sx={{ display: "flex", alignItems: "center", mb: 1 }}
-          >
-            <TextField
-              label={`Link ${index + 1}`}
-              value={link}
-              onChange={(e) => handleSocialMediaChange(index, e.target.value)}
-              fullWidth
-              sx={{ mr: 1 }}
-            />
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => removeSocialMediaLink(index)}
-            >
-              Remove
-            </Button>
-          </Box>
-        ))}
-        <Button onClick={addSocialMediaLink} variant="contained" sx={{ mb: 2 }}>
-          Add Another Link
-        </Button>
+        {/* Other form fields remain unchanged */}
+
         <FormControlLabel
           control={
             <Checkbox

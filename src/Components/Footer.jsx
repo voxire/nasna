@@ -9,15 +9,28 @@ import {
   faHandHoldingHeart,
   faChartBar,
   faUserPlus,
+  faUserShield, // Admin icon
 } from "@fortawesome/free-solid-svg-icons";
 import { auth } from "../firebase";
 
 function Footer() {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
+
+      if (user) {
+        try {
+          const tokenResult = await user.getIdTokenResult();
+          setRole(tokenResult.claims.role);
+        } catch (error) {
+          console.error("Error retrieving user role:", error);
+        }
+      } else {
+        setRole(null);
+      }
     });
 
     return () => unsubscribe();
@@ -45,15 +58,32 @@ function Footer() {
             <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight: 8 }} />
             About Us
           </Link>
+
           <Link href="/policy" color="inherit" underline="none">
             <FontAwesomeIcon icon={faFileAlt} style={{ marginRight: 8 }} />
             Policy
           </Link>
+
           {user?.email ? (
-            <Link href="/ngo/submissions" color="inherit" underline="none">
-              <FontAwesomeIcon icon={faChartBar} style={{ marginRight: 8 }} />
-              Dashboard
-            </Link>
+            <>
+              {role === "admin" ? (
+                <Link href="/manage" color="inherit" underline="none">
+                  <FontAwesomeIcon
+                    icon={faUserShield}
+                    style={{ marginRight: 8 }}
+                  />
+                  Admin Panel
+                </Link>
+              ) : (
+                <Link href="/ngo/submissions" color="inherit" underline="none">
+                  <FontAwesomeIcon
+                    icon={faChartBar}
+                    style={{ marginRight: 8 }}
+                  />
+                  Dashboard
+                </Link>
+              )}
+            </>
           ) : (
             <Link href="/auth/login" color="inherit" underline="none">
               <FontAwesomeIcon icon={faSignInAlt} style={{ marginRight: 8 }} />
@@ -69,14 +99,16 @@ function Footer() {
               </Link>
               <Link href="/auth/agent" color="inherit" underline="none">
                 <FontAwesomeIcon icon={faUserPlus} style={{ marginRight: 8 }} />
-                Become an agent
+                Become an Agent
               </Link>
             </>
           )}
-          <Link href="/feedback" color="inherit" underline="none">
+
+          {/* <Link href="/feedback" color="inherit" underline="none">
             <FontAwesomeIcon icon={faCommentDots} style={{ marginRight: 8 }} />
             Feedback
-          </Link>
+          </Link> */}
+
           <Link href="/donate" color="inherit" underline="none">
             <FontAwesomeIcon
               icon={faHandHoldingHeart}

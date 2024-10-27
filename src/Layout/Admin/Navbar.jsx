@@ -4,22 +4,30 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { auth } from "../../firebase";
 import { Modal, Box, Typography, Button } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { logout } from "../../redux/reducers/userSlice";
+import { useSnackBar } from "../../Components/NasnaSnackBar";
 
 const Navbar = ({ openSidebar }) => {
   const [openModal, setOpenModal] = useState(false);
+  const dispatch = useDispatch();
+  const { showSnackbar } = useSnackBar();
 
-  const handleLogout = () => {
-    auth.signOut();
-    setOpenModal(false);
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      dispatch(logout());
+
+      showSnackbar("You have been logged out.", "success");
+      setOpenModal(false);
+    } catch (error) {
+      console.error("Logout failed:", error);
+      showSnackbar("Failed to log out. Please try again.", "error");
+    }
   };
 
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-  };
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   return (
     <div className="navbar">

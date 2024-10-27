@@ -17,8 +17,10 @@ import {
   Alert,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { useSnackBar } from "../../Components/NasnaSnackBar";
 
 function AdminSubmissions() {
+  const { showSnackbar } = useSnackBar();
   const { t } = useTranslation();
   const [members, setMembers] = useState([]);
   const [editMember, setEditMember] = useState({
@@ -63,7 +65,13 @@ function AdminSubmissions() {
 
   const confirmDelete = async () => {
     try {
-      await db.collection("submissions").doc(memberToDelete).delete();
+      await db
+        .collection("submissions")
+        .doc(memberToDelete)
+        .delete()
+        .then(() => {
+          showSnackbar("Member deleted successfully.", "success");
+        });
       setMembers(members.filter((member) => member.id !== memberToDelete));
       setConfirmDeleteOpen(false);
     } catch (err) {

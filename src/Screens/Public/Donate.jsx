@@ -10,38 +10,30 @@ import {
 } from "@mui/material";
 import { db } from "../../firebase";
 import { collection, addDoc } from "firebase/firestore";
-import NasnaSnackBar from "../../components/NasnaSnackBar";
+import { useSnackBar } from "../../components/NasnaSnackBar"; // Use the snackbar hook
 
 function Donate() {
   const [reason, setReason] = useState("");
   const [customReason, setCustomReason] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const { showSnackbar } = useSnackBar(); // Destructure the snackbar method
 
   const handleReasonChange = (event) => {
     setReason(event.target.value);
-
     if (event.target.value !== "Other") {
       setCustomReason("");
     }
   };
 
-  const handleCustomReasonChange = (event) => {
+  const handleCustomReasonChange = (event) =>
     setCustomReason(event.target.value);
-  };
-
-  const handlePhoneChange = (event) => {
-    setPhoneNumber(event.target.value);
-  };
+  const handlePhoneChange = (event) => setPhoneNumber(event.target.value);
 
   const handleSubmit = async () => {
     if (!reason || !phoneNumber) return;
 
     const donationReason = reason === "Other" ? customReason : reason;
-
     setLoading(true);
 
     try {
@@ -51,28 +43,24 @@ function Donate() {
         timestamp: new Date(),
       });
 
+      // Reset the form state
       setReason("");
       setCustomReason("");
       setPhoneNumber("");
 
-      setSnackbarMessage("Thank you for your donation!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
+      // Show success snackbar
+      showSnackbar("Thank you for your donation!", "success");
     } catch (error) {
       console.error("Error adding donation: ", error);
-      d;
-      setSnackbarMessage(
-        "There was an error processing your donation. Please try again."
+
+      // Show error snackbar
+      showSnackbar(
+        "There was an error processing your donation. Please try again.",
+        "error"
       );
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
   };
 
   return (
@@ -153,13 +141,6 @@ function Donate() {
       >
         {loading ? "Submitting..." : "Submit Donation"}
       </Button>
-
-      <NasnaSnackBar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        onClose={handleSnackbarClose}
-      />
     </Box>
   );
 }

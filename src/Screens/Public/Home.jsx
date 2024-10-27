@@ -8,14 +8,18 @@ import {
   MenuItem,
   Checkbox,
   FormControlLabel,
-  Snackbar,
-  Alert,
 } from "@mui/material";
-import { Timestamp } from "firebase/firestore";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSnackBar } from "../../Components/NasnaSnackBar";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  Timestamp,
+} from "firebase/firestore";
 
 function Home() {
   const { t, i18n } = useTranslation();
@@ -63,7 +67,7 @@ function Home() {
     const totalAgeGroupCount = getTotalAgeGroupCount();
 
     if (totalAgeGroupCount > numberOfPeopleInHousehold) {
-      toast(t("home.toast.invalidNumberOfPeople"), { type: "error" });
+      showSnackbar(t("home.toast.invalidNumberOfPeopleInHousehold"), "error");
       return;
     }
 
@@ -86,22 +90,18 @@ function Home() {
       aidUrgency
     ) {
       try {
-        const phoneQuerySnapshot = await db
-          .collection("submissions")
-          .where("phoneNumber", "==", trimmedPhoneNumber)
-          .get();
+        const phoneQuery = query(
+          collection(db, "submissions"),
+          where("phoneNumber", "==", trimmedPhoneNumber)
+        );
 
-        console.log(phoneQuerySnapshot);
-        const nationalIDQuerySnapshot = await db
-          .collection("submissions")
-          .where("nationalID", "==", trimmedNationalID)
-          .get();
+        const phoneQuerySnapshot = await getDocs(phoneQuery);
 
-        if (!phoneQuerySnapshot.empty || !nationalIDQuerySnapshot.empty) {
-          showSnackbar(t("home.toast.invalidNumberOfPeople"), "error");
+        if (!phoneQuerySnapshot.empty) {
+          showSnackbar(t("home.toast.duplicatePhoneNumber"), "error");
           return;
         } else {
-          await db.collection("submissions").add({
+          await addDoc(collection(db, "submissions"), {
             fullName,
             phoneNumber: trimmedPhoneNumber,
             nationalID: trimmedNationalID,
@@ -123,7 +123,7 @@ function Home() {
             agent: "",
           });
 
-          showSnackbar(t("home.toast.duplicateSubmission"), "error");
+          showSnackbar(t("home.toast.memberAdded"), "success");
           navigate("/confirmation");
         }
       } catch (error) {
