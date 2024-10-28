@@ -19,38 +19,38 @@ import {
 } from "@mui/material";
 import { useSnackBar } from "../../Components/NasnaSnackBar";
 
-function Members() {
-  const [members, setMembers] = useState([]);
-  const [filteredMembers, setFilteredMembers] = useState([]);
+function Agents() {
+  const [agents, setAgents] = useState([]);
+  const [filteredAgents, setFilteredAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
     validated: "",
   });
-  const [editMember, setEditMember] = useState(null);
+  const [editAgent, setEditAgent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const { showSnackbar } = useSnackBar();
 
   useEffect(() => {
-    fetchMembers();
+    fetchAgents();
   }, []);
 
-  const fetchMembers = async () => {
+  const fetchAgents = async () => {
     setLoading(true);
     try {
       const snapshot = await db.collection("members").get();
-      const membersData = snapshot.docs
+      const agentsData = snapshot.docs
         .map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }))
-        .filter((member) => member.role === "member");
+        .filter((agent) => agent.role === "agent");
 
-      setMembers(membersData);
-      setFilteredMembers(membersData);
+      setAgents(agentsData);
+      setFilteredAgents(agentsData);
     } catch (error) {
-      console.error("Error fetching members: ", error);
-      showSnackbar("Error fetching members.", "error");
+      console.error("Error fetching agents: ", error);
+      showSnackbar("Error fetching agents.", "error");
     } finally {
       setLoading(false);
     }
@@ -59,65 +59,65 @@ function Members() {
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-    const filtered = members.filter((member) =>
-      [member.name, member.contactPersonName, member.email].some((field) =>
+    const filtered = agents.filter((agent) =>
+      [agent.name, agent.contactPersonName, agent.email].some((field) =>
         field.toLowerCase().includes(query)
       )
     );
-    setFilteredMembers(filtered);
+    setFilteredAgents(filtered);
   };
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
 
-    let filtered = members;
+    let filtered = agents;
     if (value) {
-      filtered = members.filter((member) => String(member.validated) === value);
+      filtered = agents.filter((agent) => String(agent.validated) === value);
     }
-    setFilteredMembers(filtered);
+    setFilteredAgents(filtered);
   };
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete this member?"
+      "Are you sure you want to delete this agent?"
     );
     if (!confirmDelete) return;
 
     try {
       await db.collection("members").doc(id).delete();
-      showSnackbar("Member deleted successfully.", "success");
-      fetchMembers();
+      showSnackbar("Agent deleted successfully.", "success");
+      fetchAgents();
     } catch (error) {
-      console.error("Error deleting member: ", error);
-      showSnackbar("Error deleting member. Please try again.", "error");
+      console.error("Error deleting agent: ", error);
+      showSnackbar("Error deleting agent. Please try again.", "error");
     }
   };
 
   const handleValidate = async (id) => {
     try {
       await db.collection("members").doc(id).update({ validated: true });
-      showSnackbar("Member validated successfully.", "success");
-      fetchMembers();
+      showSnackbar("Agent validated successfully.", "success");
+      fetchAgents();
     } catch (error) {
-      console.error("Error validating member: ", error);
-      showSnackbar("Error validating member. Please try again.", "error");
+      console.error("Error validating agent: ", error);
+      showSnackbar("Error validating agent. Please try again.", "error");
     }
   };
 
-  const handleOpenModal = (member) => {
-    setEditMember(member);
+  const handleOpenModal = (agent) => {
+    setEditAgent(agent);
     setModalOpen(true);
   };
 
   const handleCloseModal = () => {
-    setEditMember(null);
+    setEditAgent(null);
     setModalOpen(false);
   };
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditMember((prev) => ({
+    setEditAgent((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -126,20 +126,20 @@ function Members() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await db.collection("members").doc(editMember.id).update(editMember);
-      showSnackbar("Member updated successfully.", "success");
+      await db.collection("members").doc(editAgent.id).update(editAgent);
+      showSnackbar("Agent updated successfully.", "success");
       handleCloseModal();
-      fetchMembers(); // Refresh the member list
+      fetchAgents();
     } catch (error) {
-      console.error("Error updating member: ", error);
-      showSnackbar("Error updating member. Please try again.", "error");
+      console.error("Error updating agent: ", error);
+      showSnackbar("Error updating agent. Please try again.", "error");
     }
   };
 
   return (
     <Box sx={{ padding: 3 }}>
       <Typography variant="h4" gutterBottom>
-        NGO Members
+        Agent Members
       </Typography>
 
       <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
@@ -181,36 +181,36 @@ function Members() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredMembers.map((member) => (
-                <TableRow key={member.id}>
-                  <TableCell>{member.name}</TableCell>
-                  <TableCell>{member.contactPersonName}</TableCell>
-                  <TableCell>{member.email}</TableCell>
-                  <TableCell>{member.phoneNumber}</TableCell>
-                  <TableCell>{member.validated ? "Yes" : "No"}</TableCell>
+              {filteredAgents.map((agent) => (
+                <TableRow key={agent.id}>
+                  <TableCell>{agent.name}</TableCell>
+                  <TableCell>{agent.contactPersonName}</TableCell>
+                  <TableCell>{agent.email}</TableCell>
+                  <TableCell>{agent.phoneNumber}</TableCell>
+                  <TableCell>{agent.validated ? "Yes" : "No"}</TableCell>
                   <TableCell>
-                    {!member.validated && (
+                    {!agent.validated && (
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => handleValidate(member.id)}
+                        onClick={() => handleValidate(agent.id)}
                       >
                         Validate
                       </Button>
                     )}
-                    {member.validated && (
+                    {agent.validated && (
                       <>
                         <Button
                           variant="outlined"
                           color="secondary"
-                          onClick={() => handleOpenModal(member)}
+                          onClick={() => handleOpenModal(agent)}
                         >
                           Edit
                         </Button>
                         <Button
                           variant="outlined"
                           color="error"
-                          onClick={() => handleDelete(member.id)}
+                          onClick={() => handleDelete(agent.id)}
                         >
                           Delete
                         </Button>
@@ -235,13 +235,13 @@ function Members() {
           }}
         >
           <Typography variant="h6" gutterBottom>
-            Edit Member
+            Edit Agent
           </Typography>
           <form onSubmit={handleEditSubmit}>
             <TextField
               label="Name"
               name="name"
-              value={editMember?.name || ""}
+              value={editAgent?.name || ""}
               onChange={handleEditChange}
               fullWidth
               required
@@ -250,7 +250,7 @@ function Members() {
             <TextField
               label="Contact Person"
               name="contactPersonName"
-              value={editMember?.contactPersonName || ""}
+              value={editAgent?.contactPersonName || ""}
               onChange={handleEditChange}
               fullWidth
               required
@@ -259,7 +259,7 @@ function Members() {
             <TextField
               label="Email"
               name="email"
-              value={editMember?.email || ""}
+              value={editAgent?.email || ""}
               onChange={handleEditChange}
               fullWidth
               required
@@ -268,7 +268,7 @@ function Members() {
             <TextField
               label="Phone Number"
               name="phoneNumber"
-              value={editMember?.phoneNumber || ""}
+              value={editAgent?.phoneNumber || ""}
               onChange={handleEditChange}
               fullWidth
               required
@@ -284,4 +284,4 @@ function Members() {
   );
 }
 
-export default Members;
+export default Agents;

@@ -1,24 +1,27 @@
 {
   "home": {
     "toast": {
-      "memberAddedSuccess": "Member added successfully!",
-      "consentRequired": "Consent is required to proceed.",
-      "fillRequiredFields": "Please fill out all required fields."
+      "invalidNumberOfPeopleInHousehold": "The total number of members in the age ranges cannot exceed the number of people in the household.",
+      "memberAddedSuccess": "You've successfully added a new member!",
+      "fillRequiredFields": "Ensure all required fields are complete.",
+      "errorAddingMember": "An error occurred while creating the submission. Please try again.",
+      "duplicatePhoneNumber": "This phone number has already been used for a submission.",
+      "validEmailRequired": "Please enter a valid email address."
     },
     "needs": {
       "special": {
         "title": "Special Needs",
-        "need1": "Pregnancy",
-        "need2": "Disability",
-        "need3": "Chronic Illness",
-        "need4": "Elderly",
-        "need5": "Single Parent",
-        "need6": "Infants/Toddlers"
+        "need1": "Pregnancy Support",
+        "need2": "Disability Assistance",
+        "need3": "Chronic Illness Care",
+        "need4": "Elderly Care",
+        "need5": "Single Parent Assistance",
+        "need6": "Care for Infants/Toddlers"
       },
       "immediate": {
         "title": "Immediate Needs",
-        "need1": "Food",
-        "need2": "Water",
+        "need1": "Food Aid",
+        "need2": "Water Supply",
         "need3": "Shelter Materials",
         "need4": "Hygiene Products",
         "need5": "Medical Supplies",
@@ -37,7 +40,7 @@
     "governorate10": "Nabatiyeh",
     "male": "Male",
     "female": "Female",
-    "disclaimer": "This platform helps connect those in need with government and NGO assistance. While we don't directly provide aid, the information you share will help ensure support like food, shelter, and medical supplies reaches you. Your data will be handled with care and only shared with trusted organizations to coordinate aid effectively.",
+    "disclaimer": "This platform connects individuals with government and NGO support. While we don't provide aid directly, the information you share helps ensure you receive essential services such as food, shelter, and medical care. Your data will be handled securely and shared only with trusted organizations to coordinate aid efficiently.",
     "addressDetails": "Address Details",
     "personalInformation": "Personal Information",
     "fullName": "Full Name",
@@ -51,28 +54,26 @@
     "street": "Street",
     "building": "Building",
     "floor": "Floor",
-    "continue": "Continue",
+    "continue": "Next Step",
     "householdAndNeedsDetails": "Household and Needs Details",
     "householdInformation": "Household Information",
     "numberOfPeopleInHousehold": "Number of People in Household",
     "ageRanges": "Age Ranges",
     "numberOfMembers": "Number of Members",
-    "consent": "I give my consent to proceed.",
+    "consent": "By submitting this form, you consent to privately share your data.",
     "comments": "Comments",
-    "back": "Back",
-    "submit": "Submit",
+    "back": "Previous Step",
+    "submit": "Send Request",
     "aidUrgency": "Urgency of Aid",
     "high": "High",
     "medium": "Medium",
     "low": "Low"
   },
-
   "confirmation": {
-    "thankYou": "Thank you for submitting your information!",
-    "submissionRecieved": "Your submission has been received and will be reviewed by our team.",
-    "appreciation": "We appreciate your trust in us and will do our best to connect you with the support you need."
+    "thankYou": "Thank you for sharing your information!",
+    "submissionRecieved": "We have received your submission and our team is reviewing it.",
+    "appreciation": "We value your trust in us and will strive to connect you with the necessary support as soon as possible."
   },
-
   "about": {
     "title": {
       "aboutUs": "About Us",
@@ -80,11 +81,87 @@
       "vision": "Our Vision",
       "joinUs": "Join Us"
     },
-    "description": "This platform helps connect those in need with government and NGO assistance. While we don't directly provide aid, the information you share will help ensure support like food, shelter, and medical supplies reaches you. Your data will be handled with care and only shared with trusted organizations to coordinate aid effectively.",
-    "mission": "Our mission is to provide a platform that connects those in need with government and NGO assistance. We aim to ensure that support like food, shelter, and medical supplies reaches those who need it most.",
-    "vision": "Our vision is to create a world where everyone has access to the support they need to thrive. We believe that by connecting those in need with the right resources, we can make a difference in the lives of people around the world.",
-    "joinUs": "If you are an NGO looking to reach those in need or an individual seeking assistance, Nasna is here to help. Together, we can foster a community of support and resilience during these challenging times. Thank you for being a part of our mission to connect and uplift those affected by the crisis in Lebanon."
+    "description": "Our platform connects individuals in need with government and NGO assistance. Although we don't provide aid directly, your information ensures essential support—like food, shelter, and medical care—reaches you efficiently. All data is handled securely and shared only with trusted organizations to coordinate aid.",
+    "mission": "Our mission is to provide a reliable platform that connects individuals with critical government and NGO support, ensuring resources reach those who need them the most.",
+    "vision": "Our vision is a world where everyone has access to the support they need to thrive. By connecting individuals with the right resources, we aim to make a positive impact in communities worldwide.",
+    "joinUs": "Whether you're an NGO seeking to offer help or someone in need of assistance, Nasna is here to support you. Together, we can build a resilient community and uplift those impacted by the crisis. Thank you for being part of our mission."
   },
-
+  "footer": {
+    "aboutUs": "About Us",
+    "adminPanel": "Admin Panel",
+    "dashboard": "Dashboard",
+    "signIn": "Sign In",
+    "registerNgo": "Register NGO/Initiative",
+    "becomeAgent": "Become an Agent",
+    "allRightsReserved": "All rights reserved."
+  },
+  "register": {
+    "title": "Register as an NGO/Initiative",
+    "fields": {
+      "name": "Organization Name",
+      "contactPersonName": "Contact Person Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "phoneNumber": "Phone Number"
+    },
+    "consent": "By submitting this form, you consent to privately share your data.",
+    "toast": {
+      "consentRequired": "You must give consent to register.",
+      "passwordMismatch": "Passwords do not match.",
+      "success": "Registration successful! Please log in.",
+      "error": "Error registering NGO. Please try again."
+    },
+    "loading": "Registering...",
+    "submit": "Register"
+  },
+  "login": {
+    "fields": {
+      "email": "Email",
+      "password": "Password"
+    },
+    "buttons": {
+      "signIn": "Sign In",
+      "loading": "Signing In..."
+    },
+    "toast": {
+      "userNotFound": "No user found with this email.",
+      "wrongPassword": "Incorrect password. Please try again.",
+      "invalidEmailFormat": "Invalid email format.",
+      "invalidCredential": "Invalid credentials. Please try again.",
+      "genericError": "An error occurred. Please try again.",
+      "emailPasswordRequired": "Email and password are required.",
+      "success": "Login successful!"
+    },
+    "logoAlt": "Nasna Logo"
+  },
+  "submission": {
+    "title": "Create Submission",
+    "accountBeingVerified": "Your account is being verified. Please try again later.",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "emailAddress": "Email Address",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "currentGovernorate": "Current Governorate",
+    "previousGovernorate": "Previous Governorate",
+    "street": "Street",
+    "building": "Building",
+    "floor": "Floor",
+    "city": "City",
+    "numberOfPeopleInHousehold": "Number of People in Household",
+    "numberOfMembers": "Number of Members",
+    "aidUrgency": "Aid Urgency",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "comments": "Comments",
+    "consent": "I give my consent for this submission.",
+    "submitting": "Submitting...",
+    "submit": "Submit",
+    "success": "Submission successful!",
+    "error": "Error creating submission."
+  },
   "NotFound": "Page Not Found"
 }

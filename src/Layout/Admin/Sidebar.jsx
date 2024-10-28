@@ -7,6 +7,7 @@ import {
   faBuildingNgo,
   faList,
   faBell,
+  faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
 const SideBar = ({ sidebarOpen, closeSidebar }) => {
@@ -52,21 +53,21 @@ const SideBar = ({ sidebarOpen, closeSidebar }) => {
         </div>
         <div
           className={`sidebar__link ${
-            location.pathname === "/manage/requests" ? "active" : ""
+            location.pathname === "/manage/ngo" ? "active" : ""
           }`}
-          onClick={() => handleNavigation("/manage/requests")}
+          onClick={() => handleNavigation("/manage/ngo")}
         >
           <FontAwesomeIcon icon={faBell} className="sidebar__icon" />
-          <p id="link">NGO Requests</p>
+          <p id="link">NGO/Initiative</p>
         </div>
         <div
           className={`sidebar__link ${
-            location.pathname === "/manage/settings" ? "active" : ""
+            location.pathname === "/manage/agents" ? "active" : ""
           }`}
-          onClick={() => handleNavigation("/manage/settings")}
+          onClick={() => handleNavigation("/manage/agents")}
         >
-          <FontAwesomeIcon icon={faBuildingNgo} className="sidebar__icon" />
-          <p id="link">Active NGOS</p>
+          <FontAwesomeIcon icon={faUserPlus} className="sidebar__icon" />
+          <p id="link">Agents</p>
         </div>
       </div>
     </div>

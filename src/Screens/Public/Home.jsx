@@ -43,9 +43,9 @@ function Home() {
   const [specialNeeds, setSpecialNeeds] = useState([]);
   const [needs, setNeeds] = useState([]);
   const [aidUrgency, setAidUrgency] = useState("");
-  const [consentGiven, setConsentGiven] = useState(false);
   const [comments, setComments] = useState("");
   const [page, setPage] = useState(1);
+  const [emailError, setEmailError] = useState(false);
 
   const [numberOfPeopleInHousehold, setNumberOfPeopleInHousehold] = useState(0);
 
@@ -119,7 +119,7 @@ function Home() {
             agent: "",
           });
 
-          showSnackbar(t("home.toast.memberAdded"), "success");
+          showSnackbar(t("home.toast.memberAddedSuccess"), "success");
           navigate("/confirmation");
         }
       } catch (error) {
@@ -128,6 +128,18 @@ function Home() {
     } else {
       showSnackbar(t("home.toast.fillRequiredFields"), "error");
     }
+  };
+
+  const removeEmojis = (text) => {
+    return text.replace(
+      /([\u2700-\u27BF]|[\uE000-\uF8FF]|[\uD83C-\uDBFF\uDC00-\uDFFF])/g,
+      ""
+    );
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const pageOne = () => (
@@ -160,11 +172,10 @@ function Home() {
         }}
       >
         <Typography variant="h6">{t("home.personalInformation")}</Typography>
-
         <TextField
           label={t("home.fullName")}
           value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
+          onChange={(e) => setFullName(removeEmojis(e.target.value))}
           fullWidth
           margin="normal"
         />
@@ -172,22 +183,26 @@ function Home() {
         <TextField
           label={t("home.phoneNumber")}
           value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
+          onChange={(e) => setPhoneNumber(removeEmojis(e.target.value))}
           fullWidth
           margin="normal"
           type="tel"
-          placeholder="eg. 78874095"
         />
 
         <TextField
           label={t("home.emailAddress")}
           value={emailAddress}
-          onChange={(e) => setEmailAddress(e.target.value)}
+          onChange={(e) => {
+            const email = e.target.value;
+            setEmailAddress(email);
+            setEmailError(!validateEmail(email));
+          }}
+          error={emailError}
+          helperText={emailError ? "Please enter a valid email address." : ""}
           fullWidth
           margin="normal"
           type="email"
         />
-
         <TextField
           select
           label={t("home.gender")}
@@ -254,7 +269,7 @@ function Home() {
         <TextField
           label={t("home.city")}
           value={city}
-          onChange={(e) => setCity(e.target.value)}
+          onChange={(e) => setCity(removeEmojis(e.target.value))}
           fullWidth
           margin="normal"
         />
@@ -262,7 +277,7 @@ function Home() {
         <TextField
           label={t("home.street")}
           value={street}
-          onChange={(e) => setStreet(e.target.value)}
+          onChange={(e) => setStreet(removeEmojis(e.target.value))}
           fullWidth
           margin="normal"
         />
@@ -270,7 +285,7 @@ function Home() {
         <TextField
           label={t("home.building")}
           value={building}
-          onChange={(e) => setBuilding(e.target.value)}
+          onChange={(e) => setBuilding(removeEmojis(e.target.value))}
           fullWidth
           margin="normal"
         />
@@ -278,7 +293,7 @@ function Home() {
         <TextField
           label={t("home.floor")}
           value={floor}
-          onChange={(e) => setFloor(e.target.value)}
+          onChange={(e) => setFloor(removeEmojis(e.target.value))}
           fullWidth
           margin="normal"
         />
@@ -302,11 +317,15 @@ function Home() {
               previousGovernorate &&
               street &&
               building &&
-              floor
+              floor &&
+              !emailError
             ) {
               setPage(2);
             } else {
-              showSnackbar("Please fill in all required fields.", "error");
+              const errorMessage = emailError
+                ? "Please enter a valid email address."
+                : "Please fill in all required fields.";
+              showSnackbar(errorMessage, "error");
             }
           }}
           variant="contained"
@@ -437,7 +456,7 @@ function Home() {
         <TextField
           label={t("home.comments")}
           value={comments}
-          onChange={(e) => setComments(e.target.value)}
+          onChange={(e) => setComments(removeEmojis(e.target.value))}
           fullWidth
           margin="normal"
           multiline

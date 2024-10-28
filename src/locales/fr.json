@@ -1,89 +1,167 @@
 {
   "home": {
     "toast": {
-      "memberAddedSuccess": "Membre ajouté avec succès !",
-      "consentRequired": "Le consentement est requis pour continuer.",
-      "fillRequiredFields": "Veuillez remplir tous les champs obligatoires."
+      "invalidNumberOfPeopleInHousehold": "Le nombre total de membres dans les tranches d'âge ne peut pas dépasser le nombre de personnes dans le foyer.",
+      "memberAddedSuccess": "Vous avez ajouté un nouveau membre avec succès !",
+      "fillRequiredFields": "Assurez-vous que tous les champs requis sont remplis.",
+      "errorAddingMember": "Une erreur est survenue lors de la création de la soumission. Veuillez réessayer.",
+      "duplicatePhoneNumber": "Ce numéro de téléphone a déjà été utilisé pour une soumission.",
+      "validEmailRequired": "Veuillez entrer une adresse e-mail valide."
     },
     "needs": {
       "special": {
-        "title": "Besoins Spéciaux",
-        "need1": "Grossesse",
-        "need2": "Handicap",
-        "need3": "Maladie Chronique",
-        "need4": "Personnes Agées",
-        "need5": "Parent Isolé",
-        "need6": "Bébés/Jeunes Enfants"
+        "title": "Besoins spéciaux",
+        "need1": "Soutien à la grossesse",
+        "need2": "Assistance aux personnes handicapées",
+        "need3": "Soins pour maladies chroniques",
+        "need4": "Soins aux personnes âgées",
+        "need5": "Aide aux parents célibataires",
+        "need6": "Soins aux nourrissons et jeunes enfants"
       },
       "immediate": {
-        "title": "Besoins Immédiats",
-        "need1": "Nourriture",
-        "need2": "Eau",
-        "need3": "Matériaux de Logement",
-        "need4": "Produits d'Hygiène",
-        "need5": "Fournitures Médicales",
+        "title": "Besoins immédiats",
+        "need1": "Aide alimentaire",
+        "need2": "Fourniture d'eau",
+        "need3": "Matériaux d'abri",
+        "need4": "Produits d'hygiène",
+        "need5": "Fournitures médicales",
         "need6": "Vêtements"
       }
     },
     "governorate1": "Beyrouth",
-    "governorate2": "Mont-Liban",
+    "governorate2": "Mont Liban",
     "governorate3": "Baabdat",
     "governorate4": "Liban-Nord",
     "governorate5": "Akkar",
     "governorate6": "Baalbek",
-    "governorate7": "Bekaa",
+    "governorate7": "Békaa",
     "governorate8": "Tyr",
     "governorate9": "Saïda",
-    "governorate10": "Nabatiyeh",
+    "governorate10": "Nabatieh",
     "male": "Homme",
     "female": "Femme",
-    "disclaimer": "Cette plateforme aide à connecter ceux qui en ont besoin avec l'assistance gouvernementale et des ONG. Bien que nous ne fournissions pas directement d'aide, les informations que vous partagez aideront à garantir que le soutien, comme la nourriture, l'hébergement et les fournitures médicales, vous parvienne. Vos données seront traitées avec soin et ne seront partagées qu'avec des organisations de confiance pour coordonner efficacement l'aide.",
-    "addressDetails": "Détails de l'Adresse",
-    "personalInformation": "Informations Personnelles",
-    "fullName": "Nom Complet",
-    "phoneNumber": "Numéro de Téléphone",
-    "emailAddress": "Adresse Email",
+    "disclaimer": "Cette plateforme connecte les individus au soutien des gouvernements et des ONG. Bien que nous ne fournissions pas d'aide directement, les informations que vous partagez garantissent que vous recevez des services essentiels tels que la nourriture, le logement et les soins médicaux. Vos données seront traitées en toute sécurité et partagées uniquement avec des organisations de confiance pour coordonner l'aide de manière efficace.",
+    "addressDetails": "Détails de l'adresse",
+    "personalInformation": "Informations personnelles",
+    "fullName": "Nom complet",
+    "phoneNumber": "Numéro de téléphone",
+    "emailAddress": "Adresse e-mail",
     "gender": "Genre",
-    "locationDetails": "Détails de la Localisation",
-    "currentGovernorate": "Gouvernorat Actuel",
-    "previousGovernorate": "Gouvernorat Précédent",
+    "locationDetails": "Détails du lieu",
+    "currentGovernorate": "Gouvernorat actuel",
+    "previousGovernorate": "Gouvernorat précédent",
     "city": "Ville",
     "street": "Rue",
     "building": "Bâtiment",
     "floor": "Étage",
-    "continue": "Continuer",
-    "householdAndNeedsDetails": "Détails du Ménage et des Besoins",
-    "householdInformation": "Informations sur le Ménage",
-    "numberOfPeopleInHousehold": "Nombre de Personnes dans le Ménage",
-    "ageRanges": "Tranches d'Âge",
-    "numberOfMembers": "Nombre de Membres",
-    "consent": "Je donne mon consentement pour continuer.",
+    "continue": "Étape suivante",
+    "householdAndNeedsDetails": "Détails du ménage et des besoins",
+    "householdInformation": "Informations sur le ménage",
+    "numberOfPeopleInHousehold": "Nombre de personnes dans le ménage",
+    "ageRanges": "Tranches d'âge",
+    "numberOfMembers": "Nombre de membres",
+    "consent": "En soumettant ce formulaire, vous consentez à partager vos données en privé.",
     "comments": "Commentaires",
-    "back": "Retour",
-    "submit": "Soumettre",
-    "aidUrgency": "Urgence de l'Aide",
-    "high": "Élevé",
-    "medium": "Moyen",
-    "low": "Bas"
+    "back": "Étape précédente",
+    "submit": "Envoyer la demande",
+    "aidUrgency": "Urgence de l'aide",
+    "high": "Élevée",
+    "medium": "Moyenne",
+    "low": "Faible"
   },
-
   "confirmation": {
-    "thankYou": "Merci d'avoir soumis vos informations !",
-    "submissionRecieved": "Votre soumission a été reçue et sera examinée par notre équipe.",
-    "appreciation": "Nous apprécions votre confiance en nous et nous ferons de notre mieux pour vous connecter au soutien dont vous avez besoin."
+    "thankYou": "Merci d'avoir partagé vos informations !",
+    "submissionRecieved": "Nous avons bien reçu votre soumission et notre équipe l'examine.",
+    "appreciation": "Nous apprécions votre confiance et nous nous efforcerons de vous mettre en relation avec le soutien nécessaire dès que possible."
   },
-
   "about": {
     "title": {
-      "aboutUs": "À Propos de Nous",
-      "mission": "Notre Mission",
-      "vision": "Notre Vision",
-      "joinUs": "Rejoignez-Nous"
+      "aboutUs": "À propos de nous",
+      "mission": "Notre mission",
+      "vision": "Notre vision",
+      "joinUs": "Rejoignez-nous"
     },
-    "description": "Cette plateforme aide à connecter ceux qui en ont besoin avec l'assistance gouvernementale et des ONG. Bien que nous ne fournissions pas directement d'aide, les informations que vous partagez aideront à garantir que le soutien, comme la nourriture, l'hébergement et les fournitures médicales, vous parvienne. Vos données seront traitées avec soin et ne seront partagées qu'avec des organisations de confiance pour coordonner efficacement l'aide.",
-    "mission": "Notre mission est de fournir une plateforme qui relie ceux qui en ont besoin avec l'assistance gouvernementale et des ONG. Nous visons à garantir que le soutien, comme la nourriture, l'hébergement et les fournitures médicales, atteigne ceux qui en ont le plus besoin.",
-    "vision": "Notre vision est de créer un monde où chacun a accès au soutien dont il a besoin pour prospérer. Nous croyons qu'en connectant ceux qui en ont besoin avec les bonnes ressources, nous pouvons faire une différence dans la vie des personnes à travers le monde.",
-    "joinUs": "Si vous êtes une ONG cherchant à atteindre ceux qui en ont besoin ou un individu à la recherche d'assistance, Nasna est là pour vous aider. Ensemble, nous pouvons favoriser une communauté de soutien et de résilience en ces temps difficiles. Merci de faire partie de notre mission de connecter et d'élever ceux qui sont touchés par la crise au Liban."
+    "description": "Notre plateforme relie les individus dans le besoin avec l'assistance des gouvernements et des ONG. Bien que nous ne fournissions pas d'aide directement, vos informations garantissent que le soutien essentiel—comme la nourriture, le logement et les soins médicaux—vous parvient efficacement. Toutes les données sont traitées en toute sécurité et partagées uniquement avec des organisations de confiance.",
+    "mission": "Notre mission est de fournir une plateforme fiable reliant les individus avec un soutien essentiel, afin de garantir que les ressources atteignent ceux qui en ont besoin.",
+    "vision": "Notre vision est un monde où chacun a accès au soutien nécessaire pour s'épanouir. En connectant les individus avec les bonnes ressources, nous visons à avoir un impact positif sur les communautés du monde entier.",
+    "joinUs": "Que vous soyez une ONG cherchant à offrir de l'aide ou une personne en quête de soutien, Nasna est là pour vous. Ensemble, nous pouvons construire une communauté résiliente et aider ceux qui sont touchés par la crise. Merci de faire partie de notre mission."
   },
-  "NotFound": "Page introuvable"
+  "footer": {
+    "aboutUs": "À propos de nous",
+    "adminPanel": "Panneau d'administration",
+    "dashboard": "Tableau de bord",
+    "signIn": "Se connecter",
+    "registerNgo": "Inscrire une ONG/Initiative",
+    "becomeAgent": "Devenir agent",
+    "allRightsReserved": "Tous droits réservés."
+  },
+  "register": {
+    "title": "Inscrire une ONG/Initiative",
+    "fields": {
+      "name": "Nom de l'organisation",
+      "contactPersonName": "Nom du responsable",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "phoneNumber": "Numéro de téléphone"
+    },
+    "consent": "En soumettant ce formulaire, vous consentez à partager vos données en privé.",
+    "toast": {
+      "consentRequired": "Vous devez donner votre consentement pour vous inscrire.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "success": "Inscription réussie ! Veuillez vous connecter.",
+      "error": "Erreur lors de l'inscription. Veuillez réessayer."
+    },
+    "loading": "Inscription en cours...",
+    "submit": "S'inscrire"
+  },
+  "login": {
+    "fields": {
+      "email": "E-mail",
+      "password": "Mot de passe"
+    },
+    "buttons": {
+      "signIn": "Se connecter",
+      "loading": "Connexion en cours..."
+    },
+    "toast": {
+      "userNotFound": "Aucun utilisateur trouvé avec cet e-mail.",
+      "wrongPassword": "Mot de passe incorrect. Veuillez réessayer.",
+      "invalidEmailFormat": "Format d'e-mail non valide.",
+      "invalidCredential": "Informations d'identification non valides. Veuillez réessayer.",
+      "genericError": "Une erreur est survenue. Veuillez réessayer.",
+      "emailPasswordRequired": "L'e-mail et le mot de passe sont requis.",
+      "success": "Connexion réussie !"
+    },
+    "logoAlt": "Logo Nasna"
+  },
+  "submission": {
+    "title": "Créer une soumission",
+    "accountBeingVerified": "Votre compte est en cours de vérification. Veuillez réessayer plus tard.",
+    "fullName": "Nom complet",
+    "phoneNumber": "Numéro de téléphone",
+    "emailAddress": "Adresse e-mail",
+    "gender": "Genre",
+    "male": "Homme",
+    "female": "Femme",
+    "currentGovernorate": "Gouvernorat actuel",
+    "previousGovernorate": "Gouvernorat précédent",
+    "street": "Rue",
+    "building": "Bâtiment",
+    "floor": "Étage",
+    "city": "Ville",
+    "numberOfPeopleInHousehold": "Nombre de personnes dans le ménage",
+    "numberOfMembers": "Nombre de membres",
+    "aidUrgency": "Urgence de l'aide",
+    "high": "Élevée",
+    "medium": "Moyenne",
+    "low": "Faible",
+    "comments": "Commentaires",
+    "consent": "Je donne mon consentement pour cette soumission.",
+    "submitting": "Envoi en cours...",
+    "submit": "Soumettre",
+    "success": "Soumission réussie !",
+    "error": "Erreur lors de la soumission."
+  },
+  "NotFound": "Page non trouvée"
 }

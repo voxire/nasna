@@ -4,8 +4,10 @@ import { TextField, Button, Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useSnackBar } from "../../Components/NasnaSnackBar";
 import { loginUser } from "../../redux/reducers/userSlice";
+import { useTranslation } from "react-i18next";
 
 function Login() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,32 +26,32 @@ function Login() {
   const handleFirebaseError = (error) => {
     switch (error.code) {
       case "auth/user-not-found":
-        showSnackbar("No user found with this email.", "error");
+        showSnackbar(t("login.toast.userNotFound"), "error");
         break;
       case "auth/wrong-password":
-        showSnackbar("Incorrect password. Please try again.", "error");
+        showSnackbar(t("login.toast.wrongPassword"), "error");
         break;
       case "auth/invalid-email":
-        showSnackbar("Invalid email format.", "error");
+        showSnackbar(t("login.toast.invalidEmailFormat"), "error");
         break;
       case "auth/invalid-credential":
-        showSnackbar("Invalid credentials. Please try again.", "error");
+        showSnackbar(t("login.toast.invalidCredential"), "error");
         break;
       default:
-        showSnackbar("An error occurred. Please try again.", "error");
+        showSnackbar(t("login.toast.genericError"), "error");
         break;
     }
   };
 
   const handleSignIn = async () => {
     if (!email || !password) {
-      showSnackbar("Email and password are required.", "error");
+      showSnackbar(t("login.toast.emailPasswordRequired"), "error");
       return;
     }
 
     const result = await dispatch(loginUser({ email, password }));
     if (loginUser.fulfilled.match(result)) {
-      showSnackbar("Login successful!", "success");
+      showSnackbar(t("login.toast.success"), "success");
       navigate("/ngo/submissions");
     } else {
       handleFirebaseError(result.payload);
@@ -78,18 +80,18 @@ function Login() {
       >
         <img
           src="/Nasna Logo.png"
-          alt="Logo"
+          alt={t("login.logoAlt")}
           style={{ width: "230px", marginBottom: 20 }}
         />
         <TextField
-          label="Email"
+          label={t("login.fields.email")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           fullWidth
           margin="normal"
         />
         <TextField
-          label="Password"
+          label={t("login.fields.password")}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -104,7 +106,7 @@ function Login() {
           sx={{ mt: 2 }}
           disabled={loading}
         >
-          {loading ? "Signing In..." : "Sign In"}
+          {loading ? t("login.buttons.loading") : t("login.buttons.signIn")}
         </Button>
       </Box>
     </Box>

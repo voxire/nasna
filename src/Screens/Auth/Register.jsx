@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { db, auth } from "../../firebase";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -10,10 +9,13 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useSnackBar } from "../../Components/NasnaSnackBar";
+import { useTranslation } from "react-i18next";
+import { db, auth } from "../../firebase";
 
 function Register() {
   const navigate = useNavigate();
   const { showSnackbar } = useSnackBar();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -36,56 +38,24 @@ function Register() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
-
-  const handleSocialMediaChange = (index, value) => {
-    const updatedLinks = [...formData.socialMediaLinks];
-    updatedLinks[index] = value;
-    setFormData((prev) => ({
-      ...prev,
-      socialMediaLinks: updatedLinks,
-    }));
-  };
-
-  const addSocialMediaLink = () => {
-    setFormData((prev) => ({
-      ...prev,
-      socialMediaLinks: [...prev.socialMediaLinks, ""],
-    }));
-  };
-
-  const removeSocialMediaLink = (index) => {
-    const updatedLinks = formData.socialMediaLinks.filter(
-      (_, i) => i !== index
-    );
-    setFormData((prev) => ({
-      ...prev,
-      socialMediaLinks: updatedLinks,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.consentGiven) {
-      showSnackbar("You must give consent to register.", "error");
+      showSnackbar(t("register.toast.consentRequired"), "error");
       return;
     }
 
     if (password !== confirmPassword) {
-      showSnackbar("Passwords do not match.", "error");
+      showSnackbar(t("register.toast.passwordMismatch"), "error");
       return;
     }
 
@@ -95,7 +65,6 @@ function Register() {
         formData.email,
         password
       );
-
       await db
         .collection("members")
         .doc(userCredential.user.uid)
@@ -109,7 +78,6 @@ function Register() {
         });
 
       await auth.signOut();
-
       setFormData({
         name: "",
         contactPersonName: "",
@@ -127,12 +95,11 @@ function Register() {
       setPassword("");
       setConfirmPassword("");
 
-      showSnackbar("Registration successful! Please log in.", "success");
-
+      showSnackbar(t("register.toast.success"), "success");
       navigate("/auth/login");
     } catch (error) {
       console.error("Error registering NGO: ", error);
-      showSnackbar("Error registering NGO. Please try again.", "error");
+      showSnackbar(t("register.toast.error"), "error");
     } finally {
       setLoading(false);
     }
@@ -151,11 +118,11 @@ function Register() {
       }}
     >
       <Typography variant="h4" component="h1" gutterBottom>
-        Register as an NGO/Initiative
+        {t("register.title")}
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
-          label="Organization Name"
+          label={t("register.fields.name")}
           name="name"
           value={formData.name}
           onChange={handleChange}
@@ -164,7 +131,7 @@ function Register() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Contact Person Name"
+          label={t("register.fields.contactPersonName")}
           name="contactPersonName"
           value={formData.contactPersonName}
           onChange={handleChange}
@@ -173,7 +140,7 @@ function Register() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Email"
+          label={t("register.fields.email")}
           name="email"
           type="email"
           value={formData.email}
@@ -183,7 +150,7 @@ function Register() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Password"
+          label={t("register.fields.password")}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -192,7 +159,7 @@ function Register() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Confirm Password"
+          label={t("register.fields.confirmPassword")}
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
@@ -201,7 +168,7 @@ function Register() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Phone Number"
+          label={t("register.fields.phoneNumber")}
           name="phoneNumber"
           value={formData.phoneNumber}
           onChange={handleChange}
@@ -209,7 +176,6 @@ function Register() {
           required
           sx={{ mb: 2 }}
         />
-        {/* Other form fields remain unchanged */}
 
         <FormControlLabel
           control={
@@ -220,7 +186,7 @@ function Register() {
               required
             />
           }
-          label="I give my consent for this registration."
+          label={t("register.consent")}
           sx={{ mb: 2 }}
         />
         <Button
@@ -230,7 +196,7 @@ function Register() {
           fullWidth
           disabled={loading}
         >
-          {loading ? "Registering..." : "Register"}
+          {loading ? t("register.loading") : t("register.submit")}
         </Button>
       </form>
     </Box>

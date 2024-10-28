@@ -12,8 +12,10 @@ import {
   faUserShield, // Admin icon
 } from "@fortawesome/free-solid-svg-icons";
 import { auth } from "../firebase";
+import { useTranslation } from "react-i18next"; // Import i18next
 
 function Footer() {
+  const { t } = useTranslation(); // Initialize i18n translation hook
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
 
@@ -56,13 +58,8 @@ function Footer() {
         >
           <Link href="/about" color="inherit" underline="none">
             <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight: 8 }} />
-            About Us
+            {t("footer.aboutUs")}
           </Link>
-
-          {/* <Link href="/policy" color="inherit" underline="none">
-            <FontAwesomeIcon icon={faFileAlt} style={{ marginRight: 8 }} />
-            Policy
-          </Link> */}
 
           {user?.email ? (
             <>
@@ -72,7 +69,7 @@ function Footer() {
                     icon={faUserShield}
                     style={{ marginRight: 8 }}
                   />
-                  Admin Panel
+                  {t("footer.adminPanel")}
                 </Link>
               ) : (
                 <Link href="/ngo/submissions" color="inherit" underline="none">
@@ -80,14 +77,14 @@ function Footer() {
                     icon={faChartBar}
                     style={{ marginRight: 8 }}
                   />
-                  Dashboard
+                  {t("footer.dashboard")}
                 </Link>
               )}
             </>
           ) : (
             <Link href="/auth/login" color="inherit" underline="none">
               <FontAwesomeIcon icon={faSignInAlt} style={{ marginRight: 8 }} />
-              Sign In
+              {t("footer.signIn")}
             </Link>
           )}
 
@@ -95,32 +92,19 @@ function Footer() {
             <>
               <Link href="/auth/register" color="inherit" underline="none">
                 <FontAwesomeIcon icon={faUserPlus} style={{ marginRight: 8 }} />
-                Register NGO/Initiative
+                {t("footer.registerNgo")}
               </Link>
               <Link href="/auth/agent" color="inherit" underline="none">
                 <FontAwesomeIcon icon={faUserPlus} style={{ marginRight: 8 }} />
-                Become an Agent
+                {t("footer.becomeAgent")}
               </Link>
             </>
           )}
-
-          {/* <Link href="/feedback" color="inherit" underline="none">
-            <FontAwesomeIcon icon={faCommentDots} style={{ marginRight: 8 }} />
-            Feedback
-          </Link> */}
-          {/* 
-          <Link href="/donate" color="inherit" underline="none">
-            <FontAwesomeIcon
-              icon={faHandHoldingHeart}
-              style={{ marginRight: 8 }}
-            />
-            Donate
-          </Link> */}
         </Stack>
 
         <div className="FooterBottom">
           <Typography variant="body1">
-            © {new Date().getFullYear()} Nasna. All rights reserved.
+            © {new Date().getFullYear()} Nasna. {t("footer.allRightsReserved")}
           </Typography>
         </div>
       </Container>

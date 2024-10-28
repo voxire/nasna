@@ -12,8 +12,10 @@ import {
 import { Timestamp, collection, addDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 function CreateSubmission() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
@@ -46,12 +48,10 @@ function CreateSubmission() {
   const userUid = auth.currentUser?.uid;
 
   useEffect(() => {
-    console.log(user);
-
     if (!userUid) {
       navigate("/auth/login");
     }
-  }, []);
+  }, [userUid, navigate]);
 
   if (!user?.validated) {
     return (
@@ -66,7 +66,7 @@ function CreateSubmission() {
         }}
       >
         <Typography variant="h5">
-          Your account is being verified. Please try again later.
+          {t("submission.accountBeingVerified")}
         </Typography>
       </Box>
     );
@@ -101,6 +101,8 @@ function CreateSubmission() {
         agent: auth.currentUser?.uid,
       });
 
+      showSnackbar(t("submission.success"), "success");
+
       setFormData({
         fullName: "",
         phoneNumber: "",
@@ -128,6 +130,7 @@ function CreateSubmission() {
       });
     } catch (error) {
       console.error("Error creating submission:", error);
+      showSnackbar(t("submission.error"), "error");
     } finally {
       setLoading(false);
     }
@@ -146,11 +149,11 @@ function CreateSubmission() {
       }}
     >
       <Typography variant="h4" component="h1" gutterBottom>
-        Create Submission
+        {t("submission.title")}
       </Typography>
       <form onSubmit={handleAddMember}>
         <TextField
-          label="Full Name"
+          label={t("submission.fullName")}
           name="fullName"
           value={formData.fullName}
           onChange={handleChange}
@@ -159,7 +162,7 @@ function CreateSubmission() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Phone Number"
+          label={t("submission.phoneNumber")}
           name="phoneNumber"
           value={formData.phoneNumber}
           onChange={handleChange}
@@ -168,7 +171,7 @@ function CreateSubmission() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Email Address"
+          label={t("submission.emailAddress")}
           name="emailAddress"
           type="email"
           value={formData.emailAddress}
@@ -179,7 +182,7 @@ function CreateSubmission() {
         />
         <TextField
           select
-          label="Gender"
+          label={t("submission.gender")}
           name="gender"
           value={formData.gender}
           onChange={handleChange}
@@ -187,11 +190,11 @@ function CreateSubmission() {
           required
           sx={{ mb: 2 }}
         >
-          <MenuItem value="Male">Male</MenuItem>
-          <MenuItem value="Female">Female</MenuItem>
+          <MenuItem value="Male">{t("submission.male")}</MenuItem>
+          <MenuItem value="Female">{t("submission.female")}</MenuItem>
         </TextField>
         <TextField
-          label="Current Governorate"
+          label={t("submission.currentGovernorate")}
           name="currentGovernorate"
           value={formData.currentGovernorate}
           onChange={handleChange}
@@ -200,7 +203,7 @@ function CreateSubmission() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Previous Governorate"
+          label={t("submission.previousGovernorate")}
           name="previousGovernorate"
           value={formData.previousGovernorate}
           onChange={handleChange}
@@ -209,7 +212,7 @@ function CreateSubmission() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Street"
+          label={t("submission.street")}
           name="street"
           value={formData.street}
           onChange={handleChange}
@@ -218,7 +221,7 @@ function CreateSubmission() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Building"
+          label={t("submission.building")}
           name="building"
           value={formData.building}
           onChange={handleChange}
@@ -227,7 +230,7 @@ function CreateSubmission() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Floor"
+          label={t("submission.floor")}
           name="floor"
           value={formData.floor}
           onChange={handleChange}
@@ -236,7 +239,7 @@ function CreateSubmission() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="City"
+          label={t("submission.city")}
           name="city"
           value={formData.city}
           onChange={handleChange}
@@ -245,7 +248,7 @@ function CreateSubmission() {
           sx={{ mb: 2 }}
         />
         <TextField
-          label="Number of People in Household"
+          label={t("submission.numberOfPeopleInHousehold")}
           name="numberOfPeopleInHousehold"
           type="number"
           value={formData.numberOfPeopleInHousehold}
@@ -257,7 +260,7 @@ function CreateSubmission() {
         {Object.keys(formData.ageRanges).map((range) => (
           <TextField
             key={range}
-            label={`${range} (Number of Members)`}
+            label={`${range} (${t("submission.numberOfMembers")})`}
             name={`ageRanges.${range}`}
             type="number"
             value={formData.ageRanges[range]}
@@ -273,7 +276,7 @@ function CreateSubmission() {
         ))}
         <TextField
           select
-          label="Aid Urgency"
+          label={t("submission.aidUrgency")}
           name="aidUrgency"
           value={formData.aidUrgency}
           onChange={handleChange}
@@ -281,12 +284,12 @@ function CreateSubmission() {
           required
           sx={{ mb: 2 }}
         >
-          <MenuItem value="High">High</MenuItem>
-          <MenuItem value="Medium">Medium</MenuItem>
-          <MenuItem value="Low">Low</MenuItem>
+          <MenuItem value="High">{t("submission.high")}</MenuItem>
+          <MenuItem value="Medium">{t("submission.medium")}</MenuItem>
+          <MenuItem value="Low">{t("submission.low")}</MenuItem>
         </TextField>
         <TextField
-          label="Comments"
+          label={t("submission.comments")}
           name="comments"
           value={formData.comments}
           onChange={handleChange}
@@ -304,7 +307,7 @@ function CreateSubmission() {
               required
             />
           }
-          label="I give my consent for this submission."
+          label={t("submission.consent")}
           sx={{ mb: 2 }}
         />
         <Button
@@ -314,7 +317,7 @@ function CreateSubmission() {
           fullWidth
           disabled={loading}
         >
-          {loading ? "Submitting..." : "Submit"}
+          {loading ? t("submission.submitting") : t("submission.submit")}
         </Button>
       </form>
     </Box>

@@ -19,7 +19,7 @@ export const resources = {
 
 i18next.use(initReactI18next).init({
   resources,
-  lng: "en",
+  lng: "ar",
   fallbackLng: "en",
   compatibilityJSON: "v3",
   interpolation: {

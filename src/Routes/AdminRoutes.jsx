@@ -7,6 +7,7 @@ const AdminSubmissions = React.lazy(() =>
   import("../Screens/Admin/AdminSubmissions")
 );
 const Members = React.lazy(() => import("../Screens/Admin/Members"));
+const Agents = React.lazy(() => import("../Screens/Admin/Agents"));
 
 const AdminRoutes = [
   {
@@ -26,10 +27,18 @@ const AdminRoutes = [
     ),
   },
   {
-    path: "/manage/ngos",
+    path: "/manage/ngo",
     element: (
       <Admin>
         <Members />
+      </Admin>
+    ),
+  },
+  {
+    path: "/manage/agents",
+    element: (
+      <Admin>
+        <Agents />
       </Admin>
     ),
   },
