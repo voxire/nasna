@@ -15,7 +15,8 @@ import {
   faChartBar,
   faSignOut,
 } from "@fortawesome/free-solid-svg-icons";
-import { selectLanguage } from "../services/i18next";import { useNavigate } from "react-router-dom";
+import { selectLanguage } from "../services/i18next";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/reducers/userSlice";
 

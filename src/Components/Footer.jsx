@@ -43,6 +43,7 @@ function Footer() {
         color: "#fff",
         py: 2,
         textAlign: "center",
+        paddingBottom: 20,
       }}
     >
       <Container>
