@@ -65,6 +65,9 @@ function Register() {
         formData.email,
         password
       );
+
+      await userCredential.user.sendEmailVerification();
+
       await db
         .collection("members")
         .doc(userCredential.user.uid)

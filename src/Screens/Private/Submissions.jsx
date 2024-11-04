@@ -23,7 +23,7 @@ function Submissions() {
   const navigate = useNavigate();
   const [members, setMembers] = useState([]);
   const [filteredMembers, setFilteredMembers] = useState([]);
-  const [isVerified, setIsVerified] = useState(true);
+  const [isVerified, setIsVerified] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState({
     governorate: "",
@@ -35,7 +35,10 @@ function Submissions() {
 
   useEffect(() => {
     const fetchMembers = async () => {
-      if (!userUid) navigate("/auth/login");
+      if (!userUid) {
+        navigate("/auth/login");
+        return;
+      }
 
       const role = localStorage.getItem("userRole");
       if (role !== "member") {
@@ -49,9 +52,10 @@ function Submissions() {
       const memberDoc = await db.collection("members").doc(userUid).get();
       if (memberDoc.exists) {
         const memberData = memberDoc.data();
-        setIsVerified(memberData.validated);
 
-        if (memberData.validated) {
+        if (memberData.validated && auth.currentUser.emailVerified) {
+          setIsVerified(true);
+
           const membersCollection = await db.collection("submissions").get();
           const membersData = membersCollection.docs.map((doc) => ({
             id: doc.id,
@@ -59,12 +63,14 @@ function Submissions() {
           }));
           setMembers(membersData);
           setFilteredMembers(membersData);
+        } else {
+          setIsVerified(false);
         }
       }
     };
 
     fetchMembers();
-  }, [userUid]);
+  }, [userUid, navigate]);
 
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();

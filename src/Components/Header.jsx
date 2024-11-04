@@ -3,29 +3,42 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Button,
+  IconButton,
   Menu,
   MenuItem,
-  IconButton,
+  Button,
 } from "@mui/material";
 import { auth } from "../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  // faInfoCircle,
   faLanguage,
+  faChartBar,
+  faSignOut,
 } from "@fortawesome/free-solid-svg-icons";
-import { selectLanguage } from "../services/i18next";
-import { useNavigate } from "react-router-dom";
+import { selectLanguage } from "../services/i18next";import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../redux/reducers/userSlice";
 
-function Header() {
+function Header({ dashboard = false }) {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  const isMobile = false;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
+      if (user) {
+        try {
+          const tokenResult = await user.getIdTokenResult();
+          setRole(tokenResult.claims.role);
+        } catch (error) {
+          console.error("Error retrieving user role:", error);
+        }
+      } else {
+        setRole(null);
+      }
     });
 
     return () => unsubscribe();
@@ -40,11 +53,18 @@ function Header() {
 
   const handleLanguageChange = (lng) => {
     selectLanguage(lng);
-    console.log("Language changed to: " + lng);
     setAnchorEl(null);
   };
-  const handleClickAbout = () => {
-    window.location.href = "/";
+
+  const handleLogout = async () => {
+    try {
+      auth.signOut().then(() => {
+        dispatch(logout());
+        navigate("/auth/login");
+      });
+    } catch (error) {
+      console.error("Error logging out: ", error);
+    }
   };
 
   return (
@@ -53,7 +73,6 @@ function Header() {
       sx={{
         backgroundColor: "#f9f9f9",
         color: "#12a89d",
-        // boxShadow: "1px 1px 5px #ccc",
       }}
     >
       <Toolbar>
@@ -66,6 +85,7 @@ function Header() {
             display: "flex",
             alignItems: "center",
           }}
+          onClick={() => navigate("/")}
         >
           <img
             src="/Nasna Logo.png"
@@ -73,40 +93,69 @@ function Header() {
             width="140px"
             height="100%"
             style={{ margin: "0px", cursor: "pointer" }}
-            onClick={handleClickAbout}
           />
         </Typography>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {/* <IconButton
-            onClick={() => {
-              navigate("/about");
-            }}
-            color="inherit"
-          >
-            <FontAwesomeIcon icon={faInfoCircle} style={{ color: "#12a89d" }} />
-          </IconButton> */}
-          <IconButton
-            onClick={(event) => setAnchorEl(event.currentTarget)}
-            color="inherit"
-          >
-            <FontAwesomeIcon icon={faLanguage} style={{ color: "#12a89d" }} />
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={() => setAnchorEl(null)}
-          >
-            <MenuItem onClick={() => handleLanguageChange("en")}>
-              English
-            </MenuItem>
-            <MenuItem onClick={() => handleLanguageChange("ar")}>
-              Arabic
-            </MenuItem>
-            <MenuItem onClick={() => handleLanguageChange("fr")}>
-              French
-            </MenuItem>
-          </Menu>
-        </div>
+
+        {/* Show panel button if user is logged in */}
+        {user && (
+          <>
+            {/* {role === "admin" ? (
+              <Button
+                color="inherit"
+                onClick={() => navigate("/manage")}
+                startIcon={<FontAwesomeIcon icon={faUserShield} />}
+              >
+                Admin Panel
+              </Button>
+            ) : (
+              <Button
+                color="inherit"
+                onClick={() => navigate("/ngo/submissions")}
+                startIcon={<FontAwesomeIcon icon={faChartBar} />}
+              >
+                Dashboard
+              </Button>
+            )} */}
+            {!dashboard && (
+              <IconButton
+                color="inherit"
+                onClick={() => {
+                  if (role === "admin") navigate("/manage");
+                  else navigate("/ngo/submissions");
+                }}
+              >
+                <FontAwesomeIcon icon={faChartBar} />
+              </IconButton>
+            )}
+            <IconButton
+              color="inherit"
+              onClick={() => {
+                handleLogout();
+              }}
+            >
+              <FontAwesomeIcon icon={faSignOut} />
+            </IconButton>
+          </>
+        )}
+
+        {/* Always show language selector */}
+        <IconButton
+          onClick={(event) => setAnchorEl(event.currentTarget)}
+          color="inherit"
+        >
+          <FontAwesomeIcon icon={faLanguage} style={{ color: "#12a89d" }} />
+        </IconButton>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={() => setAnchorEl(null)}
+        >
+          <MenuItem onClick={() => handleLanguageChange("en")}>
+            English
+          </MenuItem>
+          <MenuItem onClick={() => handleLanguageChange("ar")}>Arabic</MenuItem>
+          <MenuItem onClick={() => handleLanguageChange("fr")}>French</MenuItem>
+        </Menu>
       </Toolbar>
     </AppBar>
   );

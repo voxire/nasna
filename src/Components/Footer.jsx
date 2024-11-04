@@ -2,20 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Container, Link, Stack } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCommentDots,
   faInfoCircle,
-  faFileAlt,
   faSignInAlt,
-  faHandHoldingHeart,
   faChartBar,
   faUserPlus,
-  faUserShield, // Admin icon
+  faUserShield,
 } from "@fortawesome/free-solid-svg-icons";
 import { auth } from "../firebase";
-import { useTranslation } from "react-i18next"; // Import i18next
+import { useTranslation } from "react-i18next";
 
 function Footer() {
-  const { t } = useTranslation(); // Initialize i18n translation hook
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
 
@@ -59,6 +56,10 @@ function Footer() {
           <Link href="/about" color="inherit" underline="none">
             <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight: 8 }} />
             {t("footer.aboutUs")}
+          </Link>
+          <Link href="/about" color="inherit" underline="none">
+            <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight: 8 }} />
+            {t("footer.terms & conditions")}
           </Link>
 
           {user?.email ? (

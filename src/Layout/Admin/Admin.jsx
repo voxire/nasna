@@ -4,24 +4,27 @@ import Navbar from "./Navbar";
 import SideBar from "./Sidebar";
 import PropTypes from "prop-types";
 import { auth } from "../../firebase";
+import { CircularProgress, Box } from "@mui/material";
 
 function Admin(props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      setUser(user);
-
       if (user) {
         try {
           const tokenResult = await user.getIdTokenResult();
-          setRole(tokenResult.claims.role);
+          const userRole = tokenResult.claims.role;
 
-          if (tokenResult.claims.role !== "admin") {
+          if (userRole !== "admin") {
             navigate("/");
+          } else {
+            setUser(user);
+            setRole(userRole);
           }
         } catch (error) {
           console.error("Error retrieving user role:", error);
@@ -30,18 +33,27 @@ function Admin(props) {
       } else {
         navigate("/");
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, [navigate]);
 
-  const openSidebar = () => {
-    setSidebarOpen(true);
-  };
+  const openSidebar = () => setSidebarOpen(true);
+  const closeSidebar = () => setSidebarOpen(false);
 
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-  };
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (!user || role !== "admin") {
     return null;

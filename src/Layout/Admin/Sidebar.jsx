@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faClose,
   faHome,
-  faBuildingNgo,
   faList,
   faBell,
   faUserPlus,
@@ -22,7 +21,17 @@ const SideBar = ({ sidebarOpen, closeSidebar }) => {
     <div className={`sidebar ${sidebarOpen ? "sidebar-responsive" : ""}`}>
       <div className="sidebar__nav">
         <div className="sidebar__title__container">
-          <p className="sidebar__title">Meow in Meows</p>
+          <img
+            src="/Nasna Logo.png"
+            alt="Nasna logo"
+            width="130px"
+            height="100%"
+            style={{
+              margin: "0px",
+              cursor: "pointer",
+              marginBottom: 20,
+            }}
+          />
         </div>
         <FontAwesomeIcon
           className="close__icon"

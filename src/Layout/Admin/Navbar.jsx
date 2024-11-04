@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { auth } from "../../firebase";
 import { Modal, Box, Typography, Button } from "@mui/material";
 import { useDispatch } from "react-redux";

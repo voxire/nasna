@@ -13,10 +13,12 @@ import { Timestamp, collection, addDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { useSnackBar } from "../../Components/NasnaSnackBar";
 
 function CreateSubmission() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { showSnackbar } = useSnackBar();
   const { user } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -148,9 +150,26 @@ function CreateSubmission() {
         marginBottom: "20px",
       }}
     >
-      <Typography variant="h4" component="h1" gutterBottom>
-        {t("submission.title")}
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+        }}
+      >
+        <Typography variant="h4" component="h1" gutterBottom>
+          {t("submission.title")}
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate("/agent/submissions")}
+        >
+          My Submissions
+        </Button>
+      </Box>
+
       <form onSubmit={handleAddMember}>
         <TextField
           label={t("submission.fullName")}

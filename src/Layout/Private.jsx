@@ -1,10 +1,10 @@
 import React from "react";
-import PrivateNavbar from "./Private/PrivateNavbar";
+import Header from "../Components/Header";
 
 function Private({ children }) {
   return (
     <div>
-      <PrivateNavbar />
+      <Header dashboard={true} />
       <div
         style={{
           padding: 20,

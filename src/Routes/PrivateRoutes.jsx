@@ -6,6 +6,9 @@ const Submissions = lazy(() => import("../Screens/Private/Submissions"));
 const CreateSubmission = lazy(() =>
   import("../Screens/Private/CreateSubmission")
 );
+const AgentSubmissions = lazy(() =>
+  import("../Screens/Private/AgentSubmissions")
+);
 
 const NGORoutes = [
   {
@@ -24,6 +27,16 @@ const NGORoutes = [
       <PrivateRoute>
         <Private>
           <CreateSubmission />
+        </Private>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/agent/submissions",
+    element: (
+      <PrivateRoute>
+        <Private>
+          <AgentSubmissions />
         </Private>
       </PrivateRoute>
     ),

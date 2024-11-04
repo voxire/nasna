@@ -107,7 +107,7 @@ function AdminSubmissions() {
   return (
     <Box>
       <Typography variant="h4" component="h1" gutterBottom>
-        {t("adminSubmissions.title")}
+        Submissions
       </Typography>
       <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
         <Table>
