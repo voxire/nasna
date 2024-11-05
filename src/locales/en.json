@@ -80,12 +80,67 @@
       "mission": "Our Mission",
       "vision": "Our Vision",
       "joinUs": "Join Us"
+
+    },
+ "howWeOperate": {
+    "title": "How We Operate",
+    "intro": "We work through structured processes to ensure that aid reaches those in need in the most efficient way. Below is an outline of our approach.",
+    "registrationTitle": "Registration Process",
+    "registrationDescription": "Nasna facilitates a straightforward registration process for displaced individuals, prioritizing those without access to other assistance.",
+    "partnershipsTitle": "Partnerships",
+    "partnershipsDescription": "We collaborate with local and international organizations to maximize the impact of our relief efforts and deliver aid where it's needed most.",
+    "supportTitle": "Support for Beneficiaries",
+    "supportDescription": "We offer a support system for displaced individuals and our donors, ensuring transparency and accountability in every step of our process."
+  },
+  "getInvolved": {
+      "title": "Get Involved",
+      "intro": "Join us in making a difference! There are several ways to contribute to Nasna's mission:",
+      "volunteerTitle": "Volunteer",
+      "volunteerDescription": "Become a volunteer and help us distribute aid and support to displaced individuals.",
+      "volunteerButton": "Join as a Volunteer",
+      "donateTitle": "Donate",
+      "donateDescription": "Your donation goes directly to supporting families affected by displacement.",
+      "donateButton": "Make a Donation",
+      "partnerTitle": "Partner",
+      "partnerDescription": "Partner with Nasna to expand our impact through strategic collaborations.",
+      "partnerButton": "Become a Partner"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "intro": "Find answers to common questions about Nasna's operations, eligibility, and data security.",
+      "questions": {
+        "eligibility": "Who is eligible for aid from Nasna?",
+        "legitimacy": "How can I verify Nasna’s legitimacy?",
+        "dataHandling": "How does Nasna handle my personal information?"
+      },
+      "answers": {
+        "eligibility": "Nasna provides aid primarily to displaced individuals affected by the ongoing conflict in Lebanon, especially those living with relatives or in temporary shelters.",
+        "legitimacy": "Nasna is a registered and transparent organization working in collaboration with trusted partners. You can verify our activities through our website and partner organizations.",
+        "dataHandling": "We prioritize data security and privacy. Personal information is handled in compliance with privacy laws and only used for aid distribution purposes."
+      }},
+      "legalStatus": {
+    "title": "Our Legal Status and Compliance",
+    "description": "Nasna is committed to transparency and legal compliance. We work with local and international partners to ensure all activities are conducted responsibly and within legal frameworks.",
+    "disclaimer": "Donations and funds are managed in partnership with trusted third parties. Any funds collected are exclusively used for the project’s designated purposes and are not allocated elsewhere."
+  },
+    "banner":{
+      "aboutUs": "About Us",
+      "quote": "Through the darkest times, we stand together, stronger and united. Every day brings us one step closer to peace, resilience, and brighter days. Hold on to hope – together, we will rebuild and rise.",
+      "FormButton":"Go back to the form"
+    },
+    "content":{
+      "title":"About Nasna: Standing Together for a Brighter Tomorrow",
+      "missionStatement":"Our mission is to connect, support, and empower NGOs and initiatives in Lebanon to provide organized, effective aid to those impacted by crises. We aim to bridge the gap between data and action, ensuring that every effort counts toward helping those most in need.",
+      "visionStatement":"Our vision is a Lebanon where every individual affected by crisis finds timely support and hope for a better future. We strive to create a network of collaboration, resilience, and transparency, building a foundation for recovery and unity.",
+      "volunteerButton":"Become a Volunteer"
+
     },
     "description": "Our platform connects individuals in need with government and NGO assistance. Although we don't provide aid directly, your information ensures essential support—like food, shelter, and medical care—reaches you efficiently. All data is handled securely and shared only with trusted organizations to coordinate aid.",
     "mission": "Our mission is to provide a reliable platform that connects individuals with critical government and NGO support, ensuring resources reach those who need them the most.",
     "vision": "Our vision is a world where everyone has access to the support they need to thrive. By connecting individuals with the right resources, we aim to make a positive impact in communities worldwide.",
     "joinUs": "Whether you're an NGO seeking to offer help or someone in need of assistance, Nasna is here to support you. Together, we can build a resilient community and uplift those impacted by the crisis. Thank you for being part of our mission."
   },
+
   "footer": {
     "aboutUs": "About Us",
     "adminPanel": "Admin Panel",
