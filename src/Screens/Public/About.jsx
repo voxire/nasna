@@ -1,6 +1,18 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Box, Typography, Link, Button, Grid, Paper, Divider, Avatar, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Link,
+  Button,
+  Grid,
+  Paper,
+  Divider,
+  Avatar,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import HandshakeIcon from "@mui/icons-material/Handshake";
@@ -8,7 +20,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
-import GavelIcon from '@mui/icons-material/Gavel';
+import GavelIcon from "@mui/icons-material/Gavel";
 
 function About() {
   const { t } = useTranslation();
@@ -87,10 +99,18 @@ function About() {
           <Typography variant="h4" gutterBottom>
             {t("about.content.title")}
           </Typography>
-          <Typography variant="body1" paragraph sx={{ color: "text.secondary" }}>
+          <Typography
+            variant="body1"
+            paragraph
+            sx={{ color: "text.secondary" }}
+          >
             {t("about.content.missionStatement")}
           </Typography>
-          <Typography variant="body1" paragraph sx={{ color: "text.secondary" }}>
+          <Typography
+            variant="body1"
+            paragraph
+            sx={{ color: "text.secondary" }}
+          >
             {t("about.content.visionStatement")}
           </Typography>
           <Button variant="contained" color="primary" href="/volunteer">
@@ -100,8 +120,8 @@ function About() {
 
         {/* Image Section */}
         <Box
-          component="img" 
-          src="/public/logo.png" 
+          component="img"
+          src="/public/logo.png"
           alt="Nasna Volunteers"
           sx={{
             flex: 1,
@@ -125,19 +145,34 @@ function About() {
           {t("about.howWeOperate.title")}
         </Typography>
 
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 6, maxWidth: "800px", mx: "auto" }}>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ mb: 6, maxWidth: "800px", mx: "auto" }}
+        >
           {t("about.howWeOperate.intro")}
         </Typography>
 
         <Grid container spacing={6} justifyContent="center">
           {/* Registration Process for Displaced People */}
           <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: "30px", height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <Paper
+              elevation={3}
+              sx={{
+                padding: "30px",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
               <AccountTreeIcon color="primary" sx={{ fontSize: 50, mb: 2 }} />
               <Typography variant="h6" gutterBottom>
                 {t("about.howWeOperate.registrationTitle")}
               </Typography>
-              <Divider sx={{ width: "40px", my: 2, borderColor: "primary.main" }} />
+              <Divider
+                sx={{ width: "40px", my: 2, borderColor: "primary.main" }}
+              />
               <Typography variant="body2" color="text.secondary">
                 {t("about.howWeOperate.registrationDescription")}
               </Typography>
@@ -146,12 +181,23 @@ function About() {
 
           {/* Partnerships with Other Organizations */}
           <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: "30px", height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <Paper
+              elevation={3}
+              sx={{
+                padding: "30px",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
               <HandshakeIcon color="primary" sx={{ fontSize: 50, mb: 2 }} />
               <Typography variant="h6" gutterBottom>
                 {t("about.howWeOperate.partnershipsTitle")}
               </Typography>
-              <Divider sx={{ width: "40px", my: 2, borderColor: "primary.main" }} />
+              <Divider
+                sx={{ width: "40px", my: 2, borderColor: "primary.main" }}
+              />
               <Typography variant="body2" color="text.secondary">
                 {t("about.howWeOperate.partnershipsDescription")}
               </Typography>
@@ -160,12 +206,23 @@ function About() {
 
           {/* Support for Beneficiaries and Donors */}
           <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: "30px", height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <Paper
+              elevation={3}
+              sx={{
+                padding: "30px",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
               <PeopleIcon color="primary" sx={{ fontSize: 50, mb: 2 }} />
               <Typography variant="h6" gutterBottom>
                 {t("about.howWeOperate.supportTitle")}
               </Typography>
-              <Divider sx={{ width: "40px", my: 2, borderColor: "primary.main" }} />
+              <Divider
+                sx={{ width: "40px", my: 2, borderColor: "primary.main" }}
+              />
               <Typography variant="body2" color="text.secondary">
                 {t("about.howWeOperate.supportDescription")}
               </Typography>
@@ -188,41 +245,99 @@ function About() {
           {t("about.whoWeAre.title")}
         </Typography>
 
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 6, maxWidth: "800px", mx: "auto" }}>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ mb: 6, maxWidth: "800px", mx: "auto" }}
+        >
           {t("about.whoWeAre.intro")}
         </Typography>
 
         <Grid container spacing={4} justifyContent="center">
           <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <Avatar alt="Team Member" src="/public/member1.jpg" sx={{ width: 80, height: 80, mb: 2 }} />
-              <Typography variant="h6" gutterBottom>{t("about.whoWeAre.member1.name")}</Typography>
-              <Typography variant="body2" color="text.secondary">{t("about.whoWeAre.member1.position")}</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>{t("about.whoWeAre.member1.affiliation")}</Typography>
-            </Paper>
-          </Grid>
-          
-          <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <Avatar alt="Team Member" src="/public/member2.jpg" sx={{ width: 80, height: 80, mb: 2 }} />
-              <Typography variant="h6" gutterBottom>{t("about.whoWeAre.member2.name")}</Typography>
-              <Typography variant="body2" color="text.secondary">{t("about.whoWeAre.member2.position")}</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>{t("about.whoWeAre.member2.affiliation")}</Typography>
+            <Paper
+              elevation={3}
+              sx={{
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Avatar
+                alt="Team Member"
+                src="/public/member1.jpg"
+                sx={{ width: 80, height: 80, mb: 2 }}
+              />
+              <Typography variant="h6" gutterBottom>
+                {t("about.whoWeAre.member1.name")}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t("about.whoWeAre.member1.position")}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {t("about.whoWeAre.member1.affiliation")}
+              </Typography>
             </Paper>
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <Avatar alt="Team Member" src="/public/member3.jpg" sx={{ width: 80, height: 80, mb: 2 }} />
-              <Typography variant="h6" gutterBottom>{t("about.whoWeAre.member3.name")}</Typography>
-              <Typography variant="body2" color="text.secondary">{t("about.whoWeAre.member3.position")}</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>{t("about.whoWeAre.member3.affiliation")}</Typography>
+            <Paper
+              elevation={3}
+              sx={{
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Avatar
+                alt="Team Member"
+                src="/public/member2.jpg"
+                sx={{ width: 80, height: 80, mb: 2 }}
+              />
+              <Typography variant="h6" gutterBottom>
+                {t("about.whoWeAre.member2.name")}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t("about.whoWeAre.member2.position")}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {t("about.whoWeAre.member2.affiliation")}
+              </Typography>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <Paper
+              elevation={3}
+              sx={{
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Avatar
+                alt="Team Member"
+                src="/public/member3.jpg"
+                sx={{ width: 80, height: 80, mb: 2 }}
+              />
+              <Typography variant="h6" gutterBottom>
+                {t("about.whoWeAre.member3.name")}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t("about.whoWeAre.member3.position")}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {t("about.whoWeAre.member3.affiliation")}
+              </Typography>
             </Paper>
           </Grid>
         </Grid>
       </Box>
-       {/* Get Involved Section */}
-       <Box
+      {/* Get Involved Section */}
+      <Box
         component="section"
         sx={{
           width: "100vw",
@@ -235,23 +350,46 @@ function About() {
           {t("about.getInvolved.title")}
         </Typography>
 
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 6, maxWidth: "800px", mx: "auto" }}>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ mb: 6, maxWidth: "800px", mx: "auto" }}
+        >
           {t("about.getInvolved.intro")}
         </Typography>
 
         <Grid container spacing={6} justifyContent="center">
           {/* Volunteer */}
           <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: "30px", height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <VolunteerActivismIcon color="primary" sx={{ fontSize: 50, mb: 2 }} />
+            <Paper
+              elevation={3}
+              sx={{
+                padding: "30px",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <VolunteerActivismIcon
+                color="primary"
+                sx={{ fontSize: 50, mb: 2 }}
+              />
               <Typography variant="h6" gutterBottom>
                 {t("about.getInvolved.volunteerTitle")}
               </Typography>
-              <Divider sx={{ width: "40px", my: 2, borderColor: "primary.main" }} />
+              <Divider
+                sx={{ width: "40px", my: 2, borderColor: "primary.main" }}
+              />
               <Typography variant="body2" color="text.secondary">
                 {t("about.getInvolved.volunteerDescription")}
               </Typography>
-              <Button variant="contained" color="primary" sx={{ mt: 2 }} href="/volunteer">
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ mt: 2 }}
+                href="/volunteer"
+              >
                 {t("about.getInvolved.volunteerButton")}
               </Button>
             </Paper>
@@ -259,16 +397,32 @@ function About() {
 
           {/* Donate */}
           <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: "30px", height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <Paper
+              elevation={3}
+              sx={{
+                padding: "30px",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
               <LocalAtmIcon color="primary" sx={{ fontSize: 50, mb: 2 }} />
               <Typography variant="h6" gutterBottom>
                 {t("about.getInvolved.donateTitle")}
               </Typography>
-              <Divider sx={{ width: "40px", my: 2, borderColor: "primary.main" }} />
+              <Divider
+                sx={{ width: "40px", my: 2, borderColor: "primary.main" }}
+              />
               <Typography variant="body2" color="text.secondary">
                 {t("about.getInvolved.donateDescription")}
               </Typography>
-              <Button variant="contained" color="primary" sx={{ mt: 2 }} href="/donate">
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ mt: 2 }}
+                href="/donate"
+              >
                 {t("about.getInvolved.donateButton")}
               </Button>
             </Paper>
@@ -276,16 +430,35 @@ function About() {
 
           {/* Partner */}
           <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: "30px", height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <BusinessCenterIcon color="primary" sx={{ fontSize: 50, mb: 2 }} />
+            <Paper
+              elevation={3}
+              sx={{
+                padding: "30px",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <BusinessCenterIcon
+                color="primary"
+                sx={{ fontSize: 50, mb: 2 }}
+              />
               <Typography variant="h6" gutterBottom>
                 {t("about.getInvolved.partnerTitle")}
               </Typography>
-              <Divider sx={{ width: "40px", my: 2, borderColor: "primary.main" }} />
+              <Divider
+                sx={{ width: "40px", my: 2, borderColor: "primary.main" }}
+              />
               <Typography variant="body2" color="text.secondary">
                 {t("about.getInvolved.partnerDescription")}
               </Typography>
-              <Button variant="contained" color="primary" sx={{ mt: 2 }} href="/partner">
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ mt: 2 }}
+                href="/partner"
+              >
                 {t("about.getInvolved.partnerButton")}
               </Button>
             </Paper>
@@ -306,13 +479,20 @@ function About() {
           {t("about.faq.title")}
         </Typography>
 
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 6, maxWidth: "800px", mx: "auto" }}>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ mb: 6, maxWidth: "800px", mx: "auto" }}
+        >
           {t("about.faq.intro")}
         </Typography>
 
         <Box sx={{ maxWidth: "800px", mx: "auto" }}>
           <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content">
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+            >
               <Typography>{t("about.faq.questions.eligibility")}</Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -323,7 +503,10 @@ function About() {
           </Accordion>
 
           <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel2a-content">
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel2a-content"
+            >
               <Typography>{t("about.faq.questions.legitimacy")}</Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -334,7 +517,10 @@ function About() {
           </Accordion>
 
           <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel3a-content">
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel3a-content"
+            >
               <Typography>{t("about.faq.questions.dataHandling")}</Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -345,8 +531,8 @@ function About() {
           </Accordion>
         </Box>
       </Box>
-       {/* Legal Status and Compliance Section */}
-       <Box
+      {/* Legal Status and Compliance Section */}
+      <Box
         component="section"
         sx={{
           width: "100vw",
@@ -355,12 +541,22 @@ function About() {
           textAlign: "center",
         }}
       >
-        <Paper elevation={3} sx={{ padding: "40px", maxWidth: "800px", margin: "auto" }}>
+        <Paper
+          elevation={3}
+          sx={{ padding: "40px", maxWidth: "800px", margin: "auto" }}
+        >
           <GavelIcon color="primary" sx={{ fontSize: 50, mb: 2 }} />
           <Typography variant="h4" gutterBottom>
             {t("about.legalStatus.title")}
           </Typography>
-          <Divider sx={{ width: "60px", my: 2, borderColor: "primary.main", mx: "auto" }} />
+          <Divider
+            sx={{
+              width: "60px",
+              my: 2,
+              borderColor: "primary.main",
+              mx: "auto",
+            }}
+          />
           <Typography variant="body1" color="text.secondary" paragraph>
             {t("about.legalStatus.description")}
           </Typography>

@@ -10,11 +10,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { auth } from "../firebase";
 import { useTranslation } from "react-i18next";
+import useWindowDimensions from "../utils/useWindowDimensions";
 
 function Footer() {
   const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
+  const { width } = useWindowDimensions();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -43,7 +45,7 @@ function Footer() {
         color: "#fff",
         py: 2,
         textAlign: "center",
-        paddingBottom: 20,
+        paddingBottom: width < 600 ? 20 : 5,
       }}
     >
       <Container>

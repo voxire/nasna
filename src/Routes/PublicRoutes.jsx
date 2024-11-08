@@ -6,6 +6,7 @@ const Home = lazy(() => import("../Screens/Public/Home"));
 const About = lazy(() => import("../Screens/Public/About"));
 const Confirmation = lazy(() => import("../Screens/Public/Confirmation"));
 const Donate = lazy(() => import("../Screens/Public/Donate"));
+const Terms = lazy(() => import("../Screens/Public/Terms"));
 
 const PublicRoutes = [
   {
@@ -37,6 +38,14 @@ const PublicRoutes = [
     element: (
       <Public>
         <Donate />
+      </Public>
+    ),
+  },
+  {
+    path: "/terms",
+    element: (
+      <Public>
+        <Terms />
       </Public>
     ),
   },

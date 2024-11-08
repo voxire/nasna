@@ -310,23 +310,23 @@ function Home() {
       >
         <Button
           onClick={() => {
-            if (
-              fullName &&
-              phoneNumber &&
-              currentGovernorate &&
-              previousGovernorate &&
-              street &&
-              building &&
-              floor &&
-              !emailError
-            ) {
-              setPage(2);
-            } else {
-              const errorMessage = emailError
-                ? "Please enter a valid email address."
-                : "Please fill in all required fields.";
-              showSnackbar(errorMessage, "error");
-            }
+            // if (
+            //   fullName &&
+            //   phoneNumber &&
+            //   currentGovernorate &&
+            //   previousGovernorate &&
+            //   street &&
+            //   building &&
+            //   floor &&
+            //   !emailError
+            // ) {
+            setPage(2);
+            // } else {
+            //   const errorMessage = emailError
+            //     ? "Please enter a valid email address."
+            //     : "Please fill in all required fields.";
+            //   showSnackbar(errorMessage, "error");
+            // }
           }}
           variant="contained"
         >
@@ -412,7 +412,6 @@ function Home() {
             label={t(need)}
           />
         ))}
-
         <Typography variant="h6">{t("home.needs.immediate.title")}</Typography>
         {[
           t("home.needs.immediate.need1"),
@@ -439,7 +438,6 @@ function Home() {
             label={t(need)}
           />
         ))}
-
         <TextField
           select
           label={t("home.aidUrgency")}
@@ -452,7 +450,6 @@ function Home() {
           <MenuItem value="Medium">{t("home.medium")}</MenuItem>
           <MenuItem value="Low">{t("home.low")}</MenuItem>
         </TextField>
-
         <TextField
           label={t("home.comments")}
           value={comments}
@@ -462,7 +459,7 @@ function Home() {
           multiline
           rows={4}
         />
-
+ 
         <Typography variant="body2" color="textSecondary">
           {t("home.consent")}
         </Typography>
