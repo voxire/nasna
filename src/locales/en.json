@@ -147,7 +147,8 @@
     "signIn": "Sign In",
     "registerNgo": "Register NGO/Initiative",
     "becomeAgent": "Become an Agent",
-    "allRightsReserved": "All rights reserved."
+    "allRightsReserved": "All rights reserved.",
+    "terms & conditions": "Terms & Conditions"
   },
   "register": {
     "title": "Register as an NGO/Initiative",
