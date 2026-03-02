@@ -1,0 +1,40 @@
+import i18next from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import type { SupportedLanguage } from '../types';
+
+import en from '../locales/en.json';
+import fr from '../locales/fr.json';
+import ar from '../locales/ar.json';
+
+export const resources = {
+  en: {
+    translation: en,
+  },
+  fr: {
+    translation: fr,
+  },
+  ar: {
+    translation: ar,
+  },
+};
+
+i18next.use(initReactI18next).init({
+  resources,
+  lng: 'en',
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
+});
+
+export const selectLanguage = (language: SupportedLanguage) => {
+  if (language) {
+    i18next.changeLanguage(language);
+    localStorage.setItem('language', language);
+  } else {
+    i18next.changeLanguage('ar');
+    localStorage.setItem('language', 'ar');
+  }
+};
+
+export default i18next;

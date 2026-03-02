@@ -1,46 +1,24 @@
-## Notes to be done:
+# Nasna - Together we grow
 
-* Arabic Verion
-* adjust the design (to be more user*friendly)
-* Check everything missing (info and disclaimers)
-* how the data is going to be displayed (csv or on a dashboard)
-* check the obligatroy and optional fields
-* Write a Disclaimer
+Humanitarian aid management platform for connecting displaced individuals in Lebanon with NGO and government support.
 
-## adjust the design:
+## Stack
 
-* remove names of the household members
-* add age ranges
-* remove add household member button
-* remove relationship to primary
-* make national id obligatroy
-* address should be at the start
-* address which governeret he is living in rn (dropdown menu)
-* address which governeret he came from in rn (dropdown menu)
-* street
-* building
-* floor
-* in Househould info: add message to guide user to what to do
+- React 18 + Vite
+- Material-UI 6
+- Firebase (Firestore, Auth, Hosting)
+- Redux Toolkit + redux-persist
+- i18next (EN, AR, FR)
 
-## Check everything missing:
+## Setup
 
-* Info about if there is a person with disability in the household
-* active working household members
-* natoinality
+```bash
+yarn install
+yarn start
+```
 
+## Deploy
 
-#Tasks
-##Rami:
-. [] Arabic Verion
-. [] French Version
-. [] Governments + Cities
-
-##Mohamad:
-. [] adjust the design (to be more user*friendly)
-. [] check the obligatroy and optional fields
-. [] Fix the confirmation page to not allow the user to navigate back.
-. [] Filters
-
-##Abed:
-. [] Logo
-. [] Design
+```bash
+yarn deploy
+```
