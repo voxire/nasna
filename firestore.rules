@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helpers ────────────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.role == 'admin';
+    }
+
+    function isAgent() {
+      return isSignedIn() && request.auth.token.role == 'agent';
+    }
+
+    function isMember() {
+      return isSignedIn() && request.auth.token.role == 'member';
+    }
+
+    // Reads the caller's own member doc to check the validated field.
+    // Used because "validated" is stored in Firestore, not in auth claims.
+    function isValidatedMember() {
+      return isMember()
+        && get(/databases/$(database)/documents/members/$(request.auth.uid)).data.validated == true;
+    }
+
+    // ─── /members ───────────────────────────────────────────────────────────
+
+    match /members/{userId} {
+      // A signed-in user can read their own doc (login flow reads it to get role/validated).
+      // Admins can read any doc.
+      allow read: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
+
+      // Registration: a newly authenticated user creates their own doc.
+      // Disallow setting role to 'admin' on creation.
+      allow create: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.data.role != 'admin';
+
+      // Only admins may update members (validate, edit fields).
+      // Users cannot promote themselves or change their own role/validated.
+      allow update: if isAdmin();
+
+      // Only admins may delete members.
+      allow delete: if isAdmin();
+    }
+
+    // ─── /submissions ────────────────────────────────────────────────────────
+
+    match /submissions/{submissionId} {
+      // Public (unauthenticated) users may create a submission from the Home form.
+      // Authenticated agents may also create on behalf of others.
+      allow create: if true;
+
+      // Public users may run the phone-number duplicate check query (read).
+      // NOTE: This also allows unauthenticated list access. To fully lock this
+      // down in the future, move the duplicate check to a Cloud Function and
+      // change this rule to: allow read: if isAdmin() || isValidatedMember() || ...
+      //
+      // Authenticated access:
+      //   - Admins: full read access.
+      //   - Validated NGO members: read all submissions (for the submissions dashboard).
+      //   - Agents: read only their own submissions (agent field == their UID).
+      allow read: if isAdmin()
+        || isValidatedMember()
+        || (isAgent() && resource.data.agent == request.auth.uid)
+        || !isSignedIn(); // unauthenticated phone-number duplicate check
+
+      // Only admins may edit or delete submissions.
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+  }
+}
