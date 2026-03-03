@@ -10,6 +10,7 @@
     "registerTime": "Minutes to Register",
     "minSuffix": " min",
     "governorates": "Governorates Covered",
+    "allSuffix": "All",
     "aidTypes": "Aid Categories",
     "cost": "Registration Cost",
     "costSuffix": "Free"

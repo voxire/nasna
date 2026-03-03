@@ -61,7 +61,7 @@ function Landing() {
 
   const stats = [
     { target: 5, suffix: t('landing.stats.minSuffix'), label: t('landing.stats.registerTime') },
-    { target: 8, suffix: '', label: t('landing.stats.governorates') },
+    { target: 0, suffix: t('landing.stats.allSuffix'), label: t('landing.stats.governorates') },
     { target: 6, suffix: '+', label: t('landing.stats.aidTypes') },
     { target: 0, suffix: t('landing.stats.costSuffix'), label: t('landing.stats.cost') },
   ];
@@ -436,11 +436,7 @@ function Landing() {
       </section>
 
       {/* ══ FINAL CTA ══════════════════════════════════════════════════════════ */}
-      <section
-        className="relative px-6 py-28 flex items-center justify-center overflow-hidden"
-        style={{ backgroundImage: 'url("/nabatiye.jpg")', backgroundSize: 'cover', backgroundPosition: 'center 65%' }}
-      >
-        <div className="absolute inset-0 bg-[#0c7a72]/92" />
+      <section className="relative px-6 py-28 flex items-center justify-center bg-gray-950">
         <motion.div
           className="relative z-10 flex flex-col items-center text-center gap-6 max-w-xl"
           initial={{ opacity: 0, y: 40 }}

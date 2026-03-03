@@ -9,7 +9,8 @@
   "stats": {
     "registerTime": "دقائق للتسجيل",
     "minSuffix": " دقائق",
-    "governorates": "محافظة مشمولة",
+    "governorates": "المحافظات مشمولة",
+    "allSuffix": "كل",
     "aidTypes": "فئة مساعدات",
     "cost": "تكلفة التسجيل",
     "costSuffix": "مجاني"
