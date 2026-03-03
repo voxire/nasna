@@ -30,6 +30,8 @@ function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
     return () => clearInterval(id);
   }, [inView, target]);
 
+  if (target === 0) return <span>{suffix}</span>;
+
   return (
     <span ref={ref}>
       {count >= 1_000_000
@@ -58,10 +60,10 @@ function Landing() {
   const isRtl = i18n.language === 'ar';
 
   const stats = [
-    { target: 1_500_000, suffix: '+', label: t('landing.stats.displaced') },
+    { target: 5, suffix: t('landing.stats.minSuffix'), label: t('landing.stats.registerTime') },
     { target: 8, suffix: '', label: t('landing.stats.governorates') },
     { target: 6, suffix: '+', label: t('landing.stats.aidTypes') },
-    { target: 100, suffix: '%', label: t('landing.stats.free') },
+    { target: 0, suffix: t('landing.stats.costSuffix'), label: t('landing.stats.cost') },
   ];
 
   const steps = [

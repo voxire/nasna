@@ -1,26 +1,28 @@
 {
   "hero": {
     "headline": "Help Starts Here",
-    "subtext": "Nasna connects displaced individuals with government and NGO support across Lebanon. Register once — get matched with food, shelter, and medical care.",
+    "subtext": "Nasna connects individuals and families in need with government and NGO support across Lebanon. One registration. The right help, faster.",
     "cta": "Register Now",
     "secondaryCta": "Learn More",
     "scrollHint": "Scroll"
   },
   "stats": {
-    "displaced": "Displaced in Lebanon",
+    "registerTime": "Minutes to Register",
+    "minSuffix": " min",
     "governorates": "Governorates Covered",
     "aidTypes": "Aid Categories",
-    "free": "Free to Use"
+    "cost": "Registration Cost",
+    "costSuffix": "Free"
   },
   "crisis": {
-    "eyebrow": "The Situation",
-    "title": "Lebanon is facing a humanitarian crisis",
-    "body": "Millions of Lebanese and displaced individuals are struggling to access basic necessities. Homes have been destroyed, families separated, and access to healthcare and food severely disrupted. Nasna was built to bridge that gap.",
-    "footer": "Sources: UNHCR Lebanon, 2024",
-    "issue1": "Shelter & Housing Loss",
-    "issue2": "Food Insecurity",
-    "issue3": "Medical Shortages",
-    "issue4": "Child Vulnerability"
+    "eyebrow": "Why It Matters",
+    "title": "Access to support should never be complicated",
+    "body": "In Lebanon, navigating aid and social support is fragmented, opaque, and exhausting. Families in need often don't know where to turn, which organizations to contact, or what they qualify for. Nasna changes that by creating a single, simple entry point to the support network.",
+    "footer": "Built for Lebanon. Designed for everyone who needs support.",
+    "issue1": "Housing & Shelter",
+    "issue2": "Food Security",
+    "issue3": "Healthcare Access",
+    "issue4": "Family & Child Support"
   },
   "steps": {
     "eyebrow": "The Process",

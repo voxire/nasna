@@ -1,26 +1,28 @@
 {
   "hero": {
     "headline": "L'aide commence ici",
-    "subtext": "Nasna connecte les personnes déplacées avec l'aide gouvernementale et des ONG au Liban. Inscrivez-vous une fois — obtenez de la nourriture, un abri et des soins médicaux.",
+    "subtext": "Nasna connecte les individus et les familles dans le besoin avec l'aide gouvernementale et des ONG au Liban. Une inscription. Le bon soutien, plus rapidement.",
     "cta": "S'inscrire maintenant",
     "secondaryCta": "En savoir plus",
     "scrollHint": "Défiler"
   },
   "stats": {
-    "displaced": "Déplacés au Liban",
+    "registerTime": "Minutes pour s'inscrire",
+    "minSuffix": " min",
     "governorates": "Gouvernorats couverts",
     "aidTypes": "Catégories d'aide",
-    "free": "Gratuit"
+    "cost": "Coût d'inscription",
+    "costSuffix": "Gratuit"
   },
   "crisis": {
-    "eyebrow": "La Situation",
-    "title": "Le Liban fait face à une crise humanitaire",
-    "body": "Des millions de Libanais et de personnes déplacées peinent à accéder aux besoins essentiels. Des maisons ont été détruites, des familles séparées, et l'accès aux soins et à la nourriture gravement perturbé. Nasna a été créée pour combler ce fossé.",
-    "footer": "Sources : HCR Liban, 2024",
-    "issue1": "Perte de logement",
-    "issue2": "Insécurité alimentaire",
-    "issue3": "Pénurie médicale",
-    "issue4": "Vulnérabilité des enfants"
+    "eyebrow": "Pourquoi c'est important",
+    "title": "L'accès au soutien ne devrait jamais être compliqué",
+    "body": "Au Liban, naviguer entre les aides et le soutien social est fragmenté, opaque et épuisant. Les familles dans le besoin ne savent souvent pas où se tourner, quelles organisations contacter, ni à quoi elles ont droit. Nasna change cela en créant un point d'entrée unique et simple vers le réseau de soutien.",
+    "footer": "Construit pour le Liban. Conçu pour tous ceux qui ont besoin de soutien.",
+    "issue1": "Logement et abri",
+    "issue2": "Sécurité alimentaire",
+    "issue3": "Accès aux soins",
+    "issue4": "Soutien famille et enfant"
   },
   "steps": {
     "eyebrow": "Le Processus",
