@@ -1,33 +1,36 @@
 import { useEffect, useState } from 'react';
 import { db } from '../../firebase';
+import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { toast } from 'sonner';
+import type { MemberDocument } from '../../types';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
 import {
-  Box,
-  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/Components/ui/select';
+import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
+  TableHeader,
   TableRow,
-  Typography,
-  Modal,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-} from '@mui/material';
-import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { SelectChangeEvent } from '@mui/material/Select';
-import { useSnackBar } from '../../Components/NasnaSnackBar';
-import type { MemberDocument } from '../../types';
+} from '@/Components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/Components/ui/dialog';
 
 interface AgentRow extends MemberDocument {
   id: string;
-}
-
-interface FilterState {
-  validated: string;
 }
 
 function Agents() {
@@ -35,10 +38,9 @@ function Agents() {
   const [filteredAgents, setFilteredAgents] = useState<AgentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<FilterState>({ validated: '' });
+  const [validatedFilter, setValidatedFilter] = useState('');
   const [editAgent, setEditAgent] = useState<AgentRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const { showSnackbar } = useSnackBar();
 
   useEffect(() => {
     fetchAgents();
@@ -48,75 +50,59 @@ function Agents() {
     setLoading(true);
     try {
       const snapshot = await getDocs(collection(db, 'members'));
-      const agentsData = snapshot.docs
+      const data = snapshot.docs
         .map((d) => ({ id: d.id, ...(d.data() as MemberDocument) }))
-        .filter((agent) => agent.role === 'agent');
-
-      setAgents(agentsData);
-      setFilteredAgents(agentsData);
+        .filter((a) => a.role === 'agent');
+      setAgents(data);
+      setFilteredAgents(data);
     } catch (error) {
       console.error('Error fetching agents: ', error);
-      showSnackbar('Error fetching agents.', 'error');
+      toast.error('Error fetching agents.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
-    const filtered = agents.filter((agent) =>
-      [agent.name, agent.contactPersonName, agent.email].some((field) =>
-        (field ?? '').toLowerCase().includes(query),
-      ),
+    const q = e.target.value.toLowerCase();
+    setSearchQuery(q);
+    setFilteredAgents(
+      agents.filter((a) =>
+        [a.name, a.contactPersonName, a.email].some((f) => (f ?? '').toLowerCase().includes(q))
+      )
     );
-    setFilteredAgents(filtered);
   };
 
-  const handleFilterChange = (e: SelectChangeEvent<string>) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-
-    let filtered = agents;
-    if (value) {
-      filtered = agents.filter((agent) => String(agent.validated) === value);
+  const handleFilterChange = (value: string) => {
+    setValidatedFilter(value);
+    if (!value || value === 'all') {
+      setFilteredAgents(agents);
+    } else {
+      setFilteredAgents(agents.filter((a) => String(a.validated) === value));
     }
-    setFilteredAgents(filtered);
   };
 
   const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this agent?');
-    if (!confirmDelete) return;
-
+    if (!window.confirm('Are you sure you want to delete this agent?')) return;
     try {
       await deleteDoc(doc(db, 'members', id));
-      showSnackbar('Agent deleted successfully.', 'success');
+      toast.success('Agent deleted successfully.');
       fetchAgents();
     } catch (error) {
       console.error('Error deleting agent: ', error);
-      showSnackbar('Error deleting agent. Please try again.', 'error');
+      toast.error('Error deleting agent. Please try again.');
     }
   };
 
   const handleValidate = async (id: string) => {
     try {
       await updateDoc(doc(db, 'members', id), { validated: true });
-      showSnackbar('Agent validated successfully.', 'success');
+      toast.success('Agent validated successfully.');
       fetchAgents();
     } catch (error) {
       console.error('Error validating agent: ', error);
-      showSnackbar('Error validating agent. Please try again.', 'error');
+      toast.error('Error validating agent. Please try again.');
     }
-  };
-
-  const handleOpenModal = (agent: AgentRow) => {
-    setEditAgent(agent);
-    setModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setEditAgent(null);
-    setModalOpen(false);
   };
 
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,156 +115,111 @@ function Agents() {
     if (!editAgent) return;
     try {
       await updateDoc(doc(db, 'members', editAgent.id), { ...editAgent });
-      showSnackbar('Agent updated successfully.', 'success');
-      handleCloseModal();
+      toast.success('Agent updated successfully.');
+      setModalOpen(false);
+      setEditAgent(null);
       fetchAgents();
     } catch (error) {
       console.error('Error updating agent: ', error);
-      showSnackbar('Error updating agent. Please try again.', 'error');
+      toast.error('Error updating agent. Please try again.');
     }
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Agent Members
-      </Typography>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-5 text-gray-800">Agent Members</h1>
 
-      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-        <TextField
-          label="Search"
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4 flex gap-3 flex-wrap">
+        <Input
+          placeholder="Search by Name, Contact Person, or Email"
           value={searchQuery}
           onChange={handleSearch}
-          placeholder="Search by Name, Contact Person, or Email"
-          fullWidth
+          className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
-
-        <FormControl sx={{ minWidth: 120 }}>
-          <InputLabel>Validated</InputLabel>
-          <Select name="validated" value={filters.validated} onChange={handleFilterChange}>
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="true">Validated</MenuItem>
-            <MenuItem value="false">Not Validated</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+        <Select value={validatedFilter} onValueChange={handleFilterChange}>
+          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200"><SelectValue placeholder="Validated" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="true">Validated</SelectItem>
+            <SelectItem value="false">Not Validated</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {loading ? (
-        <Typography>Loading...</Typography>
+        <p className="text-gray-500">Loading...</p>
       ) : (
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Contact Person</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Phone Number</TableCell>
-                <TableCell>Validated</TableCell>
-                <TableCell>Actions</TableCell>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50 hover:bg-gray-50">
+              <TableHead className="font-semibold text-gray-700">Name</TableHead>
+              <TableHead className="font-semibold text-gray-700">Contact Person</TableHead>
+              <TableHead className="font-semibold text-gray-700">Email</TableHead>
+              <TableHead className="font-semibold text-gray-700">Phone Number</TableHead>
+              <TableHead className="font-semibold text-gray-700">Validated</TableHead>
+              <TableHead className="font-semibold text-gray-700">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredAgents.map((agent) => (
+              <TableRow key={agent.id} className="hover:bg-gray-50">
+                <TableCell className="font-medium">{agent.name}</TableCell>
+                <TableCell>{agent.contactPersonName}</TableCell>
+                <TableCell>{agent.email}</TableCell>
+                <TableCell>{agent.phoneNumber}</TableCell>
+                <TableCell>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${agent.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                    {agent.validated ? 'Validated' : 'Pending'}
+                  </span>
+                </TableCell>
+                <TableCell className="flex gap-2">
+                  {!agent.validated && (
+                    <Button size="sm" className="bg-[#12a89d] hover:bg-[#0e9088] text-white" onClick={() => handleValidate(agent.id)}>Validate</Button>
+                  )}
+                  {agent.validated && (
+                    <>
+                      <Button size="sm" variant="outline" className="border-gray-300" onClick={() => { setEditAgent(agent); setModalOpen(true); }}>Edit</Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleDelete(agent.id)}>Delete</Button>
+                    </>
+                  )}
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredAgents.map((agent) => (
-                <TableRow key={agent.id}>
-                  <TableCell>{agent.name}</TableCell>
-                  <TableCell>{agent.contactPersonName}</TableCell>
-                  <TableCell>{agent.email}</TableCell>
-                  <TableCell>{agent.phoneNumber}</TableCell>
-                  <TableCell>{agent.validated ? 'Yes' : 'No'}</TableCell>
-                  <TableCell>
-                    {!agent.validated && (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleValidate(agent.id)}
-                      >
-                        Validate
-                      </Button>
-                    )}
-                    {agent.validated && (
-                      <>
-                        <Button
-                          variant="outlined"
-                          color="secondary"
-                          onClick={() => handleOpenModal(agent)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          onClick={() => handleDelete(agent.id)}
-                        >
-                          Delete
-                        </Button>
-                      </>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            ))}
+          </TableBody>
+        </Table>
+        </div>
       )}
 
-      <Modal open={modalOpen} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            maxWidth: 400,
-            margin: 'auto',
-            backgroundColor: '#fff',
-            padding: 2,
-            borderRadius: 2,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Edit Agent
-          </Typography>
-          <form onSubmit={handleEditSubmit}>
-            <TextField
-              label="Name"
-              name="name"
-              value={editAgent?.name || ''}
-              onChange={handleEditChange}
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Contact Person"
-              name="contactPersonName"
-              value={editAgent?.contactPersonName || ''}
-              onChange={handleEditChange}
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Email"
-              name="email"
-              value={editAgent?.email || ''}
-              onChange={handleEditChange}
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Phone Number"
-              name="phoneNumber"
-              value={editAgent?.phoneNumber || ''}
-              onChange={handleEditChange}
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-            />
-            <Button type="submit" variant="contained" color="primary">
-              Save Changes
-            </Button>
+      <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) setEditAgent(null); }}>
+        <DialogContent className="max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Edit Agent</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-3">
+            {[
+              { name: 'name', label: 'Name' },
+              { name: 'contactPersonName', label: 'Contact Person' },
+              { name: 'email', label: 'Email' },
+              { name: 'phoneNumber', label: 'Phone Number' },
+            ].map(({ name, label }) => (
+              <div key={name} className="space-y-1">
+                <Label>{label}</Label>
+                <Input
+                  name={name}
+                  value={(editAgent?.[name as keyof AgentRow] as string) ?? ''}
+                  onChange={handleEditChange}
+                  required
+                />
+              </div>
+            ))}
+            <DialogFooter>
+              <Button type="submit">Save Changes</Button>
+            </DialogFooter>
           </form>
-        </Box>
-      </Modal>
-    </Box>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
 

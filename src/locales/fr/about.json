@@ -1,0 +1,17 @@
+{
+  "title": {
+    "aboutUs": "À propos de nous",
+    "mission": "Notre mission",
+    "vision": "Notre vision",
+    "joinUs": "Rejoignez-nous"
+  },
+  "description": "Notre plateforme relie les individus dans le besoin avec l'assistance des gouvernements et des ONG. Bien que nous ne fournissions pas d'aide directement, vos informations garantissent que le soutien essentiel vous parvient efficacement.",
+  "mission": "Notre mission est de fournir une plateforme fiable reliant les individus avec un soutien essentiel.",
+  "vision": "Notre vision est un monde où chacun a accès au soutien nécessaire pour s'épanouir.",
+  "joinUs": "Que vous soyez une ONG cherchant à offrir de l'aide ou une personne en quête de soutien, Nasna est là pour vous.",
+  "banner": {
+    "aboutUs": "À propos de nous",
+    "quote": "Dans les moments les plus sombres, nous nous tenons ensemble, plus forts et unis.",
+    "FormButton": "Retour au formulaire"
+  }
+}

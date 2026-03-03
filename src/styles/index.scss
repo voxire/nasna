@@ -1,4 +1,3 @@
-@use 'variables';
 @use 'imports';
 
 :root {
@@ -14,9 +13,11 @@
   user-select: none;
 }
 
-* {
-  padding: 0;
-  margin: 0;
+@layer base {
+  * {
+    padding: 0;
+    margin: 0;
+  }
 }
 
 .FooterBottom {

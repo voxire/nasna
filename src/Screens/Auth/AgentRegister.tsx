@@ -1,178 +1,167 @@
-import { useState } from 'react';
 import { db, auth } from '../../firebase';
-import { Box, TextField, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useSnackBar } from '../../Components/NasnaSnackBar';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { toast } from 'sonner';
 import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
 
-interface AgentFormData {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  phoneNumber: string;
-  areaOfOperation: string;
-  role: string;
-}
+const agentSchema = z
+  .object({
+    name: z.string().min(1),
+    email: z.string().email(),
+    password: z.string().min(6),
+    confirmPassword: z.string().min(6),
+    phoneNumber: z.string().min(1),
+    areaOfOperation: z.string().min(1),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
+type AgentFormData = z.infer<typeof agentSchema>;
 
 function AgentRegister() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { showSnackbar } = useSnackBar();
 
-  const [formData, setFormData] = useState<AgentFormData>({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phoneNumber: '',
-    areaOfOperation: '',
-    role: 'agent',
+  const form = useForm<AgentFormData>({
+    resolver: zodResolver(agentSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phoneNumber: '',
+      areaOfOperation: '',
+    },
   });
 
-  const [loading, setLoading] = useState(false);
+  const { formState: { isSubmitting } } = form;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      showSnackbar('Passwords do not match.', 'error');
-      return;
-    }
-
-    setLoading(true);
+  const onSubmit = async (data: AgentFormData) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password,
-      );
-
-      const { password: _pw, confirmPassword: _cpw, ...dataToSave } = formData;
-
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
       await setDoc(doc(db, 'members', userCredential.user.uid), {
         uid: userCredential.user.uid,
-        ...dataToSave,
+        name: data.name,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        areaOfOperation: data.areaOfOperation,
+        role: 'agent',
         isAdmin: false,
         validated: false,
         createdAt: new Date(),
         updatedAt: new Date(),
         consentGiven: true,
       });
-
       await signOut(auth);
-
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        phoneNumber: '',
-        areaOfOperation: '',
-        role: 'agent',
-      });
-
-      showSnackbar('Registration successful! Please log in.', 'success');
+      toast.success('Registration successful! Please log in.');
       navigate('/auth/login');
     } catch (error) {
       console.error('Error registering agent: ', error);
-      showSnackbar('Error registering. Please try again.', 'error');
-    } finally {
-      setLoading(false);
+      toast.error('Error registering. Please try again.');
     }
   };
 
   return (
-    <Box
-      sx={{
-        maxWidth: '600px',
-        margin: '0 auto',
-        padding: '20px',
-        backgroundColor: '#f5f5f5',
-        borderRadius: '8px',
-        marginTop: '20px',
-        marginBottom: '20px',
-      }}
-    >
-      <Typography variant="h4" component="h1" gutterBottom>
-        Become An Agent
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="Full Name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Password"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Confirm Password"
-          name="confirmPassword"
-          type="password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Phone Number"
-          name="phoneNumber"
-          value={formData.phoneNumber}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label="Area of Operation"
-          name="areaOfOperation"
-          value={formData.areaOfOperation}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <Typography variant="body2" color="textSecondary">
-          {t('home.consent')}
-        </Typography>
-        <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
-          {loading ? 'Registering...' : 'Register'}
-        </Button>
-      </form>
-    </Box>
+    <div className="max-w-[600px] mx-auto my-8 px-4">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Become An Agent</h1>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Full Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirm Password</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone Number</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="areaOfOperation"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Area of Operation</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <p className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">{t('home.consent')}</p>
+          <Button type="submit" className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white" disabled={isSubmitting}>
+            {isSubmitting ? 'Registering...' : 'Register'}
+          </Button>
+        </form>
+      </Form>
+      </div>
+    </div>
   );
 }
 

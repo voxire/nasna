@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClose, faHome, faList, faBell, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { X, Home, List, Bell, UserPlus } from 'lucide-react';
 
 interface SideBarProps {
   sidebarOpen: boolean;
@@ -24,21 +23,17 @@ const SideBar = ({ sidebarOpen, closeSidebar }: SideBarProps) => {
             alt="Nasna logo"
             width="130px"
             height="100%"
-            style={{
-              margin: '0px',
-              cursor: 'pointer',
-              marginBottom: 20,
-            }}
+            style={{ margin: '0px', cursor: 'pointer', marginBottom: 20 }}
           />
         </div>
-        <FontAwesomeIcon className="close__icon" onClick={closeSidebar} icon={faClose} size="lg" />
+        <X className="close__icon cursor-pointer" onClick={closeSidebar} size={24} />
       </div>
       <div className="sidebar__menu">
         <div
           className={`sidebar__link ${location.pathname === '/manage' ? 'active' : ''}`}
           onClick={() => handleNavigation('/manage')}
         >
-          <FontAwesomeIcon icon={faHome} className="sidebar__icon" />
+          <Home className="sidebar__icon" size={18} />
           <p id="link">Home</p>
         </div>
 
@@ -46,21 +41,21 @@ const SideBar = ({ sidebarOpen, closeSidebar }: SideBarProps) => {
           className={`sidebar__link ${location.pathname === '/manage/submissions' ? 'active' : ''}`}
           onClick={() => handleNavigation('/manage/submissions')}
         >
-          <FontAwesomeIcon icon={faList} className="sidebar__icon" />
+          <List className="sidebar__icon" size={18} />
           <p id="link">Submissions</p>
         </div>
         <div
           className={`sidebar__link ${location.pathname === '/manage/ngo' ? 'active' : ''}`}
           onClick={() => handleNavigation('/manage/ngo')}
         >
-          <FontAwesomeIcon icon={faBell} className="sidebar__icon" />
+          <Bell className="sidebar__icon" size={18} />
           <p id="link">NGO/Initiative</p>
         </div>
         <div
           className={`sidebar__link ${location.pathname === '/manage/agents' ? 'active' : ''}`}
           onClick={() => handleNavigation('/manage/agents')}
         >
-          <FontAwesomeIcon icon={faUserPlus} className="sidebar__icon" />
+          <UserPlus className="sidebar__icon" size={18} />
           <p id="link">Agents</p>
         </div>
       </div>

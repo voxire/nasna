@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faBuildingNgo, faComment, faList } from '@fortawesome/free-solid-svg-icons';
+import { List, Building2, Bell, MessageSquare } from 'lucide-react';
 import { db } from '../../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
@@ -27,7 +26,6 @@ function Dashboard() {
         console.error('Error fetching data:', error);
       }
     };
-
     fetchData();
   }, []);
 
@@ -44,7 +42,7 @@ function Dashboard() {
           <div className="card">
             <div className="card_inner">
               <div>
-                <FontAwesomeIcon icon={faList} />
+                <List />
                 <p className="text-primary-p">Submissions</p>
               </div>
               <span className="font-bold text-title">{submissions}</span>
@@ -54,7 +52,7 @@ function Dashboard() {
           <div className="card">
             <div className="card_inner">
               <div>
-                <FontAwesomeIcon icon={faBuildingNgo} />
+                <Building2 />
                 <p className="text-primary-p">NGOs</p>
               </div>
               <span className="font-bold text-title">{businesses}</span>
@@ -64,7 +62,7 @@ function Dashboard() {
           <div className="card">
             <div className="card_inner">
               <div>
-                <FontAwesomeIcon icon={faBell} />
+                <Bell />
                 <p className="text-primary-p">Pending NGO Requests</p>
               </div>
               <span className="font-bold text-title">{pendingRequests}</span>
@@ -74,7 +72,7 @@ function Dashboard() {
           <div className="card">
             <div className="card_inner">
               <div>
-                <FontAwesomeIcon icon={faComment} />
+                <MessageSquare />
                 <p className="text-primary-p">Unread Feedback</p>
               </div>
               <span className="font-bold text-title">{averageRating}</span>

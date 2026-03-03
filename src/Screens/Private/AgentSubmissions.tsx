@@ -1,23 +1,19 @@
 import { useEffect, useState } from 'react';
 import { db, auth } from '../../firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import type { SubmissionDocument } from '../../types';
+import { Button } from '@/Components/ui/button';
 import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
+  TableHeader,
   TableRow,
-  Paper,
-  Typography,
-  Box,
-  CircularProgress,
-  Button,
-} from '@mui/material';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import type { SubmissionDocument } from '../../types';
+} from '@/Components/ui/table';
 
 interface SubmissionRow extends SubmissionDocument {
   id: string;
@@ -38,7 +34,6 @@ function AgentSubmissions() {
           navigate('/');
           return;
         }
-
         const q = query(collection(db, 'submissions'), where('agent', '==', agentUid));
         const snapshot = await getDocs(q);
         const data = snapshot.docs.map((d) => ({
@@ -53,61 +48,58 @@ function AgentSubmissions() {
         setLoading(false);
       }
     };
-
     fetchSubmissions();
   }, [navigate]);
 
-  if (loading)
+  if (loading) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '80vh',
-        }}
-      >
-        <CircularProgress color="primary" />
-      </Box>
+      <div className="flex justify-center items-center min-h-[80vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />
+      </div>
     );
-  if (error) return <Typography color="error">{error}</Typography>;
+  }
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
 
   return (
-    <Box>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => navigate(-1)}
-        sx={{ marginBottom: 2 }}
-      >
-        <FontAwesomeIcon icon={faArrowLeft} />
-      </Button>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3 }}>
-        Agent Submissions
-      </Typography>
-      <TableContainer component={Paper}>
+    <div>
+      <div className="flex items-center gap-3 mb-6">
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-gray-600 hover:bg-gray-100">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <h1 className="text-2xl font-bold text-gray-800">Agent Submissions</h1>
+      </div>
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Full Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Phone Number</TableCell>
-              <TableCell>Date Registered</TableCell>
+          <TableHeader>
+            <TableRow className="bg-gray-50 hover:bg-gray-50">
+              <TableHead className="font-semibold text-gray-700">Full Name</TableHead>
+              <TableHead className="font-semibold text-gray-700">Email</TableHead>
+              <TableHead className="font-semibold text-gray-700">Phone Number</TableHead>
+              <TableHead className="font-semibold text-gray-700">Date Registered</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
-            {submissions.map((submission) => (
-              <TableRow key={submission.id}>
-                <TableCell>{submission.fullName}</TableCell>
-                <TableCell>{submission.emailAddress}</TableCell>
-                <TableCell>{submission.phoneNumber}</TableCell>
-                <TableCell>{submission.registrationDate?.toDate().toLocaleDateString()}</TableCell>
+            {submissions.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-12 text-gray-500">No submissions found.</TableCell>
               </TableRow>
-            ))}
+            ) : (
+              submissions.map((submission) => (
+                <TableRow key={submission.id} className="hover:bg-gray-50">
+                  <TableCell className="font-medium">{submission.fullName}</TableCell>
+                  <TableCell>{submission.emailAddress}</TableCell>
+                  <TableCell>{submission.phoneNumber}</TableCell>
+                  <TableCell>{submission.registrationDate?.toDate().toLocaleDateString()}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
-      </TableContainer>
-    </Box>
+      </div>
+    </div>
   );
 }
 

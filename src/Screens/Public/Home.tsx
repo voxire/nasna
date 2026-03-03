@@ -1,26 +1,35 @@
 import { useState } from 'react';
 import { db } from '../../firebase';
-import {
-  TextField,
-  Button,
-  Typography,
-  Box,
-  MenuItem,
-  Checkbox,
-  FormControlLabel,
-} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useSnackBar } from '../../Components/NasnaSnackBar';
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  Timestamp,
-} from 'firebase/firestore';
+import { toast } from 'sonner';
+import { collection, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
 import type { AgeRanges } from '../../types';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Checkbox } from '@/Components/ui/checkbox';
+import { Label } from '@/Components/ui/label';
+import { Textarea } from '@/Components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/Components/ui/select';
+
+const GOVERNORATES = [
+  { value: 'Beirut', key: 'home.governorate1' },
+  { value: 'Mount Lebanon', key: 'home.governorate2' },
+  { value: 'Baabdat', key: 'home.governorate3' },
+  { value: 'North Lebanon', key: 'home.governorate4' },
+  { value: 'Akkar', key: 'home.governorate5' },
+  { value: 'Baalbek', key: 'home.governorate6' },
+  { value: 'Beqaa', key: 'home.governorate7' },
+  { value: 'Tyre', key: 'home.governorate8' },
+  { value: 'Saida', key: 'home.governorate9' },
+  { value: 'Nabatiyeh', key: 'home.governorate10' },
+];
 
 function Home() {
   const { t, i18n } = useTranslation();
@@ -35,11 +44,7 @@ function Home() {
   const [floor, setFloor] = useState('');
   const [city, setCity] = useState('');
   const [ageRanges, setAgeRanges] = useState<AgeRanges>({
-    '0-3': 0,
-    '4-12': 0,
-    '13-18': 0,
-    '19-60': 0,
-    '60+': 0,
+    '0-3': 0, '4-12': 0, '13-18': 0, '19-60': 0, '60+': 0,
   });
   const [specialNeeds, setSpecialNeeds] = useState<string[]>([]);
   const [needs, setNeeds] = useState<string[]>([]);
@@ -47,455 +52,277 @@ function Home() {
   const [comments, setComments] = useState('');
   const [page, setPage] = useState(1);
   const [emailError, setEmailError] = useState(false);
-
   const [numberOfPeopleInHousehold, setNumberOfPeopleInHousehold] = useState(0);
 
   const navigate = useNavigate();
-  const { showSnackbar } = useSnackBar();
 
-  const getTotalAgeGroupCount = () => {
-    return Object.values(ageRanges).reduce((acc, count) => acc + Number(count), 0);
-  };
+  const getTotalAgeGroupCount = () =>
+    Object.values(ageRanges).reduce((acc, count) => acc + Number(count), 0);
+
+  const removeEmojis = (text: string) =>
+    text.replace(/\p{Extended_Pictographic}/gu, '').replace(/[\uE000-\uF8FF]/gu, '');
+
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleAddMember = async () => {
-    const trimmedPhoneNumber = phoneNumber.trim();
-
-    const totalAgeGroupCount = getTotalAgeGroupCount();
-
-    if (totalAgeGroupCount > numberOfPeopleInHousehold) {
-      showSnackbar(t('home.toast.invalidNumberOfPeopleInHousehold'), 'error');
+    const trimmedPhone = phoneNumber.trim();
+    if (getTotalAgeGroupCount() > numberOfPeopleInHousehold) {
+      toast.error(t('home.toast.invalidNumberOfPeopleInHousehold'));
       return;
     }
 
     if (
-      fullName &&
-      trimmedPhoneNumber &&
-      currentGovernorate &&
-      previousGovernorate &&
-      street &&
-      building &&
-      floor &&
-      ageRanges['0-3'] !== undefined &&
-      ageRanges['4-12'] !== undefined &&
-      ageRanges['13-18'] !== undefined &&
-      ageRanges['19-60'] !== undefined &&
-      ageRanges['60+'] !== undefined &&
-      specialNeeds.length &&
-      needs.length &&
-      aidUrgency
+      fullName && trimmedPhone && currentGovernorate && previousGovernorate &&
+      street && building && floor && specialNeeds.length && needs.length && aidUrgency
     ) {
       try {
-        const phoneQuery = query(
-          collection(db, 'submissions'),
-          where('phoneNumber', '==', trimmedPhoneNumber),
-        );
-
-        const phoneQuerySnapshot = await getDocs(phoneQuery);
-
-        if (!phoneQuerySnapshot.empty) {
-          showSnackbar(t('home.toast.duplicatePhoneNumber'), 'error');
+        const phoneQuery = query(collection(db, 'submissions'), where('phoneNumber', '==', trimmedPhone));
+        const snapshot = await getDocs(phoneQuery);
+        if (!snapshot.empty) {
+          toast.error(t('home.toast.duplicatePhoneNumber'));
           return;
-        } else {
-          await addDoc(collection(db, 'submissions'), {
-            fullName,
-            phoneNumber: trimmedPhoneNumber,
-            emailAddress,
-            gender,
-            currentGovernorate,
-            previousGovernorate,
-            city,
-            street,
-            building,
-            floor,
-            ageRanges,
-            specialNeeds,
-            needs,
-            aidUrgency,
-            consentGiven: true,
-            comments,
-            registrationDate: Timestamp.fromDate(new Date()),
-            agent: '',
-          });
-
-          showSnackbar(t('home.toast.memberAddedSuccess'), 'success');
-          navigate('/confirmation');
         }
+        await addDoc(collection(db, 'submissions'), {
+          fullName, phoneNumber: trimmedPhone, emailAddress, gender,
+          currentGovernorate, previousGovernorate, city, street, building, floor,
+          ageRanges, specialNeeds, needs, aidUrgency, consentGiven: true,
+          comments, registrationDate: Timestamp.fromDate(new Date()), agent: '',
+        });
+        toast.success(t('home.toast.memberAddedSuccess'));
+        navigate('/confirmation');
       } catch {
-        showSnackbar(t('home.toast.errorAddingMember'), 'error');
+        toast.error(t('home.toast.errorAddingMember'));
       }
     } else {
-      showSnackbar(t('home.toast.fillRequiredFields'), 'error');
+      toast.error(t('home.toast.fillRequiredFields'));
     }
   };
 
-  const removeEmojis = (text: string) => {
-    return text.replace(/\p{Extended_Pictographic}/gu, '').replace(/[\uE000-\uF8FF]/gu, '');
-  };
-
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const pageOne = () => (
-    <Box>
-      <Box
-        sx={{
-          backgroundColor: '#fff3cd',
-          padding: '16px',
-          borderRadius: '8px',
-          marginBottom: '16px',
-          border: '1px solid #ffeeba',
-        }}
-      >
-        <Typography variant="body1" color="textSecondary">
-          {t('home.disclaimer')}
-        </Typography>
-      </Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        {t('home.addressDetails')}
-      </Typography>
+    <div>
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
+        <p className="text-sm text-amber-800">{t('home.disclaimer')}</p>
+      </div>
+      <h1 className="text-2xl font-bold mb-5 text-gray-800">{t('home.addressDetails')}</h1>
 
-      <Box
-        sx={{
-          backgroundColor: '#f5f5f5',
-          padding: '16px',
-          borderRadius: '8px',
-          marginBottom: '16px',
-        }}
-      >
-        <Typography variant="h6">{t('home.personalInformation')}</Typography>
-        <TextField
-          label={t('home.fullName')}
-          value={fullName}
-          onChange={(e) => setFullName(removeEmojis(e.target.value))}
-          fullWidth
-          margin="normal"
-        />
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-4 space-y-4">
+        <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.personalInformation')}</h2>
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t('home.fullName')}</Label>
+          <Input value={fullName} onChange={(e) => setFullName(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t('home.phoneNumber')}</Label>
+          <Input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t('home.emailAddress')}</Label>
+          <Input
+            type="email"
+            value={emailAddress}
+            onChange={(e) => {
+              setEmailAddress(e.target.value);
+              setEmailError(!validateEmail(e.target.value));
+            }}
+            className={`bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d] ${emailError ? 'border-red-400' : ''}`}
+          />
+          {emailError && <p className="text-xs text-red-500 mt-1">Please enter a valid email address.</p>}
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t('home.gender')}</Label>
+          <Select value={gender} onValueChange={setGender}>
+            <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Male">{t('home.male')}</SelectItem>
+              <SelectItem value="Female">{t('home.female')}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
 
-        <TextField
-          label={t('home.phoneNumber')}
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(removeEmojis(e.target.value))}
-          fullWidth
-          margin="normal"
-          type="tel"
-        />
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-4 space-y-4">
+        <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.locationDetails')}</h2>
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t('home.previousGovernorate')}</Label>
+          <Select value={previousGovernorate} onValueChange={setPreviousGovernorate}>
+            <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {GOVERNORATES.map((g) => (
+                <SelectItem key={g.value} value={g.value}>{t(g.key)}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t('home.currentGovernorate')}</Label>
+          <Select value={currentGovernorate} onValueChange={setCurrentGovernorate}>
+            <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {GOVERNORATES.map((g) => (
+                <SelectItem key={g.value} value={g.value}>{t(g.key)}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-700">{t('home.city')}</Label>
+            <Input value={city} onChange={(e) => setCity(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-700">{t('home.street')}</Label>
+            <Input value={street} onChange={(e) => setStreet(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-700">{t('home.building')}</Label>
+            <Input value={building} onChange={(e) => setBuilding(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-700">{t('home.floor')}</Label>
+            <Input value={floor} onChange={(e) => setFloor(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+          </div>
+        </div>
+      </div>
 
-        <TextField
-          label={t('home.emailAddress')}
-          value={emailAddress}
-          onChange={(e) => {
-            const email = e.target.value;
-            setEmailAddress(email);
-            setEmailError(!validateEmail(email));
-          }}
-          error={emailError}
-          helperText={emailError ? 'Please enter a valid email address.' : ''}
-          fullWidth
-          margin="normal"
-          type="email"
-        />
-        <TextField
-          select
-          label={t('home.gender')}
-          value={gender}
-          onChange={(e) => setGender(e.target.value)}
-          fullWidth
-          margin="normal"
-        >
-          <MenuItem value="Male">{t('home.male')}</MenuItem>
-          <MenuItem value="Female">{t('home.female')}</MenuItem>
-        </TextField>
-      </Box>
-
-      <Box
-        sx={{
-          backgroundColor: '#f5f5f5',
-          padding: '16px',
-          borderRadius: '8px',
-          marginBottom: '16px',
-        }}
-      >
-        <Typography variant="h6">{t('home.locationDetails')}</Typography>
-
-        <TextField
-          select
-          label={t('home.previousGovernorate')}
-          value={previousGovernorate}
-          onChange={(e) => setPreviousGovernorate(e.target.value)}
-          fullWidth
-          margin="normal"
-        >
-          <MenuItem value="Beirut">{t('home.governorate1')}</MenuItem>
-          <MenuItem value="Mount Lebanon">{t('home.governorate2')}</MenuItem>
-          <MenuItem value="Baabdat">{t('home.governorate3')}</MenuItem>
-          <MenuItem value="North Lebanon">{t('home.governorate4')}</MenuItem>
-          <MenuItem value="Akkar">{t('home.governorate5')}</MenuItem>
-          <MenuItem value="Baalbek">{t('home.governorate6')}</MenuItem>
-          <MenuItem value="Beqaa">{t('home.governorate7')}</MenuItem>
-          <MenuItem value="Tyre">{t('home.governorate8')}</MenuItem>
-          <MenuItem value="Saida">{t('home.governorate9')}</MenuItem>
-          <MenuItem value="Nabatiyeh">{t('home.governorate10')}</MenuItem>
-        </TextField>
-
-        <TextField
-          select
-          label={t('home.currentGovernorate')}
-          value={currentGovernorate}
-          onChange={(e) => setCurrentGovernorate(e.target.value)}
-          fullWidth
-          margin="normal"
-        >
-          <MenuItem value="Beirut">{t('home.governorate1')}</MenuItem>
-          <MenuItem value="Mount Lebanon">{t('home.governorate2')}</MenuItem>
-          <MenuItem value="Baabdat">{t('home.governorate3')}</MenuItem>
-          <MenuItem value="North Lebanon">{t('home.governorate4')}</MenuItem>
-          <MenuItem value="Akkar">{t('home.governorate5')}</MenuItem>
-          <MenuItem value="Baalbek">{t('home.governorate6')}</MenuItem>
-          <MenuItem value="Beqaa">{t('home.governorate7')}</MenuItem>
-          <MenuItem value="Tyre">{t('home.governorate8')}</MenuItem>
-          <MenuItem value="Saida">{t('home.governorate9')}</MenuItem>
-          <MenuItem value="Nabatiyeh">{t('home.governorate10')}</MenuItem>
-        </TextField>
-        <TextField
-          label={t('home.city')}
-          value={city}
-          onChange={(e) => setCity(removeEmojis(e.target.value))}
-          fullWidth
-          margin="normal"
-        />
-
-        <TextField
-          label={t('home.street')}
-          value={street}
-          onChange={(e) => setStreet(removeEmojis(e.target.value))}
-          fullWidth
-          margin="normal"
-        />
-
-        <TextField
-          label={t('home.building')}
-          value={building}
-          onChange={(e) => setBuilding(removeEmojis(e.target.value))}
-          fullWidth
-          margin="normal"
-        />
-
-        <TextField
-          label={t('home.floor')}
-          value={floor}
-          onChange={(e) => setFloor(removeEmojis(e.target.value))}
-          fullWidth
-          margin="normal"
-        />
-      </Box>
-
-      <Box
-        sx={{
-          display: 'flex',
-          marginTop: '16px',
-          gap: 2,
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-        }}
-      >
+      <div className="flex justify-end mt-5">
         <Button
+          className="bg-[#12a89d] hover:bg-[#0e9088] text-white px-8"
           onClick={() => {
-            if (
-              fullName &&
-              phoneNumber &&
-              currentGovernorate &&
-              previousGovernorate &&
-              street &&
-              building &&
-              floor &&
-              !emailError
-            ) {
+            if (fullName && phoneNumber && currentGovernorate && previousGovernorate && street && building && floor && !emailError) {
               setPage(2);
             } else {
-              const errorMessage = emailError
-                ? t('home.toast.validEmailRequired')
-                : t('home.toast.fillRequiredFields');
-              showSnackbar(errorMessage, 'error');
+              toast.error(emailError ? t('home.toast.validEmailRequired') : t('home.toast.fillRequiredFields'));
             }
           }}
-          variant="contained"
         >
           {t('home.continue')}
         </Button>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 
   const pageTwo = () => (
-    <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        {t('home.householdAndNeedsDetails')}
-      </Typography>
+    <div>
+      <h1 className="text-2xl font-bold mb-5 text-gray-800">{t('home.householdAndNeedsDetails')}</h1>
 
-      <Box
-        sx={{
-          backgroundColor: '#f5f5f5',
-          padding: '16px',
-          borderRadius: '8px',
-          marginBottom: '16px',
-        }}
-      >
-        <Typography variant="h6">{t('home.householdInformation')}</Typography>
-
-        <TextField
-          label={t('home.numberOfPeopleInHousehold')}
-          value={numberOfPeopleInHousehold}
-          onChange={(e) => setNumberOfPeopleInHousehold(Number(e.target.value))}
-          fullWidth
-          margin="normal"
-          type="number"
-        />
-
-        <Typography variant="body1">{t('home.ageRanges')}</Typography>
-        {(Object.keys(ageRanges) as Array<keyof AgeRanges>).map((range) => (
-          <TextField
-            key={range}
-            label={`${range} (${t('home.numberOfMembers')})`}
-            value={ageRanges[range]}
-            onChange={(e) => setAgeRanges({ ...ageRanges, [range]: Number(e.target.value) })}
-            fullWidth
-            margin="normal"
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-4 space-y-4">
+        <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.householdInformation')}</h2>
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t('home.numberOfPeopleInHousehold')}</Label>
+          <Input
             type="number"
+            value={numberOfPeopleInHousehold}
+            onChange={(e) => setNumberOfPeopleInHousehold(Number(e.target.value))}
+            className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
           />
-        ))}
-      </Box>
+        </div>
+        <p className="text-sm font-semibold text-gray-700">{t('home.ageRanges')}</p>
+        <div className="grid grid-cols-2 gap-3">
+          {(Object.keys(ageRanges) as Array<keyof AgeRanges>).map((range) => (
+            <div key={range} className="space-y-1.5">
+              <Label className="text-xs font-medium text-gray-600">{`${range} (${t('home.numberOfMembers')})`}</Label>
+              <Input
+                type="number"
+                value={ageRanges[range]}
+                onChange={(e) => setAgeRanges({ ...ageRanges, [range]: Number(e.target.value) })}
+                className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
 
-      <Box
-        sx={{
-          backgroundColor: '#f5f5f5',
-          padding: '16px',
-          borderRadius: '8px',
-          marginBottom: '16px',
-        }}
-      >
-        <Typography variant="h6">{t('home.needs.special.title')}</Typography>
-        {[
-          t('home.needs.special.need1'),
-          t('home.needs.special.need2'),
-          t('home.needs.special.need3'),
-          t('home.needs.special.need4'),
-          t('home.needs.special.need5'),
-          t('home.needs.special.need6'),
-        ].map((need) => (
-          <FormControlLabel
-            key={need}
-            control={
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-4 space-y-4">
+        <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.needs.special.title')}</h2>
+        <div className="grid grid-cols-1 gap-2">
+          {[
+            t('home.needs.special.need1'), t('home.needs.special.need2'),
+            t('home.needs.special.need3'), t('home.needs.special.need4'),
+            t('home.needs.special.need5'), t('home.needs.special.need6'),
+          ].map((need) => (
+            <div key={need} className="flex items-center gap-2 py-1">
               <Checkbox
+                id={`special-${need}`}
                 checked={specialNeeds.includes(need)}
-                onChange={(e) =>
-                  setSpecialNeeds(
-                    e.target.checked
-                      ? [...specialNeeds, need]
-                      : specialNeeds.filter((n) => n !== need),
-                  )
+                onCheckedChange={(checked) =>
+                  setSpecialNeeds(checked ? [...specialNeeds, need] : specialNeeds.filter((n) => n !== need))
                 }
+                className="border-gray-300 data-[state=checked]:bg-[#12a89d] data-[state=checked]:border-[#12a89d]"
               />
-            }
-            label={t(need)}
-          />
-        ))}
-        <Typography variant="h6">{t('home.needs.immediate.title')}</Typography>
-        {[
-          t('home.needs.immediate.need1'),
-          t('home.needs.immediate.need2'),
-          t('home.needs.immediate.need3'),
-          t('home.needs.immediate.need4'),
-          t('home.needs.immediate.need5'),
-          t('home.needs.immediate.need6'),
-        ].map((need) => (
-          <FormControlLabel
-            key={need}
-            control={
+              <Label htmlFor={`special-${need}`} className="text-sm text-gray-700 cursor-pointer">{need}</Label>
+            </div>
+          ))}
+        </div>
+
+        <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide pt-2">{t('home.needs.immediate.title')}</h2>
+        <div className="grid grid-cols-1 gap-2">
+          {[
+            t('home.needs.immediate.need1'), t('home.needs.immediate.need2'),
+            t('home.needs.immediate.need3'), t('home.needs.immediate.need4'),
+            t('home.needs.immediate.need5'), t('home.needs.immediate.need6'),
+          ].map((need) => (
+            <div key={need} className="flex items-center gap-2 py-1">
               <Checkbox
+                id={`need-${need}`}
                 checked={needs.includes(need)}
-                onChange={(e) =>
-                  setNeeds(
-                    e.target.checked ? [...needs, need] : needs.filter((n) => n !== need),
-                  )
+                onCheckedChange={(checked) =>
+                  setNeeds(checked ? [...needs, need] : needs.filter((n) => n !== need))
                 }
+                className="border-gray-300 data-[state=checked]:bg-[#12a89d] data-[state=checked]:border-[#12a89d]"
               />
-            }
-            label={t(need)}
+              <Label htmlFor={`need-${need}`} className="text-sm text-gray-700 cursor-pointer">{need}</Label>
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-1.5 pt-2">
+          <Label className="text-sm font-medium text-gray-700">{t('home.aidUrgency')}</Label>
+          <Select value={aidUrgency} onValueChange={setAidUrgency}>
+            <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="High">{t('home.high')}</SelectItem>
+              <SelectItem value="Medium">{t('home.medium')}</SelectItem>
+              <SelectItem value="Low">{t('home.low')}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t('home.comments')}</Label>
+          <Textarea
+            value={comments}
+            onChange={(e) => setComments(removeEmojis(e.target.value))}
+            rows={4}
+            className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d] resize-none"
           />
-        ))}
-        <TextField
-          select
-          label={t('home.aidUrgency')}
-          value={aidUrgency}
-          onChange={(e) => setAidUrgency(e.target.value)}
-          fullWidth
-          margin="normal"
-        >
-          <MenuItem value="High">{t('home.high')}</MenuItem>
-          <MenuItem value="Medium">{t('home.medium')}</MenuItem>
-          <MenuItem value="Low">{t('home.low')}</MenuItem>
-        </TextField>
-        <TextField
-          label={t('home.comments')}
-          value={comments}
-          onChange={(e) => setComments(removeEmojis(e.target.value))}
-          fullWidth
-          margin="normal"
-          multiline
-          rows={4}
-        />
+        </div>
 
-        <Typography variant="body2" color="textSecondary">
-          {t('home.consent')}
-        </Typography>
-      </Box>
+        <p className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">{t('home.consent')}</p>
+      </div>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Button onClick={() => setPage(1)} variant="outlined">
-          {t('home.back')}
-        </Button>
-        <Button onClick={handleAddMember} variant="contained">
-          {t('home.submit')}
-        </Button>
-      </Box>
-    </Box>
+      <div className="flex justify-between items-center mt-5">
+        <Button variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-50" onClick={() => setPage(1)}>{t('home.back')}</Button>
+        <Button className="bg-[#12a89d] hover:bg-[#0e9088] text-white px-8" onClick={handleAddMember}>{t('home.submit')}</Button>
+      </div>
+    </div>
   );
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '24px',
-        paddingTop: '30px',
-        paddingBottom: '150px',
-        maxWidth: '600px',
-        margin: '0 auto',
-        direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
-      }}
+    <div
+      className="flex flex-col px-6 pt-7 pb-36 max-w-[600px] mx-auto"
+      dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
     >
-      <Box
-        sx={{
-          width: '100%',
-          backgroundColor: '#e0e0e0',
-          borderRadius: '4px',
-          overflow: 'hidden',
-          marginBottom: '16px',
-        }}
-      >
-        <Box
-          sx={{
-            width: page === 1 ? '50%' : '100%',
-            backgroundColor: '#12a89d',
-            height: '8px',
-            transition: 'width 0.3s ease',
-          }}
+      {/* Progress bar */}
+      <div className="w-full bg-gray-200 rounded h-2 overflow-hidden mb-4">
+        <div
+          className="bg-[#12a89d] h-2 transition-all duration-300"
+          style={{ width: page === 1 ? '50%' : '100%' }}
         />
-      </Box>
+      </div>
       {page === 1 ? pageOne() : pageTwo()}
-    </Box>
+    </div>
   );
 }
 

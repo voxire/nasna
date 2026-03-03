@@ -1,0 +1,20 @@
+{
+  "title": "Inscrire une ONG/Initiative",
+  "fields": {
+    "name": "Nom de l'organisation",
+    "contactPersonName": "Nom du responsable",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "phoneNumber": "Numéro de téléphone"
+  },
+  "consent": "En soumettant ce formulaire, vous consentez à partager vos données en privé.",
+  "toast": {
+    "consentRequired": "Vous devez donner votre consentement pour vous inscrire.",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "success": "Inscription réussie ! Veuillez vous connecter.",
+    "error": "Erreur lors de l'inscription. Veuillez réessayer."
+  },
+  "loading": "Inscription en cours...",
+  "submit": "S'inscrire"
+}

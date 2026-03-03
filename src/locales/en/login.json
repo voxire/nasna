@@ -1,0 +1,22 @@
+{
+  "title": "Welcome back",
+  "subtitle": "Sign in to your account",
+  "logoAlt": "Nasna Logo",
+  "fields": {
+    "email": "Email",
+    "password": "Password"
+  },
+  "buttons": {
+    "signIn": "Sign In",
+    "loading": "Signing In..."
+  },
+  "toast": {
+    "userNotFound": "No user found with this email.",
+    "wrongPassword": "Incorrect password. Please try again.",
+    "invalidEmailFormat": "Invalid email format.",
+    "invalidCredential": "Invalid credentials. Please try again.",
+    "genericError": "An error occurred. Please try again.",
+    "emailPasswordRequired": "Email and password are required.",
+    "success": "Login successful!"
+  }
+}

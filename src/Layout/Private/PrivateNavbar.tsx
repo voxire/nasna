@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, IconButton } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLanguage } from '@fortawesome/free-solid-svg-icons';
+import { useEffect } from 'react';
+import { Globe, LogOut } from 'lucide-react';
 import { selectLanguage } from '../../services/i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../redux/hooks';
@@ -9,10 +7,16 @@ import { logout } from '../../redux/reducers/userSlice';
 import { auth } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import type { SupportedLanguage } from '../../types';
+import { Button } from '@/Components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
 
 function PrivateNavbar() {
   const dispatch = useAppDispatch();
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,7 +28,6 @@ function PrivateNavbar() {
 
   const handleLanguageChange = (lng: SupportedLanguage) => {
     selectLanguage(lng);
-    setAnchorEl(null);
   };
 
   const handleClickAbout = () => {
@@ -42,48 +45,38 @@ function PrivateNavbar() {
   };
 
   return (
-    <AppBar
-      position="sticky"
-      sx={{
-        backgroundColor: '#f9f9f9',
-        color: '#12a89d',
-      }}
-    >
-      <Toolbar>
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{
-            flexGrow: 1,
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
+    <header className="sticky top-0 z-50 h-20 bg-white border-b border-gray-200">
+      <div className="flex items-center h-full px-6">
+        <div className="flex-1 flex items-center">
           <img
             src="/Nasna Logo.png"
             alt="Nasna logo"
-            width="140px"
-            height="100%"
-            style={{ margin: '0px', cursor: 'pointer' }}
+            className="h-16 w-auto cursor-pointer"
             onClick={handleClickAbout}
           />
-        </Typography>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Button color="inherit" onClick={handleLogout} sx={{ marginLeft: '10px' }}>
+        </div>
+
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" onClick={handleLogout} className="text-[#12a89d]">
+            <LogOut className="h-4 w-4 mr-1" />
             Logout
           </Button>
-          <IconButton onClick={(event) => setAnchorEl(event.currentTarget)} color="inherit">
-            <FontAwesomeIcon icon={faLanguage} style={{ color: '#12a89d' }} />
-          </IconButton>
-          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-            <MenuItem onClick={() => handleLanguageChange('en')}>English</MenuItem>
-            <MenuItem onClick={() => handleLanguageChange('ar')}>Arabic</MenuItem>
-            <MenuItem onClick={() => handleLanguageChange('fr')}>French</MenuItem>
-          </Menu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Globe className="h-5 w-5 text-[#12a89d]" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleLanguageChange('en')}>English</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLanguageChange('ar')}>Arabic</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLanguageChange('fr')}>French</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </Toolbar>
-    </AppBar>
+      </div>
+    </header>
   );
 }
 

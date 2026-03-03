@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { Box, Typography, Button, Grid, Paper, Divider } from '@mui/material';
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
-import HandshakeIcon from '@mui/icons-material/Handshake';
-import PeopleIcon from '@mui/icons-material/People';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent } from '@/Components/ui/card';
+import { Separator } from '@/Components/ui/separator';
+import { GitBranch, Handshake, Users } from 'lucide-react';
 
 function About() {
   const { t } = useTranslation();
@@ -10,141 +10,70 @@ function About() {
   return (
     <>
       {/* Banner Section */}
-      <Box
-        component="section"
-        sx={{
-          maxWidth: '100%',
-          minHeight: '25vh',
+      <section
+        className="relative flex items-center justify-center min-h-[25vh] text-white overflow-hidden"
+        style={{
           backgroundImage: 'url("/public/nabatiye.jpg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#fff',
-          overflow: 'hidden',
         }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}
-        />
-        <Box
-          sx={{
-            position: 'relative',
-            zIndex: 1,
-            textAlign: 'center',
-            p: 2,
-          }}
-        >
-          <Typography variant="h3" gutterBottom>
-            {t('about.banner.aboutUs')}
-          </Typography>
-          <Typography variant="body1" paragraph>
-            {t('about.banner.quote')}
-          </Typography>
-        </Box>
-      </Box>
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center p-4">
+          <h1 className="text-4xl font-bold mb-2">{t('about.banner.aboutUs')}</h1>
+          <p className="text-base">{t('about.banner.quote')}</p>
+        </div>
+      </section>
 
       {/* About Us Content Section */}
-      <Box
-        component="section"
-        sx={{
-          maxWidth: '100%',
-          padding: '40px',
-          display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
-          alignItems: 'center',
-          overflow: 'hidden',
-        }}
-      >
-        <Box
-          sx={{
-            flex: 1,
-            textAlign: { xs: 'center', md: 'left' },
-            mb: { xs: 4, md: 0 },
-            mr: { md: 4 },
-          }}
-        >
-          <Typography variant="h4" gutterBottom>
-            {t('about.content.title')}
-          </Typography>
-          <Typography variant="body1" paragraph color="text.secondary">
-            {t('about.content.missionStatement')}
-          </Typography>
-          <Typography variant="body1" paragraph color="text.secondary">
-            {t('about.content.visionStatement')}
-          </Typography>
-          <Button variant="contained" color="primary" href="/auth/register">
-            {t('about.content.volunteerButton')}
+      <section className="flex flex-col md:flex-row items-center px-10 py-12 gap-8">
+        <div className="flex-1 text-center md:text-left">
+          <h2 className="text-2xl font-bold mb-3">{t('about.content.title')}</h2>
+          <p className="text-muted-foreground mb-3">{t('about.content.missionStatement')}</p>
+          <p className="text-muted-foreground mb-4">{t('about.content.visionStatement')}</p>
+          <Button asChild>
+            <a href="/auth/register">{t('about.content.volunteerButton')}</a>
           </Button>
-        </Box>
-
-        <Box
-          component="img"
+        </div>
+        <img
           src="/logo.png"
           alt="Nasna Volunteers"
-          sx={{
-            flex: 1,
-            maxWidth: '100%',
-            height: 'auto',
-            overflow: 'hidden',
-          }}
+          className="flex-1 max-w-full h-auto"
         />
-      </Box>
+      </section>
 
       {/* How We Operate Section */}
-      <Box
-        component="section"
-        sx={{
-          maxWidth: '100%',
-          padding: '60px 20px',
-        }}
-      >
-        <Typography variant="h4" gutterBottom color="primary">
-          {t('about.howWeOperate.title')}
-        </Typography>
+      <section className="px-5 py-16">
+        <h2 className="text-2xl font-bold text-[#12a89d] mb-8">{t('about.howWeOperate.title')}</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <CardContent className="p-6">
+              <GitBranch className="h-12 w-12 text-[#12a89d] mb-3" />
+              <h3 className="text-lg font-semibold">{t('about.howWeOperate.registrationTitle')}</h3>
+              <Separator className="my-3" />
+              <p className="text-muted-foreground">{t('about.howWeOperate.registrationDescription')}</p>
+            </CardContent>
+          </Card>
 
-        <Grid container spacing={4} justifyContent="center">
-          <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ p: 3 }}>
-              <AccountTreeIcon color="primary" sx={{ fontSize: 50 }} />
-              <Typography variant="h6">{t('about.howWeOperate.registrationTitle')}</Typography>
-              <Divider sx={{ my: 2 }} />
-              <Typography color="text.secondary">
-                {t('about.howWeOperate.registrationDescription')}
-              </Typography>
-            </Paper>
-          </Grid>
+          <Card>
+            <CardContent className="p-6">
+              <Handshake className="h-12 w-12 text-[#12a89d] mb-3" />
+              <h3 className="text-lg font-semibold">{t('about.howWeOperate.partnershipsTitle')}</h3>
+              <Separator className="my-3" />
+              <p className="text-muted-foreground">{t('about.howWeOperate.partnershipsDescription')}</p>
+            </CardContent>
+          </Card>
 
-          <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ p: 3 }}>
-              <HandshakeIcon color="primary" sx={{ fontSize: 50 }} />
-              <Typography variant="h6">{t('about.howWeOperate.partnershipsTitle')}</Typography>
-              <Divider sx={{ my: 2 }} />
-              <Typography color="text.secondary">
-                {t('about.howWeOperate.partnershipsDescription')}
-              </Typography>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ p: 3 }}>
-              <PeopleIcon color="primary" sx={{ fontSize: 50 }} />
-              <Typography variant="h6">{t('about.howWeOperate.supportTitle')}</Typography>
-              <Divider sx={{ my: 2 }} />
-              <Typography color="text.secondary">
-                {t('about.howWeOperate.supportDescription')}
-              </Typography>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Box>
+          <Card>
+            <CardContent className="p-6">
+              <Users className="h-12 w-12 text-[#12a89d] mb-3" />
+              <h3 className="text-lg font-semibold">{t('about.howWeOperate.supportTitle')}</h3>
+              <Separator className="my-3" />
+              <p className="text-muted-foreground">{t('about.howWeOperate.supportDescription')}</p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     </>
   );
 }

@@ -1,0 +1,20 @@
+{
+  "title": "Register as an NGO/Initiative",
+  "fields": {
+    "name": "Organization Name",
+    "contactPersonName": "Contact Person Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "phoneNumber": "Phone Number"
+  },
+  "consent": "By submitting this form, you consent to privately share your data.",
+  "toast": {
+    "consentRequired": "You must give consent to register.",
+    "passwordMismatch": "Passwords do not match.",
+    "success": "Registration successful! Please log in.",
+    "error": "Error registering NGO. Please try again."
+  },
+  "loading": "Registering...",
+  "submit": "Register"
+}

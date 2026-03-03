@@ -1,6 +1,6 @@
 import { useEffect, useState, Suspense } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { CircularProgress, Box } from '@mui/material';
+import { Loader2 } from 'lucide-react';
 import ScrollToTop from './Components/ScrollToTop';
 import PublicRoutes from './Routes/PublicRoutes';
 import AuthRoutes from './Routes/AuthRoutes';
@@ -31,16 +31,9 @@ export default function App() {
       <ScrollToTop />
       <Suspense
         fallback={
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '80vh',
-            }}
-          >
-            <CircularProgress color="primary" />
-          </Box>
+          <div className="flex justify-center items-center min-h-[80vh]">
+            <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />
+          </div>
         }
       >
         <Routes key={location.pathname} location={location}>

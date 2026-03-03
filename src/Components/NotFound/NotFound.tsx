@@ -1,8 +1,7 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router';
-import { Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/Components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 function NotFound() {
   const navigate = useNavigate();
@@ -15,8 +14,8 @@ function NotFound() {
       <br />
       <span className="info">{t('NotFound')}</span>
       <div className="goBack">
-        <Button variant="contained" color="primary" className="goBack" onClick={() => navigate(-1)}>
-          <FontAwesomeIcon icon={faArrowLeft} />
+        <Button variant="default" className="goBack" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4" />
         </Button>
       </div>
     </div>

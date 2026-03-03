@@ -1,0 +1,22 @@
+{
+  "title": "Bon retour",
+  "subtitle": "Connectez-vous à votre compte",
+  "logoAlt": "Logo Nasna",
+  "fields": {
+    "email": "E-mail",
+    "password": "Mot de passe"
+  },
+  "buttons": {
+    "signIn": "Se connecter",
+    "loading": "Connexion en cours..."
+  },
+  "toast": {
+    "userNotFound": "Aucun utilisateur trouvé avec cet e-mail.",
+    "wrongPassword": "Mot de passe incorrect. Veuillez réessayer.",
+    "invalidEmailFormat": "Format d'e-mail non valide.",
+    "invalidCredential": "Informations d'identification non valides. Veuillez réessayer.",
+    "genericError": "Une erreur est survenue. Veuillez réessayer.",
+    "emailPasswordRequired": "L'e-mail et le mot de passe sont requis.",
+    "success": "Connexion réussie !"
+  }
+}

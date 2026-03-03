@@ -1,4 +1,3 @@
-import { Box, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import Lottie from 'lottie-react';
 import animationData from '../../../public/animation/Nasna.json';
@@ -7,37 +6,14 @@ function Confirmation() {
   const { t } = useTranslation();
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        height: '86dvh',
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: '24px',
-          textAlign: 'center',
-          flexGrow: 0.7,
-        }}
-      >
+    <div className="flex flex-col justify-between" style={{ height: '86dvh' }}>
+      <div className="flex flex-col justify-center items-center p-6 text-center flex-grow">
         <Lottie animationData={animationData} style={{ width: 300, height: 300 }} />
-        <Typography variant="h4" component="h1" gutterBottom>
-          {t('confirmation.thankYou')}
-        </Typography>
-        <Typography variant="h6" component="p" gutterBottom>
-          {t('confirmation.submissionRecieved')}
-        </Typography>
-        <Typography variant="body1" component="p" gutterBottom>
-          {t('confirmation.appreciation')}
-        </Typography>
-      </Box>
-    </Box>
+        <h1 className="text-3xl font-bold mb-2">{t('confirmation.thankYou')}</h1>
+        <h2 className="text-xl mb-2">{t('confirmation.submissionRecieved')}</h2>
+        <p className="text-base">{t('confirmation.appreciation')}</p>
+      </div>
+    </div>
   );
 }
 

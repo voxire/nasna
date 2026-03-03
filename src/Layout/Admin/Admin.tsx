@@ -1,10 +1,11 @@
 import { useState, useEffect, ReactNode } from 'react';
+import PageTransition from '../../Components/PageTransition';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import SideBar from './Sidebar';
 import { auth } from '../../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { CircularProgress, Box } from '@mui/material';
+import { Loader2 } from 'lucide-react';
 
 interface AdminProps {
   children: ReactNode;
@@ -39,7 +40,6 @@ function Admin({ children }: AdminProps) {
       }
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, [navigate]);
 
@@ -51,9 +51,9 @@ function Admin({ children }: AdminProps) {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <CircularProgress />
-      </Box>
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />
+      </div>
     );
   }
 
@@ -64,7 +64,7 @@ function Admin({ children }: AdminProps) {
   return (
     <div className="Admincontainer">
       <Navbar openSidebar={openSidebar} />
-      <div className="InnerContainer">{children}</div>
+      <div className="InnerContainer"><PageTransition>{children}</PageTransition></div>
       <SideBar sidebarOpen={sidebarOpen} closeSidebar={closeSidebar} />
     </div>
   );

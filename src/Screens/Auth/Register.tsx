@@ -1,203 +1,196 @@
-import { useState } from 'react';
-import { Box, TextField, Button, FormControlLabel, Checkbox, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useSnackBar } from '../../Components/NasnaSnackBar';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { db, auth } from '../../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Checkbox } from '@/Components/ui/checkbox';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
 
-interface RegisterFormData {
-  name: string;
-  contactPersonName: string;
-  email: string;
-  phoneNumber: string;
-  areaOfOperation: string;
-  kindOfHelp: string;
-  initiativeOrNgo: string;
-  role: string;
-  numberOfVolunteers: string;
-  isOfficiallyRegistered: boolean;
-  consentGiven: boolean;
-}
+const registerSchema = z
+  .object({
+    name: z.string().min(1),
+    contactPersonName: z.string().min(1),
+    email: z.string().email(),
+    password: z.string().min(6),
+    confirmPassword: z.string().min(6),
+    phoneNumber: z.string().min(1),
+    consentGiven: z.boolean().refine((v) => v === true, { message: 'Consent is required' }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
+type RegisterFormData = z.infer<typeof registerSchema>;
 
 function Register() {
   const navigate = useNavigate();
-  const { showSnackbar } = useSnackBar();
   const { t } = useTranslation();
 
-  const [formData, setFormData] = useState<RegisterFormData>({
-    name: '',
-    contactPersonName: '',
-    email: '',
-    phoneNumber: '',
-    areaOfOperation: '',
-    kindOfHelp: '',
-    initiativeOrNgo: '',
-    role: 'member',
-    numberOfVolunteers: '',
-    isOfficiallyRegistered: false,
-    consentGiven: false,
+  const form = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: '',
+      contactPersonName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phoneNumber: '',
+      consentGiven: false,
+    },
   });
 
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { formState: { isSubmitting } } = form;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: checked }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.consentGiven) {
-      showSnackbar(t('register.toast.consentRequired'), 'error');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      showSnackbar(t('register.toast.passwordMismatch'), 'error');
-      return;
-    }
-
-    setLoading(true);
+  const onSubmit = async (data: RegisterFormData) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, password);
-
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
       await sendEmailVerification(userCredential.user);
-
       await setDoc(doc(db, 'members', userCredential.user.uid), {
         uid: userCredential.user.uid,
-        ...formData,
-        isAdmin: false,
-        validated: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      await signOut(auth);
-      setFormData({
-        name: '',
-        contactPersonName: '',
-        email: '',
-        phoneNumber: '',
+        name: data.name,
+        contactPersonName: data.contactPersonName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        consentGiven: data.consentGiven,
         areaOfOperation: '',
         kindOfHelp: '',
         initiativeOrNgo: '',
         role: 'member',
         numberOfVolunteers: '',
         isOfficiallyRegistered: false,
-        consentGiven: false,
+        isAdmin: false,
+        validated: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
-      setPassword('');
-      setConfirmPassword('');
-
-      showSnackbar(t('register.toast.success'), 'success');
+      await signOut(auth);
+      toast.success(t('register.toast.success'));
       navigate('/auth/login');
     } catch (error) {
       console.error('Error registering NGO: ', error);
-      showSnackbar(t('register.toast.error'), 'error');
-    } finally {
-      setLoading(false);
+      toast.error(t('register.toast.error'));
     }
   };
 
   return (
-    <Box
-      sx={{
-        maxWidth: '600px',
-        margin: '0 auto',
-        padding: '20px',
-        backgroundColor: '#f5f5f5',
-        borderRadius: '8px',
-        marginTop: '20px',
-        marginBottom: '20px',
-      }}
-    >
-      <Typography variant="h4" component="h1" gutterBottom>
-        {t('register.title')}
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label={t('register.fields.name')}
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label={t('register.fields.contactPersonName')}
-          name="contactPersonName"
-          value={formData.contactPersonName}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label={t('register.fields.email')}
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label={t('register.fields.password')}
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label={t('register.fields.confirmPassword')}
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          label={t('register.fields.phoneNumber')}
-          name="phoneNumber"
-          value={formData.phoneNumber}
-          onChange={handleChange}
-          fullWidth
-          required
-          sx={{ mb: 2 }}
-        />
-
-        <FormControlLabel
-          control={
-            <Checkbox
-              name="consentGiven"
-              checked={formData.consentGiven}
-              onChange={handleCheckboxChange}
-              required
+    <div className="max-w-[600px] mx-auto my-8 px-4">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+        <h1 className="text-2xl font-bold mb-6 text-gray-800">{t('register.title')}</h1>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.name')}</FormLabel>
+                  <FormControl>
+                    <Input className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          }
-          label={t('register.consent')}
-          sx={{ mb: 2 }}
-        />
-        <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
-          {loading ? t('register.loading') : t('register.submit')}
-        </Button>
-      </form>
-    </Box>
+            <FormField
+              control={form.control}
+              name="contactPersonName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.contactPersonName')}</FormLabel>
+                  <FormControl>
+                    <Input className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.email')}</FormLabel>
+                  <FormControl>
+                    <Input type="email" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.password')}</FormLabel>
+                    <FormControl>
+                      <Input type="password" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.confirmPassword')}</FormLabel>
+                    <FormControl>
+                      <Input type="password" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.phoneNumber')}</FormLabel>
+                  <FormControl>
+                    <Input className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="consentGiven"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start gap-3 bg-gray-50 rounded-lg p-3">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="border-gray-300 data-[state=checked]:bg-[#12a89d] data-[state=checked]:border-[#12a89d] mt-0.5"
+                    />
+                  </FormControl>
+                  <div className="leading-none">
+                    <FormLabel className="text-sm text-gray-700 font-normal cursor-pointer">{t('register.consent')}</FormLabel>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white mt-2" disabled={isSubmitting}>
+              {isSubmitting ? t('register.loading') : t('register.submit')}
+            </Button>
+          </form>
+        </Form>
+      </div>
+    </div>
   );
 }
 

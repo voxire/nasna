@@ -1,33 +1,36 @@
 import { useEffect, useState } from 'react';
 import { db } from '../../firebase';
+import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { toast } from 'sonner';
+import type { MemberDocument } from '../../types';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
 import {
-  Box,
-  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/Components/ui/select';
+import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
+  TableHeader,
   TableRow,
-  Typography,
-  Modal,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-} from '@mui/material';
-import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { SelectChangeEvent } from '@mui/material/Select';
-import { useSnackBar } from '../../Components/NasnaSnackBar';
-import type { MemberDocument } from '../../types';
+} from '@/Components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/Components/ui/dialog';
 
 interface MemberRow extends MemberDocument {
   id: string;
-}
-
-interface FilterState {
-  validated: string;
 }
 
 function Members() {
@@ -35,10 +38,9 @@ function Members() {
   const [filteredMembers, setFilteredMembers] = useState<MemberRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<FilterState>({ validated: '' });
+  const [validatedFilter, setValidatedFilter] = useState('');
   const [editMember, setEditMember] = useState<MemberRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const { showSnackbar } = useSnackBar();
 
   useEffect(() => {
     fetchMembers();
@@ -48,75 +50,59 @@ function Members() {
     setLoading(true);
     try {
       const snapshot = await getDocs(collection(db, 'members'));
-      const membersData = snapshot.docs
+      const data = snapshot.docs
         .map((d) => ({ id: d.id, ...(d.data() as MemberDocument) }))
-        .filter((member) => member.role === 'member');
-
-      setMembers(membersData);
-      setFilteredMembers(membersData);
+        .filter((m) => m.role === 'member');
+      setMembers(data);
+      setFilteredMembers(data);
     } catch (error) {
       console.error('Error fetching members: ', error);
-      showSnackbar('Error fetching members.', 'error');
+      toast.error('Error fetching members.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
-    const filtered = members.filter((member) =>
-      [member.name, member.contactPersonName, member.email].some((field) =>
-        (field ?? '').toLowerCase().includes(query),
-      ),
+    const q = e.target.value.toLowerCase();
+    setSearchQuery(q);
+    setFilteredMembers(
+      members.filter((m) =>
+        [m.name, m.contactPersonName, m.email].some((f) => (f ?? '').toLowerCase().includes(q))
+      )
     );
-    setFilteredMembers(filtered);
   };
 
-  const handleFilterChange = (e: SelectChangeEvent<string>) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-
-    let filtered = members;
-    if (value) {
-      filtered = members.filter((member) => String(member.validated) === value);
+  const handleFilterChange = (value: string) => {
+    setValidatedFilter(value);
+    if (!value || value === 'all') {
+      setFilteredMembers(members);
+    } else {
+      setFilteredMembers(members.filter((m) => String(m.validated) === value));
     }
-    setFilteredMembers(filtered);
   };
 
   const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this member?');
-    if (!confirmDelete) return;
-
+    if (!window.confirm('Are you sure you want to delete this member?')) return;
     try {
       await deleteDoc(doc(db, 'members', id));
-      showSnackbar('Member deleted successfully.', 'success');
+      toast.success('Member deleted successfully.');
       fetchMembers();
     } catch (error) {
       console.error('Error deleting member: ', error);
-      showSnackbar('Error deleting member. Please try again.', 'error');
+      toast.error('Error deleting member. Please try again.');
     }
   };
 
   const handleValidate = async (id: string) => {
     try {
       await updateDoc(doc(db, 'members', id), { validated: true });
-      showSnackbar('Member validated successfully.', 'success');
+      toast.success('Member validated successfully.');
       fetchMembers();
     } catch (error) {
       console.error('Error validating member: ', error);
-      showSnackbar('Error validating member. Please try again.', 'error');
+      toast.error('Error validating member. Please try again.');
     }
-  };
-
-  const handleOpenModal = (member: MemberRow) => {
-    setEditMember(member);
-    setModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setEditMember(null);
-    setModalOpen(false);
   };
 
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,156 +115,111 @@ function Members() {
     if (!editMember) return;
     try {
       await updateDoc(doc(db, 'members', editMember.id), { ...editMember });
-      showSnackbar('Member updated successfully.', 'success');
-      handleCloseModal();
+      toast.success('Member updated successfully.');
+      setModalOpen(false);
+      setEditMember(null);
       fetchMembers();
     } catch (error) {
       console.error('Error updating member: ', error);
-      showSnackbar('Error updating member. Please try again.', 'error');
+      toast.error('Error updating member. Please try again.');
     }
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        NGO Members
-      </Typography>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-5 text-gray-800">NGO Members</h1>
 
-      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-        <TextField
-          label="Search"
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4 flex gap-3 flex-wrap">
+        <Input
+          placeholder="Search by Name, Contact Person, or Email"
           value={searchQuery}
           onChange={handleSearch}
-          placeholder="Search by Name, Contact Person, or Email"
-          fullWidth
+          className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
-
-        <FormControl sx={{ minWidth: 120 }}>
-          <InputLabel>Validated</InputLabel>
-          <Select name="validated" value={filters.validated} onChange={handleFilterChange}>
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="true">Validated</MenuItem>
-            <MenuItem value="false">Not Validated</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+        <Select value={validatedFilter} onValueChange={handleFilterChange}>
+          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200"><SelectValue placeholder="Validated" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="true">Validated</SelectItem>
+            <SelectItem value="false">Not Validated</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {loading ? (
-        <Typography>Loading...</Typography>
+        <p className="text-gray-500">Loading...</p>
       ) : (
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Contact Person</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Phone Number</TableCell>
-                <TableCell>Validated</TableCell>
-                <TableCell>Actions</TableCell>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50 hover:bg-gray-50">
+              <TableHead className="font-semibold text-gray-700">Name</TableHead>
+              <TableHead className="font-semibold text-gray-700">Contact Person</TableHead>
+              <TableHead className="font-semibold text-gray-700">Email</TableHead>
+              <TableHead className="font-semibold text-gray-700">Phone Number</TableHead>
+              <TableHead className="font-semibold text-gray-700">Validated</TableHead>
+              <TableHead className="font-semibold text-gray-700">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredMembers.map((member) => (
+              <TableRow key={member.id} className="hover:bg-gray-50">
+                <TableCell className="font-medium">{member.name}</TableCell>
+                <TableCell>{member.contactPersonName}</TableCell>
+                <TableCell>{member.email}</TableCell>
+                <TableCell>{member.phoneNumber}</TableCell>
+                <TableCell>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${member.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                    {member.validated ? 'Validated' : 'Pending'}
+                  </span>
+                </TableCell>
+                <TableCell className="flex gap-2">
+                  {!member.validated && (
+                    <Button size="sm" className="bg-[#12a89d] hover:bg-[#0e9088] text-white" onClick={() => handleValidate(member.id)}>Validate</Button>
+                  )}
+                  {member.validated && (
+                    <>
+                      <Button size="sm" variant="outline" className="border-gray-300" onClick={() => { setEditMember(member); setModalOpen(true); }}>Edit</Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleDelete(member.id)}>Delete</Button>
+                    </>
+                  )}
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredMembers.map((member) => (
-                <TableRow key={member.id}>
-                  <TableCell>{member.name}</TableCell>
-                  <TableCell>{member.contactPersonName}</TableCell>
-                  <TableCell>{member.email}</TableCell>
-                  <TableCell>{member.phoneNumber}</TableCell>
-                  <TableCell>{member.validated ? 'Yes' : 'No'}</TableCell>
-                  <TableCell>
-                    {!member.validated && (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleValidate(member.id)}
-                      >
-                        Validate
-                      </Button>
-                    )}
-                    {member.validated && (
-                      <>
-                        <Button
-                          variant="outlined"
-                          color="secondary"
-                          onClick={() => handleOpenModal(member)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          onClick={() => handleDelete(member.id)}
-                        >
-                          Delete
-                        </Button>
-                      </>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            ))}
+          </TableBody>
+        </Table>
+        </div>
       )}
 
-      <Modal open={modalOpen} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            maxWidth: 400,
-            margin: 'auto',
-            backgroundColor: '#fff',
-            padding: 2,
-            borderRadius: 2,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Edit Member
-          </Typography>
-          <form onSubmit={handleEditSubmit}>
-            <TextField
-              label="Name"
-              name="name"
-              value={editMember?.name || ''}
-              onChange={handleEditChange}
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Contact Person"
-              name="contactPersonName"
-              value={editMember?.contactPersonName || ''}
-              onChange={handleEditChange}
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Email"
-              name="email"
-              value={editMember?.email || ''}
-              onChange={handleEditChange}
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Phone Number"
-              name="phoneNumber"
-              value={editMember?.phoneNumber || ''}
-              onChange={handleEditChange}
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-            />
-            <Button type="submit" variant="contained" color="primary">
-              Save Changes
-            </Button>
+      <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) setEditMember(null); }}>
+        <DialogContent className="max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Edit Member</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-3">
+            {[
+              { name: 'name', label: 'Name' },
+              { name: 'contactPersonName', label: 'Contact Person' },
+              { name: 'email', label: 'Email' },
+              { name: 'phoneNumber', label: 'Phone Number' },
+            ].map(({ name, label }) => (
+              <div key={name} className="space-y-1">
+                <Label>{label}</Label>
+                <Input
+                  name={name}
+                  value={(editMember?.[name as keyof MemberRow] as string) ?? ''}
+                  onChange={handleEditChange}
+                  required
+                />
+              </div>
+            ))}
+            <DialogFooter>
+              <Button type="submit">Save Changes</Button>
+            </DialogFooter>
           </form>
-        </Box>
-      </Modal>
-    </Box>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
 
