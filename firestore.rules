@@ -21,57 +21,68 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.role == 'member';
     }
 
-    // Reads the caller's own member doc to check the validated field.
-    // Used because "validated" is stored in Firestore, not in auth claims.
     function isValidatedMember() {
       return isMember()
         && get(/databases/$(database)/documents/members/$(request.auth.uid)).data.validated == true;
     }
 
+    // Ensure incoming data only contains the allowed set of keys
+    function onlyFields(allowed) {
+      return request.resource.data.keys().hasOnly(allowed);
+    }
+
+    // Prevent fields from being changed in an update
+    function fieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
     // ─── /members ───────────────────────────────────────────────────────────
 
     match /members/{userId} {
-      // A signed-in user can read their own doc (login flow reads it to get role/validated).
-      // Admins can read any doc.
       allow read: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
 
-      // Registration: a newly authenticated user creates their own doc.
-      // Disallow setting role to 'admin' on creation.
+      // Registration: only allowed fields, role must not be 'admin'
       allow create: if isSignedIn()
         && request.auth.uid == userId
-        && request.resource.data.role != 'admin';
+        && request.resource.data.role in ['member', 'agent']
+        && onlyFields(['name', 'contactPersonName', 'email', 'phoneNumber', 'role',
+                       'validated', 'createdAt'])
+        && request.resource.data.validated == false; // cannot self-validate on create
 
-      // Only admins may update members (validate, edit fields).
-      // Users cannot promote themselves or change their own role/validated.
-      allow update: if isAdmin();
+      // Users cannot change their own role or validated status — admin only
+      allow update: if isAdmin()
+        && onlyFields(['name', 'contactPersonName', 'email', 'phoneNumber',
+                       'validated', 'updatedAt']);
 
-      // Only admins may delete members.
       allow delete: if isAdmin();
     }
 
     // ─── /submissions ────────────────────────────────────────────────────────
 
     match /submissions/{submissionId} {
-      // Public (unauthenticated) users may create a submission from the Home form.
-      // Authenticated agents may also create on behalf of others.
-      allow create: if true;
+      // Validate all fields on create — prevents garbage data injection
+      allow create: if onlyFields([
+          'fullName', 'phoneNumber', 'emailAddress', 'gender',
+          'currentGovernorate', 'previousGovernorate', 'street', 'building',
+          'floor', 'city', 'ageRanges', 'specialNeeds', 'needs', 'aidUrgency',
+          'consentGiven', 'comments', 'numberOfPeopleInHousehold',
+          'registrationDate', 'createdAt', 'updatedAt', 'agent'
+        ])
+        && request.resource.data.consentGiven == true  // consent is mandatory
+        && request.resource.data.aidUrgency in ['High', 'Medium', 'Low']
+        && request.resource.data.gender in ['Male', 'Female', ''];
 
-      // Public users may run the phone-number duplicate check query (read).
-      // NOTE: This also allows unauthenticated list access. To fully lock this
-      // down in the future, move the duplicate check to a Cloud Function and
-      // change this rule to: allow read: if isAdmin() || isValidatedMember() || ...
-      //
-      // Authenticated access:
-      //   - Admins: full read access.
-      //   - Validated NGO members: read all submissions (for the submissions dashboard).
-      //   - Agents: read only their own submissions (agent field == their UID).
       allow read: if isAdmin()
         || isValidatedMember()
         || (isAgent() && resource.data.agent == request.auth.uid)
-        || !isSignedIn(); // unauthenticated phone-number duplicate check
+        || !isSignedIn(); // unauthenticated phone-number duplicate check (see NOTE below)
+        // NOTE: move the duplicate-phone check to a Cloud Function to remove this
 
-      // Only admins may edit or delete submissions.
-      allow update: if isAdmin();
+      // Only admins may edit; prevent changing the core submission fields
+      allow update: if isAdmin()
+        && fieldsUnchanged(['fullName', 'phoneNumber', 'emailAddress', 'agent',
+                            'createdAt', 'registrationDate']);
+
       allow delete: if isAdmin();
     }
 

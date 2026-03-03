@@ -2,17 +2,29 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCS6vvEiEiZ-GYHY42QQ-QXJjdWLJ9Q4HE',
-  authDomain: 'btrajek-se3dni.firebaseapp.com',
-  projectId: 'btrajek-se3dni',
-  storageBucket: 'btrajek-se3dni.appspot.com',
-  messagingSenderId: '261651232882',
-  appId: '1:261651232882:web:d99c881d03ed13f327eaeb',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+
+// App Check: only requests from your registered web app are accepted.
+// Get your reCAPTCHA v3 site key from: Firebase Console → App Check → Apps
+// In dev, set: self.FIREBASE_APPCHECK_DEBUG_TOKEN = true in the browser console,
+// then whitelist the generated token in Firebase Console.
+if (import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+    isTokenAutoRefreshEnabled: true,
+  });
+}
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
