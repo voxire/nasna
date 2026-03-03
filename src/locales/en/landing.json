@@ -1,25 +1,67 @@
 {
   "hero": {
     "headline": "Help Starts Here",
-    "subtext": "Nasna connects displaced individuals with government and NGO aid across Lebanon. Register once and get matched with the support you need.",
-    "cta": "Register Now"
+    "subtext": "Nasna connects displaced individuals with government and NGO support across Lebanon. Register once — get matched with food, shelter, and medical care.",
+    "cta": "Register Now",
+    "secondaryCta": "Learn More",
+    "scrollHint": "Scroll"
+  },
+  "stats": {
+    "displaced": "Displaced in Lebanon",
+    "governorates": "Governorates Covered",
+    "aidTypes": "Aid Categories",
+    "free": "Free to Use"
+  },
+  "crisis": {
+    "eyebrow": "The Situation",
+    "title": "Lebanon is facing a humanitarian crisis",
+    "body": "Millions of Lebanese and displaced individuals are struggling to access basic necessities. Homes have been destroyed, families separated, and access to healthcare and food severely disrupted. Nasna was built to bridge that gap.",
+    "footer": "Sources: UNHCR Lebanon, 2024",
+    "issue1": "Shelter & Housing Loss",
+    "issue2": "Food Insecurity",
+    "issue3": "Medical Shortages",
+    "issue4": "Child Vulnerability"
   },
   "steps": {
+    "eyebrow": "The Process",
     "title": "How It Works",
-    "subtitle": "Three simple steps to access the aid you need.",
-    "step1": { "title": "Fill the Form", "desc": "Share your household details, location, and immediate needs in a few minutes." },
-    "step2": { "title": "Review & Verify", "desc": "Your information is reviewed by our partner organizations." },
-    "step3": { "title": "Receive Aid", "desc": "Get matched with food, shelter, medical care, and other essential services." }
+    "subtitle": "Four simple steps from registration to receiving aid.",
+    "step1": { "title": "Fill the Form", "desc": "Share your household details, current location, and immediate needs. It takes under 5 minutes." },
+    "step2": { "title": "Verification", "desc": "Your submission is reviewed and verified by our partner NGOs and government bodies." },
+    "step3": { "title": "Matching", "desc": "We match your profile with the aid programs best suited to your situation." },
+    "step4": { "title": "Receive Aid", "desc": "You are contacted directly with information about how to access the services you qualify for." }
   },
-  "features": {
-    "title": "Why Nasna",
-    "secure": { "title": "Secure & Private", "desc": "Your data is encrypted and shared only with verified partner organizations." },
-    "free": { "title": "Completely Free", "desc": "No fees, no catches. Nasna is a free platform for those in need." },
-    "trusted": { "title": "Trusted Partners", "desc": "We work with government bodies and accredited NGOs across Lebanon." }
+  "services": {
+    "eyebrow": "What We Cover",
+    "title": "Aid We Help Connect You To",
+    "subtitle": "Nasna coordinates access across six essential aid categories.",
+    "food": "Food Aid",
+    "water": "Water Supply",
+    "shelter": "Shelter & Housing",
+    "medical": "Medical Care",
+    "clothing": "Clothing",
+    "childcare": "Child & Family Support"
+  },
+  "security": {
+    "eyebrow": "Your Privacy Matters",
+    "title": "Your Data Is Safe With Us",
+    "subtitle": "We take data protection seriously. Here is what we guarantee.",
+    "point1": { "title": "End-to-End Encryption", "desc": "All data transmitted through Nasna is encrypted at rest and in transit. Your information is never exposed." },
+    "point2": { "title": "No Data Selling", "desc": "Your personal data is never sold or shared with third parties for commercial purposes. Ever." },
+    "point3": { "title": "Verified Partners Only", "desc": "Only accredited NGOs and official government bodies have access to aid-relevant portions of your data." }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Have questions? We have answers.",
+    "q1": { "q": "Who can register on Nasna?", "a": "Any individual or family in Lebanon who has been displaced or is in need of humanitarian aid may register. There are no eligibility restrictions to submitting a request." },
+    "q2": { "q": "Is Nasna really free?", "a": "Yes. Nasna is 100% free for individuals. We are a non-profit platform funded by partner organizations. You will never be asked to pay anything." },
+    "q3": { "q": "What happens to my data?", "a": "Your data is shared only with verified partner organizations to coordinate the delivery of aid to you. It is never sold, and you can request deletion at any time." },
+    "q4": { "q": "What happens after I submit?", "a": "Your submission enters a review queue. A partner organization will contact you — typically within a few business days — to discuss what aid is available in your area." }
   },
   "cta": {
-    "title": "Ready to Register?",
-    "subtitle": "The form takes less than 5 minutes. Your information helps us get you the right support faster.",
-    "button": "Start Registration"
+    "title": "Ready to Get the Help You Need?",
+    "subtitle": "Registration takes less than 5 minutes. Your information helps us get you the right support, faster.",
+    "button": "Start Registration",
+    "note": "Free, private, and secure."
   }
 }

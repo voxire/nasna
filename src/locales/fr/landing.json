@@ -1,25 +1,67 @@
 {
   "hero": {
     "headline": "L'aide commence ici",
-    "subtext": "Nasna connecte les personnes déplacées avec l'aide gouvernementale et des ONG au Liban. Inscrivez-vous une fois et recevez le soutien dont vous avez besoin.",
-    "cta": "S'inscrire maintenant"
+    "subtext": "Nasna connecte les personnes déplacées avec l'aide gouvernementale et des ONG au Liban. Inscrivez-vous une fois — obtenez de la nourriture, un abri et des soins médicaux.",
+    "cta": "S'inscrire maintenant",
+    "secondaryCta": "En savoir plus",
+    "scrollHint": "Défiler"
+  },
+  "stats": {
+    "displaced": "Déplacés au Liban",
+    "governorates": "Gouvernorats couverts",
+    "aidTypes": "Catégories d'aide",
+    "free": "Gratuit"
+  },
+  "crisis": {
+    "eyebrow": "La Situation",
+    "title": "Le Liban fait face à une crise humanitaire",
+    "body": "Des millions de Libanais et de personnes déplacées peinent à accéder aux besoins essentiels. Des maisons ont été détruites, des familles séparées, et l'accès aux soins et à la nourriture gravement perturbé. Nasna a été créée pour combler ce fossé.",
+    "footer": "Sources : HCR Liban, 2024",
+    "issue1": "Perte de logement",
+    "issue2": "Insécurité alimentaire",
+    "issue3": "Pénurie médicale",
+    "issue4": "Vulnérabilité des enfants"
   },
   "steps": {
+    "eyebrow": "Le Processus",
     "title": "Comment ça marche",
-    "subtitle": "Trois étapes simples pour accéder à l'aide dont vous avez besoin.",
-    "step1": { "title": "Remplir le formulaire", "desc": "Partagez les détails de votre ménage, votre localisation et vos besoins immédiats en quelques minutes." },
-    "step2": { "title": "Examen et vérification", "desc": "Vos informations sont examinées par nos organisations partenaires." },
-    "step3": { "title": "Recevoir de l'aide", "desc": "Soyez mis en relation avec de la nourriture, un abri, des soins médicaux et d'autres services essentiels." }
+    "subtitle": "Quatre étapes simples de l'inscription à la réception de l'aide.",
+    "step1": { "title": "Remplir le formulaire", "desc": "Partagez les détails de votre ménage, votre localisation actuelle et vos besoins immédiats. Cela prend moins de 5 minutes." },
+    "step2": { "title": "Vérification", "desc": "Votre soumission est examinée et vérifiée par nos ONG partenaires et organismes gouvernementaux." },
+    "step3": { "title": "Correspondance", "desc": "Nous faisons correspondre votre profil avec les programmes d'aide les mieux adaptés à votre situation." },
+    "step4": { "title": "Recevoir de l'aide", "desc": "Vous êtes contacté directement avec des informations sur la façon d'accéder aux services auxquels vous êtes éligible." }
   },
-  "features": {
-    "title": "Pourquoi Nasna",
-    "secure": { "title": "Sécurisé et privé", "desc": "Vos données sont chiffrées et partagées uniquement avec des organisations partenaires vérifiées." },
-    "free": { "title": "Entièrement gratuit", "desc": "Pas de frais, pas de conditions. Nasna est une plateforme gratuite pour ceux dans le besoin." },
-    "trusted": { "title": "Partenaires de confiance", "desc": "Nous travaillons avec des organismes gouvernementaux et des ONG accréditées à travers le Liban." }
+  "services": {
+    "eyebrow": "Ce que nous couvrons",
+    "title": "Aide à laquelle nous vous connectons",
+    "subtitle": "Nasna coordonne l'accès à six catégories d'aide essentielles.",
+    "food": "Aide alimentaire",
+    "water": "Fourniture d'eau",
+    "shelter": "Abri et logement",
+    "medical": "Soins médicaux",
+    "clothing": "Vêtements",
+    "childcare": "Soutien enfants et famille"
+  },
+  "security": {
+    "eyebrow": "Votre vie privée compte",
+    "title": "Vos données sont en sécurité",
+    "subtitle": "Nous prenons la protection des données au sérieux. Voici ce que nous garantissons.",
+    "point1": { "title": "Chiffrement de bout en bout", "desc": "Toutes les données transmises via Nasna sont chiffrées au repos et en transit. Vos informations ne sont jamais exposées." },
+    "point2": { "title": "Pas de vente de données", "desc": "Vos données personnelles ne sont jamais vendues ni partagées avec des tiers à des fins commerciales. Jamais." },
+    "point3": { "title": "Partenaires vérifiés uniquement", "desc": "Seules les ONG accréditées et les organismes gouvernementaux officiels ont accès aux parties pertinentes de vos données." }
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "subtitle": "Des questions ? Nous avons des réponses.",
+    "q1": { "q": "Qui peut s'inscrire sur Nasna ?", "a": "Tout individu ou famille au Liban déplacé ou ayant besoin d'aide humanitaire peut s'inscrire. Il n'y a aucune restriction d'éligibilité pour soumettre une demande." },
+    "q2": { "q": "Nasna est-il vraiment gratuit ?", "a": "Oui. Nasna est 100% gratuit pour les particuliers. Nous sommes une plateforme à but non lucratif financée par des organisations partenaires. Vous ne serez jamais invité à payer quoi que ce soit." },
+    "q3": { "q": "Que se passe-t-il avec mes données ?", "a": "Vos données sont partagées uniquement avec des organisations partenaires vérifiées pour coordonner la livraison de l'aide. Elles ne sont jamais vendues et vous pouvez en demander la suppression à tout moment." },
+    "q4": { "q": "Que se passe-t-il après ma soumission ?", "a": "Votre soumission entre dans une file d'attente de révision. Une organisation partenaire vous contactera — généralement dans quelques jours ouvrables — pour discuter de l'aide disponible dans votre région." }
   },
   "cta": {
-    "title": "Prêt à vous inscrire ?",
-    "subtitle": "Le formulaire prend moins de 5 minutes. Vos informations nous aident à vous fournir le bon soutien plus rapidement.",
-    "button": "Commencer l'inscription"
+    "title": "Prêt à obtenir l'aide dont vous avez besoin ?",
+    "subtitle": "L'inscription prend moins de 5 minutes. Vos informations nous aident à vous fournir le bon soutien, plus rapidement.",
+    "button": "Commencer l'inscription",
+    "note": "Gratuit, privé et sécurisé."
   }
 }
