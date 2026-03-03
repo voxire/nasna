@@ -99,7 +99,7 @@ function Landing() {
     <div dir={isRtl ? 'rtl' : 'ltr'} className="overflow-x-hidden">
 
       {/* ══ HERO ══════════════════════════════════════════════════════════════ */}
-      <section className="relative min-h-[85vh] flex flex-col items-center justify-center text-white overflow-hidden">
+      <section className="relative min-h-[90vh] flex flex-col items-center justify-center text-white overflow-hidden">
         <div
           className="absolute inset-0"
           style={{ backgroundImage: 'url("/nabatiye.jpg")', backgroundSize: 'cover', backgroundPosition: 'center 40%' }}
