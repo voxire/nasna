@@ -2,7 +2,6 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -14,17 +13,6 @@ const firebaseConfig = {
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-
-// App Check: only requests from your registered web app are accepted.
-// Get your reCAPTCHA v3 site key from: Firebase Console → App Check → Apps
-// In dev, set: self.FIREBASE_APPCHECK_DEBUG_TOKEN = true in the browser console,
-// then whitelist the generated token in Firebase Console.
-if (import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
-  initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
-    isTokenAutoRefreshEnabled: true,
-  });
-}
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
