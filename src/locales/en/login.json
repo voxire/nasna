@@ -17,6 +17,7 @@
     "invalidCredential": "Invalid credentials. Please try again.",
     "genericError": "An error occurred. Please try again.",
     "emailPasswordRequired": "Email and password are required.",
-    "success": "Login successful!"
+    "success": "Login successful!",
+    "tooManyAttempts": "Too many failed attempts. Please wait 15 minutes before trying again."
   }
 }

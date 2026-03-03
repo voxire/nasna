@@ -135,11 +135,11 @@ function Home() {
         <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.personalInformation')}</h2>
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.fullName')}</Label>
-          <Input value={fullName} onChange={(e) => setFullName(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+          <Input value={fullName} onChange={(e) => setFullName(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
         </div>
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.phoneNumber')}</Label>
-          <Input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+          <Input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(removeEmojis(e.target.value))} maxLength={20} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
         </div>
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.emailAddress')}</Label>
@@ -193,21 +193,21 @@ function Home() {
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">{t('home.city')}</Label>
-            <Input value={city} onChange={(e) => setCity(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+            <Input value={city} onChange={(e) => setCity(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
           </div>
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">{t('home.street')}</Label>
-            <Input value={street} onChange={(e) => setStreet(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+            <Input value={street} onChange={(e) => setStreet(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">{t('home.building')}</Label>
-            <Input value={building} onChange={(e) => setBuilding(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+            <Input value={building} onChange={(e) => setBuilding(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
           </div>
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">{t('home.floor')}</Label>
-            <Input value={floor} onChange={(e) => setFloor(removeEmojis(e.target.value))} className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+            <Input value={floor} onChange={(e) => setFloor(removeEmojis(e.target.value))} maxLength={10} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
           </div>
         </div>
       </div>
@@ -320,6 +320,7 @@ function Home() {
           <Textarea
             value={comments}
             onChange={(e) => setComments(removeEmojis(e.target.value))}
+            maxLength={500}
             rows={4}
             className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d] resize-none"
           />

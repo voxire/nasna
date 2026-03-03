@@ -4,6 +4,7 @@ import { auth } from '../firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
 import { getCookie } from '../utils/cookies';
+import { useIdleTimeout } from '../hooks/useIdleTimeout';
 
 interface PrivateRouteProps {
   children: ReactNode;
@@ -12,6 +13,7 @@ interface PrivateRouteProps {
 function PrivateRoute({ children }: PrivateRouteProps) {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  useIdleTimeout();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {

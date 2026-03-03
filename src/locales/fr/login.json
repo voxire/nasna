@@ -17,6 +17,7 @@
     "invalidCredential": "Informations d'identification non valides. Veuillez réessayer.",
     "genericError": "Une erreur est survenue. Veuillez réessayer.",
     "emailPasswordRequired": "L'e-mail et le mot de passe sont requis.",
-    "success": "Connexion réussie !"
+    "success": "Connexion réussie !",
+    "tooManyAttempts": "Trop de tentatives échouées. Veuillez attendre 15 minutes avant de réessayer."
   }
 }

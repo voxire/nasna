@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { loginUser } from '../../redux/reducers/userSlice';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { getCookie, setCookie, deleteCookie } from '../../utils/cookies';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
@@ -56,12 +57,26 @@ function Login() {
   };
 
   const onSubmit = async (data: LoginFormData) => {
+    if (getCookie('nasna_login_locked')) {
+      toast.error(t('login.toast.tooManyAttempts'));
+      return;
+    }
+
     const result = await dispatch(loginUser({ email: data.email, password: data.password }));
     if (loginUser.fulfilled.match(result)) {
+      deleteCookie('nasna_login_attempts');
       toast.success(t('login.toast.success'));
       navigate('/ngo/submissions');
     } else {
-      handleFirebaseError((result.payload as string) ?? '');
+      const attempts = Number(getCookie('nasna_login_attempts') || '0') + 1;
+      if (attempts >= 5) {
+        setCookie('nasna_login_locked', '1', 15 * 60);
+        deleteCookie('nasna_login_attempts');
+        toast.error(t('login.toast.tooManyAttempts'));
+      } else {
+        setCookie('nasna_login_attempts', String(attempts), 15 * 60);
+        handleFirebaseError((result.payload as string) ?? '');
+      }
     }
   };
 
@@ -90,7 +105,7 @@ function Login() {
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-gray-700">{t('login.fields.email')}</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="you@example.com" className="border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                      <Input type="email" placeholder="you@example.com" autoComplete="off" className="border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -103,7 +118,7 @@ function Login() {
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-gray-700">{t('login.fields.password')}</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" className="border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                      <Input type="password" placeholder="••••••••" autoComplete="off" className="border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
