@@ -1,0 +1,25 @@
+{
+  "hero": {
+    "headline": "Help Starts Here",
+    "subtext": "Nasna connects displaced individuals with government and NGO aid across Lebanon. Register once and get matched with the support you need.",
+    "cta": "Register Now"
+  },
+  "steps": {
+    "title": "How It Works",
+    "subtitle": "Three simple steps to access the aid you need.",
+    "step1": { "title": "Fill the Form", "desc": "Share your household details, location, and immediate needs in a few minutes." },
+    "step2": { "title": "Review & Verify", "desc": "Your information is reviewed by our partner organizations." },
+    "step3": { "title": "Receive Aid", "desc": "Get matched with food, shelter, medical care, and other essential services." }
+  },
+  "features": {
+    "title": "Why Nasna",
+    "secure": { "title": "Secure & Private", "desc": "Your data is encrypted and shared only with verified partner organizations." },
+    "free": { "title": "Completely Free", "desc": "No fees, no catches. Nasna is a free platform for those in need." },
+    "trusted": { "title": "Trusted Partners", "desc": "We work with government bodies and accredited NGOs across Lebanon." }
+  },
+  "cta": {
+    "title": "Ready to Register?",
+    "subtitle": "The form takes less than 5 minutes. Your information helps us get you the right support faster.",
+    "button": "Start Registration"
+  }
+}

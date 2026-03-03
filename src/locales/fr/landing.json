@@ -1,0 +1,25 @@
+{
+  "hero": {
+    "headline": "L'aide commence ici",
+    "subtext": "Nasna connecte les personnes déplacées avec l'aide gouvernementale et des ONG au Liban. Inscrivez-vous une fois et recevez le soutien dont vous avez besoin.",
+    "cta": "S'inscrire maintenant"
+  },
+  "steps": {
+    "title": "Comment ça marche",
+    "subtitle": "Trois étapes simples pour accéder à l'aide dont vous avez besoin.",
+    "step1": { "title": "Remplir le formulaire", "desc": "Partagez les détails de votre ménage, votre localisation et vos besoins immédiats en quelques minutes." },
+    "step2": { "title": "Examen et vérification", "desc": "Vos informations sont examinées par nos organisations partenaires." },
+    "step3": { "title": "Recevoir de l'aide", "desc": "Soyez mis en relation avec de la nourriture, un abri, des soins médicaux et d'autres services essentiels." }
+  },
+  "features": {
+    "title": "Pourquoi Nasna",
+    "secure": { "title": "Sécurisé et privé", "desc": "Vos données sont chiffrées et partagées uniquement avec des organisations partenaires vérifiées." },
+    "free": { "title": "Entièrement gratuit", "desc": "Pas de frais, pas de conditions. Nasna est une plateforme gratuite pour ceux dans le besoin." },
+    "trusted": { "title": "Partenaires de confiance", "desc": "Nous travaillons avec des organismes gouvernementaux et des ONG accréditées à travers le Liban." }
+  },
+  "cta": {
+    "title": "Prêt à vous inscrire ?",
+    "subtitle": "Le formulaire prend moins de 5 minutes. Vos informations nous aident à vous fournir le bon soutien plus rapidement.",
+    "button": "Commencer l'inscription"
+  }
+}
