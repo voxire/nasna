@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../redux/hooks';
 import { logout } from '../redux/reducers/userSlice';
 import type { SupportedLanguage } from '../types';
+import { getCookie } from '../utils/cookies';
 import { Button } from '@/Components/ui/button';
 import {
   DropdownMenu,
@@ -43,7 +44,7 @@ function Header({ dashboard = false }: HeaderProps) {
   }, []);
 
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('language');
+    const savedLanguage = getCookie('language');
     if (savedLanguage) {
       selectLanguage(savedLanguage as SupportedLanguage);
     }

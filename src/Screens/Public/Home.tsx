@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { collection, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
+import { getCookie, setCookie } from '../../utils/cookies';
 import type { AgeRanges } from '../../types';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -53,6 +54,7 @@ function Home() {
   const [page, setPage] = useState(1);
   const [emailError, setEmailError] = useState(false);
   const [numberOfPeopleInHousehold, setNumberOfPeopleInHousehold] = useState(0);
+  const [honeypot, setHoneypot] = useState('');
 
   const navigate = useNavigate();
 
@@ -65,6 +67,9 @@ function Home() {
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleAddMember = async () => {
+    // Honeypot — silently block bots that fill hidden fields
+    if (honeypot) return;
+
     const trimmedPhone = phoneNumber.trim();
     if (getTotalAgeGroupCount() > numberOfPeopleInHousehold) {
       toast.error(t('home.toast.invalidNumberOfPeopleInHousehold'));
@@ -75,19 +80,40 @@ function Home() {
       fullName && trimmedPhone && currentGovernorate && previousGovernorate &&
       street && building && floor && specialNeeds.length && needs.length && aidUrgency
     ) {
+      // 24h cooldown — cookie auto-expires after 24h, no timestamp math needed
+      if (getCookie('nasna_submitted')) {
+        toast.error(t('home.toast.submissionCooldown'));
+        return;
+      }
+
       try {
-        const phoneQuery = query(collection(db, 'submissions'), where('phoneNumber', '==', trimmedPhone));
-        const snapshot = await getDocs(phoneQuery);
-        if (!snapshot.empty) {
+        // Phone duplicate check
+        const phoneSnapshot = await getDocs(
+          query(collection(db, 'submissions'), where('phoneNumber', '==', trimmedPhone))
+        );
+        if (!phoneSnapshot.empty) {
           toast.error(t('home.toast.duplicatePhoneNumber'));
           return;
         }
+
+        // Email duplicate check (only if provided)
+        if (emailAddress) {
+          const emailSnapshot = await getDocs(
+            query(collection(db, 'submissions'), where('emailAddress', '==', emailAddress))
+          );
+          if (!emailSnapshot.empty) {
+            toast.error(t('home.toast.duplicateEmail'));
+            return;
+          }
+        }
+
         await addDoc(collection(db, 'submissions'), {
           fullName, phoneNumber: trimmedPhone, emailAddress, gender,
           currentGovernorate, previousGovernorate, city, street, building, floor,
           ageRanges, specialNeeds, needs, aidUrgency, consentGiven: true,
           comments, registrationDate: Timestamp.fromDate(new Date()), agent: '',
         });
+        setCookie('nasna_submitted', '1', 86_400);
         toast.success(t('home.toast.memberAddedSuccess'));
         navigate('/confirmation');
       } catch {
@@ -311,9 +337,23 @@ function Home() {
 
   return (
     <div
-      className="flex flex-col px-6 pt-7 pb-36 max-w-[600px] mx-auto"
+      className="flex flex-col px-6 pt-7 pb-12 max-w-[600px] mx-auto"
       dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
     >
+      {/* Honeypot — hidden from humans, bots fill it */}
+      <div style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }} aria-hidden="true">
+        <label htmlFor="hp_website">Website</label>
+        <input
+          id="hp_website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+        />
+      </div>
+
       {/* Progress bar */}
       <div className="w-full bg-gray-200 rounded h-2 overflow-hidden mb-4">
         <div

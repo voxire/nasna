@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { getCookie } from '../../utils/cookies';
 import { Globe, LogOut } from 'lucide-react';
 import { selectLanguage } from '../../services/i18next';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +21,7 @@ function PrivateNavbar() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('language');
+    const savedLanguage = getCookie('language');
     if (savedLanguage) {
       selectLanguage(savedLanguage as SupportedLanguage);
     }

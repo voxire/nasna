@@ -1,6 +1,7 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import type { SupportedLanguage } from '../types';
+import { getCookie, setCookie } from '../utils/cookies';
 
 const buildResources = () => {
   const resources: Record<string, Record<string, Record<string, unknown>>> = {
@@ -39,7 +40,7 @@ const buildResources = () => {
   return resources;
 };
 
-const savedLanguage = (localStorage.getItem('language') as SupportedLanguage) || 'ar';
+const savedLanguage = (getCookie('language') as SupportedLanguage) || 'ar';
 
 i18next.use(initReactI18next).init({
   resources: buildResources(),
@@ -59,7 +60,7 @@ document.documentElement.dir = savedLanguage === 'ar' ? 'rtl' : 'ltr';
 export const selectLanguage = (language: SupportedLanguage) => {
   if (language) {
     i18next.changeLanguage(language);
-    localStorage.setItem('language', language);
+    setCookie('language', language, 365 * 24 * 60 * 60);
   }
 };
 

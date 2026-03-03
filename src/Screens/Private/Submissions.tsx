@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { db, auth } from '../../firebase';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { getCookie } from '../../utils/cookies';
 import type { SubmissionDocument } from '../../types';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -47,7 +48,7 @@ function Submissions() {
         navigate('/auth/login');
         return;
       }
-      const role = localStorage.getItem('userRole');
+      const role = getCookie('userRole');
       if (role !== 'member') {
         if (role === 'agent') { navigate('/agent/create'); return; }
         navigate('/');

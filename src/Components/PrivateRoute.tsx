@@ -1,8 +1,9 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { auth } from '../firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
+import { getCookie } from '../utils/cookies';
 
 interface PrivateRouteProps {
   children: ReactNode;
@@ -13,8 +14,13 @@ function PrivateRoute({ children }: PrivateRouteProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && !getCookie('nasna_session')) {
+        await signOut(auth);
+        setCurrentUser(null);
+      } else {
+        setCurrentUser(user);
+      }
       setLoading(false);
     });
     return () => unsubscribe();

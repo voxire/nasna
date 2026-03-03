@@ -5,6 +5,8 @@
     "fillRequiredFields": "Assurez-vous que tous les champs requis sont remplis.",
     "errorAddingMember": "Une erreur est survenue lors de la création de la soumission. Veuillez réessayer.",
     "duplicatePhoneNumber": "Ce numéro de téléphone a déjà été utilisé pour une soumission.",
+    "duplicateEmail": "Cette adresse e-mail a déjà été utilisée pour une soumission.",
+    "submissionCooldown": "Vous avez déjà soumis une demande récemment. Veuillez attendre 24 heures avant de soumettre à nouveau.",
     "validEmailRequired": "Veuillez entrer une adresse e-mail valide."
   },
   "needs": {

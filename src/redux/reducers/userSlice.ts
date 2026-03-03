@@ -3,6 +3,7 @@ import { signInWithEmailAndPassword, AuthError } from 'firebase/auth';
 import { auth, db } from '../../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import type { ReduxUserData, ReduxUserSliceState } from '../../types';
+import { setCookie, deleteCookie } from '../../utils/cookies';
 
 export const loginUser = createAsyncThunk<
   ReduxUserData,
@@ -23,7 +24,8 @@ export const loginUser = createAsyncThunk<
     const userData = userDoc.data() as Omit<ReduxUserData, 'uid'>;
     const role = userData.role;
 
-    localStorage.setItem('userRole', role);
+    setCookie('userRole', role, 7 * 24 * 60 * 60);
+    setCookie('nasna_session', '1', 12 * 60 * 60);
 
     return { uid, ...userData };
   } catch (error) {
@@ -46,7 +48,8 @@ const userSlice = createSlice({
       state.user = null;
       state.loading = false;
       state.error = null;
-      localStorage.removeItem('userRole');
+      deleteCookie('userRole');
+      deleteCookie('nasna_session');
     },
   },
   extraReducers: (builder) => {
