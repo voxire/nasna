@@ -55,9 +55,8 @@ const stagger = {
 // ─── Component ────────────────────────────────────────────────────────────────
 function Landing() {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [openFaq, setOpenFaq] = useState<string | null>(null);
-  const isRtl = i18n.language === 'ar';
 
   const stats = [
     { target: 5, suffix: t('landing.stats.minSuffix'), label: t('landing.stats.registerTime') },
@@ -96,7 +95,7 @@ function Landing() {
   ];
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'} className="overflow-x-hidden">
+    <div>
 
       {/* ══ HERO ══════════════════════════════════════════════════════════════ */}
       <section className="relative min-h-[90vh] flex flex-col items-center justify-center text-white overflow-hidden">
@@ -268,8 +267,8 @@ function Landing() {
                 <motion.div
                   key={step.num}
                   className="flex gap-5 items-start py-8 border-b border-gray-100 last:border-0"
-                  initial={{ opacity: 0, x: isRtl ? (i % 2 === 0 ? 30 : -30) : (i % 2 === 0 ? -30 : 30) }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-40px' }}
                   transition={{ duration: 0.55 }}
                 >

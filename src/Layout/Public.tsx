@@ -9,20 +9,9 @@ interface PublicProps {
 
 function Public({ children }: PublicProps) {
   return (
-    <div>
+    <div className="overflow-x-hidden">
       <Header />
-      <div
-        style={{
-          backgroundColor: '#FAFAFA',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'stretch',
-        }}
-      >
-        <div style={{ maxWidth: '1500px', width: '100%' }}>
-          <PageTransition>{children}</PageTransition>
-        </div>
-      </div>
+      <PageTransition>{children}</PageTransition>
       <Footer />
     </div>
   );
