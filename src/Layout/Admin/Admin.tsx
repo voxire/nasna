@@ -3,34 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
-import { SidebarProvider, SidebarTrigger, useSidebar } from '@/Components/ui/sidebar';
-import { Separator } from '@/Components/ui/separator';
+import { SidebarProvider } from '@/Components/ui/sidebar';
 import AppSidebar from './Sidebar';
 import PageTransition from '../../Components/PageTransition';
 import AdminBreadcrumb from './Navbar';
-import { cn } from '@/lib/utils';
-
-// Separate component so it can use useSidebar() inside SidebarProvider
-function AdminContent({ children }: { children: ReactNode }) {
-  const { state } = useSidebar();
-  return (
-    <div
-      className={cn(
-        'flex flex-col min-h-screen transition-[margin-left] duration-200 ease-linear',
-        state === 'expanded' ? 'ml-64' : 'ml-12'
-      )}
-    >
-      <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-white px-4 sticky top-0 z-10">
-        <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-4" />
-        <AdminBreadcrumb />
-      </header>
-      <main className="flex-1 p-6 bg-gray-50">
-        <PageTransition>{children}</PageTransition>
-      </main>
-    </div>
-  );
-}
 
 interface AdminProps {
   children: ReactNode;
@@ -78,7 +54,14 @@ function Admin({ children }: AdminProps) {
   return (
     <SidebarProvider>
       <AppSidebar user={user} />
-      <AdminContent>{children}</AdminContent>
+      <div className="flex flex-col min-h-screen ml-64">
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-white px-4 sticky top-0 z-10">
+          <AdminBreadcrumb />
+        </header>
+        <main className="flex-1 p-6 bg-gray-50">
+          <PageTransition>{children}</PageTransition>
+        </main>
+      </div>
     </SidebarProvider>
   );
 }
