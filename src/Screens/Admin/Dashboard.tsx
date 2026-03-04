@@ -6,27 +6,27 @@ import { Card, CardContent } from '@/Components/ui/card';
 
 const STATS = [
   { label: 'Submissions', icon: List, key: 'submissions' as const },
-  { label: 'NGOs', icon: Building2, key: 'businesses' as const },
-  { label: 'Pending NGO Requests', icon: Bell, key: 'pendingRequests' as const },
+  { label: 'Validated NGOs', icon: Building2, key: 'ngoCount' as const },
+  { label: 'Pending NGO Approvals', icon: Bell, key: 'pendingNgo' as const },
   { label: 'Unread Feedback', icon: MessageSquare, key: 'feedback' as const },
 ];
 
 function Dashboard() {
-  const [counts, setCounts] = useState({ submissions: 0, businesses: 0, pendingRequests: 0, feedback: 0 });
+  const [counts, setCounts] = useState({ submissions: 0, ngoCount: 0, pendingNgo: 0, feedback: 0 });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [submissionsSnap, businessesSnap, requestsSnap, feedbackSnap] = await Promise.all([
+        const [submissionsSnap, ngoSnap, pendingSnap, feedbackSnap] = await Promise.all([
           getDocs(collection(db, 'submissions')),
-          getDocs(collection(db, 'businesses')),
-          getDocs(query(collection(db, 'requests'), where('status', '==', 'pending'))),
+          getDocs(query(collection(db, 'members'), where('role', '==', 'member'), where('validated', '==', true))),
+          getDocs(query(collection(db, 'members'), where('role', '==', 'member'), where('validated', '==', false))),
           getDocs(query(collection(db, 'feedback'), where('read', '==', false))),
         ]);
         setCounts({
           submissions: submissionsSnap.size,
-          businesses: businessesSnap.size,
-          pendingRequests: requestsSnap.size,
+          ngoCount: ngoSnap.size,
+          pendingNgo: pendingSnap.size,
           feedback: feedbackSnap.size,
         });
       } catch (error) {

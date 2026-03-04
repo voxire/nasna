@@ -6,7 +6,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAppDispatch } from '../redux/hooks';
 import { logout } from '../redux/reducers/userSlice';
 import type { SupportedLanguage } from '../types';
-import { getCookie } from '../utils/cookies';
+import { getCookie, deleteCookie } from '../utils/cookies';
 import { Button } from '@/Components/ui/button';
 import {
   DropdownMenu,
@@ -64,6 +64,7 @@ function Header({ dashboard = false }: HeaderProps) {
 
   const handleLogout = async () => {
     try {
+      deleteCookie('nasna_session');
       await signOut(auth);
       dispatch(logout());
       navigate('/auth/login');

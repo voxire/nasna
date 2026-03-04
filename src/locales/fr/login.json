@@ -2,13 +2,24 @@
   "title": "Bon retour",
   "subtitle": "Connectez-vous à votre compte",
   "logoAlt": "Logo Nasna",
+  "bannerSubtitle": "Connecter les individus au soutien gouvernemental et associatif au Liban.",
+  "forgotPassword": "Mot de passe oublié ?",
+  "forgotPasswordTitle": "Réinitialiser le mot de passe",
+  "forgotPasswordDesc": "Entrez votre adresse e-mail et nous vous enverrons un lien de réinitialisation.",
+  "forgotSubmit": "Envoyer le lien",
+  "forgotSending": "Envoi en cours...",
+  "googleButton": "Continuer avec Google",
+  "googleLoading": "Connexion en cours...",
+  "noAccount": "Pas encore de compte ?",
+  "registerLink": "S'inscrire",
   "fields": {
     "email": "E-mail",
     "password": "Mot de passe"
   },
   "buttons": {
     "signIn": "Se connecter",
-    "loading": "Connexion en cours..."
+    "loading": "Connexion en cours...",
+    "cancel": "Annuler"
   },
   "toast": {
     "userNotFound": "Aucun utilisateur trouvé avec cet e-mail.",
@@ -18,6 +29,8 @@
     "genericError": "Une erreur est survenue. Veuillez réessayer.",
     "emailPasswordRequired": "L'e-mail et le mot de passe sont requis.",
     "success": "Connexion réussie !",
-    "tooManyAttempts": "Trop de tentatives échouées. Veuillez attendre 15 minutes avant de réessayer."
+    "tooManyAttempts": "Trop de tentatives échouées. Veuillez attendre 15 minutes avant de réessayer.",
+    "resetSent": "E-mail de réinitialisation envoyé ! Vérifiez votre boîte de réception.",
+    "resetError": "Échec de l'envoi. Assurez-vous que l'e-mail est bien enregistré."
   }
 }

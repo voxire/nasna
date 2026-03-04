@@ -64,6 +64,7 @@ export default function Feedback() {
         name: data.name || '',
         email: data.email || '',
         message: data.message,
+        read: false,
         createdAt: Timestamp.now(),
       });
       toast.success(t('feedback.successTitle'), { description: t('feedback.successMessage') });

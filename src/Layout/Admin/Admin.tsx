@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
-import { SidebarProvider } from '@/Components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/Components/ui/sidebar';
 import AppSidebar from './Sidebar';
 import PageTransition from '../../Components/PageTransition';
 import AdminBreadcrumb from './Navbar';
@@ -56,6 +56,7 @@ function Admin({ children }: AdminProps) {
       <AppSidebar user={user} />
       <div className="flex flex-col flex-1 min-w-0 overflow-y-auto">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-white px-4 sticky top-0 z-10">
+          <SidebarTrigger className="md:hidden" />
           <AdminBreadcrumb />
         </header>
         <main className="flex-1 p-6 bg-gray-50">
