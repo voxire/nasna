@@ -33,7 +33,7 @@ function Footer() {
 
           {/* Brand */}
           <div className="flex flex-col gap-3">
-            <img src="/Nasna Logo.png" alt="Nasna logo" className="h-12 w-auto brightness-0 invert" />
+            <img src="/Nasna Logo.png" alt="Nasna logo" className="h-12 w-auto" />
             <p className="text-white/70 text-sm leading-relaxed max-w-[220px]">
               Connecting individuals with NGO support across Lebanon.
             </p>
