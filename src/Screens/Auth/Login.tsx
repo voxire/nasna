@@ -64,6 +64,13 @@ function Login() {
     setGoogleLoading(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
+      const tokenResult = await result.user.getIdTokenResult();
+      const role = tokenResult.claims['role'] as string | undefined;
+      if (role === 'admin') {
+        toast.success(t('login.toast.success'));
+        navigate('/manage');
+        return;
+      }
       const memberDoc = await getDoc(doc(db, 'members', result.user.uid));
       if (memberDoc.exists()) {
         toast.success(t('login.toast.success'));
