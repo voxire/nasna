@@ -148,7 +148,7 @@ function Landing() {
           >
             <Button
               size="lg"
-              className="bg-[#12a89d] hover:bg-[#0e9088] text-white font-bold px-10 text-base rounded-full shadow-lg shadow-[#12a89d]/40 transition-all duration-200 hover:scale-105"
+              className="bg-[#12a89d] hover:bg-[#0e9088] text-white font-bold px-10 text-base rounded-full transition-all duration-200 hover:scale-105"
               onClick={() => navigate('/submit')}
             >
               {t('landing.hero.cta')}
@@ -449,7 +449,7 @@ function Landing() {
           <p className="text-white/75 text-base leading-relaxed max-w-sm">{t('landing.cta.subtitle')}</p>
           <Button
             size="lg"
-            className="bg-white text-[#12a89d] hover:bg-gray-100 font-bold px-12 text-base rounded-full shadow-2xl hover:scale-105 transition-all duration-200"
+            className="bg-white text-[#12a89d] hover:bg-gray-100 font-bold px-12 text-base rounded-full hover:scale-105 transition-all duration-200"
             onClick={() => navigate('/submit')}
           >
             {t('landing.cta.button')}
