@@ -67,6 +67,7 @@ function Register() {
         isOfficiallyRegistered: false,
         isAdmin: false,
         validated: false,
+        onboarded: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       });

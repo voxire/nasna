@@ -57,6 +57,7 @@ function AgentRegister() {
         role: 'agent',
         isAdmin: false,
         validated: false,
+        onboarded: true,
         createdAt: new Date(),
         updatedAt: new Date(),
         consentGiven: true,

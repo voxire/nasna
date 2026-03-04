@@ -46,7 +46,7 @@ service cloud.firestore {
         && request.auth.uid == userId
         && request.resource.data.role in ['member', 'agent']
         && onlyFields(['uid', 'name', 'contactPersonName', 'email', 'phoneNumber', 'role',
-                       'validated', 'createdAt', 'updatedAt', 'consentGiven',
+                       'validated', 'onboarded', 'createdAt', 'updatedAt', 'consentGiven',
                        'areaOfOperation', 'kindOfHelp', 'initiativeOrNgo',
                        'numberOfVolunteers', 'isOfficiallyRegistered', 'isAdmin'])
         && request.resource.data.validated == false; // cannot self-validate on create

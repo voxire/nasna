@@ -1,0 +1,58 @@
+import { useEffect, useState, ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
+import { auth, db } from '../firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { Loader2 } from 'lucide-react';
+
+interface GuestRouteProps {
+  children: ReactNode;
+}
+
+function GuestRoute({ children }: GuestRouteProps) {
+  const [loading, setLoading] = useState(true);
+  const [redirect, setRedirect] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user: User | null) => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const tokenResult = await user.getIdTokenResult();
+        const role = tokenResult.claims['role'] as string | undefined;
+        if (role === 'admin') {
+          setRedirect('/manage');
+          setLoading(false);
+          return;
+        }
+        const memberDoc = await getDoc(doc(db, 'members', user.uid));
+        if (memberDoc.exists() && memberDoc.data().onboarded === true) {
+          setRedirect('/ngo/submissions');
+        } else {
+          setRedirect('/auth/onboarding');
+        }
+      } catch {
+        setLoading(false);
+        return;
+      }
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />
+      </div>
+    );
+  }
+
+  if (redirect) return <Navigate to={redirect} replace />;
+
+  return <>{children}</>;
+}
+
+export default GuestRoute;

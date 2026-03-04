@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import Public from '../Layout/Public';
+import GuestRoute from '../Components/GuestRoute';
 import type { RouteConfig } from '../types';
 
 const Login = lazy(() => import('../Screens/Auth/Login'));
@@ -12,7 +13,9 @@ const AuthRoutes: RouteConfig[] = [
     path: '/auth/login',
     element: (
       <Public>
-        <Login />
+        <GuestRoute>
+          <Login />
+        </GuestRoute>
       </Public>
     ),
   },
@@ -20,7 +23,9 @@ const AuthRoutes: RouteConfig[] = [
     path: '/auth/register',
     element: (
       <Public>
-        <Register />
+        <GuestRoute>
+          <Register />
+        </GuestRoute>
       </Public>
     ),
   },
@@ -28,7 +33,9 @@ const AuthRoutes: RouteConfig[] = [
     path: '/auth/agent',
     element: (
       <Public>
-        <AgentRegister />
+        <GuestRoute>
+          <AgentRegister />
+        </GuestRoute>
       </Public>
     ),
   },
