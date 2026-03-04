@@ -3,14 +3,13 @@ import { List, Building2, Bell, MessageSquare } from 'lucide-react';
 import { db } from '../../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Card, CardContent } from '@/Components/ui/card';
-import { auth } from '../../firebase';
 
 const STATS = [
-  { label: 'Submissions', icon: List, key: 'submissions' },
-  { label: 'NGOs', icon: Building2, key: 'businesses' },
-  { label: 'Pending NGO Requests', icon: Bell, key: 'pendingRequests' },
-  { label: 'Unread Feedback', icon: MessageSquare, key: 'feedback' },
-] as const;
+  { label: 'Submissions', icon: List, key: 'submissions' as const },
+  { label: 'NGOs', icon: Building2, key: 'businesses' as const },
+  { label: 'Pending NGO Requests', icon: Bell, key: 'pendingRequests' as const },
+  { label: 'Unread Feedback', icon: MessageSquare, key: 'feedback' as const },
+];
 
 function Dashboard() {
   const [counts, setCounts] = useState({ submissions: 0, businesses: 0, pendingRequests: 0, feedback: 0 });
@@ -40,23 +39,23 @@ function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Hello,</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Welcome back, {auth.currentUser?.email}
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-sm text-muted-foreground mt-1">Welcome to your admin panel.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {STATS.map(({ label, icon: Icon, key }) => (
-          <Card key={key} className="shadow-sm">
-            <CardContent className="p-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-gray-100">
-                  <Icon className="h-5 w-5 text-gray-600" />
+          <Card key={key}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-muted">
+                    <Icon className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">{label}</span>
                 </div>
-                <span className="text-sm font-medium text-gray-700">{label}</span>
+                <span className="text-2xl font-bold">{counts[key]}</span>
               </div>
-              <span className="text-2xl font-bold text-gray-900">{counts[key]}</span>
             </CardContent>
           </Card>
         ))}

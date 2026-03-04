@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/Components/ui/sidebar';
 import AppSidebar from './Sidebar';
 import PageTransition from '../../Components/PageTransition';
+import AdminBreadcrumb from './Navbar';
 
 interface AdminProps {
   children: ReactNode;
@@ -54,10 +55,11 @@ function Admin({ children }: AdminProps) {
     <SidebarProvider>
       <AppSidebar user={user} />
       <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-white px-4">
-          <SidebarTrigger className="text-gray-600" />
+        <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-white px-4">
+          <SidebarTrigger className="-ml-1" />
+          <AdminBreadcrumb />
         </header>
-        <main className="flex-1 overflow-y-auto bg-[#eff0f1] p-6">
+        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
           <PageTransition>{children}</PageTransition>
         </main>
       </SidebarInset>

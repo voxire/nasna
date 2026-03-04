@@ -4,30 +4,41 @@ import { auth } from '../../firebase';
 import { useAppDispatch } from '../../redux/hooks';
 import { logout } from '../../redux/reducers/userSlice';
 import { toast } from 'sonner';
-import { Home, List, Bell, UserPlus, LogOut } from 'lucide-react';
+import { Home, List, Bell, UserPlus, ChevronsUpDown, LogOut } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { Button } from '@/Components/ui/button';
+} from '@/Components/ui/sidebar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 
 const NAV_ITEMS = [
   { path: '/manage', label: 'Home', icon: Home },
   { path: '/manage/submissions', label: 'Submissions', icon: List },
-  { path: '/manage/ngo', label: 'NGO/Initiative', icon: Bell },
+  { path: '/manage/ngo', label: 'NGO / Initiative', icon: Bell },
   { path: '/manage/agents', label: 'Agents', icon: UserPlus },
 ];
 
 interface AppSidebarProps {
   user: User;
+}
+
+function getInitials(email: string) {
+  return email.slice(0, 2).toUpperCase();
 }
 
 export default function AppSidebar({ user }: AppSidebarProps) {
@@ -46,41 +57,47 @@ export default function AppSidebar({ user }: AppSidebarProps) {
   };
 
   return (
-    <Sidebar
-      style={
-        {
-          '--sidebar': '#262626',
-          '--sidebar-foreground': '#ffffff',
-          '--sidebar-accent': '#3a3a3a',
-          '--sidebar-accent-foreground': '#ffffff',
-          '--sidebar-border': 'rgba(255,255,255,0.08)',
-          '--sidebar-primary': '#12a89d',
-          '--sidebar-primary-foreground': '#ffffff',
-          '--sidebar-ring': '#12a89d',
-        } as React.CSSProperties
-      }
-    >
-      <SidebarHeader className="px-4 py-5">
-        <img
-          src="/Nasna Logo.png"
-          alt="Nasna"
-          className="h-12 w-auto cursor-pointer brightness-0 invert"
-          onClick={() => navigate('/')}
-        />
+    <Sidebar collapsible="icon">
+      {/* Header — logo + app name */}
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="lg"
+              className="cursor-pointer"
+              onClick={() => navigate('/')}
+            >
+              <div className="flex aspect-square h-8 w-8 items-center justify-center rounded-lg bg-[#12a89d] text-white shrink-0">
+                <img
+                  src="/Nasna Logo.png"
+                  alt="Nasna"
+                  className="h-5 w-5 object-contain brightness-0 invert"
+                />
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="font-semibold text-sm">Nasna</span>
+                <span className="text-xs text-muted-foreground">Admin Panel</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
 
+      {/* Navigation */}
       <SidebarContent>
         <SidebarGroup>
+          <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {NAV_ITEMS.map(({ path, label, icon: Icon }) => (
                 <SidebarMenuItem key={path}>
                   <SidebarMenuButton
+                    tooltip={label}
                     isActive={location.pathname === path}
                     onClick={() => navigate(path)}
                     className="cursor-pointer"
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon />
                     <span>{label}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -90,19 +107,37 @@ export default function AppSidebar({ user }: AppSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="px-4 py-4 border-t border-white/10">
-        <div className="flex flex-col gap-2">
-          <p className="text-xs text-white/50 truncate">{user.email}</p>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            className="justify-start gap-2 text-white/70 hover:text-white hover:bg-white/10 px-2"
-          >
-            <LogOut className="h-4 w-4" />
-            Log out
-          </Button>
-        </div>
+      {/* Footer — user avatar + email + logout */}
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
+                >
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarFallback className="rounded-lg bg-[#12a89d] text-white text-xs">
+                      {getInitials(user.email ?? 'AD')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col leading-tight min-w-0">
+                    <span className="text-sm font-medium truncate">{user.displayName ?? 'Admin'}</span>
+                    <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" align="start" className="w-56">
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:text-red-600">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

@@ -75,15 +75,20 @@ function Header({ dashboard = false }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 h-20 bg-white border-b border-gray-200">
       <div className="flex items-center h-full px-6">
-        {/* Logo + desktop nav */}
-        <div className="flex-1 flex items-center gap-8">
+        {/* Logo */}
+        <div className="flex-1 flex items-center">
           <img
             src="/Nasna Logo.png"
             alt="Nasna logo"
             className="h-16 w-auto cursor-pointer"
             onClick={() => navigate('/')}
           />
-          <nav className="hidden md:flex items-center gap-6">
+        </div>
+
+        {/* Right controls */}
+        <div className="flex items-center gap-1">
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-6 mr-2">
             {NAV_LINKS.map(({ to, labelKey }) => (
               <Link
                 key={to}
@@ -98,10 +103,6 @@ function Header({ dashboard = false }: HeaderProps) {
               </Link>
             ))}
           </nav>
-        </div>
-
-        {/* Right controls */}
-        <div className="flex items-center gap-1">
           {user && (
             <>
               {!dashboard && (
