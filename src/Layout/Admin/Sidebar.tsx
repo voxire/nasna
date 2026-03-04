@@ -67,12 +67,8 @@ export default function AppSidebar({ user }: AppSidebarProps) {
               className="cursor-pointer"
               onClick={() => navigate('/')}
             >
-              <div className="flex aspect-square h-8 w-8 items-center justify-center rounded-lg bg-[#12a89d] text-white shrink-0">
-                <img
-                  src="/Nasna Logo.png"
-                  alt="Nasna"
-                  className="h-5 w-5 object-contain brightness-0 invert"
-                />
+              <div className="flex aspect-square h-8 w-8 items-center justify-center rounded-lg bg-[#12a89d] text-white shrink-0 font-bold text-base">
+                N
               </div>
               <div className="flex flex-col leading-tight">
                 <span className="font-semibold text-sm">Nasna</span>

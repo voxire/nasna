@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/Components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/Components/ui/sidebar';
+import { Separator } from '@/Components/ui/separator';
 import AppSidebar from './Sidebar';
 import PageTransition from '../../Components/PageTransition';
 import AdminBreadcrumb from './Navbar';
@@ -54,15 +55,17 @@ function Admin({ children }: AdminProps) {
   return (
     <SidebarProvider>
       <AppSidebar user={user} />
-      <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b bg-white px-4">
+      {/* Use plain div instead of SidebarInset to avoid w-full flex conflict */}
+      <div className="flex flex-col flex-1 min-w-0 min-h-screen">
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-white px-4 sticky top-0 z-10">
           <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="mr-2 h-4" />
           <AdminBreadcrumb />
         </header>
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+        <main className="flex-1 p-6 bg-gray-50">
           <PageTransition>{children}</PageTransition>
         </main>
-      </SidebarInset>
+      </div>
     </SidebarProvider>
   );
 }

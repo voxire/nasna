@@ -126,7 +126,7 @@ function Members() {
   };
 
   return (
-    <div className="p-6">
+    <div>
       <h1 className="text-2xl font-bold mb-5 text-gray-800">NGO Members</h1>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4 flex gap-3 flex-wrap">
