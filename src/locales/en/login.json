@@ -2,13 +2,24 @@
   "title": "Welcome back",
   "subtitle": "Sign in to your account",
   "logoAlt": "Nasna Logo",
+  "bannerSubtitle": "Connecting individuals with government and NGO support across Lebanon.",
+  "forgotPassword": "Forgot password?",
+  "forgotPasswordTitle": "Reset Password",
+  "forgotPasswordDesc": "Enter your email address and we'll send you a reset link.",
+  "forgotSubmit": "Send Reset Link",
+  "forgotSending": "Sending...",
+  "googleButton": "Continue with Google",
+  "googleLoading": "Signing in...",
+  "noAccount": "Don't have an account?",
+  "registerLink": "Register",
   "fields": {
     "email": "Email",
     "password": "Password"
   },
   "buttons": {
     "signIn": "Sign In",
-    "loading": "Signing In..."
+    "loading": "Signing In...",
+    "cancel": "Cancel"
   },
   "toast": {
     "userNotFound": "No user found with this email.",
@@ -18,6 +29,8 @@
     "genericError": "An error occurred. Please try again.",
     "emailPasswordRequired": "Email and password are required.",
     "success": "Login successful!",
-    "tooManyAttempts": "Too many failed attempts. Please wait 15 minutes before trying again."
+    "tooManyAttempts": "Too many failed attempts. Please wait 15 minutes before trying again.",
+    "resetSent": "Password reset email sent! Check your inbox.",
+    "resetError": "Failed to send reset email. Make sure the email is registered."
   }
 }

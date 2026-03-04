@@ -6,6 +6,8 @@ const Dashboard = lazy(() => import('../Screens/Admin/Dashboard'));
 const AdminSubmissions = lazy(() => import('../Screens/Admin/AdminSubmissions'));
 const Members = lazy(() => import('../Screens/Admin/Members'));
 const Agents = lazy(() => import('../Screens/Admin/Agents'));
+const FeedbackManagement = lazy(() => import('../Screens/Admin/FeedbackManagement'));
+const OffersManagement = lazy(() => import('../Screens/Admin/OffersManagement'));
 
 const AdminRoutes: RouteConfig[] = [
   {
@@ -37,6 +39,22 @@ const AdminRoutes: RouteConfig[] = [
     element: (
       <Admin>
         <Agents />
+      </Admin>
+    ),
+  },
+  {
+    path: '/manage/feedback',
+    element: (
+      <Admin>
+        <FeedbackManagement />
+      </Admin>
+    ),
+  },
+  {
+    path: '/manage/offers',
+    element: (
+      <Admin>
+        <OffersManagement />
       </Admin>
     ),
   },

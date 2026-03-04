@@ -13,6 +13,8 @@ const ROUTE_LABELS: Record<string, string> = {
   '/manage/submissions': 'Submissions',
   '/manage/ngo': 'NGO / Initiative',
   '/manage/agents': 'Agents',
+  '/manage/feedback': 'Feedback',
+  '/manage/offers': 'Aid Offers',
 };
 
 export default function AdminBreadcrumb() {

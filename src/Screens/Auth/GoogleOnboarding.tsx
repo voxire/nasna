@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { auth, db } from '../../firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { setCookie } from '../../utils/cookies';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { toast } from 'sonner';
 import { Building2, Loader2, UserCheck } from 'lucide-react';
@@ -102,6 +103,7 @@ function GoogleOnboarding() {
         createdAt: new Date(),
         updatedAt: new Date(),
       });
+      setCookie('nasna_session', '1', 8 * 60 * 60);
       toast.success('Profile created! Welcome to Nasna.');
       navigate('/ngo/submissions');
     } catch (error) {

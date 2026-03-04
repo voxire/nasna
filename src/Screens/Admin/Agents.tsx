@@ -29,6 +29,8 @@ import {
   DialogFooter,
 } from '@/Components/ui/dialog';
 
+const PAGE_SIZE = 10;
+
 interface AgentRow extends MemberDocument {
   id: string;
 }
@@ -41,6 +43,7 @@ function Agents() {
   const [validatedFilter, setValidatedFilter] = useState('');
   const [editAgent, setEditAgent] = useState<AgentRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     fetchAgents();
@@ -63,23 +66,29 @@ function Agents() {
     }
   };
 
+  const applyFilters = (query: string, filter: string, data: AgentRow[]) => {
+    let result = data;
+    if (query) {
+      result = result.filter((a) =>
+        [a.name, a.contactPersonName, a.email].some((f) => (f ?? '').toLowerCase().includes(query))
+      );
+    }
+    if (filter && filter !== 'all') {
+      result = result.filter((a) => String(a.validated) === filter);
+    }
+    setFilteredAgents(result);
+    setPage(1);
+  };
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const q = e.target.value.toLowerCase();
     setSearchQuery(q);
-    setFilteredAgents(
-      agents.filter((a) =>
-        [a.name, a.contactPersonName, a.email].some((f) => (f ?? '').toLowerCase().includes(q))
-      )
-    );
+    applyFilters(q, validatedFilter, agents);
   };
 
   const handleFilterChange = (value: string) => {
     setValidatedFilter(value);
-    if (!value || value === 'all') {
-      setFilteredAgents(agents);
-    } else {
-      setFilteredAgents(agents.filter((a) => String(a.validated) === value));
-    }
+    applyFilters(searchQuery, value, agents);
   };
 
   const handleDelete = async (id: string) => {
@@ -125,9 +134,12 @@ function Agents() {
     }
   };
 
+  const totalPages = Math.max(1, Math.ceil(filteredAgents.length / PAGE_SIZE));
+  const paged = filteredAgents.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-5 text-gray-800">Agent Members</h1>
+      <h1 className="text-2xl font-bold mb-5 text-gray-800">Field Agents</h1>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4 flex gap-3 flex-wrap">
         <Input
@@ -150,44 +162,55 @@ function Agents() {
         <p className="text-gray-500">Loading...</p>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50 hover:bg-gray-50">
-              <TableHead className="font-semibold text-gray-700">Name</TableHead>
-              <TableHead className="font-semibold text-gray-700">Contact Person</TableHead>
-              <TableHead className="font-semibold text-gray-700">Email</TableHead>
-              <TableHead className="font-semibold text-gray-700">Phone Number</TableHead>
-              <TableHead className="font-semibold text-gray-700">Validated</TableHead>
-              <TableHead className="font-semibold text-gray-700">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredAgents.map((agent) => (
-              <TableRow key={agent.id} className="hover:bg-gray-50">
-                <TableCell className="font-medium">{agent.name}</TableCell>
-                <TableCell>{agent.contactPersonName}</TableCell>
-                <TableCell>{agent.email}</TableCell>
-                <TableCell>{agent.phoneNumber}</TableCell>
-                <TableCell>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${agent.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                    {agent.validated ? 'Validated' : 'Pending'}
-                  </span>
-                </TableCell>
-                <TableCell className="flex gap-2">
-                  {!agent.validated && (
-                    <Button size="sm" className="bg-[#12a89d] hover:bg-[#0e9088] text-white" onClick={() => handleValidate(agent.id)}>Validate</Button>
-                  )}
-                  {agent.validated && (
-                    <>
-                      <Button size="sm" variant="outline" className="border-gray-300" onClick={() => { setEditAgent(agent); setModalOpen(true); }}>Edit</Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(agent.id)}>Delete</Button>
-                    </>
-                  )}
-                </TableCell>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                <TableHead className="font-semibold text-gray-700">Name</TableHead>
+                <TableHead className="font-semibold text-gray-700">Contact Person</TableHead>
+                <TableHead className="font-semibold text-gray-700">Email</TableHead>
+                <TableHead className="font-semibold text-gray-700">Phone Number</TableHead>
+                <TableHead className="font-semibold text-gray-700">Validated</TableHead>
+                <TableHead className="font-semibold text-gray-700">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {paged.map((agent) => (
+                <TableRow key={agent.id} className="hover:bg-gray-50">
+                  <TableCell className="font-medium">{agent.name}</TableCell>
+                  <TableCell>{agent.contactPersonName}</TableCell>
+                  <TableCell>{agent.email}</TableCell>
+                  <TableCell>{agent.phoneNumber}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${agent.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                      {agent.validated ? 'Validated' : 'Pending'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="flex gap-2">
+                    {!agent.validated && (
+                      <Button size="sm" className="bg-[#12a89d] hover:bg-[#0e9088] text-white" onClick={() => handleValidate(agent.id)}>Validate</Button>
+                    )}
+                    {agent.validated && (
+                      <>
+                        <Button size="sm" variant="outline" className="border-gray-300" onClick={() => { setEditAgent(agent); setModalOpen(true); }}>Edit</Button>
+                        <Button size="sm" variant="destructive" onClick={() => handleDelete(agent.id)}>Delete</Button>
+                      </>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <div className="flex items-center justify-between px-4 py-3 border-t text-sm text-gray-500">
+            <span>
+              {filteredAgents.length === 0
+                ? '0 results'
+                : `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, filteredAgents.length)} of ${filteredAgents.length}`}
+            </span>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 1}>Previous</Button>
+              <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages}>Next</Button>
+            </div>
+          </div>
         </div>
       )}
 

@@ -29,6 +29,8 @@ import {
   DialogFooter,
 } from '@/Components/ui/dialog';
 
+const PAGE_SIZE = 10;
+
 interface MemberRow extends MemberDocument {
   id: string;
 }
@@ -41,6 +43,7 @@ function Members() {
   const [validatedFilter, setValidatedFilter] = useState('');
   const [editMember, setEditMember] = useState<MemberRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     fetchMembers();
@@ -63,23 +66,29 @@ function Members() {
     }
   };
 
+  const applyFilters = (query: string, filter: string, data: MemberRow[]) => {
+    let result = data;
+    if (query) {
+      result = result.filter((m) =>
+        [m.name, m.contactPersonName, m.email].some((f) => (f ?? '').toLowerCase().includes(query))
+      );
+    }
+    if (filter && filter !== 'all') {
+      result = result.filter((m) => String(m.validated) === filter);
+    }
+    setFilteredMembers(result);
+    setPage(1);
+  };
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const q = e.target.value.toLowerCase();
     setSearchQuery(q);
-    setFilteredMembers(
-      members.filter((m) =>
-        [m.name, m.contactPersonName, m.email].some((f) => (f ?? '').toLowerCase().includes(q))
-      )
-    );
+    applyFilters(q, validatedFilter, members);
   };
 
   const handleFilterChange = (value: string) => {
     setValidatedFilter(value);
-    if (!value || value === 'all') {
-      setFilteredMembers(members);
-    } else {
-      setFilteredMembers(members.filter((m) => String(m.validated) === value));
-    }
+    applyFilters(searchQuery, value, members);
   };
 
   const handleDelete = async (id: string) => {
@@ -125,6 +134,9 @@ function Members() {
     }
   };
 
+  const totalPages = Math.max(1, Math.ceil(filteredMembers.length / PAGE_SIZE));
+  const paged = filteredMembers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-5 text-gray-800">NGO Members</h1>
@@ -150,44 +162,55 @@ function Members() {
         <p className="text-gray-500">Loading...</p>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50 hover:bg-gray-50">
-              <TableHead className="font-semibold text-gray-700">Name</TableHead>
-              <TableHead className="font-semibold text-gray-700">Contact Person</TableHead>
-              <TableHead className="font-semibold text-gray-700">Email</TableHead>
-              <TableHead className="font-semibold text-gray-700">Phone Number</TableHead>
-              <TableHead className="font-semibold text-gray-700">Validated</TableHead>
-              <TableHead className="font-semibold text-gray-700">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredMembers.map((member) => (
-              <TableRow key={member.id} className="hover:bg-gray-50">
-                <TableCell className="font-medium">{member.name}</TableCell>
-                <TableCell>{member.contactPersonName}</TableCell>
-                <TableCell>{member.email}</TableCell>
-                <TableCell>{member.phoneNumber}</TableCell>
-                <TableCell>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${member.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                    {member.validated ? 'Validated' : 'Pending'}
-                  </span>
-                </TableCell>
-                <TableCell className="flex gap-2">
-                  {!member.validated && (
-                    <Button size="sm" className="bg-[#12a89d] hover:bg-[#0e9088] text-white" onClick={() => handleValidate(member.id)}>Validate</Button>
-                  )}
-                  {member.validated && (
-                    <>
-                      <Button size="sm" variant="outline" className="border-gray-300" onClick={() => { setEditMember(member); setModalOpen(true); }}>Edit</Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(member.id)}>Delete</Button>
-                    </>
-                  )}
-                </TableCell>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                <TableHead className="font-semibold text-gray-700">Name</TableHead>
+                <TableHead className="font-semibold text-gray-700">Contact Person</TableHead>
+                <TableHead className="font-semibold text-gray-700">Email</TableHead>
+                <TableHead className="font-semibold text-gray-700">Phone Number</TableHead>
+                <TableHead className="font-semibold text-gray-700">Validated</TableHead>
+                <TableHead className="font-semibold text-gray-700">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {paged.map((member) => (
+                <TableRow key={member.id} className="hover:bg-gray-50">
+                  <TableCell className="font-medium">{member.name}</TableCell>
+                  <TableCell>{member.contactPersonName}</TableCell>
+                  <TableCell>{member.email}</TableCell>
+                  <TableCell>{member.phoneNumber}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${member.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                      {member.validated ? 'Validated' : 'Pending'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="flex gap-2">
+                    {!member.validated && (
+                      <Button size="sm" className="bg-[#12a89d] hover:bg-[#0e9088] text-white" onClick={() => handleValidate(member.id)}>Validate</Button>
+                    )}
+                    {member.validated && (
+                      <>
+                        <Button size="sm" variant="outline" className="border-gray-300" onClick={() => { setEditMember(member); setModalOpen(true); }}>Edit</Button>
+                        <Button size="sm" variant="destructive" onClick={() => handleDelete(member.id)}>Delete</Button>
+                      </>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <div className="flex items-center justify-between px-4 py-3 border-t text-sm text-gray-500">
+            <span>
+              {filteredMembers.length === 0
+                ? '0 results'
+                : `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, filteredMembers.length)} of ${filteredMembers.length}`}
+            </span>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 1}>Previous</Button>
+              <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages}>Next</Button>
+            </div>
+          </div>
         </div>
       )}
 

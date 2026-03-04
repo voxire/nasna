@@ -4,7 +4,8 @@ import { auth } from '../../firebase';
 import { useAppDispatch } from '../../redux/hooks';
 import { logout } from '../../redux/reducers/userSlice';
 import { toast } from 'sonner';
-import { Home, List, Bell, UserPlus, ChevronsUpDown, LogOut } from 'lucide-react';
+import { deleteCookie } from '../../utils/cookies';
+import { Home, List, Bell, UserPlus, ChevronsUpDown, LogOut, MessageSquare, HandHeart } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import {
   Sidebar,
@@ -31,6 +32,8 @@ const NAV_ITEMS = [
   { path: '/manage/submissions', label: 'Submissions', icon: List },
   { path: '/manage/ngo', label: 'NGO / Initiative', icon: Bell },
   { path: '/manage/agents', label: 'Agents', icon: UserPlus },
+  { path: '/manage/feedback', label: 'Feedback', icon: MessageSquare },
+  { path: '/manage/offers', label: 'Aid Offers', icon: HandHeart },
 ];
 
 interface AppSidebarProps {
@@ -48,6 +51,7 @@ export default function AppSidebar({ user }: AppSidebarProps) {
 
   const handleLogout = async () => {
     try {
+      deleteCookie('nasna_session');
       await signOut(auth);
       dispatch(logout());
       toast.success('You have been logged out.');

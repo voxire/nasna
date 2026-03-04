@@ -5,6 +5,7 @@ import { useAppDispatch } from '../redux/hooks';
 import { logout } from '../redux/reducers/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { deleteCookie } from '../utils/cookies';
 
 const IDLE_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -17,6 +18,7 @@ export function useIdleTimeout() {
     const reset = () => {
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(async () => {
+        deleteCookie('nasna_session');
         await signOut(auth);
         dispatch(logout());
         toast.info('Session expired due to inactivity.');

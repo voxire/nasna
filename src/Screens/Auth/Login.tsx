@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
 import { auth, googleProvider, db } from '../../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
@@ -14,6 +14,14 @@ import { getCookie, setCookie, deleteCookie } from '../../utils/cookies';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/Components/ui/dialog';
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -28,6 +36,9 @@ function Login() {
   const navigate = useNavigate();
   const { user, loading } = useAppSelector((state) => state.user);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -67,11 +78,13 @@ function Login() {
       const tokenResult = await result.user.getIdTokenResult();
       const role = tokenResult.claims['role'] as string | undefined;
       if (role === 'admin') {
+        setCookie('nasna_session', '1', 8 * 60 * 60);
         toast.success(t('login.toast.success'));
         navigate('/manage');
         return;
       }
       const memberDoc = await getDoc(doc(db, 'members', result.user.uid));
+      setCookie('nasna_session', '1', 8 * 60 * 60);
       if (memberDoc.exists()) {
         toast.success(t('login.toast.success'));
         navigate('/ngo/submissions');
@@ -101,6 +114,7 @@ function Login() {
     const result = await dispatch(loginUser({ email: data.email, password: data.password }));
     if (loginUser.fulfilled.match(result)) {
       deleteCookie('nasna_login_attempts');
+      setCookie('nasna_session', '1', 8 * 60 * 60);
       toast.success(t('login.toast.success'));
       navigate('/ngo/submissions');
     } else {
@@ -116,17 +130,32 @@ function Login() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!forgotEmail.trim()) return;
+    setForgotLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, forgotEmail.trim());
+      toast.success(t('login.toast.resetSent'));
+      setForgotOpen(false);
+      setForgotEmail('');
+    } catch {
+      toast.error(t('login.toast.resetError'));
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col md:flex-row md:min-h-[85vh]">
-      {/* Teal banner — top on mobile, left panel on desktop */}
+      {/* Teal banner */}
       <div className="flex flex-col items-center justify-center bg-[#12a89d] py-8 px-8 md:w-1/2 md:py-0">
         <img src="/Nasna Logo.png" alt={t('login.logoAlt')} className="h-16 md:h-24 w-auto brightness-0 invert" />
         <p className="hidden md:block text-white/80 text-center text-sm leading-relaxed max-w-xs mt-6">
-          Connecting individuals with government and NGO support across Lebanon.
+          {t('login.bannerSubtitle')}
         </p>
       </div>
 
-      {/* Form — below on mobile, right panel on desktop */}
+      {/* Form */}
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 bg-white">
         <div className="w-full max-w-sm">
           <h1 className="text-2xl font-bold text-gray-800 mb-1">{t('login.title')}</h1>
@@ -152,7 +181,16 @@ function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">{t('login.fields.password')}</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="text-sm font-medium text-gray-700">{t('login.fields.password')}</FormLabel>
+                      <button
+                        type="button"
+                        className="text-xs text-[#12a89d] hover:underline"
+                        onClick={() => setForgotOpen(true)}
+                      >
+                        {t('login.forgotPassword')}
+                      </button>
+                    </div>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" autoComplete="off" className="border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
                     </FormControl>
@@ -188,17 +226,45 @@ function Login() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            {googleLoading ? 'Signing in...' : 'Continue with Google'}
+            {googleLoading ? t('login.googleLoading') : t('login.googleButton')}
           </Button>
 
           <p className="mt-6 text-center text-sm text-gray-500">
-            Don't have an account?{' '}
+            {t('login.noAccount')}{' '}
             <span className="text-[#12a89d] font-medium cursor-pointer hover:underline" onClick={() => navigate('/auth/register')}>
-              Register
+              {t('login.registerLink')}
             </span>
           </p>
         </div>
       </div>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={forgotOpen} onOpenChange={(open) => { setForgotOpen(open); if (!open) setForgotEmail(''); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t('login.forgotPasswordTitle')}</DialogTitle>
+            <DialogDescription>{t('login.forgotPasswordDesc')}</DialogDescription>
+          </DialogHeader>
+          <Input
+            type="email"
+            placeholder="you@example.com"
+            value={forgotEmail}
+            onChange={(e) => setForgotEmail(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleForgotPassword(); }}
+            className="border-gray-200 focus-visible:ring-[#12a89d]"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setForgotOpen(false)}>{t('login.buttons.cancel') || 'Cancel'}</Button>
+            <Button
+              className="bg-[#12a89d] hover:bg-[#0e9088] text-white"
+              onClick={handleForgotPassword}
+              disabled={forgotLoading || !forgotEmail.trim()}
+            >
+              {forgotLoading ? t('login.forgotSending') : t('login.forgotSubmit')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
