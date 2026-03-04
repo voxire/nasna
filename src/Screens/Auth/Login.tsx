@@ -4,7 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider } from '../../firebase';
+import { auth, googleProvider, db } from '../../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { loginUser } from '../../redux/reducers/userSlice';
 import { useTranslation } from 'react-i18next';
@@ -62,12 +63,21 @@ function Login() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
-      toast.success(t('login.toast.success'));
-      navigate('/ngo/submissions');
+      const result = await signInWithPopup(auth, googleProvider);
+      const memberDoc = await getDoc(doc(db, 'members', result.user.uid));
+      if (memberDoc.exists()) {
+        toast.success(t('login.toast.success'));
+        navigate('/ngo/submissions');
+      } else {
+        navigate('/auth/onboarding');
+      }
     } catch (error: unknown) {
       const code = (error as { code?: string })?.code ?? '';
-      if (code !== 'auth/popup-closed-by-user') {
+      if (code === 'auth/account-exists-with-different-credential') {
+        const email = (error as { customData?: { email?: string } })?.customData?.email ?? '';
+        if (email) form.setValue('email', email);
+        toast.error('This email is already registered. Please sign in with your email and password below.', { duration: 7000 });
+      } else if (code !== 'auth/popup-closed-by-user') {
         toast.error(t('login.toast.genericError'));
       }
     } finally {

@@ -5,6 +5,7 @@ import type { RouteConfig } from '../types';
 const Login = lazy(() => import('../Screens/Auth/Login'));
 const Register = lazy(() => import('../Screens/Auth/Register'));
 const AgentRegister = lazy(() => import('../Screens/Auth/AgentRegister'));
+const GoogleOnboarding = lazy(() => import('../Screens/Auth/GoogleOnboarding'));
 
 const AuthRoutes: RouteConfig[] = [
   {
@@ -28,6 +29,14 @@ const AuthRoutes: RouteConfig[] = [
     element: (
       <Public>
         <AgentRegister />
+      </Public>
+    ),
+  },
+  {
+    path: '/auth/onboarding',
+    element: (
+      <Public>
+        <GoogleOnboarding />
       </Public>
     ),
   },

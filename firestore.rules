@@ -45,8 +45,10 @@ service cloud.firestore {
       allow create: if isSignedIn()
         && request.auth.uid == userId
         && request.resource.data.role in ['member', 'agent']
-        && onlyFields(['name', 'contactPersonName', 'email', 'phoneNumber', 'role',
-                       'validated', 'createdAt'])
+        && onlyFields(['uid', 'name', 'contactPersonName', 'email', 'phoneNumber', 'role',
+                       'validated', 'createdAt', 'updatedAt', 'consentGiven',
+                       'areaOfOperation', 'kindOfHelp', 'initiativeOrNgo',
+                       'numberOfVolunteers', 'isOfficiallyRegistered', 'isAdmin'])
         && request.resource.data.validated == false; // cannot self-validate on create
 
       // Users cannot change their own role or validated status — admin only
@@ -55,6 +57,37 @@ service cloud.firestore {
                        'validated', 'updatedAt']);
 
       allow delete: if isAdmin();
+    }
+
+    // ─── /feedback ───────────────────────────────────────────────────────────
+
+    match /feedback/{docId} {
+      allow create: if onlyFields(['type', 'name', 'email', 'message', 'createdAt'])
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 10;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ─── /offers ─────────────────────────────────────────────────────────────
+
+    match /offers/{docId} {
+      allow create: if onlyFields(['type', 'phone', 'region', 'lat', 'lng',
+                                   'neighborhood', 'capacity', 'description', 'createdAt']);
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ─── /businesses ─────────────────────────────────────────────────────────
+
+    match /businesses/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ─── /requests ───────────────────────────────────────────────────────────
+
+    match /requests/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
     }
 
     // ─── /submissions ────────────────────────────────────────────────────────
