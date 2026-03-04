@@ -57,7 +57,7 @@ export default function AppSidebar({ user }: AppSidebarProps) {
   };
 
   return (
-    <Sidebar collapsible="none">
+    <Sidebar collapsible="none" className="w-64 shrink-0">
       {/* Header — logo + app name */}
       <SidebarHeader>
         <SidebarMenu>

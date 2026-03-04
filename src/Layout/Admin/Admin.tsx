@@ -54,7 +54,7 @@ function Admin({ children }: AdminProps) {
   return (
     <SidebarProvider>
       <AppSidebar user={user} />
-      <div className="flex flex-col min-h-screen ml-64">
+      <div className="flex flex-col flex-1 min-h-screen min-w-0">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-white px-4 sticky top-0 z-10">
           <AdminBreadcrumb />
         </header>
