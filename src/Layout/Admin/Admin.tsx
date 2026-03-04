@@ -52,9 +52,9 @@ function Admin({ children }: AdminProps) {
   if (!user || role !== 'admin') return null;
 
   return (
-    <SidebarProvider>
+    <SidebarProvider className="h-screen overflow-hidden">
       <AppSidebar user={user} />
-      <div className="flex flex-col flex-1 min-h-screen min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 overflow-y-auto">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-white px-4 sticky top-0 z-10">
           <AdminBreadcrumb />
         </header>
