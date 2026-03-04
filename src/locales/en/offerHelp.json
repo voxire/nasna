@@ -1,0 +1,38 @@
+{
+  "title": "Offer Help",
+  "subtitle": "Post your aid listing to connect with people in need.",
+  "typeLabel": "What are you offering?",
+  "typePlaceholder": "Select type",
+  "types": {
+    "Shelter": "Shelter",
+    "Food": "Food",
+    "Medical": "Medical",
+    "Clothing": "Clothing",
+    "Water": "Water",
+    "Other": "Other"
+  },
+  "phoneLabel": "Phone Number",
+  "phonePlaceholder": "e.g. +961 71 234 567",
+  "regionLabel": "Region",
+  "regionPlaceholder": "Select a region",
+  "neighborhoodLabel": "Neighborhood / Area",
+  "neighborhoodPlaceholder": "Optional",
+  "capacityLabel": "Capacity (number of people)",
+  "capacityPlaceholder": "e.g. 5",
+  "descriptionLabel": "Description",
+  "descriptionPlaceholder": "Additional details about what you are offering...",
+  "mapLabel": "Pin Location on Map (optional)",
+  "mapHint": "Click on the map to drop a pin",
+  "mapPinned": "Pin set",
+  "submit": "Submit Listing",
+  "submitting": "Submitting...",
+  "successTitle": "Listing submitted!",
+  "successMessage": "Your offer has been posted successfully.",
+  "securityNotice": "Your phone number will be visible publicly. Only share information you are comfortable making public.",
+  "errors": {
+    "typeRequired": "Please select a type",
+    "phoneRequired": "Phone number is required",
+    "regionRequired": "Please select a region",
+    "capacityRequired": "Capacity is required for shelter listings"
+  }
+}

@@ -41,6 +41,15 @@ function Footer() {
             <Link to="/about" className="text-white/80 hover:text-white transition-colors no-underline">
               {t('footer.aboutUs')}
             </Link>
+            <Link to="/offer-help" className="text-white/80 hover:text-white transition-colors no-underline">
+              {t('footer.offerHelp')}
+            </Link>
+            <Link to="/resources" className="text-white/80 hover:text-white transition-colors no-underline">
+              {t('footer.resources')}
+            </Link>
+            <Link to="/feedback" className="text-white/80 hover:text-white transition-colors no-underline">
+              {t('footer.feedback')}
+            </Link>
             <Link to="/terms" className="text-white/80 hover:text-white transition-colors no-underline">
               {t('footer.terms & conditions')}
             </Link>

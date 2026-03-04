@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { auth } from '../firebase';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { selectLanguage } from '../services/i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAppDispatch } from '../redux/hooks';
 import { logout } from '../redux/reducers/userSlice';
 import type { SupportedLanguage } from '../types';
@@ -14,7 +14,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
-import { Globe, LayoutDashboard, LogOut } from 'lucide-react';
+import { Globe, LayoutDashboard, LogOut, Menu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+const NAV_LINKS = [
+  { to: '/about', labelKey: 'header.about' },
+  { to: '/offer-help', labelKey: 'header.offerHelp' },
+  { to: '/resources', labelKey: 'header.resources' },
+  { to: '/feedback', labelKey: 'header.feedback' },
+];
 
 interface HeaderProps {
   dashboard?: boolean;
@@ -24,7 +32,9 @@ function Header({ dashboard = false }: HeaderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -50,9 +60,7 @@ function Header({ dashboard = false }: HeaderProps) {
     }
   }, []);
 
-  const handleLanguageChange = (lng: SupportedLanguage) => {
-    selectLanguage(lng);
-  };
+  const handleLanguageChange = (lng: SupportedLanguage) => selectLanguage(lng);
 
   const handleLogout = async () => {
     try {
@@ -67,15 +75,32 @@ function Header({ dashboard = false }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 h-20 bg-white border-b border-gray-200">
       <div className="flex items-center h-full px-6">
-        <div className="flex-1 flex items-center">
+        {/* Logo + desktop nav */}
+        <div className="flex-1 flex items-center gap-8">
           <img
             src="/Nasna Logo.png"
             alt="Nasna logo"
             className="h-16 w-auto cursor-pointer"
             onClick={() => navigate('/')}
           />
+          <nav className="hidden md:flex items-center gap-6">
+            {NAV_LINKS.map(({ to, labelKey }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`text-sm font-medium transition-colors no-underline ${
+                  location.pathname === to
+                    ? 'text-[#12a89d]'
+                    : 'text-gray-600 hover:text-[#12a89d]'
+                }`}
+              >
+                {t(labelKey)}
+              </Link>
+            ))}
+          </nav>
         </div>
 
+        {/* Right controls */}
         <div className="flex items-center gap-1">
           {user && (
             <>
@@ -83,10 +108,7 @@ function Header({ dashboard = false }: HeaderProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => {
-                    if (role === 'admin') navigate('/manage');
-                    else navigate('/ngo/submissions');
-                  }}
+                  onClick={() => navigate(role === 'admin' ? '/manage' : '/ngo/submissions')}
                 >
                   <LayoutDashboard className="h-5 w-5 text-[#12a89d]" />
                 </Button>
@@ -97,6 +119,7 @@ function Header({ dashboard = false }: HeaderProps) {
             </>
           )}
 
+          {/* Language picker */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -109,6 +132,30 @@ function Header({ dashboard = false }: HeaderProps) {
               <DropdownMenuItem onClick={() => handleLanguageChange('fr')}>French</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Mobile hamburger */}
+          <div className="md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5 text-[#12a89d]" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {NAV_LINKS.map(({ to, labelKey }) => (
+                  <DropdownMenuItem key={to} onClick={() => navigate(to)}>
+                    <span
+                      className={
+                        location.pathname === to ? 'text-[#12a89d] font-medium' : ''
+                      }
+                    >
+                      {t(labelKey)}
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </header>

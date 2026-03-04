@@ -1,0 +1,29 @@
+{
+  "title": "Commentaires",
+  "subtitle": "Aidez-nous à améliorer Nasna en partageant vos commentaires.",
+  "typeLabel": "Type de commentaire",
+  "typePlaceholder": "Sélectionnez le type",
+  "types": {
+    "General": "Général",
+    "Bug Report": "Rapport de bogue",
+    "Feature Request": "Demande de fonctionnalité",
+    "Complaint": "Plainte",
+    "Compliment": "Compliment"
+  },
+  "nameLabel": "Nom",
+  "namePlaceholder": "Votre nom (optionnel)",
+  "emailLabel": "E-mail",
+  "emailPlaceholder": "votre@email.com (optionnel)",
+  "messageLabel": "Message",
+  "messagePlaceholder": "Écrivez votre commentaire ici...",
+  "submit": "Envoyer le commentaire",
+  "submitting": "Envoi en cours...",
+  "successTitle": "Merci!",
+  "successMessage": "Votre commentaire a bien été reçu.",
+  "errors": {
+    "typeRequired": "Veuillez sélectionner un type de commentaire",
+    "messageTooShort": "Le message doit comporter au moins 10 caractères",
+    "messageTooLong": "Le message doit faire moins de 2000 caractères",
+    "invalidEmail": "Veuillez entrer une adresse e-mail valide"
+  }
+}

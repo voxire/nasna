@@ -8,56 +8,20 @@ const About = lazy(() => import('../Screens/Public/About'));
 const Confirmation = lazy(() => import('../Screens/Public/Confirmation'));
 const Donate = lazy(() => import('../Screens/Public/Donate'));
 const Terms = lazy(() => import('../Screens/Public/Terms'));
+const OfferHelp = lazy(() => import('../Screens/Public/OfferHelp'));
+const Resources = lazy(() => import('../Screens/Public/Resources'));
+const Feedback = lazy(() => import('../Screens/Public/Feedback'));
 
 const PublicRoutes: RouteConfig[] = [
-  {
-    path: '/',
-    element: (
-      <Public>
-        <Landing />
-      </Public>
-    ),
-  },
-  {
-    path: '/submit',
-    element: (
-      <Public>
-        <Home />
-      </Public>
-    ),
-  },
-  {
-    path: '/about',
-    element: (
-      <Public>
-        <About />
-      </Public>
-    ),
-  },
-  {
-    path: '/confirmation',
-    element: (
-      <Public>
-        <Confirmation />
-      </Public>
-    ),
-  },
-  {
-    path: '/donate',
-    element: (
-      <Public>
-        <Donate />
-      </Public>
-    ),
-  },
-  {
-    path: '/terms',
-    element: (
-      <Public>
-        <Terms />
-      </Public>
-    ),
-  },
+  { path: '/', element: <Public><Landing /></Public> },
+  { path: '/submit', element: <Public><Home /></Public> },
+  { path: '/about', element: <Public><About /></Public> },
+  { path: '/confirmation', element: <Public><Confirmation /></Public> },
+  { path: '/donate', element: <Public><Donate /></Public> },
+  { path: '/terms', element: <Public><Terms /></Public> },
+  { path: '/offer-help', element: <Public><OfferHelp /></Public> },
+  { path: '/resources', element: <Public><Resources /></Public> },
+  { path: '/feedback', element: <Public><Feedback /></Public> },
 ];
 
 export default PublicRoutes;

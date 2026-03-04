@@ -1,0 +1,38 @@
+{
+  "title": "تقديم مساعدة",
+  "subtitle": "انشر إعلان مساعدتك للتواصل مع المحتاجين.",
+  "typeLabel": "ماذا تقدم؟",
+  "typePlaceholder": "اختر النوع",
+  "types": {
+    "Shelter": "مأوى",
+    "Food": "طعام",
+    "Medical": "رعاية طبية",
+    "Clothing": "ملابس",
+    "Water": "ماء",
+    "Other": "أخرى"
+  },
+  "phoneLabel": "رقم الهاتف",
+  "phonePlaceholder": "مثال: +961 71 234 567",
+  "regionLabel": "المنطقة",
+  "regionPlaceholder": "اختر منطقة",
+  "neighborhoodLabel": "الحي / المنطقة",
+  "neighborhoodPlaceholder": "اختياري",
+  "capacityLabel": "السعة (عدد الأشخاص)",
+  "capacityPlaceholder": "مثال: 5",
+  "descriptionLabel": "الوصف",
+  "descriptionPlaceholder": "تفاصيل إضافية حول ما تقدمه...",
+  "mapLabel": "حدد الموقع على الخريطة (اختياري)",
+  "mapHint": "انقر على الخريطة لتحديد الموقع",
+  "mapPinned": "تم تحديد الموقع",
+  "submit": "نشر الإعلان",
+  "submitting": "جارٍ النشر...",
+  "successTitle": "تم نشر الإعلان!",
+  "successMessage": "تم نشر عرضك بنجاح.",
+  "securityNotice": "رقم هاتفك سيكون مرئياً للعموم. شارك فقط المعلومات التي تريد إتاحتها.",
+  "errors": {
+    "typeRequired": "يرجى اختيار النوع",
+    "phoneRequired": "رقم الهاتف مطلوب",
+    "regionRequired": "يرجى اختيار المنطقة",
+    "capacityRequired": "السعة مطلوبة لإعلانات المأوى"
+  }
+}

@@ -4,7 +4,6 @@ import { I18nextProvider } from 'react-i18next';
 import App from './App';
 import i18next from './services/i18next';
 import './styles/globals.css';
-import './styles/index.scss';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store, { persistor } from './redux/store';

@@ -1,18 +1,17 @@
 import { useState, useEffect, ReactNode } from 'react';
-import PageTransition from '../../Components/PageTransition';
 import { useNavigate } from 'react-router-dom';
-import Navbar from './Navbar';
-import SideBar from './Sidebar';
 import { auth } from '../../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import AppSidebar from './Sidebar';
+import PageTransition from '../../Components/PageTransition';
 
 interface AdminProps {
   children: ReactNode;
 }
 
 function Admin({ children }: AdminProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<string | null>(null);
@@ -24,15 +23,13 @@ function Admin({ children }: AdminProps) {
         try {
           const tokenResult = await firebaseUser.getIdTokenResult();
           const userRole = tokenResult.claims['role'] as string;
-
           if (userRole !== 'admin') {
             navigate('/');
           } else {
             setUser(firebaseUser);
             setRole(userRole);
           }
-        } catch (error) {
-          console.error('Error retrieving user role:', error);
+        } catch {
           navigate('/');
         }
       } else {
@@ -43,12 +40,6 @@ function Admin({ children }: AdminProps) {
     return () => unsubscribe();
   }, [navigate]);
 
-  const openSidebar = (source: string) => {
-    console.debug('openSidebar called from', source);
-    setSidebarOpen(true);
-  };
-  const closeSidebar = () => setSidebarOpen(false);
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -57,16 +48,20 @@ function Admin({ children }: AdminProps) {
     );
   }
 
-  if (!user || role !== 'admin') {
-    return null;
-  }
+  if (!user || role !== 'admin') return null;
 
   return (
-    <div className="Admincontainer">
-      <Navbar openSidebar={openSidebar} />
-      <div className="InnerContainer"><PageTransition>{children}</PageTransition></div>
-      <SideBar sidebarOpen={sidebarOpen} closeSidebar={closeSidebar} />
-    </div>
+    <SidebarProvider>
+      <AppSidebar user={user} />
+      <SidebarInset>
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-white px-4">
+          <SidebarTrigger className="text-gray-600" />
+        </header>
+        <main className="flex-1 overflow-y-auto bg-[#eff0f1] p-6">
+          <PageTransition>{children}</PageTransition>
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
 

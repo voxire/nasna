@@ -1,0 +1,38 @@
+{
+  "title": "Offrir de l'aide",
+  "subtitle": "Publiez votre annonce d'aide pour vous connecter avec les personnes dans le besoin.",
+  "typeLabel": "Que proposez-vous?",
+  "typePlaceholder": "Sélectionnez le type",
+  "types": {
+    "Shelter": "Hébergement",
+    "Food": "Nourriture",
+    "Medical": "Aide médicale",
+    "Clothing": "Vêtements",
+    "Water": "Eau",
+    "Other": "Autre"
+  },
+  "phoneLabel": "Numéro de téléphone",
+  "phonePlaceholder": "ex: +961 71 234 567",
+  "regionLabel": "Région",
+  "regionPlaceholder": "Sélectionnez une région",
+  "neighborhoodLabel": "Quartier / Zone",
+  "neighborhoodPlaceholder": "Optionnel",
+  "capacityLabel": "Capacité (nombre de personnes)",
+  "capacityPlaceholder": "ex: 5",
+  "descriptionLabel": "Description",
+  "descriptionPlaceholder": "Détails supplémentaires sur ce que vous proposez...",
+  "mapLabel": "Épingler sur la carte (optionnel)",
+  "mapHint": "Cliquez sur la carte pour placer une épingle",
+  "mapPinned": "Épingle définie",
+  "submit": "Publier l'annonce",
+  "submitting": "Publication...",
+  "successTitle": "Annonce publiée!",
+  "successMessage": "Votre offre a été publiée avec succès.",
+  "securityNotice": "Votre numéro de téléphone sera visible publiquement. Ne partagez que les informations que vous souhaitez rendre publiques.",
+  "errors": {
+    "typeRequired": "Veuillez sélectionner un type",
+    "phoneRequired": "Le numéro de téléphone est requis",
+    "regionRequired": "Veuillez sélectionner une région",
+    "capacityRequired": "La capacité est requise pour les hébergements"
+  }
+}

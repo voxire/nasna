@@ -1,0 +1,29 @@
+{
+  "title": "ملاحظات",
+  "subtitle": "ساعدنا في تحسين نصنى من خلال مشاركة أفكارك.",
+  "typeLabel": "نوع الملاحظة",
+  "typePlaceholder": "اختر النوع",
+  "types": {
+    "General": "عام",
+    "Bug Report": "الإبلاغ عن خطأ",
+    "Feature Request": "طلب ميزة",
+    "Complaint": "شكوى",
+    "Compliment": "إطراء"
+  },
+  "nameLabel": "الاسم",
+  "namePlaceholder": "اسمك (اختياري)",
+  "emailLabel": "البريد الإلكتروني",
+  "emailPlaceholder": "بريدك@الالكتروني.com (اختياري)",
+  "messageLabel": "الرسالة",
+  "messagePlaceholder": "اكتب ملاحظاتك هنا...",
+  "submit": "إرسال الملاحظة",
+  "submitting": "جارٍ الإرسال...",
+  "successTitle": "شكراً لك!",
+  "successMessage": "تم استلام ملاحظاتك.",
+  "errors": {
+    "typeRequired": "يرجى اختيار نوع الملاحظة",
+    "messageTooShort": "يجب أن تكون الرسالة 10 أحرف على الأقل",
+    "messageTooLong": "يجب أن تكون الرسالة أقل من 2000 حرف",
+    "invalidEmail": "يرجى إدخال بريد إلكتروني صالح"
+  }
+}
