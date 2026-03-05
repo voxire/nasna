@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { db, auth } from '../../firebase';
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, limit } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { getCookie } from '../../utils/cookies';
 import type { SubmissionDocument } from '../../types';
@@ -59,7 +59,7 @@ function Submissions() {
         const memberData = memberDoc.data();
         if (memberData['validated'] && auth.currentUser?.emailVerified) {
           setIsVerified(true);
-          const snap = await getDocs(collection(db, 'submissions'));
+          const snap = await getDocs(query(collection(db, 'submissions'), limit(50)));
           const data = snap.docs.map((d) => ({ id: d.id, ...(d.data() as SubmissionDocument) }));
           setMembers(data);
           setFilteredMembers(data);
@@ -188,7 +188,14 @@ function Submissions() {
                     <TableCell>{member.street}</TableCell>
                     <TableCell>{member.building}</TableCell>
                     <TableCell>{member.floor}</TableCell>
-                    <TableCell>{JSON.stringify(member.ageRanges)}</TableCell>
+                    <TableCell className="text-xs">
+                      {member.ageRanges && typeof member.ageRanges === 'object'
+                        ? Object.entries(member.ageRanges)
+                            .filter(([, v]) => Number(v) > 0)
+                            .map(([range, count]) => `${range}: ${count}`)
+                            .join(', ') || '—'
+                        : '—'}
+                    </TableCell>
                     <TableCell>{member.specialNeeds.join(', ')}</TableCell>
                     <TableCell>{member.needs.join(', ')}</TableCell>
                     <TableCell>

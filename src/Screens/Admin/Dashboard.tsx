@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { List, Building2, Bell, MessageSquare } from 'lucide-react';
 import { db } from '../../firebase';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getCountFromServer, query, where } from 'firebase/firestore';
 import { Card, CardContent } from '@/Components/ui/card';
 
 const STATS = [
@@ -18,16 +18,16 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         const [submissionsSnap, ngoSnap, pendingSnap, feedbackSnap] = await Promise.all([
-          getDocs(collection(db, 'submissions')),
-          getDocs(query(collection(db, 'members'), where('role', '==', 'member'), where('validated', '==', true))),
-          getDocs(query(collection(db, 'members'), where('role', '==', 'member'), where('validated', '==', false))),
-          getDocs(query(collection(db, 'feedback'), where('read', '==', false))),
+          getCountFromServer(collection(db, 'submissions')),
+          getCountFromServer(query(collection(db, 'members'), where('role', '==', 'member'), where('validated', '==', true))),
+          getCountFromServer(query(collection(db, 'members'), where('role', '==', 'member'), where('validated', '==', false))),
+          getCountFromServer(query(collection(db, 'feedback'), where('read', '==', false))),
         ]);
         setCounts({
-          submissions: submissionsSnap.size,
-          ngoCount: ngoSnap.size,
-          pendingNgo: pendingSnap.size,
-          feedback: feedbackSnap.size,
+          submissions: submissionsSnap.data().count,
+          ngoCount: ngoSnap.data().count,
+          pendingNgo: pendingSnap.data().count,
+          feedback: feedbackSnap.data().count,
         });
       } catch (error) {
         console.error('Error fetching dashboard data:', error);

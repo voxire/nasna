@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, updateDoc, query, limit } from 'firebase/firestore';
 import { toast } from 'sonner';
 import type { SubmissionDocument } from '../../types';
 import { Button } from '@/Components/ui/button';
@@ -47,7 +47,7 @@ interface EditState {
   street?: string;
   building?: string;
   floor?: string;
-  ageRanges: string[];
+  ageRanges: Record<string, number>;
   specialNeeds: string[];
   needs: string[];
   aidUrgency?: string;
@@ -61,7 +61,7 @@ function AdminSubmissions() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [urgencyFilter, setUrgencyFilter] = useState('');
-  const [editMember, setEditMember] = useState<EditState>({ ageRanges: [], specialNeeds: [], needs: [] });
+  const [editMember, setEditMember] = useState<EditState>({ ageRanges: {}, specialNeeds: [], needs: [] });
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
@@ -71,7 +71,7 @@ function AdminSubmissions() {
     const fetchSubmissions = async () => {
       setLoading(true);
       try {
-        const snap = await getDocs(collection(db, 'submissions'));
+        const snap = await getDocs(query(collection(db, 'submissions'), limit(50)));
         const data = snap.docs.map((d) => ({ id: d.id, ...(d.data() as SubmissionDocument) }));
         setSubmissions(data);
         setFiltered(data);
@@ -115,7 +115,9 @@ function AdminSubmissions() {
   const handleEditClick = (member: SubmissionRow) => {
     setEditMember({
       ...member,
-      ageRanges: Array.isArray(member.ageRanges) ? (member.ageRanges as unknown as string[]) : [],
+      ageRanges: member.ageRanges && typeof member.ageRanges === 'object'
+        ? (member.ageRanges as unknown as Record<string, number>)
+        : {},
       specialNeeds: Array.isArray(member.specialNeeds) ? member.specialNeeds : [],
       needs: Array.isArray(member.needs) ? member.needs : [],
     });
@@ -167,7 +169,7 @@ function AdminSubmissions() {
     { key: 'street', label: 'Street' },
     { key: 'building', label: 'Building' },
     { key: 'floor', label: 'Floor' },
-    { key: 'ageRanges', label: 'Age Ranges', isArray: true },
+    { key: 'ageRanges', label: 'Age Ranges', disabled: true },
     { key: 'specialNeeds', label: 'Special Needs', isArray: true },
     { key: 'needs', label: 'Immediate Needs', isArray: true },
     { key: 'aidUrgency', label: 'Aid Urgency' },
@@ -237,7 +239,14 @@ function AdminSubmissions() {
                     <TableCell>{member.street}</TableCell>
                     <TableCell>{member.building}</TableCell>
                     <TableCell>{member.floor}</TableCell>
-                    <TableCell>{JSON.stringify(member.ageRanges || [])}</TableCell>
+                    <TableCell className="text-xs">
+                      {member.ageRanges && typeof member.ageRanges === 'object'
+                        ? Object.entries(member.ageRanges)
+                            .filter(([, v]) => Number(v) > 0)
+                            .map(([range, count]) => `${range}: ${count}`)
+                            .join(', ') || '—'
+                        : '—'}
+                    </TableCell>
                     <TableCell>{member.specialNeeds?.join(', ') || ''}</TableCell>
                     <TableCell>{member.needs?.join(', ') || ''}</TableCell>
                     <TableCell>
@@ -288,6 +297,10 @@ function AdminSubmissions() {
                       ? (editMember[key] as string[]).join(', ')
                       : key === 'registrationDate'
                       ? editMember.registrationDate?.toDate().toLocaleDateString() ?? ''
+                      : key === 'ageRanges'
+                      ? Object.entries(editMember.ageRanges)
+                          .map(([range, count]) => `${range}: ${count}`)
+                          .join(', ')
                       : (editMember[key] as string) ?? ''
                   }
                   disabled={disabled}

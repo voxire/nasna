@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { z } from 'zod';
 import type { AgeRanges, AidUrgency, Gender } from '../../types';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -18,6 +19,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/Components/ui/select';
+import AidTypeCheckboxGrid from '@/Components/AidTypeCheckboxGrid';
+
+const submissionSchema = z.object({
+  fullName: z.string().min(1),
+  phoneNumber: z.string().min(1),
+  emailAddress: z.string().email().or(z.literal('')),
+  gender: z.enum(['Male', 'Female']),
+  currentGovernorate: z.string().min(1),
+  previousGovernorate: z.string().min(1),
+  street: z.string().min(1),
+  building: z.string().min(1),
+  floor: z.string().min(1),
+  city: z.string().min(1),
+  ageRanges: z.object({
+    '0-3': z.number().min(0),
+    '4-12': z.number().min(0),
+    '13-18': z.number().min(0),
+    '19-60': z.number().min(0),
+    '60+': z.number().min(0),
+  }),
+  specialNeeds: z.array(z.string()),
+  needs: z.array(z.string()),
+  aidUrgency: z.enum(['High', 'Medium', 'Low']),
+  consentGiven: z.literal(true, { error: 'Consent is required' }),
+  comments: z.string(),
+  numberOfPeopleInHousehold: z.number().min(0),
+});
 
 interface SubmissionFormData {
   fullName: string;
@@ -44,7 +72,7 @@ const defaultFormData: SubmissionFormData = {
   currentGovernorate: '', previousGovernorate: '', street: '', building: '',
   floor: '', city: '',
   ageRanges: { '0-3': 0, '4-12': 0, '13-18': 0, '19-60': 0, '60+': 0 },
-  specialNeeds: [], needs: [], aidUrgency: '', consentGiven: true, comments: '',
+  specialNeeds: [], needs: [], aidUrgency: '', consentGiven: false, comments: '',
   numberOfPeopleInHousehold: 0,
 };
 
@@ -75,10 +103,22 @@ function CreateSubmission() {
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const result = submissionSchema.safeParse(formData);
+    if (!result.success) {
+      const consentError = result.error.issues.find((i) => i.path.includes('consentGiven'));
+      if (consentError) {
+        toast.error(t('submission.consentRequired'));
+      } else {
+        toast.error(t('submission.validationError'));
+      }
+      return;
+    }
+
     setLoading(true);
     try {
       await addDoc(collection(db, 'submissions'), {
-        ...formData,
+        ...result.data,
         registrationDate: Timestamp.fromDate(new Date()),
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -86,8 +126,7 @@ function CreateSubmission() {
       });
       toast.success(t('submission.success'));
       setFormData(defaultFormData);
-    } catch (error) {
-      console.error('Error creating submission:', error);
+    } catch {
       toast.error(t('submission.error'));
     } finally {
       setLoading(false);
@@ -98,12 +137,12 @@ function CreateSubmission() {
     <div className="max-w-[600px] mx-auto my-5 px-4">
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold text-gray-800">{t('submission.title')}</h1>
-        <Button variant="outline" className="border-gray-300 text-gray-600" onClick={() => navigate('/agent/submissions')}>My Submissions</Button>
+        <Button variant="outline" className="border-gray-300 text-gray-600" onClick={() => navigate('/agent/submissions')}>{t('submission.mySubmissions')}</Button>
       </div>
 
       <form onSubmit={handleAddMember} className="space-y-4">
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
-          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">Personal Information</h2>
+          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('submission.personalInformation')}</h2>
           {[
             { name: 'fullName', label: t('submission.fullName') },
             { name: 'phoneNumber', label: t('submission.phoneNumber') },
@@ -134,7 +173,7 @@ function CreateSubmission() {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
-          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">Location Details</h2>
+          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('submission.locationDetails')}</h2>
           <div className="grid grid-cols-2 gap-3">
             {[
               { name: 'currentGovernorate', label: t('submission.currentGovernorate') },
@@ -158,7 +197,7 @@ function CreateSubmission() {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
-          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">Household & Needs</h2>
+          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('submission.householdAndNeeds')}</h2>
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">{t('submission.numberOfPeopleInHousehold')}</Label>
             <Input
@@ -187,6 +226,15 @@ function CreateSubmission() {
                 />
               </div>
             ))}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-700">{t('submission.needsTitle')}</Label>
+            <AidTypeCheckboxGrid
+              selected={formData.needs}
+              onChange={(selected) => setFormData((prev) => ({ ...prev, needs: selected }))}
+              i18nPrefix="submission.needs"
+            />
           </div>
 
           <div className="space-y-1.5">
