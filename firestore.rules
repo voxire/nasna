@@ -105,11 +105,10 @@ service cloud.firestore {
         && request.resource.data.aidUrgency in ['High', 'Medium', 'Low']
         && request.resource.data.gender in ['Male', 'Female', ''];
 
+      // Duplicate-phone check moved to Cloud Function — no unauthenticated reads
       allow read: if isAdmin()
         || isValidatedMember()
-        || (isAgent() && resource.data.agent == request.auth.uid)
-        || !isSignedIn(); // unauthenticated phone-number duplicate check (see NOTE below)
-        // NOTE: move the duplicate-phone check to a Cloud Function to remove this
+        || (isAgent() && resource.data.agent == request.auth.uid);
 
       // Only admins may edit; prevent changing the core submission fields
       allow update: if isAdmin()

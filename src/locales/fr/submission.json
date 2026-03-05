@@ -20,9 +20,24 @@
   "medium": "Moyenne",
   "low": "Faible",
   "comments": "Commentaires",
+  "mySubmissions": "Mes soumissions",
+  "personalInformation": "Informations personnelles",
+  "locationDetails": "Détails de localisation",
+  "householdAndNeeds": "Ménage et besoins",
   "consent": "Je donne mon consentement pour cette soumission.",
   "submitting": "Envoi en cours...",
   "submit": "Soumettre",
+  "needsTitle": "Besoins immédiats",
+  "needs": {
+    "food": "Aide alimentaire",
+    "water": "Approvisionnement en eau",
+    "shelter": "Matériaux d'abri",
+    "hygiene": "Produits d'hygiène",
+    "medical": "Fournitures médicales",
+    "clothing": "Vêtements"
+  },
+  "consentRequired": "Vous devez donner votre consentement avant de soumettre.",
+  "validationError": "Veuillez remplir tous les champs obligatoires correctement.",
   "success": "Soumission réussie !",
   "error": "Erreur lors de la soumission."
 }

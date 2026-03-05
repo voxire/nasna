@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { db, auth } from '../../firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
@@ -34,7 +34,7 @@ function AgentSubmissions() {
           navigate('/');
           return;
         }
-        const q = query(collection(db, 'submissions'), where('agent', '==', agentUid));
+        const q = query(collection(db, 'submissions'), where('agent', '==', agentUid), limit(20));
         const snapshot = await getDocs(q);
         const data = snapshot.docs.map((d) => ({
           id: d.id,

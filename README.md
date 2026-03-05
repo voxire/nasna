@@ -1,24 +1,24 @@
 # Nasna - Together we grow
 
-Humanitarian aid management platform for connecting displaced individuals in Lebanon with NGO and government support.
+Humanitarian aid coordination platform connecting displaced individuals in Lebanon with NGO and government support.
 
 ## Stack
 
-- React 18 + Vite
-- Material-UI 6
-- Firebase (Firestore, Auth, Hosting)
+- React 19 + Vite 7 + TypeScript 5.9
+- Tailwind CSS v4 + shadcn/ui (Radix UI)
+- Firebase (Firestore, Auth, Cloud Functions, Hosting)
 - Redux Toolkit + redux-persist
-- i18next (EN, AR, FR)
+- i18next (AR, EN, FR)
 
 ## Setup
 
 ```bash
-yarn install
-yarn start
+pnpm install
+pnpm start
 ```
 
 ## Deploy
 
 ```bash
-yarn deploy
+pnpm deploy
 ```

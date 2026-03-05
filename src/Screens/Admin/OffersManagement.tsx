@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, deleteDoc, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, Timestamp, query, limit } from 'firebase/firestore';
 import { toast } from 'sonner';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -52,7 +52,7 @@ function OffersManagement() {
   const fetchOffers = async () => {
     setLoading(true);
     try {
-      const snap = await getDocs(collection(db, 'offers'));
+      const snap = await getDocs(query(collection(db, 'offers'), limit(50)));
       const data = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<OfferRow, 'id'>) }));
       data.sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds);
       setItems(data);

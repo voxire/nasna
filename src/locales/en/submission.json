@@ -20,9 +20,24 @@
   "medium": "Medium",
   "low": "Low",
   "comments": "Comments",
+  "mySubmissions": "My Submissions",
+  "personalInformation": "Personal Information",
+  "locationDetails": "Location Details",
+  "householdAndNeeds": "Household & Needs",
   "consent": "I give my consent for this submission.",
   "submitting": "Submitting...",
   "submit": "Submit",
+  "needsTitle": "Immediate Needs",
+  "needs": {
+    "food": "Food Aid",
+    "water": "Water Supply",
+    "shelter": "Shelter Materials",
+    "hygiene": "Hygiene Products",
+    "medical": "Medical Supplies",
+    "clothing": "Clothing"
+  },
+  "consentRequired": "You must give consent before submitting.",
+  "validationError": "Please fill in all required fields correctly.",
   "success": "Submission successful!",
   "error": "Error creating submission."
 }

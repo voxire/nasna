@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { db } from '../../firebase';
+import { db, functions } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { collection, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
 import { getCookie, setCookie } from '../../utils/cookies';
 import type { AgeRanges } from '../../types';
 import { Button } from '@/Components/ui/button';
@@ -54,6 +55,7 @@ function Home() {
   const [page, setPage] = useState(1);
   const [emailError, setEmailError] = useState(false);
   const [numberOfPeopleInHousehold, setNumberOfPeopleInHousehold] = useState(0);
+  const [consentGiven, setConsentGiven] = useState(false);
   const [honeypot, setHoneypot] = useState('');
 
   const navigate = useNavigate();
@@ -78,7 +80,7 @@ function Home() {
 
     if (
       fullName && trimmedPhone && currentGovernorate && previousGovernorate &&
-      street && building && floor && specialNeeds.length && needs.length && aidUrgency
+      street && building && floor && specialNeeds.length && needs.length && aidUrgency && consentGiven
     ) {
       // 24h cooldown — cookie auto-expires after 24h, no timestamp math needed
       if (getCookie('nasna_submitted')) {
@@ -87,30 +89,30 @@ function Home() {
       }
 
       try {
-        // Phone duplicate check
-        const phoneSnapshot = await getDocs(
-          query(collection(db, 'submissions'), where('phoneNumber', '==', trimmedPhone))
-        );
-        if (!phoneSnapshot.empty) {
+        // Duplicate check via Cloud Function — no client-side Firestore query
+        const checkDuplicate = httpsCallable<
+          { phoneNumber: string; emailAddress?: string },
+          { phoneDuplicate: boolean; emailDuplicate: boolean }
+        >(functions, 'checkSubmissionDuplicates');
+
+        const { data: dupResult } = await checkDuplicate({
+          phoneNumber: trimmedPhone,
+          emailAddress: emailAddress.trim().toLowerCase() || undefined,
+        });
+
+        if (dupResult.phoneDuplicate) {
           toast.error(t('home.toast.duplicatePhoneNumber'));
           return;
         }
-
-        // Email duplicate check (only if provided)
-        if (emailAddress) {
-          const emailSnapshot = await getDocs(
-            query(collection(db, 'submissions'), where('emailAddress', '==', emailAddress))
-          );
-          if (!emailSnapshot.empty) {
-            toast.error(t('home.toast.duplicateEmail'));
-            return;
-          }
+        if (dupResult.emailDuplicate) {
+          toast.error(t('home.toast.duplicateEmail'));
+          return;
         }
 
         await addDoc(collection(db, 'submissions'), {
-          fullName, phoneNumber: trimmedPhone, emailAddress, gender,
+          fullName, phoneNumber: trimmedPhone, emailAddress: emailAddress.trim().toLowerCase(), gender,
           currentGovernorate, previousGovernorate, city, street, building, floor,
-          ageRanges, specialNeeds, needs, aidUrgency, consentGiven: true,
+          ageRanges, specialNeeds, needs, aidUrgency, consentGiven,
           comments, registrationDate: Timestamp.fromDate(new Date()), agent: '',
         });
         setCookie('nasna_submitted', '1', 86_400);
@@ -326,7 +328,15 @@ function Home() {
           />
         </div>
 
-        <p className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">{t('home.consent')}</p>
+        <div className="flex items-start gap-2 bg-gray-50 rounded-lg p-3">
+          <Checkbox
+            id="consent"
+            checked={consentGiven}
+            onCheckedChange={(checked) => setConsentGiven(Boolean(checked))}
+            className="border-gray-300 data-[state=checked]:bg-[#12a89d] data-[state=checked]:border-[#12a89d] mt-0.5"
+          />
+          <Label htmlFor="consent" className="text-xs text-gray-700 font-normal cursor-pointer">{t('home.consent')}</Label>
+        </div>
       </div>
 
       <div className="flex justify-between items-center mt-5">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, updateDoc, query, limit } from 'firebase/firestore';
 import { toast } from 'sonner';
 import type { MemberDocument } from '../../types';
 import { Button } from '@/Components/ui/button';
@@ -52,7 +52,7 @@ function Agents() {
   const fetchAgents = async () => {
     setLoading(true);
     try {
-      const snapshot = await getDocs(collection(db, 'members'));
+      const snapshot = await getDocs(query(collection(db, 'members'), limit(50)));
       const data = snapshot.docs
         .map((d) => ({ id: d.id, ...(d.data() as MemberDocument) }))
         .filter((a) => a.role === 'agent');
