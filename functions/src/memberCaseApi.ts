@@ -69,6 +69,15 @@ interface RecordAidDeliveryRequest {
   submissionId: string;
 }
 
+interface UpdateMemberCoverageProfileRequest {
+  coverageType: 'governorate' | 'center' | 'hybrid';
+  coverageGovernorates: string[];
+  coverageCenterIds: string[];
+  aidTypes: string[];
+  maxCaseLoad: number;
+  deliveryMode: 'delivery' | 'pickup' | 'both';
+}
+
 interface MemberCaseResponse {
   id: string;
   fullName: string;
@@ -430,6 +439,46 @@ export const recordMemberAidDelivery = onCall<RecordAidDeliveryRequest>(
     const updatedSnapshot = await submissionRef.get();
     return {
       case: sanitizeSubmission(updatedSnapshot.id, updatedSnapshot.data() as SubmissionRecord),
+    };
+  },
+);
+
+export const updateMemberCoverageProfile = onCall<UpdateMemberCoverageProfileRequest>(
+  { region: 'europe-west1' },
+  async (request) => {
+    const uid = assertSignedIn(request.auth?.uid);
+    await getValidatedMemberProfile(uid);
+
+    const {
+      coverageType,
+      coverageGovernorates = [],
+      coverageCenterIds = [],
+      aidTypes = [],
+      maxCaseLoad,
+      deliveryMode,
+    } = request.data ?? {};
+
+    if (!coverageType || !deliveryMode || !Number.isFinite(maxCaseLoad)) {
+      throw new HttpsError('invalid-argument', 'Coverage profile is incomplete.');
+    }
+
+    await db.collection('members').doc(uid).set(
+      {
+        coverageType,
+        coverageGovernorates,
+        coverageCenterIds,
+        aidTypes,
+        maxCaseLoad,
+        deliveryMode,
+        updatedAt: new Date(),
+      },
+      { merge: true },
+    );
+
+    const snapshot = await db.collection('members').doc(uid).get();
+
+    return {
+      profile: snapshot.data(),
     };
   },
 );

@@ -12,4 +12,5 @@ export {
   listMemberPendingCases,
   recordMemberAidDelivery,
   updateMemberCaseStatus,
+  updateMemberCoverageProfile,
 } from './memberCaseApi';

@@ -4,6 +4,9 @@ import Private from '../Layout/Private';
 import type { RouteConfig } from '../types';
 
 const Submissions = lazy(() => import('../Screens/Private/Submissions'));
+const MyCases = lazy(() => import('../Screens/Private/MyCases'));
+const CaseDetail = lazy(() => import('../Screens/Private/CaseDetail'));
+const ProfileCoverage = lazy(() => import('../Screens/Private/ProfileCoverage'));
 const CreateSubmission = lazy(() => import('../Screens/Private/CreateSubmission'));
 const AgentSubmissions = lazy(() => import('../Screens/Private/AgentSubmissions'));
 
@@ -14,6 +17,36 @@ const NGORoutes: RouteConfig[] = [
       <PrivateRoute>
         <Private>
           <Submissions />
+        </Private>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/ngo/my-cases',
+    element: (
+      <PrivateRoute>
+        <Private>
+          <MyCases />
+        </Private>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/ngo/cases/:caseId',
+    element: (
+      <PrivateRoute>
+        <Private>
+          <CaseDetail />
+        </Private>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/ngo/profile-coverage',
+    element: (
+      <PrivateRoute>
+        <Private>
+          <ProfileCoverage />
         </Private>
       </PrivateRoute>
     ),
