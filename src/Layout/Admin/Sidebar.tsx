@@ -15,6 +15,7 @@ import {
   MessageSquare,
   HandHeart,
   Radar,
+  ShieldPlus,
 } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import {
@@ -44,6 +45,7 @@ const NAV_ITEMS = [
   { path: '/manage/ngo', label: 'NGO / Initiative', icon: Bell },
   { path: '/manage/agents', label: 'Agents', icon: UserPlus },
   { path: '/manage/feedback', label: 'Feedback', icon: MessageSquare },
+  { path: '/manage/emergency', label: 'Emergency', icon: ShieldPlus },
   { path: '/manage/offers', label: 'Aid Offers', icon: HandHeart },
 ];
 

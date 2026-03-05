@@ -11,17 +11,89 @@ const Terms = lazy(() => import('../Screens/Public/Terms'));
 const OfferHelp = lazy(() => import('../Screens/Public/OfferHelp'));
 const Resources = lazy(() => import('../Screens/Public/Resources'));
 const Feedback = lazy(() => import('../Screens/Public/Feedback'));
+const Emergency = lazy(() => import('../Screens/Public/Emergency'));
 
 const PublicRoutes: RouteConfig[] = [
-  { path: '/', element: <Public><Landing /></Public> },
-  { path: '/submit', element: <Public><Home /></Public> },
-  { path: '/about', element: <Public><About /></Public> },
-  { path: '/confirmation', element: <Public><Confirmation /></Public> },
-  { path: '/donate', element: <Public><Donate /></Public> },
-  { path: '/terms', element: <Public><Terms /></Public> },
-  { path: '/offer-help', element: <Public><OfferHelp /></Public> },
-  { path: '/resources', element: <Public><Resources /></Public> },
-  { path: '/feedback', element: <Public><Feedback /></Public> },
+  {
+    path: '/',
+    element: (
+      <Public>
+        <Landing />
+      </Public>
+    ),
+  },
+  {
+    path: '/submit',
+    element: (
+      <Public>
+        <Home />
+      </Public>
+    ),
+  },
+  {
+    path: '/about',
+    element: (
+      <Public>
+        <About />
+      </Public>
+    ),
+  },
+  {
+    path: '/confirmation',
+    element: (
+      <Public>
+        <Confirmation />
+      </Public>
+    ),
+  },
+  {
+    path: '/donate',
+    element: (
+      <Public>
+        <Donate />
+      </Public>
+    ),
+  },
+  {
+    path: '/terms',
+    element: (
+      <Public>
+        <Terms />
+      </Public>
+    ),
+  },
+  {
+    path: '/offer-help',
+    element: (
+      <Public>
+        <OfferHelp />
+      </Public>
+    ),
+  },
+  {
+    path: '/resources',
+    element: (
+      <Public>
+        <Resources />
+      </Public>
+    ),
+  },
+  {
+    path: '/emergency',
+    element: (
+      <Public>
+        <Emergency />
+      </Public>
+    ),
+  },
+  {
+    path: '/feedback',
+    element: (
+      <Public>
+        <Feedback />
+      </Public>
+    ),
+  },
 ];
 
 export default PublicRoutes;
