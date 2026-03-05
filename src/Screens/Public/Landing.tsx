@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useInView, AnimatePresence } from 'motion/react';
+import type { Variants } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/Components/ui/button';
@@ -43,11 +44,15 @@ function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
 }
 
 // ─── Reusable motion variants ─────────────────────────────────────────────────
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: 'easeOut' } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+  },
 };
-const stagger = {
+const stagger: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.1 } },
 };
@@ -263,7 +268,7 @@ function Landing() {
             <div className="absolute top-6 bottom-6 start-6 w-px bg-gray-100 hidden md:block" />
 
             <div className="space-y-0">
-              {steps.map((step, i) => (
+              {steps.map((step) => (
                 <motion.div
                   key={step.num}
                   className="flex gap-5 items-start py-8 border-b border-gray-100 last:border-0"

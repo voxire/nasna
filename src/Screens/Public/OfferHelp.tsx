@@ -55,7 +55,8 @@ const schema = z
     }
   });
 
-type FormData = z.infer<typeof schema>;
+type FormInput = z.input<typeof schema>;
+type FormOutput = z.output<typeof schema>;
 
 function MapPinPicker({ onPin }: { onPin: (lat: number, lng: number) => void }) {
   useMapEvents({ click(e) { onPin(e.latlng.lat, e.latlng.lng); } });
@@ -74,11 +75,13 @@ export default function OfferHelp() {
     watch,
     reset,
     formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<FormInput, unknown, FormOutput>({
+    resolver: zodResolver(schema),
+  });
 
   const offerType = watch('type');
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: FormOutput) => {
     setSubmitting(true);
     try {
       await addDoc(collection(db, 'offers'), {

@@ -3,6 +3,12 @@ import { initReactI18next } from 'react-i18next';
 import type { SupportedLanguage } from '../types';
 import { getCookie, setCookie } from '../utils/cookies';
 
+type LocaleNamespace = Record<string, unknown>;
+type LocaleModule = { default: LocaleNamespace };
+
+const loadLocaleModules = (pattern: string): Record<string, LocaleModule> =>
+  import.meta.glob<LocaleModule>(pattern, { eager: true });
+
 const buildResources = () => {
   const resources: Record<string, Record<string, Record<string, unknown>>> = {
     en: { translation: {} },
@@ -10,31 +16,22 @@ const buildResources = () => {
     fr: { translation: {} },
   };
 
-  const enModules = import.meta.glob<{ default: Record<string, unknown> }>(
-    '../locales/en/*.json',
-    { eager: true }
-  );
+  const enModules = loadLocaleModules('../locales/en/*.json');
   Object.entries(enModules).forEach(([path, mod]) => {
     const key = path.split('/').pop()?.replace('.json', '') ?? '';
-    if (key) resources.en.translation[key] = mod.default ?? mod;
+    if (key) resources.en.translation[key] = mod.default;
   });
 
-  const arModules = import.meta.glob<{ default: Record<string, unknown> }>(
-    '../locales/ar/*.json',
-    { eager: true }
-  );
+  const arModules = loadLocaleModules('../locales/ar/*.json');
   Object.entries(arModules).forEach(([path, mod]) => {
     const key = path.split('/').pop()?.replace('.json', '') ?? '';
-    if (key) resources.ar.translation[key] = mod.default ?? mod;
+    if (key) resources.ar.translation[key] = mod.default;
   });
 
-  const frModules = import.meta.glob<{ default: Record<string, unknown> }>(
-    '../locales/fr/*.json',
-    { eager: true }
-  );
+  const frModules = loadLocaleModules('../locales/fr/*.json');
   Object.entries(frModules).forEach(([path, mod]) => {
     const key = path.split('/').pop()?.replace('.json', '') ?? '';
-    if (key) resources.fr.translation[key] = mod.default ?? mod;
+    if (key) resources.fr.translation[key] = mod.default;
   });
 
   return resources;
