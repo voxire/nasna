@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { auth, db } from '../../firebase';
-import { Timestamp, collection, addDoc } from 'firebase/firestore';
+import { Timestamp, addDoc, collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { X } from 'lucide-react';
-import type { AgeRanges, AidUrgency, Gender } from '../../types';
+import type { AgeRanges, AidUrgency, CenterDocument, Gender, LocationType } from '../../types';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { Input } from '@/Components/ui/input';
@@ -22,9 +22,10 @@ import {
   SelectValue,
 } from '@/Components/ui/select';
 import AidTypeCheckboxGrid from '@/Components/AidTypeCheckboxGrid';
+import CenterPicker from '@/Components/CenterPicker';
 import { buildSubmissionWorkflowDefaults } from '@/lib/v2Defaults';
 
-const submissionSchema = z.object({
+const baseSubmissionSchema = z.object({
   fullName: z.string().min(1),
   phoneNumber: z
     .string()
@@ -41,6 +42,8 @@ const submissionSchema = z.object({
   building: z.string().min(1),
   floor: z.string().min(1),
   city: z.string().min(1),
+  locationType: z.enum(['with_family', 'center']),
+  centerId: z.string(),
   ageRanges: z.object({
     '0-3': z.number().min(0),
     '4-12': z.number().min(0),
@@ -56,11 +59,23 @@ const submissionSchema = z.object({
   numberOfPeopleInHousehold: z.number().min(0),
 });
 
+const submissionSchema = baseSubmissionSchema.superRefine((value, context) => {
+  if (value.locationType === 'center' && !value.centerId.trim()) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['centerId'],
+      message: 'Center selection is required',
+    });
+  }
+});
+
 interface SubmissionFormData {
   fullName: string;
   phoneNumber: string;
   emailAddress: string;
   gender: Gender | '';
+  locationType: LocationType;
+  centerId: string;
   currentGovernorate: string;
   previousGovernorate: string;
   street: string;
@@ -81,6 +96,8 @@ const defaultFormData: SubmissionFormData = {
   phoneNumber: '',
   emailAddress: '',
   gender: '',
+  locationType: 'with_family',
+  centerId: '',
   currentGovernorate: '',
   previousGovernorate: '',
   street: '',
@@ -103,12 +120,28 @@ function CreateSubmission() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<SubmissionFormData>(defaultFormData);
   const [specialNeedInput, setSpecialNeedInput] = useState('');
+  const [centers, setCenters] = useState<Array<CenterDocument & { id: string }>>([]);
 
   const userUid = auth.currentUser?.uid;
 
   useEffect(() => {
     if (!userUid) navigate('/auth/login');
   }, [userUid, navigate]);
+
+  useEffect(() => {
+    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
+
+    return onSnapshot(centerQuery, (snapshot) => {
+      setCenters(
+        snapshot.docs
+          .map((document) => ({
+            id: document.id,
+            ...(document.data() as CenterDocument),
+          }))
+          .sort((left, right) => left.name.localeCompare(right.name)),
+      );
+    });
+  }, []);
 
   if (!user?.validated) {
     return (
@@ -121,6 +154,9 @@ function CreateSubmission() {
   const handleChange = (name: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const selectedCenter = centers.find((center) => center.id === formData.centerId);
+  const isCenterCase = formData.locationType === 'center';
 
   const addSpecialNeed = () => {
     const normalized = specialNeedInput.trim();
@@ -145,11 +181,26 @@ function CreateSubmission() {
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const result = submissionSchema.safeParse(formData);
+    const payload =
+      isCenterCase && selectedCenter
+        ? {
+            ...formData,
+            currentGovernorate: selectedCenter.governorate,
+            city: selectedCenter.city,
+            street: selectedCenter.address,
+            building: selectedCenter.name,
+            floor: 'Center intake',
+          }
+        : formData;
+
+    const result = submissionSchema.safeParse(payload);
     if (!result.success) {
       const consentError = result.error.issues.find((i) => i.path.includes('consentGiven'));
+      const centerError = result.error.issues.find((i) => i.path.includes('centerId'));
       if (consentError) {
         toast.error(t('submission.consentRequired'));
+      } else if (centerError) {
+        toast.error('Select a center before submitting this case.');
       } else {
         toast.error(t('submission.validationError'));
       }
@@ -229,26 +280,82 @@ function CreateSubmission() {
           <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">
             {t('submission.locationDetails')}
           </h2>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-700">Current living situation</Label>
+            <Select
+              value={formData.locationType}
+              onValueChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  locationType: value as LocationType,
+                  centerId: '',
+                }))
+              }
+            >
+              <SelectTrigger className="bg-gray-50 border-gray-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="with_family">Staying with family or host</SelectItem>
+                <SelectItem value="center">Staying in a center</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="grid grid-cols-2 gap-3">
-            {[
-              { name: 'currentGovernorate', label: t('submission.currentGovernorate') },
-              { name: 'previousGovernorate', label: t('submission.previousGovernorate') },
-              { name: 'street', label: t('submission.street') },
-              { name: 'building', label: t('submission.building') },
-              { name: 'floor', label: t('submission.floor') },
-              { name: 'city', label: t('submission.city') },
-            ].map(({ name, label }) => (
-              <div key={name} className="space-y-1.5">
-                <Label className="text-sm font-medium text-gray-700">{label}</Label>
-                <Input
-                  value={String(formData[name as keyof SubmissionFormData] ?? '')}
-                  onChange={(e) => handleChange(name, e.target.value)}
-                  required
-                  className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+            {[{ name: 'previousGovernorate', label: t('submission.previousGovernorate') }].map(
+              ({ name, label }) => (
+                <div key={name} className="space-y-1.5">
+                  <Label className="text-sm font-medium text-gray-700">{label}</Label>
+                  <Input
+                    value={String(formData[name as keyof SubmissionFormData] ?? '')}
+                    onChange={(e) => handleChange(name, e.target.value)}
+                    required
+                    className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                  />
+                </div>
+              ),
+            )}
+          </div>
+          {isCenterCase ? (
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium text-gray-700">Center</Label>
+                <CenterPicker
+                  value={formData.centerId}
+                  onValueChange={(value) => handleChange('centerId', value)}
                 />
               </div>
-            ))}
-          </div>
+              {selectedCenter ? (
+                <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
+                  <p className="font-medium text-gray-800">{selectedCenter.name}</p>
+                  <p>
+                    {selectedCenter.city}, {selectedCenter.governorate}
+                  </p>
+                  <p>{selectedCenter.address}</p>
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { name: 'currentGovernorate', label: t('submission.currentGovernorate') },
+                { name: 'street', label: t('submission.street') },
+                { name: 'building', label: t('submission.building') },
+                { name: 'floor', label: t('submission.floor') },
+                { name: 'city', label: t('submission.city') },
+              ].map(({ name, label }) => (
+                <div key={name} className="space-y-1.5">
+                  <Label className="text-sm font-medium text-gray-700">{label}</Label>
+                  <Input
+                    value={String(formData[name as keyof SubmissionFormData] ?? '')}
+                    onChange={(e) => handleChange(name, e.target.value)}
+                    required
+                    className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">

@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { db } from '@/firebase';
 import { updateMemberCoverageProfile } from '@/services/memberCases';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { Button } from '@/Components/ui/button';
+import { Checkbox } from '@/Components/ui/checkbox';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import {
@@ -10,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/Components/ui/select';
+import type { CenterDocument } from '@/types';
 
 export default function ProfileCoverage() {
   const [coverageType, setCoverageType] = useState<'governorate' | 'center' | 'hybrid'>(
@@ -21,12 +25,38 @@ export default function ProfileCoverage() {
   const [maxCaseLoad, setMaxCaseLoad] = useState(10);
   const [deliveryMode, setDeliveryMode] = useState<'delivery' | 'pickup' | 'both'>('both');
   const [saving, setSaving] = useState(false);
+  const [centers, setCenters] = useState<Array<CenterDocument & { id: string }>>([]);
+
+  useEffect(() => {
+    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
+
+    return onSnapshot(centerQuery, (snapshot) => {
+      setCenters(
+        snapshot.docs
+          .map((document) => ({
+            id: document.id,
+            ...(document.data() as CenterDocument),
+          }))
+          .sort((left, right) => left.name.localeCompare(right.name)),
+      );
+    });
+  }, []);
 
   const parseCsv = (value: string) =>
     value
       .split(',')
       .map((item) => item.trim())
       .filter(Boolean);
+
+  const selectedCenterIds = useMemo(() => parseCsv(coverageCenterIds), [coverageCenterIds]);
+
+  const toggleCenter = (centerId: string, checked: boolean) => {
+    const nextIds = checked
+      ? Array.from(new Set([...selectedCenterIds, centerId]))
+      : selectedCenterIds.filter((item) => item !== centerId);
+
+    setCoverageCenterIds(nextIds.join(', '));
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -98,11 +128,31 @@ export default function ProfileCoverage() {
           </div>
           <div className="space-y-2 md:col-span-2">
             <Label>Coverage Center IDs</Label>
-            <Input
-              value={coverageCenterIds}
-              onChange={(event) => setCoverageCenterIds(event.target.value)}
-              placeholder="center-001, center-002"
-            />
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+              {centers.length === 0 ? (
+                <p className="text-sm text-gray-500">No active centers available.</p>
+              ) : (
+                <div className="grid gap-3 md:grid-cols-2">
+                  {centers.map((center) => (
+                    <label
+                      key={center.id}
+                      className="flex items-start gap-3 rounded-lg bg-white p-3"
+                    >
+                      <Checkbox
+                        checked={selectedCenterIds.includes(center.id)}
+                        onCheckedChange={(checked) => toggleCenter(center.id, Boolean(checked))}
+                      />
+                      <span className="space-y-1 text-sm">
+                        <span className="block font-medium text-gray-800">{center.name}</span>
+                        <span className="block text-gray-500">
+                          {center.city}, {center.governorate}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <div className="space-y-2 md:col-span-2">
             <Label>Aid Types</Label>

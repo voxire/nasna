@@ -1,18 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { db, functions } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { addDoc, collection, onSnapshot, query, Timestamp, where } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { getCookie, setCookie } from '../../utils/cookies';
-import type { AgeRanges } from '../../types';
+import type { AgeRanges, CenterDocument, LocationType } from '../../types';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { buildSubmissionWorkflowDefaults } from '@/lib/v2Defaults';
+import CenterPicker from '@/Components/CenterPicker';
 import {
   Select,
   SelectContent,
@@ -36,6 +37,8 @@ const GOVERNORATES = [
 
 function Home() {
   const { t, i18n } = useTranslation();
+  const [locationType, setLocationType] = useState<LocationType>('with_family');
+  const [centerId, setCenterId] = useState('');
   const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
@@ -58,8 +61,24 @@ function Home() {
   const [numberOfPeopleInHousehold, setNumberOfPeopleInHousehold] = useState(0);
   const [consentGiven, setConsentGiven] = useState(false);
   const [honeypot, setHoneypot] = useState('');
+  const [centers, setCenters] = useState<Array<CenterDocument & { id: string }>>([]);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
+
+    return onSnapshot(centerQuery, (snapshot) => {
+      setCenters(
+        snapshot.docs
+          .map((document) => ({
+            id: document.id,
+            ...(document.data() as CenterDocument),
+          }))
+          .sort((left, right) => left.name.localeCompare(right.name)),
+      );
+    });
+  }, []);
 
   const getTotalAgeGroupCount = () =>
     Object.values(ageRanges).reduce((acc, count) => acc + Number(count), 0);
@@ -68,6 +87,11 @@ function Home() {
     text.replace(/\p{Extended_Pictographic}/gu, '').replace(/[\uE000-\uF8FF]/gu, '');
 
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const selectedCenter = centers.find((center) => center.id === centerId);
+  const isCenterCase = locationType === 'center';
+  const hasRequiredAddress = currentGovernorate && previousGovernorate && city && street && building && floor;
+  const hasRequiredCenterFields = previousGovernorate && selectedCenter;
 
   const handleAddMember = async () => {
     // Honeypot — silently block bots that fill hidden fields
@@ -80,8 +104,13 @@ function Home() {
     }
 
     if (
-      fullName && trimmedPhone && currentGovernorate && previousGovernorate &&
-      street && building && floor && specialNeeds.length && needs.length && aidUrgency && consentGiven
+      fullName &&
+      trimmedPhone &&
+      (isCenterCase ? hasRequiredCenterFields : hasRequiredAddress) &&
+      specialNeeds.length &&
+      needs.length &&
+      aidUrgency &&
+      consentGiven
     ) {
       // 24h cooldown — cookie auto-expires after 24h, no timestamp math needed
       if (getCookie('nasna_submitted')) {
@@ -110,12 +139,26 @@ function Home() {
           return;
         }
 
+        const center = isCenterCase ? selectedCenter : null;
+        const resolvedGovernorate = center ? center.governorate : currentGovernorate;
+        const resolvedCity = center ? center.city : city;
+        const resolvedStreet = center ? center.address : street;
+        const resolvedBuilding = center ? center.name : building;
+        const resolvedFloor = isCenterCase ? 'Center intake' : floor;
+
         await addDoc(collection(db, 'submissions'), {
           fullName, phoneNumber: trimmedPhone, emailAddress: emailAddress.trim().toLowerCase(), gender,
-          currentGovernorate, previousGovernorate, city, street, building, floor,
+          currentGovernorate: resolvedGovernorate,
+          previousGovernorate,
+          city: resolvedCity,
+          street: resolvedStreet,
+          building: resolvedBuilding,
+          floor: resolvedFloor,
           ageRanges, specialNeeds, needs, aidUrgency, consentGiven,
           comments,
           ...buildSubmissionWorkflowDefaults('web'),
+          locationType,
+          centerId: center ? center.id : '',
           registrationDate: Timestamp.fromDate(new Date()),
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -177,6 +220,22 @@ function Home() {
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-4 space-y-4">
         <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.locationDetails')}</h2>
         <div className="space-y-1.5">
+          <Label className="text-sm font-medium text-gray-700">Current living situation</Label>
+          <Select
+            value={locationType}
+            onValueChange={(value) => {
+              setLocationType(value as LocationType);
+              setCenterId('');
+            }}
+          >
+            <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="with_family">Staying with family or host</SelectItem>
+              <SelectItem value="center">Staying in a center</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.previousGovernorate')}</Label>
           <Select value={previousGovernorate} onValueChange={setPreviousGovernorate}>
             <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
@@ -187,44 +246,68 @@ function Home() {
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t('home.currentGovernorate')}</Label>
-          <Select value={currentGovernorate} onValueChange={setCurrentGovernorate}>
-            <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {GOVERNORATES.map((g) => (
-                <SelectItem key={g.value} value={g.value}>{t(g.key)}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">{t('home.city')}</Label>
-            <Input value={city} onChange={(e) => setCity(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+        {isCenterCase ? (
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-gray-700">Center</Label>
+              <CenterPicker value={centerId} onValueChange={setCenterId} />
+            </div>
+            {selectedCenter ? (
+              <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
+                <p className="font-medium text-gray-800">{selectedCenter.name}</p>
+                <p>
+                  {selectedCenter.city}, {selectedCenter.governorate}
+                </p>
+                <p>{selectedCenter.address}</p>
+              </div>
+            ) : null}
           </div>
-          <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">{t('home.street')}</Label>
-            <Input value={street} onChange={(e) => setStreet(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">{t('home.building')}</Label>
-            <Input value={building} onChange={(e) => setBuilding(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">{t('home.floor')}</Label>
-            <Input value={floor} onChange={(e) => setFloor(removeEmojis(e.target.value))} maxLength={10} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
-          </div>
-        </div>
+        ) : (
+          <>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-gray-700">{t('home.currentGovernorate')}</Label>
+              <Select value={currentGovernorate} onValueChange={setCurrentGovernorate}>
+                <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {GOVERNORATES.map((g) => (
+                    <SelectItem key={g.value} value={g.value}>{t(g.key)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium text-gray-700">{t('home.city')}</Label>
+                <Input value={city} onChange={(e) => setCity(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium text-gray-700">{t('home.street')}</Label>
+                <Input value={street} onChange={(e) => setStreet(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium text-gray-700">{t('home.building')}</Label>
+                <Input value={building} onChange={(e) => setBuilding(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium text-gray-700">{t('home.floor')}</Label>
+                <Input value={floor} onChange={(e) => setFloor(removeEmojis(e.target.value))} maxLength={10} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="flex justify-end mt-5">
         <Button
           className="bg-[#12a89d] hover:bg-[#0e9088] text-white px-8"
           onClick={() => {
-            if (fullName && phoneNumber && currentGovernorate && previousGovernorate && street && building && floor && !emailError) {
+            const pageOneValid = isCenterCase
+              ? Boolean(fullName && phoneNumber && previousGovernorate && selectedCenter && !emailError)
+              : Boolean(fullName && phoneNumber && currentGovernorate && previousGovernorate && street && building && floor && !emailError);
+
+            if (pageOneValid) {
               setPage(2);
             } else {
               toast.error(emailError ? t('home.toast.validEmailRequired') : t('home.toast.fillRequiredFields'));
