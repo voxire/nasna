@@ -97,8 +97,12 @@ function Login() {
       setCookie('nasna_session', '1', 8 * 60 * 60);
 
       if (memberDoc.exists()) {
-        const memberData = memberDoc.data() as { role?: string; onboarded?: boolean };
-        const role = claimedRole ?? memberData.role;
+        const memberData = memberDoc.data() as {
+          role?: string;
+          onboarded?: boolean;
+          isAdmin?: boolean;
+        };
+        const role = claimedRole ?? (memberData.isAdmin === true ? 'admin' : memberData.role);
         if (role) {
           setCookie('userRole', role, 7 * 24 * 60 * 60);
         }

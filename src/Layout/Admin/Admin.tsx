@@ -1,7 +1,8 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../../firebase';
+import { auth, db } from '../../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from '@/Components/ui/sidebar';
 import AppSidebar from './Sidebar';
@@ -23,7 +24,12 @@ function Admin({ children }: AdminProps) {
       if (firebaseUser) {
         try {
           const tokenResult = await firebaseUser.getIdTokenResult();
-          const userRole = tokenResult.claims['role'] as string;
+          const memberSnapshot = await getDoc(doc(db, 'members', firebaseUser.uid));
+          const memberData = memberSnapshot.exists() ? memberSnapshot.data() : null;
+          const userRole =
+            (tokenResult.claims['role'] as string | undefined) ??
+            (memberData?.isAdmin === true ? 'admin' : memberData?.role);
+
           if (userRole !== 'admin') {
             navigate('/');
           } else {

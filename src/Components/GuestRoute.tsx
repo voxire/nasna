@@ -31,16 +31,16 @@ function GuestRoute({ children }: GuestRouteProps) {
 
       try {
         const tokenResult = await user.getIdTokenResult();
+        const memberDoc = await getDoc(doc(db, 'members', user.uid));
+        const memberData = memberDoc.exists() ? memberDoc.data() : null;
         const claimedRole = tokenResult.claims['role'] as string | undefined;
-        if (claimedRole === 'admin') {
+        const role = claimedRole ?? (memberData?.isAdmin === true ? 'admin' : memberData?.role);
+
+        if (role === 'admin') {
           setRedirect('/manage');
           setLoading(false);
           return;
         }
-
-        const memberDoc = await getDoc(doc(db, 'members', user.uid));
-        const memberData = memberDoc.exists() ? memberDoc.data() : null;
-        const role = claimedRole ?? memberData?.role;
 
         if (memberData?.onboarded !== true) {
           setRedirect('/auth/onboarding');
