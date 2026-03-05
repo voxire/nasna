@@ -1,4 +1,5 @@
 export { checkSubmissionDuplicates } from './checkSubmissionDuplicates';
+export { createDonationCheckoutSession } from './payments';
 export {
   dailyStaleCaseCheck,
   nightlyGlobalStatsRebuild,

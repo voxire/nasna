@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { db } from '../../firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { functions } from '../../firebase';
+import { httpsCallable } from 'firebase/functions';
 import { toast } from 'sonner';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -15,8 +15,11 @@ import {
 
 function Donate() {
   const [reason, setReason] = useState('');
+  const [fundingTarget, setFundingTarget] = useState<'family' | 'center' | 'ngo' | ''>('');
   const [customReason, setCustomReason] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [donorName, setDonorName] = useState('');
+  const [amountUsd, setAmountUsd] = useState(25);
   const [loading, setLoading] = useState(false);
 
   const handleReasonChange = (value: string) => {
@@ -25,22 +28,37 @@ function Donate() {
   };
 
   const handleSubmit = async () => {
-    if (!reason || !phoneNumber) return;
+    if (!reason || !phoneNumber || !donorName || !fundingTarget || amountUsd < 1) return;
     const donationReason = reason === 'Other' ? customReason : reason;
     setLoading(true);
     try {
-      await addDoc(collection(db, 'donations'), {
+      const startCheckout = httpsCallable<
+        {
+          donorName: string;
+          donorPhone: string;
+          fundingTarget: 'family' | 'center' | 'ngo';
+          amountUsd: number;
+          reason: string;
+        },
+        { sessionId: string; url?: string }
+      >(functions, 'createDonationCheckoutSession');
+
+      const { data } = await startCheckout({
+        donorName,
+        donorPhone: phoneNumber,
+        fundingTarget,
+        amountUsd,
         reason: donationReason,
-        phone: phoneNumber,
-        timestamp: new Date(),
       });
-      setReason('');
-      setCustomReason('');
-      setPhoneNumber('');
-      toast.success('Thank you for your donation!');
+
+      if (!data.url) {
+        throw new Error('Missing checkout URL.');
+      }
+
+      window.location.assign(data.url);
     } catch (error) {
       console.error('Error adding donation: ', error);
-      toast.error('There was an error processing your donation. Please try again.');
+      toast.error('There was an error starting checkout. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -52,15 +70,21 @@ function Donate() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-3">Donate</h1>
           <p className="text-gray-600 mb-2">
-            Your donations support our project and will help families in need. Some funds will be
-            directly allocated to assist those in critical situations.
-          </p>
-          <p className="text-gray-600">
-            To donate, send the amount via whish money to: <strong className="text-[#12a89d]">+123 456 7890</strong>
+            Choose where you want funds directed, enter the amount, and continue through secure
+            checkout.
           </p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-5">
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-700">Your Name</Label>
+            <Input
+              value={donorName}
+              onChange={(e) => setDonorName(e.target.value)}
+              placeholder="Donor name"
+              className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+            />
+          </div>
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">Phone Number</Label>
             <Input
@@ -68,6 +92,31 @@ function Donate() {
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="+123 456 7890"
+              className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-700">Funding Target</Label>
+            <Select value={fundingTarget} onValueChange={(value) => setFundingTarget(value as typeof fundingTarget)}>
+              <SelectTrigger className="bg-gray-50 border-gray-200">
+                <SelectValue placeholder="Choose who to fund" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="family">Fund a Family</SelectItem>
+                <SelectItem value="center">Fund a Center</SelectItem>
+                <SelectItem value="ngo">Fund an NGO</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-700">Amount (USD)</Label>
+            <Input
+              type="number"
+              min={1}
+              value={amountUsd}
+              onChange={(e) => setAmountUsd(Number(e.target.value))}
               className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
             />
           </div>
@@ -102,9 +151,17 @@ function Donate() {
           <Button
             className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white"
             onClick={handleSubmit}
-            disabled={!reason || !phoneNumber || (reason === 'Other' && !customReason) || loading}
+            disabled={
+              !reason ||
+              !phoneNumber ||
+              !donorName ||
+              !fundingTarget ||
+              amountUsd < 1 ||
+              (reason === 'Other' && !customReason) ||
+              loading
+            }
           >
-            {loading ? 'Submitting...' : 'Submit Donation'}
+            {loading ? 'Starting Checkout...' : 'Continue to Checkout'}
           </Button>
         </div>
       </div>

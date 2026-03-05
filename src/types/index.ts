@@ -150,9 +150,16 @@ export interface GlobalStatsDocument {
 }
 
 export interface DonationDocument {
+  id?: string;
   reason: string;
-  phone: string;
-  timestamp: Date;
+  fundingTarget: 'family' | 'center' | 'ngo';
+  donorPhone: string;
+  donorName: string;
+  amountUsd: number;
+  status: 'checkout_created' | 'paid' | 'failed';
+  stripeSessionId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface ReduxUserData {
