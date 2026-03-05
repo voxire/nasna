@@ -5,7 +5,17 @@ import { useAppDispatch } from '../../redux/hooks';
 import { logout } from '../../redux/reducers/userSlice';
 import { toast } from 'sonner';
 import { deleteCookie } from '../../utils/cookies';
-import { Home, List, Bell, UserPlus, ChevronsUpDown, LogOut, MessageSquare, HandHeart } from 'lucide-react';
+import {
+  Home,
+  List,
+  Bell,
+  UserPlus,
+  ChevronsUpDown,
+  LogOut,
+  MessageSquare,
+  HandHeart,
+  Radar,
+} from 'lucide-react';
 import type { User } from 'firebase/auth';
 import {
   Sidebar,
@@ -29,6 +39,7 @@ import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 
 const NAV_ITEMS = [
   { path: '/manage', label: 'Home', icon: Home },
+  { path: '/manage/dispatch', label: 'Dispatch Center', icon: Radar },
   { path: '/manage/submissions', label: 'Submissions', icon: List },
   { path: '/manage/ngo', label: 'NGO / Initiative', icon: Bell },
   { path: '/manage/agents', label: 'Agents', icon: UserPlus },
@@ -66,11 +77,7 @@ export default function AppSidebar({ user }: AppSidebarProps) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              className="cursor-pointer"
-              onClick={() => navigate('/')}
-            >
+            <SidebarMenuButton size="lg" className="cursor-pointer" onClick={() => navigate('/')}>
               <div className="flex aspect-square h-8 w-8 items-center justify-center rounded-lg bg-[#12a89d] text-white shrink-0 font-bold text-base">
                 N
               </div>
@@ -123,14 +130,19 @@ export default function AppSidebar({ user }: AppSidebarProps) {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col leading-tight min-w-0">
-                    <span className="text-sm font-medium truncate">{user.displayName ?? 'Admin'}</span>
+                    <span className="text-sm font-medium truncate">
+                      {user.displayName ?? 'Admin'}
+                    </span>
                     <span className="text-xs text-muted-foreground truncate">{user.email}</span>
                   </div>
                   <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-56">
-                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:text-red-600">
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="cursor-pointer text-red-600 focus:text-red-600"
+                >
                   <LogOut className="h-4 w-4 mr-2" />
                   Log out
                 </DropdownMenuItem>

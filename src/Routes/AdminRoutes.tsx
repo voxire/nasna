@@ -3,6 +3,7 @@ import Admin from '../Layout/Admin/Admin';
 import type { RouteConfig } from '../types';
 
 const Dashboard = lazy(() => import('../Screens/Admin/Dashboard'));
+const DispatchCenter = lazy(() => import('../Screens/Admin/DispatchCenter'));
 const AdminSubmissions = lazy(() => import('../Screens/Admin/AdminSubmissions'));
 const Members = lazy(() => import('../Screens/Admin/Members'));
 const Agents = lazy(() => import('../Screens/Admin/Agents'));
@@ -15,6 +16,14 @@ const AdminRoutes: RouteConfig[] = [
     element: (
       <Admin>
         <Dashboard />
+      </Admin>
+    ),
+  },
+  {
+    path: '/manage/dispatch',
+    element: (
+      <Admin>
+        <DispatchCenter />
       </Admin>
     ),
   },
