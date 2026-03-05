@@ -38,7 +38,7 @@ function Footer() {
               className="h-14 w-auto max-w-[200px] object-contain brightness-0 invert"
             />
             <p className="text-white/70 text-sm leading-relaxed max-w-[220px]">
-              Connecting individuals with NGO support across Lebanon.
+              {t('footer.tagline')}
             </p>
           </div>
 
@@ -46,7 +46,7 @@ function Footer() {
           <div className="flex gap-16">
             <div>
               <p className="text-white/50 text-[11px] font-semibold uppercase tracking-widest mb-3">
-                Navigate
+                {t('footer.navigate')}
               </p>
               <ul className="space-y-2 text-sm">
                 <li>
@@ -62,7 +62,7 @@ function Footer() {
                     to="/impact"
                     className="text-white/80 hover:text-white transition-colors no-underline"
                   >
-                    Impact
+                    {t('footer.impact')}
                   </Link>
                 </li>
                 <li>
@@ -70,7 +70,7 @@ function Footer() {
                     to="/housing"
                     className="text-white/80 hover:text-white transition-colors no-underline"
                   >
-                    Housing Directory
+                    {t('footer.housing')}
                   </Link>
                 </li>
                 <li>
@@ -78,7 +78,7 @@ function Footer() {
                     to="/offer-housing"
                     className="text-white/80 hover:text-white transition-colors no-underline"
                   >
-                    Offer Housing
+                    {t('footer.offerHousing')}
                   </Link>
                 </li>
                 <li>
@@ -86,7 +86,7 @@ function Footer() {
                     to="/emergency"
                     className="text-white/80 hover:text-white transition-colors no-underline"
                   >
-                    Emergency
+                    {t('footer.emergency')}
                   </Link>
                 </li>
                 <li>
@@ -126,7 +126,7 @@ function Footer() {
 
             <div>
               <p className="text-white/50 text-[11px] font-semibold uppercase tracking-widest mb-3">
-                Account
+                {t('footer.account')}
               </p>
               <ul className="space-y-2 text-sm">
                 {user ? (

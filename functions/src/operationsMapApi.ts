@@ -69,16 +69,25 @@ export const getOperationsMapData = onCall(
   async (request) => {
     assertAdmin(request.auth?.token.role);
 
-    const [submissionSnapshot, memberSnapshot, centerSnapshot, housingSnapshot] = await Promise.all([
-      db.collection('submissions').get(),
-      db.collection('members').where('role', '==', 'member').where('validated', '==', true).get(),
-      db.collection('centers').where('active', '==', true).get(),
-      db.collection('housing').where('status', '==', 'approved').get(),
-    ]);
+    const [submissionSnapshot, memberSnapshot, centerSnapshot, housingSnapshot] = await Promise.all(
+      [
+        db.collection('submissions').get(),
+        db.collection('members').where('role', '==', 'member').where('validated', '==', true).get(),
+        db.collection('centers').where('active', '==', true).get(),
+        db.collection('housing').where('status', '==', 'approved').get(),
+      ],
+    );
 
     const submissionClustersMap = new Map<
       string,
-      { governorate: string; count: number; urgentCount: number; pendingCount: number; lat: number; lng: number }
+      {
+        governorate: string;
+        count: number;
+        urgentCount: number;
+        pendingCount: number;
+        lat: number;
+        lng: number;
+      }
     >();
 
     submissionSnapshot.docs.forEach((document) => {

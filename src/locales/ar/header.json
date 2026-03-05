@@ -1,6 +1,13 @@
 {
   "about": "من نحن",
+  "impact": "الأثر",
+  "housing": "السكن",
+  "emergency": "الطوارئ",
   "offerHelp": "تقديم مساعدة",
   "resources": "الموارد",
-  "feedback": "ملاحظات"
+  "feedback": "ملاحظات",
+  "caseFeed": "الحالات المتاحة",
+  "myCases": "حالاتي",
+  "coverage": "التغطية",
+  "logout": "تسجيل الخروج"
 }

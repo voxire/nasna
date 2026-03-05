@@ -1,5 +1,12 @@
 {
   "aboutUs": "À propos de nous",
+  "tagline": "Mettre en relation les personnes avec le soutien des ONG à travers le Liban.",
+  "navigate": "Navigation",
+  "account": "Compte",
+  "impact": "Impact",
+  "housing": "Annuaire d'hébergement",
+  "offerHousing": "Proposer un hébergement",
+  "emergency": "Urgence",
   "adminPanel": "Panneau d'administration",
   "dashboard": "Tableau de bord",
   "signIn": "Se connecter",

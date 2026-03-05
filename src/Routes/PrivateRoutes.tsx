@@ -14,7 +14,7 @@ const NGORoutes: RouteConfig[] = [
   {
     path: '/ngo/submissions',
     element: (
-      <PrivateRoute>
+      <PrivateRoute allowedRoles={['member']} requireValidated>
         <Private>
           <Submissions />
         </Private>
@@ -24,7 +24,7 @@ const NGORoutes: RouteConfig[] = [
   {
     path: '/ngo/my-cases',
     element: (
-      <PrivateRoute>
+      <PrivateRoute allowedRoles={['member']} requireValidated>
         <Private>
           <MyCases />
         </Private>
@@ -34,7 +34,7 @@ const NGORoutes: RouteConfig[] = [
   {
     path: '/ngo/cases/:caseId',
     element: (
-      <PrivateRoute>
+      <PrivateRoute allowedRoles={['member']} requireValidated>
         <Private>
           <CaseDetail />
         </Private>
@@ -44,7 +44,7 @@ const NGORoutes: RouteConfig[] = [
   {
     path: '/ngo/profile-coverage',
     element: (
-      <PrivateRoute>
+      <PrivateRoute allowedRoles={['member']} requireValidated>
         <Private>
           <ProfileCoverage />
         </Private>
@@ -54,7 +54,7 @@ const NGORoutes: RouteConfig[] = [
   {
     path: '/agent/create',
     element: (
-      <PrivateRoute>
+      <PrivateRoute allowedRoles={['agent']} requireValidated>
         <Private>
           <CreateSubmission />
         </Private>
@@ -64,7 +64,7 @@ const NGORoutes: RouteConfig[] = [
   {
     path: '/agent/submissions',
     element: (
-      <PrivateRoute>
+      <PrivateRoute allowedRoles={['agent']} requireValidated>
         <Private>
           <AgentSubmissions />
         </Private>

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { auth, db } from '../../firebase';
 import { addDoc, collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from '../../redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -125,7 +124,6 @@ const defaultFormData: SubmissionFormData = {
 function CreateSubmission() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user } = useAppSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<SubmissionFormData>(defaultFormData);
   const [specialNeedInput, setSpecialNeedInput] = useState('');
@@ -140,10 +138,6 @@ function CreateSubmission() {
 
   const userUid = auth.currentUser?.uid;
   const draftKey = useMemo(() => `submission-draft:${userUid ?? 'anonymous'}`, [userUid]);
-
-  useEffect(() => {
-    if (!userUid) navigate('/auth/login');
-  }, [userUid, navigate]);
 
   useEffect(() => {
     const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
@@ -254,14 +248,6 @@ function CreateSubmission() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [queuedItems.length]);
 
-  if (!user?.validated) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center bg-gray-50 text-center">
-        <h2 className="text-xl font-semibold">{t('submission.accountBeingVerified')}</h2>
-      </div>
-    );
-  }
-
   const handleChange = (name: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -330,7 +316,7 @@ function CreateSubmission() {
       if (consentError) {
         toast.error(t('submission.consentRequired'));
       } else if (centerError) {
-        toast.error('Select a center before submitting this case.');
+        toast.error(t('submission.centerRequired'));
       } else {
         toast.error(t('submission.validationError'));
       }
@@ -345,8 +331,8 @@ function CreateSubmission() {
         await queueSubmission(userUid ?? 'anonymous', submissionPayload);
         await refreshQueuedItems();
         await resetSubmissionState();
-        setLastSyncMessage('Submission saved offline and queued for sync.');
-        toast.success('Submission saved offline. It will sync when you reconnect.');
+        setLastSyncMessage(t('submission.offlineQueued'));
+        toast.success(t('submission.offlineQueued'));
         return;
       }
 
@@ -361,8 +347,8 @@ function CreateSubmission() {
         await queueSubmission(userUid ?? 'anonymous', buildSubmissionPayload(result.data));
         await refreshQueuedItems();
         await resetSubmissionState();
-        setLastSyncMessage('Submission moved to the offline queue after a network failure.');
-        toast.success('Network unavailable. Submission saved offline for retry.');
+        setLastSyncMessage(t('submission.offlineRecovered'));
+        toast.success(t('submission.offlineRecovered'));
       } else {
         toast.error(t('submission.error'));
       }
@@ -386,8 +372,7 @@ function CreateSubmission() {
 
       {!isOnline ? (
         <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-          You are offline. New submissions will be queued in this browser and synced automatically
-          when the connection returns.
+          {t('submission.offlineBanner')}
         </div>
       ) : null}
 
@@ -397,14 +382,13 @@ function CreateSubmission() {
             <div className="space-y-1">
               <p className="font-medium">
                 {syncingQueue
-                  ? 'Syncing queued submissions...'
-                  : `${queuedItems.length} queued submission${queuedItems.length === 1 ? '' : 's'} on this device`}
+                  ? t('submission.syncingQueue')
+                  : t('submission.queueCount', { count: queuedItems.length })}
               </p>
               {lastSyncMessage ? <p>{lastSyncMessage}</p> : null}
               {failedQueueItems.length > 0 ? (
                 <p className="text-rose-700">
-                  {failedQueueItems.length} queued submission
-                  {failedQueueItems.length === 1 ? ' has' : 's have'} failed and can be retried.
+                  {t('submission.queueFailed', { count: failedQueueItems.length })}
                 </p>
               ) : null}
             </div>
@@ -414,7 +398,7 @@ function CreateSubmission() {
               onClick={() => void syncOfflineQueue()}
               disabled={!isOnline || syncingQueue || queuedItems.length === 0}
             >
-              Retry Sync
+              {t('submission.retrySync')}
             </Button>
           </div>
         </div>
@@ -461,7 +445,9 @@ function CreateSubmission() {
             {t('submission.locationDetails')}
           </h2>
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">Current living situation</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              {t('submission.locationType')}
+            </Label>
             <Select
               value={formData.locationType}
               onValueChange={(value) =>
@@ -476,8 +462,8 @@ function CreateSubmission() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="with_family">Staying with family or host</SelectItem>
-                <SelectItem value="center">Staying in a center</SelectItem>
+                <SelectItem value="with_family">{t('submission.withFamily')}</SelectItem>
+                <SelectItem value="center">{t('submission.inCenter')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -499,7 +485,9 @@ function CreateSubmission() {
           {isCenterCase ? (
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-gray-700">Center</Label>
+                <Label className="text-sm font-medium text-gray-700">
+                  {t('submission.center')}
+                </Label>
                 <CenterPicker
                   value={formData.centerId}
                   onValueChange={(value) => handleChange('centerId', value)}

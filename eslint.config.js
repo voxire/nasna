@@ -42,4 +42,13 @@ export default [
       '@typescript-eslint/no-explicit-any': 'warn',
     },
   },
+  {
+    files: [
+      'src/Components/ui/**/*.{ts,tsx}',
+      'src/context/AuthContext.tsx',
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ];

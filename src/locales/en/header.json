@@ -1,6 +1,13 @@
 {
   "about": "About",
+  "impact": "Impact",
+  "housing": "Housing",
+  "emergency": "Emergency",
   "offerHelp": "Offer Help",
   "resources": "Resources",
-  "feedback": "Feedback"
+  "feedback": "Feedback",
+  "caseFeed": "Case Feed",
+  "myCases": "My Cases",
+  "coverage": "Coverage",
+  "logout": "Logout"
 }
