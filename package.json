@@ -16,7 +16,12 @@
     "functions:deploy": "pnpm --dir functions deploy",
     "check": "pnpm tsc && pnpm functions:build",
     "format": "prettier --write \"src/**/*.{ts,tsx,scss,json}\" \"functions/src/**/*.ts\" \".github/workflows/*.yml\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,scss,json}\" \"functions/src/**/*.ts\" \".github/workflows/*.yml\""
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,scss,json}\" \"functions/src/**/*.ts\" \".github/workflows/*.yml\"",
+    "test": "jest --runInBand",
+    "test:app": "jest --config jest.app.config.cjs --runInBand",
+    "test:functions": "jest --config jest.functions.config.cjs --runInBand",
+    "test:app:coverage": "jest --config jest.app.config.cjs --runInBand --coverage",
+    "test:functions:coverage": "jest --config jest.functions.config.cjs --runInBand --coverage"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -64,6 +69,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^25.3.3",
     "@types/react": "^19.0.0",
@@ -80,8 +89,12 @@
     "eslint-plugin-react-refresh": "^0.4.9",
     "firebase-tools": "^15.8.0",
     "globals": "^15.9.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "prettier": "^3.8.1",
     "sass": "^1.80.2",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.9.0",
     "vite": "^7.0.0"
   }
