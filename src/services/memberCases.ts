@@ -1,0 +1,92 @@
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '@/firebase';
+
+export interface MemberCase {
+  id: string;
+  fullName: string;
+  phoneNumber: string;
+  gender: string;
+  currentGovernorate: string;
+  previousGovernorate: string;
+  street: string;
+  building: string;
+  floor: string;
+  city: string;
+  ageRanges: Record<string, number>;
+  specialNeeds: string[];
+  needs: string[];
+  aidUrgency: string;
+  comments: string;
+  numberOfPeopleInHousehold: number;
+  registrationDate: string | null;
+  status: string;
+  locationType: string;
+  centerId: string;
+  assignedTo: string;
+  assignedAt: string | null;
+  aidDelivered: boolean;
+  staleFlagged: boolean;
+  source: string;
+}
+
+interface CaseListResponse {
+  cases: MemberCase[];
+}
+
+interface CaseDetailResponse {
+  case: MemberCase;
+}
+
+export async function listMemberPendingCases(limit = 50) {
+  const callable = httpsCallable<{ limit: number }, CaseListResponse>(
+    functions,
+    'listMemberPendingCases',
+  );
+  const result = await callable({ limit });
+  return result.data.cases;
+}
+
+export async function listMemberClaimedCases(limit = 50) {
+  const callable = httpsCallable<{ limit: number }, CaseListResponse>(
+    functions,
+    'listMemberClaimedCases',
+  );
+  const result = await callable({ limit });
+  return result.data.cases;
+}
+
+export async function getMemberCaseDetail(submissionId: string) {
+  const callable = httpsCallable<{ submissionId: string }, CaseDetailResponse>(
+    functions,
+    'getMemberCaseDetail',
+  );
+  const result = await callable({ submissionId });
+  return result.data.case;
+}
+
+export async function claimMemberCase(submissionId: string) {
+  const callable = httpsCallable<{ submissionId: string }, CaseDetailResponse>(
+    functions,
+    'claimMemberCase',
+  );
+  const result = await callable({ submissionId });
+  return result.data.case;
+}
+
+export async function updateMemberCaseStatus(submissionId: string, status: string) {
+  const callable = httpsCallable<{ submissionId: string; status: string }, CaseDetailResponse>(
+    functions,
+    'updateMemberCaseStatus',
+  );
+  const result = await callable({ submissionId, status });
+  return result.data.case;
+}
+
+export async function recordMemberAidDelivery(submissionId: string) {
+  const callable = httpsCallable<{ submissionId: string }, CaseDetailResponse>(
+    functions,
+    'recordMemberAidDelivery',
+  );
+  const result = await callable({ submissionId });
+  return result.data.case;
+}
