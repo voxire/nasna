@@ -6,9 +6,6 @@ import { getCookie, setCookie } from '../utils/cookies';
 type LocaleNamespace = Record<string, unknown>;
 type LocaleModule = { default: LocaleNamespace };
 
-const loadLocaleModules = (pattern: string): Record<string, LocaleModule> =>
-  import.meta.glob<LocaleModule>(pattern, { eager: true });
-
 const buildResources = () => {
   const resources: Record<string, Record<string, Record<string, unknown>>> = {
     en: { translation: {} },
@@ -16,19 +13,19 @@ const buildResources = () => {
     fr: { translation: {} },
   };
 
-  const enModules = loadLocaleModules('../locales/en/*.json');
+  const enModules = import.meta.glob<LocaleModule>('../locales/en/*.json', { eager: true });
   Object.entries(enModules).forEach(([path, mod]) => {
     const key = path.split('/').pop()?.replace('.json', '') ?? '';
     if (key) resources.en.translation[key] = mod.default;
   });
 
-  const arModules = loadLocaleModules('../locales/ar/*.json');
+  const arModules = import.meta.glob<LocaleModule>('../locales/ar/*.json', { eager: true });
   Object.entries(arModules).forEach(([path, mod]) => {
     const key = path.split('/').pop()?.replace('.json', '') ?? '';
     if (key) resources.ar.translation[key] = mod.default;
   });
 
-  const frModules = loadLocaleModules('../locales/fr/*.json');
+  const frModules = import.meta.glob<LocaleModule>('../locales/fr/*.json', { eager: true });
   Object.entries(frModules).forEach(([path, mod]) => {
     const key = path.split('/').pop()?.replace('.json', '') ?? '';
     if (key) resources.fr.translation[key] = mod.default;
