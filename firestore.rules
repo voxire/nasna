@@ -102,8 +102,20 @@ service cloud.firestore {
     // ─── /housing ───────────────────────────────────────────────────────────
 
     match /housing/{housingId} {
+      allow create: if onlyFields(['hostName', 'hostPhone', 'area', 'address', 'capacity',
+                                   'availableSpots', 'priceType', 'notes', 'status',
+                                   'createdAt', 'updatedAt'])
+        && request.resource.data.hostName is string
+        && request.resource.data.hostPhone is string
+        && request.resource.data.area is string
+        && request.resource.data.address is string
+        && request.resource.data.capacity is int
+        && request.resource.data.availableSpots is int
+        && request.resource.data.availableSpots <= request.resource.data.capacity
+        && request.resource.data.priceType in ['free', 'subsidized', 'paid']
+        && request.resource.data.status == 'pending_review';
       allow read: if isAdmin();
-      allow write: if isAdmin();
+      allow update, delete: if isAdmin();
     }
 
     // ─── /emergencyContacts ─────────────────────────────────────────────────
