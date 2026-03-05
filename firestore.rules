@@ -114,7 +114,7 @@ service cloud.firestore {
         && request.resource.data.availableSpots <= request.resource.data.capacity
         && request.resource.data.priceType in ['free', 'subsidized', 'paid']
         && request.resource.data.status == 'pending_review';
-      allow read: if isAdmin();
+      allow read: if isAdmin() || resource.data.status == 'approved';
       allow update, delete: if isAdmin();
     }
 
