@@ -40,16 +40,19 @@ function PrivateRoute({
 
         if (user) {
           const tokenResult = await user.getIdTokenResult();
-          const nextRole = (tokenResult.claims['role'] as UserRole | undefined) ?? null;
-          setRole(nextRole);
+          const claimedRole = (tokenResult.claims['role'] as UserRole | undefined) ?? null;
 
-          if (nextRole === 'member' || nextRole === 'agent') {
-            const memberSnapshot = await getDoc(doc(db, 'members', user.uid));
-            setMemberProfile(
-              memberSnapshot.exists() ? (memberSnapshot.data() as MemberDocument) : null,
-            );
-          } else {
+          if (claimedRole === 'admin') {
+            setRole(claimedRole);
             setMemberProfile(null);
+          } else {
+            const memberSnapshot = await getDoc(doc(db, 'members', user.uid));
+            const profile = memberSnapshot.exists()
+              ? (memberSnapshot.data() as MemberDocument)
+              : null;
+
+            setMemberProfile(profile);
+            setRole(claimedRole ?? profile?.role ?? null);
           }
         } else {
           setRole(null);

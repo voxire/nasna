@@ -37,6 +37,13 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+const resolvePostLoginPath = (role?: string, onboarded?: boolean) => {
+  if (role === 'admin') return '/manage';
+  if (onboarded !== true) return '/auth/onboarding';
+  if (role === 'agent') return '/agent/create';
+  return '/ngo/submissions';
+};
+
 function Login() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -77,18 +84,26 @@ function Login() {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const tokenResult = await result.user.getIdTokenResult();
-      const role = tokenResult.claims['role'] as string | undefined;
-      if (role === 'admin') {
+      const claimedRole = tokenResult.claims['role'] as string | undefined;
+      if (claimedRole === 'admin') {
+        setCookie('userRole', 'admin', 7 * 24 * 60 * 60);
         setCookie('nasna_session', '1', 8 * 60 * 60);
         toast.success(t('login.toast.success'));
         navigate('/manage');
         return;
       }
+
       const memberDoc = await getDoc(doc(db, 'members', result.user.uid));
       setCookie('nasna_session', '1', 8 * 60 * 60);
+
       if (memberDoc.exists()) {
+        const memberData = memberDoc.data() as { role?: string; onboarded?: boolean };
+        const role = claimedRole ?? memberData.role;
+        if (role) {
+          setCookie('userRole', role, 7 * 24 * 60 * 60);
+        }
         toast.success(t('login.toast.success'));
-        navigate('/ngo/submissions');
+        navigate(resolvePostLoginPath(role, memberData.onboarded));
       } else {
         navigate('/auth/onboarding');
       }
@@ -120,7 +135,7 @@ function Login() {
       deleteCookie('nasna_login_attempts');
       setCookie('nasna_session', '1', 8 * 60 * 60);
       toast.success(t('login.toast.success'));
-      navigate('/ngo/submissions');
+      navigate(resolvePostLoginPath(result.payload.role, result.payload.onboarded));
     } else {
       const attempts = Number(getCookie('nasna_login_attempts') || '0') + 1;
       if (attempts >= 5) {
