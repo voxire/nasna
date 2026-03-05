@@ -1,10 +1,9 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
-import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
-import { getCookie } from '../utils/cookies';
 
 interface GuestRouteProps {
   children: ReactNode;
@@ -17,13 +16,6 @@ function GuestRoute({ children }: GuestRouteProps) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user: User | null) => {
       if (!user) {
-        setRedirect(null);
-        setLoading(false);
-        return;
-      }
-
-      if (!getCookie('nasna_session')) {
-        await signOut(auth);
         setRedirect(null);
         setLoading(false);
         return;

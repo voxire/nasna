@@ -1,10 +1,9 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { auth } from '../firebase';
-import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
-import { getCookie } from '../utils/cookies';
 import { useIdleTimeout } from '../hooks/useIdleTimeout';
 import { db } from '../firebase';
 import type { MemberDocument, UserRole } from '../types';
@@ -30,34 +29,27 @@ function PrivateRoute({
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user && !getCookie('nasna_session')) {
-        await signOut(auth);
-        setCurrentUser(null);
+      setCurrentUser(user);
+
+      if (user) {
+        const tokenResult = await user.getIdTokenResult();
+        const claimedRole = (tokenResult.claims['role'] as UserRole | undefined) ?? null;
+
+        if (claimedRole === 'admin') {
+          setRole(claimedRole);
+          setMemberProfile(null);
+        } else {
+          const memberSnapshot = await getDoc(doc(db, 'members', user.uid));
+          const profile = memberSnapshot.exists()
+            ? (memberSnapshot.data() as MemberDocument)
+            : null;
+
+          setMemberProfile(profile);
+          setRole(claimedRole ?? profile?.role ?? null);
+        }
+      } else {
         setRole(null);
         setMemberProfile(null);
-      } else {
-        setCurrentUser(user);
-
-        if (user) {
-          const tokenResult = await user.getIdTokenResult();
-          const claimedRole = (tokenResult.claims['role'] as UserRole | undefined) ?? null;
-
-          if (claimedRole === 'admin') {
-            setRole(claimedRole);
-            setMemberProfile(null);
-          } else {
-            const memberSnapshot = await getDoc(doc(db, 'members', user.uid));
-            const profile = memberSnapshot.exists()
-              ? (memberSnapshot.data() as MemberDocument)
-              : null;
-
-            setMemberProfile(profile);
-            setRole(claimedRole ?? profile?.role ?? null);
-          }
-        } else {
-          setRole(null);
-          setMemberProfile(null);
-        }
       }
 
       setLoading(false);
