@@ -139,12 +139,26 @@ export default function DispatchCenter() {
 
     return ngoMembers
       .filter((member) => {
+        const coverageType = member.coverageType ?? 'governorate';
         const coverageGovernorates = member.coverageGovernorates ?? [];
+        const coverageCenterIds = member.coverageCenterIds ?? [];
         const governorateMatch =
           coverageGovernorates.length === 0 ||
           coverageGovernorates.includes(selectedCase.currentGovernorate);
+        const centerMatch =
+          coverageCenterIds.length > 0 &&
+          selectedCase.locationType === 'center' &&
+          coverageCenterIds.includes(selectedCase.centerId ?? '');
         const belowCapacity =
           Number(member.currentCaseLoad ?? 0) < Number(member.maxCaseLoad ?? 10);
+
+        if (coverageType === 'center') {
+          return centerMatch && belowCapacity;
+        }
+
+        if (coverageType === 'hybrid') {
+          return (governorateMatch || centerMatch) && belowCapacity;
+        }
 
         return governorateMatch && belowCapacity;
       })
@@ -325,7 +339,11 @@ export default function DispatchCenter() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <p className="text-sm text-gray-900">{submission.currentGovernorate}</p>
+                    <p className="text-sm text-gray-900">
+                      {submission.locationType === 'center' && submission.centerId
+                        ? `${submission.currentGovernorate} · Center case`
+                        : submission.currentGovernorate}
+                    </p>
                     <p className="text-sm text-gray-500">
                       {submission.city || submission.street || 'Address pending'}
                     </p>
