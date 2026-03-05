@@ -1,6 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, deleteDoc, updateDoc, query, limit } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  type DocumentData,
+  deleteDoc,
+  type QueryDocumentSnapshot,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
 import { toast } from 'sonner';
 import type { MemberDocument } from '../../types';
 import { Button } from '@/Components/ui/button';
@@ -28,6 +36,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/Components/ui/dialog';
+import { usePaginatedQuery } from '@/hooks/usePaginatedQuery';
 
 const PAGE_SIZE = 10;
 
@@ -36,59 +45,57 @@ interface MemberRow extends MemberDocument {
 }
 
 function Members() {
-  const [members, setMembers] = useState<MemberRow[]>([]);
-  const [filteredMembers, setFilteredMembers] = useState<MemberRow[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [validatedFilter, setValidatedFilter] = useState('');
   const [editMember, setEditMember] = useState<MemberRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [page, setPage] = useState(1);
+  const memberConstraints = useMemo(() => [where('role', '==', 'member')], []);
+  const mapMember = useCallback(
+    (documentSnapshot: QueryDocumentSnapshot<DocumentData>) => ({
+      id: documentSnapshot.id,
+      ...(documentSnapshot.data() as MemberDocument),
+    }),
+    [],
+  );
+  const {
+    items: members,
+    loading,
+    error,
+    page,
+    hasNextPage,
+    hasPreviousPage,
+    nextPage,
+    previousPage,
+  } = usePaginatedQuery<MemberRow>({
+    collectionRef: collection(db, 'members'),
+    constraints: memberConstraints,
+    orderByField: 'createdAt',
+    pageSize: PAGE_SIZE,
+    mapDoc: mapMember,
+  });
 
-  useEffect(() => {
-    fetchMembers();
-  }, []);
-
-  const fetchMembers = async () => {
-    setLoading(true);
-    try {
-      const snapshot = await getDocs(query(collection(db, 'members'), limit(50)));
-      const data = snapshot.docs
-        .map((d) => ({ id: d.id, ...(d.data() as MemberDocument) }))
-        .filter((m) => m.role === 'member');
-      setMembers(data);
-      setFilteredMembers(data);
-    } catch (error) {
-      console.error('Error fetching members: ', error);
-      toast.error('Error fetching members.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const applyFilters = (query: string, filter: string, data: MemberRow[]) => {
-    let result = data;
-    if (query) {
-      result = result.filter((m) =>
-        [m.name, m.contactPersonName, m.email].some((f) => (f ?? '').toLowerCase().includes(query))
+  const filteredMembers = useMemo(() => {
+    let result = members;
+    if (searchQuery) {
+      const queryValue = searchQuery.toLowerCase();
+      result = result.filter((member) =>
+        [member.name, member.contactPersonName, member.email].some((field) =>
+          (field ?? '').toLowerCase().includes(queryValue),
+        ),
       );
     }
-    if (filter && filter !== 'all') {
-      result = result.filter((m) => String(m.validated) === filter);
+    if (validatedFilter && validatedFilter !== 'all') {
+      result = result.filter((member) => String(member.validated) === validatedFilter);
     }
-    setFilteredMembers(result);
-    setPage(1);
-  };
+    return result;
+  }, [members, searchQuery, validatedFilter]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const q = e.target.value.toLowerCase();
-    setSearchQuery(q);
-    applyFilters(q, validatedFilter, members);
+    setSearchQuery(e.target.value);
   };
 
   const handleFilterChange = (value: string) => {
     setValidatedFilter(value);
-    applyFilters(searchQuery, value, members);
   };
 
   const handleDelete = async (id: string) => {
@@ -96,7 +103,6 @@ function Members() {
     try {
       await deleteDoc(doc(db, 'members', id));
       toast.success('Member deleted successfully.');
-      fetchMembers();
     } catch (error) {
       console.error('Error deleting member: ', error);
       toast.error('Error deleting member. Please try again.');
@@ -105,9 +111,8 @@ function Members() {
 
   const handleValidate = async (id: string) => {
     try {
-      await updateDoc(doc(db, 'members', id), { validated: true });
+      await updateDoc(doc(db, 'members', id), { validated: true, updatedAt: new Date() });
       toast.success('Member validated successfully.');
-      fetchMembers();
     } catch (error) {
       console.error('Error validating member: ', error);
       toast.error('Error validating member. Please try again.');
@@ -123,19 +128,21 @@ function Members() {
     e.preventDefault();
     if (!editMember) return;
     try {
-      await updateDoc(doc(db, 'members', editMember.id), { ...editMember });
+      await updateDoc(doc(db, 'members', editMember.id), {
+        name: editMember.name,
+        contactPersonName: editMember.contactPersonName ?? '',
+        email: editMember.email,
+        phoneNumber: editMember.phoneNumber,
+        updatedAt: new Date(),
+      });
       toast.success('Member updated successfully.');
       setModalOpen(false);
       setEditMember(null);
-      fetchMembers();
     } catch (error) {
       console.error('Error updating member: ', error);
       toast.error('Error updating member. Please try again.');
     }
   };
-
-  const totalPages = Math.max(1, Math.ceil(filteredMembers.length / PAGE_SIZE));
-  const paged = filteredMembers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div>
@@ -149,7 +156,9 @@ function Members() {
           className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
         <Select value={validatedFilter} onValueChange={handleFilterChange}>
-          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200"><SelectValue placeholder="Validated" /></SelectTrigger>
+          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
+            <SelectValue placeholder="Validated" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
             <SelectItem value="true">Validated</SelectItem>
@@ -160,6 +169,8 @@ function Members() {
 
       {loading ? (
         <p className="text-gray-500">Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <Table>
@@ -174,25 +185,49 @@ function Members() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paged.map((member) => (
+              {filteredMembers.map((member) => (
                 <TableRow key={member.id} className="hover:bg-gray-50">
                   <TableCell className="font-medium">{member.name}</TableCell>
                   <TableCell>{member.contactPersonName}</TableCell>
                   <TableCell>{member.email}</TableCell>
                   <TableCell>{member.phoneNumber}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${member.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${member.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}
+                    >
                       {member.validated ? 'Validated' : 'Pending'}
                     </span>
                   </TableCell>
                   <TableCell className="flex gap-2">
                     {!member.validated && (
-                      <Button size="sm" className="bg-[#12a89d] hover:bg-[#0e9088] text-white" onClick={() => handleValidate(member.id)}>Validate</Button>
+                      <Button
+                        size="sm"
+                        className="bg-[#12a89d] hover:bg-[#0e9088] text-white"
+                        onClick={() => handleValidate(member.id)}
+                      >
+                        Validate
+                      </Button>
                     )}
                     {member.validated && (
                       <>
-                        <Button size="sm" variant="outline" className="border-gray-300" onClick={() => { setEditMember(member); setModalOpen(true); }}>Edit</Button>
-                        <Button size="sm" variant="destructive" onClick={() => handleDelete(member.id)}>Delete</Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-gray-300"
+                          onClick={() => {
+                            setEditMember(member);
+                            setModalOpen(true);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDelete(member.id)}
+                        >
+                          Delete
+                        </Button>
                       </>
                     )}
                   </TableCell>
@@ -203,18 +238,33 @@ function Members() {
           <div className="flex items-center justify-between px-4 py-3 border-t text-sm text-gray-500">
             <span>
               {filteredMembers.length === 0
-                ? '0 results'
-                : `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, filteredMembers.length)} of ${filteredMembers.length}`}
+                ? `No results on page ${page}`
+                : `${filteredMembers.length} result(s) on page ${page}`}
             </span>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 1}>Previous</Button>
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages}>Next</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={previousPage}
+                disabled={!hasPreviousPage}
+              >
+                Previous
+              </Button>
+              <Button variant="outline" size="sm" onClick={nextPage} disabled={!hasNextPage}>
+                Next
+              </Button>
             </div>
           </div>
         </div>
       )}
 
-      <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) setEditMember(null); }}>
+      <Dialog
+        open={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          if (!open) setEditMember(null);
+        }}
+      >
         <DialogContent className="max-w-[400px]">
           <DialogHeader>
             <DialogTitle>Edit Member</DialogTitle>

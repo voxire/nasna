@@ -6,8 +6,10 @@ import { useAppSelector } from '../../redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { X } from 'lucide-react';
 import type { AgeRanges, AidUrgency, Gender } from '../../types';
 import { Button } from '@/Components/ui/button';
+import { Badge } from '@/Components/ui/badge';
 import { Input } from '@/Components/ui/input';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Label } from '@/Components/ui/label';
@@ -29,7 +31,7 @@ const submissionSchema = z.object({
     .regex(/^\+?[0-9\s\-()]{7,20}$/, 'Invalid phone number'),
   emailAddress: z.preprocess(
     (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
-    z.string().trim().email().optional()
+    z.string().trim().email().optional(),
   ),
   gender: z.enum(['Male', 'Female']),
   currentGovernorate: z.string().min(1),
@@ -74,11 +76,22 @@ interface SubmissionFormData {
 }
 
 const defaultFormData: SubmissionFormData = {
-  fullName: '', phoneNumber: '', emailAddress: '', gender: '',
-  currentGovernorate: '', previousGovernorate: '', street: '', building: '',
-  floor: '', city: '',
+  fullName: '',
+  phoneNumber: '',
+  emailAddress: '',
+  gender: '',
+  currentGovernorate: '',
+  previousGovernorate: '',
+  street: '',
+  building: '',
+  floor: '',
+  city: '',
   ageRanges: { '0-3': 0, '4-12': 0, '13-18': 0, '19-60': 0, '60+': 0 },
-  specialNeeds: [], needs: [], aidUrgency: '', consentGiven: false, comments: '',
+  specialNeeds: [],
+  needs: [],
+  aidUrgency: '',
+  consentGiven: false,
+  comments: '',
   numberOfPeopleInHousehold: 0,
 };
 
@@ -88,6 +101,7 @@ function CreateSubmission() {
   const { user } = useAppSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<SubmissionFormData>(defaultFormData);
+  const [specialNeedInput, setSpecialNeedInput] = useState('');
 
   const userUid = auth.currentUser?.uid;
 
@@ -105,6 +119,26 @@ function CreateSubmission() {
 
   const handleChange = (name: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const addSpecialNeed = () => {
+    const normalized = specialNeedInput.trim();
+    if (!normalized) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      specialNeeds: prev.specialNeeds.includes(normalized)
+        ? prev.specialNeeds
+        : [...prev.specialNeeds, normalized],
+    }));
+    setSpecialNeedInput('');
+  };
+
+  const removeSpecialNeed = (specialNeed: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      specialNeeds: prev.specialNeeds.filter((item) => item !== specialNeed),
+    }));
   };
 
   const handleAddMember = async (e: React.FormEvent) => {
@@ -132,6 +166,7 @@ function CreateSubmission() {
       });
       toast.success(t('submission.success'));
       setFormData(defaultFormData);
+      setSpecialNeedInput('');
     } catch {
       toast.error(t('submission.error'));
     } finally {
@@ -143,12 +178,20 @@ function CreateSubmission() {
     <div className="max-w-[600px] mx-auto my-5 px-4">
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold text-gray-800">{t('submission.title')}</h1>
-        <Button variant="outline" className="border-gray-300 text-gray-600" onClick={() => navigate('/agent/submissions')}>{t('submission.mySubmissions')}</Button>
+        <Button
+          variant="outline"
+          className="border-gray-300 text-gray-600"
+          onClick={() => navigate('/agent/submissions')}
+        >
+          {t('submission.mySubmissions')}
+        </Button>
       </div>
 
       <form onSubmit={handleAddMember} className="space-y-4">
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
-          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('submission.personalInformation')}</h2>
+          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">
+            {t('submission.personalInformation')}
+          </h2>
           {[
             { name: 'fullName', label: t('submission.fullName') },
             { name: 'phoneNumber', label: t('submission.phoneNumber') },
@@ -169,7 +212,9 @@ function CreateSubmission() {
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">{t('submission.gender')}</Label>
             <Select value={formData.gender} onValueChange={(v) => handleChange('gender', v)}>
-              <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="bg-gray-50 border-gray-200">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Male">{t('submission.male')}</SelectItem>
                 <SelectItem value="Female">{t('submission.female')}</SelectItem>
@@ -179,7 +224,9 @@ function CreateSubmission() {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
-          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('submission.locationDetails')}</h2>
+          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">
+            {t('submission.locationDetails')}
+          </h2>
           <div className="grid grid-cols-2 gap-3">
             {[
               { name: 'currentGovernorate', label: t('submission.currentGovernorate') },
@@ -203,9 +250,13 @@ function CreateSubmission() {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
-          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('submission.householdAndNeeds')}</h2>
+          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">
+            {t('submission.householdAndNeeds')}
+          </h2>
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">{t('submission.numberOfPeopleInHousehold')}</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              {t('submission.numberOfPeopleInHousehold')}
+            </Label>
             <Input
               type="number"
               value={formData.numberOfPeopleInHousehold}
@@ -235,7 +286,9 @@ function CreateSubmission() {
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">{t('submission.needsTitle')}</Label>
+            <Label className="text-sm font-medium text-gray-700">
+              {t('submission.needsTitle')}
+            </Label>
             <AidTypeCheckboxGrid
               selected={formData.needs}
               onChange={(selected) => setFormData((prev) => ({ ...prev, needs: selected }))}
@@ -243,10 +296,62 @@ function CreateSubmission() {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700">
+              {t('submission.specialNeedsTitle')}
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                value={specialNeedInput}
+                onChange={(e) => setSpecialNeedInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    addSpecialNeed();
+                  }
+                }}
+                placeholder={t('submission.specialNeedsPlaceholder')}
+                className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+              />
+              <Button type="button" variant="outline" onClick={addSpecialNeed}>
+                {t('submission.addSpecialNeed')}
+              </Button>
+            </div>
+            <p className="text-xs text-gray-500">{t('submission.specialNeedsHint')}</p>
+            {formData.specialNeeds.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {formData.specialNeeds.map((specialNeed) => (
+                  <Badge
+                    key={specialNeed}
+                    variant="secondary"
+                    className="flex items-center gap-1 rounded-full px-3 py-1"
+                  >
+                    <span>{specialNeed}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeSpecialNeed(specialNeed)}
+                      className="rounded-full p-0.5 hover:bg-black/10"
+                      aria-label={`${t('submission.removeSpecialNeed')} ${specialNeed}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">{t('submission.aidUrgency')}</Label>
-            <Select value={formData.aidUrgency} onValueChange={(v) => handleChange('aidUrgency', v)}>
-              <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
+            <Label className="text-sm font-medium text-gray-700">
+              {t('submission.aidUrgency')}
+            </Label>
+            <Select
+              value={formData.aidUrgency}
+              onValueChange={(v) => handleChange('aidUrgency', v)}
+            >
+              <SelectTrigger className="bg-gray-50 border-gray-200">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="High">{t('submission.high')}</SelectItem>
                 <SelectItem value="Medium">{t('submission.medium')}</SelectItem>
@@ -275,11 +380,17 @@ function CreateSubmission() {
               required
               className="border-gray-300 data-[state=checked]:bg-[#12a89d] data-[state=checked]:border-[#12a89d] mt-0.5"
             />
-            <Label htmlFor="consent" className="text-sm text-gray-700 font-normal cursor-pointer">{t('submission.consent')}</Label>
+            <Label htmlFor="consent" className="text-sm text-gray-700 font-normal cursor-pointer">
+              {t('submission.consent')}
+            </Label>
           </div>
         </div>
 
-        <Button type="submit" className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white" disabled={loading}>
+        <Button
+          type="submit"
+          className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white"
+          disabled={loading}
+        >
           {loading ? t('submission.submitting') : t('submission.submit')}
         </Button>
       </form>

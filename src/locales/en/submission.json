@@ -28,6 +28,11 @@
   "submitting": "Submitting...",
   "submit": "Submit",
   "needsTitle": "Immediate Needs",
+  "specialNeedsTitle": "Special Needs",
+  "specialNeedsPlaceholder": "Add a condition or special requirement",
+  "specialNeedsHint": "Examples: wheelchair, chronic medication, pregnancy, elderly, infant.",
+  "addSpecialNeed": "Add",
+  "removeSpecialNeed": "Remove",
   "needs": {
     "food": "Food Aid",
     "water": "Water Supply",

@@ -1,6 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, deleteDoc, updateDoc, query, limit } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  type DocumentData,
+  deleteDoc,
+  type QueryDocumentSnapshot,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
 import { toast } from 'sonner';
 import type { MemberDocument } from '../../types';
 import { Button } from '@/Components/ui/button';
@@ -28,6 +36,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/Components/ui/dialog';
+import { usePaginatedQuery } from '@/hooks/usePaginatedQuery';
 
 const PAGE_SIZE = 10;
 
@@ -36,59 +45,57 @@ interface AgentRow extends MemberDocument {
 }
 
 function Agents() {
-  const [agents, setAgents] = useState<AgentRow[]>([]);
-  const [filteredAgents, setFilteredAgents] = useState<AgentRow[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [validatedFilter, setValidatedFilter] = useState('');
   const [editAgent, setEditAgent] = useState<AgentRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [page, setPage] = useState(1);
+  const agentConstraints = useMemo(() => [where('role', '==', 'agent')], []);
+  const mapAgent = useCallback(
+    (documentSnapshot: QueryDocumentSnapshot<DocumentData>) => ({
+      id: documentSnapshot.id,
+      ...(documentSnapshot.data() as MemberDocument),
+    }),
+    [],
+  );
+  const {
+    items: agents,
+    loading,
+    error,
+    page,
+    hasNextPage,
+    hasPreviousPage,
+    nextPage,
+    previousPage,
+  } = usePaginatedQuery<AgentRow>({
+    collectionRef: collection(db, 'members'),
+    constraints: agentConstraints,
+    orderByField: 'createdAt',
+    pageSize: PAGE_SIZE,
+    mapDoc: mapAgent,
+  });
 
-  useEffect(() => {
-    fetchAgents();
-  }, []);
-
-  const fetchAgents = async () => {
-    setLoading(true);
-    try {
-      const snapshot = await getDocs(query(collection(db, 'members'), limit(50)));
-      const data = snapshot.docs
-        .map((d) => ({ id: d.id, ...(d.data() as MemberDocument) }))
-        .filter((a) => a.role === 'agent');
-      setAgents(data);
-      setFilteredAgents(data);
-    } catch (error) {
-      console.error('Error fetching agents: ', error);
-      toast.error('Error fetching agents.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const applyFilters = (query: string, filter: string, data: AgentRow[]) => {
-    let result = data;
-    if (query) {
-      result = result.filter((a) =>
-        [a.name, a.contactPersonName, a.email].some((f) => (f ?? '').toLowerCase().includes(query))
+  const filteredAgents = useMemo(() => {
+    let result = agents;
+    if (searchQuery) {
+      const queryValue = searchQuery.toLowerCase();
+      result = result.filter((agent) =>
+        [agent.name, agent.contactPersonName, agent.email].some((field) =>
+          (field ?? '').toLowerCase().includes(queryValue),
+        ),
       );
     }
-    if (filter && filter !== 'all') {
-      result = result.filter((a) => String(a.validated) === filter);
+    if (validatedFilter && validatedFilter !== 'all') {
+      result = result.filter((agent) => String(agent.validated) === validatedFilter);
     }
-    setFilteredAgents(result);
-    setPage(1);
-  };
+    return result;
+  }, [agents, searchQuery, validatedFilter]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const q = e.target.value.toLowerCase();
-    setSearchQuery(q);
-    applyFilters(q, validatedFilter, agents);
+    setSearchQuery(e.target.value);
   };
 
   const handleFilterChange = (value: string) => {
     setValidatedFilter(value);
-    applyFilters(searchQuery, value, agents);
   };
 
   const handleDelete = async (id: string) => {
@@ -96,7 +103,6 @@ function Agents() {
     try {
       await deleteDoc(doc(db, 'members', id));
       toast.success('Agent deleted successfully.');
-      fetchAgents();
     } catch (error) {
       console.error('Error deleting agent: ', error);
       toast.error('Error deleting agent. Please try again.');
@@ -105,9 +111,8 @@ function Agents() {
 
   const handleValidate = async (id: string) => {
     try {
-      await updateDoc(doc(db, 'members', id), { validated: true });
+      await updateDoc(doc(db, 'members', id), { validated: true, updatedAt: new Date() });
       toast.success('Agent validated successfully.');
-      fetchAgents();
     } catch (error) {
       console.error('Error validating agent: ', error);
       toast.error('Error validating agent. Please try again.');
@@ -123,19 +128,21 @@ function Agents() {
     e.preventDefault();
     if (!editAgent) return;
     try {
-      await updateDoc(doc(db, 'members', editAgent.id), { ...editAgent });
+      await updateDoc(doc(db, 'members', editAgent.id), {
+        name: editAgent.name,
+        contactPersonName: editAgent.contactPersonName ?? '',
+        email: editAgent.email,
+        phoneNumber: editAgent.phoneNumber,
+        updatedAt: new Date(),
+      });
       toast.success('Agent updated successfully.');
       setModalOpen(false);
       setEditAgent(null);
-      fetchAgents();
     } catch (error) {
       console.error('Error updating agent: ', error);
       toast.error('Error updating agent. Please try again.');
     }
   };
-
-  const totalPages = Math.max(1, Math.ceil(filteredAgents.length / PAGE_SIZE));
-  const paged = filteredAgents.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div>
@@ -149,7 +156,9 @@ function Agents() {
           className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
         <Select value={validatedFilter} onValueChange={handleFilterChange}>
-          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200"><SelectValue placeholder="Validated" /></SelectTrigger>
+          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
+            <SelectValue placeholder="Validated" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
             <SelectItem value="true">Validated</SelectItem>
@@ -160,6 +169,8 @@ function Agents() {
 
       {loading ? (
         <p className="text-gray-500">Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <Table>
@@ -174,25 +185,49 @@ function Agents() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paged.map((agent) => (
+              {filteredAgents.map((agent) => (
                 <TableRow key={agent.id} className="hover:bg-gray-50">
                   <TableCell className="font-medium">{agent.name}</TableCell>
                   <TableCell>{agent.contactPersonName}</TableCell>
                   <TableCell>{agent.email}</TableCell>
                   <TableCell>{agent.phoneNumber}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${agent.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${agent.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}
+                    >
                       {agent.validated ? 'Validated' : 'Pending'}
                     </span>
                   </TableCell>
                   <TableCell className="flex gap-2">
                     {!agent.validated && (
-                      <Button size="sm" className="bg-[#12a89d] hover:bg-[#0e9088] text-white" onClick={() => handleValidate(agent.id)}>Validate</Button>
+                      <Button
+                        size="sm"
+                        className="bg-[#12a89d] hover:bg-[#0e9088] text-white"
+                        onClick={() => handleValidate(agent.id)}
+                      >
+                        Validate
+                      </Button>
                     )}
                     {agent.validated && (
                       <>
-                        <Button size="sm" variant="outline" className="border-gray-300" onClick={() => { setEditAgent(agent); setModalOpen(true); }}>Edit</Button>
-                        <Button size="sm" variant="destructive" onClick={() => handleDelete(agent.id)}>Delete</Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-gray-300"
+                          onClick={() => {
+                            setEditAgent(agent);
+                            setModalOpen(true);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDelete(agent.id)}
+                        >
+                          Delete
+                        </Button>
                       </>
                     )}
                   </TableCell>
@@ -203,18 +238,33 @@ function Agents() {
           <div className="flex items-center justify-between px-4 py-3 border-t text-sm text-gray-500">
             <span>
               {filteredAgents.length === 0
-                ? '0 results'
-                : `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, filteredAgents.length)} of ${filteredAgents.length}`}
+                ? `No results on page ${page}`
+                : `${filteredAgents.length} result(s) on page ${page}`}
             </span>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 1}>Previous</Button>
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages}>Next</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={previousPage}
+                disabled={!hasPreviousPage}
+              >
+                Previous
+              </Button>
+              <Button variant="outline" size="sm" onClick={nextPage} disabled={!hasNextPage}>
+                Next
+              </Button>
             </div>
           </div>
         </div>
       )}
 
-      <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) setEditAgent(null); }}>
+      <Dialog
+        open={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          if (!open) setEditAgent(null);
+        }}
+      >
         <DialogContent className="max-w-[400px]">
           <DialogHeader>
             <DialogTitle>Edit Agent</DialogTitle>

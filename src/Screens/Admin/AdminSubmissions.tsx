@@ -1,6 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, deleteDoc, updateDoc, query, limit } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  type DocumentData,
+  deleteDoc,
+  type QueryDocumentSnapshot,
+  updateDoc,
+} from 'firebase/firestore';
 import { toast } from 'sonner';
 import type { SubmissionDocument } from '../../types';
 import { Button } from '@/Components/ui/button';
@@ -29,6 +36,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/Components/ui/dialog';
+import { usePaginatedQuery } from '@/hooks/usePaginatedQuery';
 
 const PAGE_SIZE = 10;
 
@@ -56,68 +64,74 @@ interface EditState {
 }
 
 function AdminSubmissions() {
-  const [submissions, setSubmissions] = useState<SubmissionRow[]>([]);
-  const [filtered, setFiltered] = useState<SubmissionRow[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [urgencyFilter, setUrgencyFilter] = useState('');
-  const [editMember, setEditMember] = useState<EditState>({ ageRanges: {}, specialNeeds: [], needs: [] });
+  const [editMember, setEditMember] = useState<EditState>({
+    ageRanges: {},
+    specialNeeds: [],
+    needs: [],
+  });
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
+  const mapSubmission = useCallback(
+    (documentSnapshot: QueryDocumentSnapshot<DocumentData>) => ({
+      id: documentSnapshot.id,
+      ...(documentSnapshot.data() as SubmissionDocument),
+    }),
+    [],
+  );
 
-  useEffect(() => {
-    const fetchSubmissions = async () => {
-      setLoading(true);
-      try {
-        const snap = await getDocs(query(collection(db, 'submissions'), limit(50)));
-        const data = snap.docs.map((d) => ({ id: d.id, ...(d.data() as SubmissionDocument) }));
-        setSubmissions(data);
-        setFiltered(data);
-      } catch {
-        toast.error('Failed to load submissions.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSubmissions();
-  }, []);
+  const {
+    items: submissions,
+    loading,
+    error,
+    page,
+    hasNextPage,
+    hasPreviousPage,
+    nextPage,
+    previousPage,
+  } = usePaginatedQuery<SubmissionRow>({
+    collectionRef: collection(db, 'submissions'),
+    orderByField: 'registrationDate',
+    pageSize: PAGE_SIZE,
+    mapDoc: mapSubmission,
+  });
 
-  const applyFilters = (query: string, urgency: string, data: SubmissionRow[]) => {
-    let result = data;
-    if (query) {
-      const q = query.toLowerCase();
-      result = result.filter((s) =>
-        [s.fullName, s.phoneNumber, s.emailAddress, s.currentGovernorate].some(
-          (f) => (f ?? '').toLowerCase().includes(q)
-        )
+  const filtered = useMemo(() => {
+    let result = submissions;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter((submission) =>
+        [
+          submission.fullName,
+          submission.phoneNumber,
+          submission.emailAddress,
+          submission.currentGovernorate,
+        ].some((field) => (field ?? '').toLowerCase().includes(q)),
       );
     }
-    if (urgency && urgency !== 'all') {
-      result = result.filter((s) => s.aidUrgency === urgency);
+    if (urgencyFilter && urgencyFilter !== 'all') {
+      result = result.filter((submission) => submission.aidUrgency === urgencyFilter);
     }
-    setFiltered(result);
-    setPage(1);
-  };
+    return result;
+  }, [searchQuery, submissions, urgencyFilter]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const q = e.target.value;
-    setSearchQuery(q);
-    applyFilters(q, urgencyFilter, submissions);
+    setSearchQuery(e.target.value);
   };
 
   const handleUrgencyFilter = (value: string) => {
     setUrgencyFilter(value);
-    applyFilters(searchQuery, value, submissions);
   };
 
   const handleEditClick = (member: SubmissionRow) => {
     setEditMember({
       ...member,
-      ageRanges: member.ageRanges && typeof member.ageRanges === 'object'
-        ? (member.ageRanges as unknown as Record<string, number>)
-        : {},
+      ageRanges:
+        member.ageRanges && typeof member.ageRanges === 'object'
+          ? (member.ageRanges as unknown as Record<string, number>)
+          : {},
       specialNeeds: Array.isArray(member.specialNeeds) ? member.specialNeeds : [],
       needs: Array.isArray(member.needs) ? member.needs : [],
     });
@@ -134,9 +148,6 @@ function AdminSubmissions() {
     try {
       await deleteDoc(doc(db, 'submissions', memberToDelete));
       toast.success('Submission deleted successfully.');
-      const updated = submissions.filter((s) => s.id !== memberToDelete);
-      setSubmissions(updated);
-      applyFilters(searchQuery, urgencyFilter, updated);
       setConfirmDeleteOpen(false);
     } catch {
       toast.error('Failed to delete submission.');
@@ -146,11 +157,22 @@ function AdminSubmissions() {
   const handleSaveEdit = async () => {
     if (!editMember.id) return;
     try {
-      await updateDoc(doc(db, 'submissions', editMember.id), {
-        ...editMember,
+      const updatePayload = {
+        gender: editMember.gender ?? '',
+        currentGovernorate: editMember.currentGovernorate ?? '',
+        previousGovernorate: editMember.previousGovernorate ?? '',
+        street: editMember.street ?? '',
+        building: editMember.building ?? '',
+        floor: editMember.floor ?? '',
         ageRanges: editMember.ageRanges,
         specialNeeds: editMember.specialNeeds,
         needs: editMember.needs,
+        aidUrgency: editMember.aidUrgency ?? '',
+        comments: editMember.comments ?? '',
+        updatedAt: new Date(),
+      };
+      await updateDoc(doc(db, 'submissions', editMember.id), {
+        ...updatePayload,
       });
       toast.success('Submission updated successfully.');
       setModalOpen(false);
@@ -159,25 +181,29 @@ function AdminSubmissions() {
     }
   };
 
-  const editFields: Array<{ key: keyof EditState; label: string; isArray?: boolean; disabled?: boolean }> = [
-    { key: 'fullName', label: 'Full Name' },
-    { key: 'phoneNumber', label: 'Phone Number' },
-    { key: 'emailAddress', label: 'Email Address' },
+  const editFields: Array<{
+    key: keyof EditState;
+    label: string;
+    isArray?: boolean;
+    disabled?: boolean;
+  }> = [
+    { key: 'fullName', label: 'Full Name', disabled: true },
+    { key: 'phoneNumber', label: 'Phone Number', disabled: true },
+    { key: 'emailAddress', label: 'Email Address', disabled: true },
     { key: 'gender', label: 'Gender' },
     { key: 'currentGovernorate', label: 'Current Governorate' },
     { key: 'previousGovernorate', label: 'Previous Governorate' },
     { key: 'street', label: 'Street' },
     { key: 'building', label: 'Building' },
     { key: 'floor', label: 'Floor' },
-    { key: 'ageRanges', label: 'Age Ranges', disabled: true },
     { key: 'specialNeeds', label: 'Special Needs', isArray: true },
     { key: 'needs', label: 'Immediate Needs', isArray: true },
     { key: 'aidUrgency', label: 'Aid Urgency' },
     { key: 'comments', label: 'Comments' },
   ];
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const ageRangeKeys = Object.keys(editMember.ageRanges) as Array<
+    keyof typeof editMember.ageRanges
+  >;
 
   return (
     <div>
@@ -191,7 +217,9 @@ function AdminSubmissions() {
           className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
         <Select value={urgencyFilter} onValueChange={handleUrgencyFilter}>
-          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200"><SelectValue placeholder="Urgency" /></SelectTrigger>
+          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
+            <SelectValue placeholder="Urgency" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
             <SelectItem value="High">High</SelectItem>
@@ -203,6 +231,8 @@ function AdminSubmissions() {
 
       {loading ? (
         <p className="text-gray-500">Loading...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
@@ -228,7 +258,7 @@ function AdminSubmissions() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paged.map((member) => (
+                {filtered.map((member) => (
                   <TableRow key={member.id} className="hover:bg-gray-50">
                     <TableCell className="font-medium">{member.fullName}</TableCell>
                     <TableCell>{member.phoneNumber}</TableCell>
@@ -250,17 +280,35 @@ function AdminSubmissions() {
                     <TableCell>{member.specialNeeds?.join(', ') || ''}</TableCell>
                     <TableCell>{member.needs?.join(', ') || ''}</TableCell>
                     <TableCell>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        member.aidUrgency === 'High' ? 'bg-red-100 text-red-700' :
-                        member.aidUrgency === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-green-100 text-green-700'
-                      }`}>{member.aidUrgency}</span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          member.aidUrgency === 'High'
+                            ? 'bg-red-100 text-red-700'
+                            : member.aidUrgency === 'Medium'
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : 'bg-green-100 text-green-700'
+                        }`}
+                      >
+                        {member.aidUrgency}
+                      </span>
                     </TableCell>
                     <TableCell>{member.comments}</TableCell>
                     <TableCell>{member.registrationDate?.toDate().toLocaleDateString()}</TableCell>
                     <TableCell className="flex gap-2">
-                      <Button size="sm" className="bg-[#12a89d] hover:bg-[#0e9088] text-white" onClick={() => handleEditClick(member)}>Edit</Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDeleteClick(member.id)}>Delete</Button>
+                      <Button
+                        size="sm"
+                        className="bg-[#12a89d] hover:bg-[#0e9088] text-white"
+                        onClick={() => handleEditClick(member)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteClick(member.id)}
+                      >
+                        Delete
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -270,12 +318,21 @@ function AdminSubmissions() {
           <div className="flex items-center justify-between px-4 py-3 border-t text-sm text-gray-500">
             <span>
               {filtered.length === 0
-                ? '0 results'
-                : `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length}`}
+                ? `No results on page ${page}`
+                : `${filtered.length} result(s) on page ${page}`}
             </span>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 1}>Previous</Button>
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages}>Next</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={previousPage}
+                disabled={!hasPreviousPage}
+              >
+                Previous
+              </Button>
+              <Button variant="outline" size="sm" onClick={nextPage} disabled={!hasNextPage}>
+                Next
+              </Button>
             </div>
           </div>
         </div>
@@ -296,12 +353,12 @@ function AdminSubmissions() {
                     isArray
                       ? (editMember[key] as string[]).join(', ')
                       : key === 'registrationDate'
-                      ? editMember.registrationDate?.toDate().toLocaleDateString() ?? ''
-                      : key === 'ageRanges'
-                      ? Object.entries(editMember.ageRanges)
-                          .map(([range, count]) => `${range}: ${count}`)
-                          .join(', ')
-                      : (editMember[key] as string) ?? ''
+                        ? (editMember.registrationDate?.toDate().toLocaleDateString() ?? '')
+                        : key === 'ageRanges'
+                          ? Object.entries(editMember.ageRanges)
+                              .map(([range, count]) => `${range}: ${count}`)
+                              .join(', ')
+                          : ((editMember[key] as string) ?? '')
                   }
                   disabled={disabled}
                   onChange={(e) =>
@@ -313,10 +370,36 @@ function AdminSubmissions() {
                 />
               </div>
             ))}
+            <div className="space-y-2">
+              <Label>Age Ranges</Label>
+              <div className="grid grid-cols-2 gap-3">
+                {ageRangeKeys.map((range) => (
+                  <div key={range} className="space-y-1">
+                    <Label className="text-xs text-gray-600">{range}</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={editMember.ageRanges[range] ?? 0}
+                      onChange={(e) =>
+                        setEditMember((current) => ({
+                          ...current,
+                          ageRanges: {
+                            ...current.ageRanges,
+                            [range]: Number(e.target.value),
+                          },
+                        }))
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
           <DialogFooter className="flex justify-between">
             <Button onClick={handleSaveEdit}>Save</Button>
-            <Button variant="secondary" onClick={() => setModalOpen(false)}>Close</Button>
+            <Button variant="secondary" onClick={() => setModalOpen(false)}>
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -329,8 +412,12 @@ function AdminSubmissions() {
             <DialogDescription>Are you sure you want to delete this submission?</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-between">
-            <Button variant="destructive" onClick={confirmDelete}>Confirm</Button>
-            <Button variant="secondary" onClick={() => setConfirmDeleteOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Confirm
+            </Button>
+            <Button variant="secondary" onClick={() => setConfirmDeleteOpen(false)}>
+              Cancel
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
