@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { auth, db } from '../../firebase';
-import { Timestamp, addDoc, collection, onSnapshot, query, where } from 'firebase/firestore';
+import { addDoc, collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../redux/hooks';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +24,15 @@ import {
 import AidTypeCheckboxGrid from '@/Components/AidTypeCheckboxGrid';
 import CenterPicker from '@/Components/CenterPicker';
 import { buildSubmissionWorkflowDefaults } from '@/lib/v2Defaults';
+import {
+  clearSubmissionDraft,
+  listQueuedSubmissions,
+  loadSubmissionDraft,
+  queueSubmission,
+  saveSubmissionDraft,
+  syncQueuedSubmissions,
+  type QueuedSubmissionRecord,
+} from '@/services/offlineSubmissionQueue';
 
 const baseSubmissionSchema = z.object({
   fullName: z.string().min(1),
@@ -121,8 +130,16 @@ function CreateSubmission() {
   const [formData, setFormData] = useState<SubmissionFormData>(defaultFormData);
   const [specialNeedInput, setSpecialNeedInput] = useState('');
   const [centers, setCenters] = useState<Array<CenterDocument & { id: string }>>([]);
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator === 'undefined' ? true : navigator.onLine,
+  );
+  const [queuedItems, setQueuedItems] = useState<QueuedSubmissionRecord[]>([]);
+  const [syncingQueue, setSyncingQueue] = useState(false);
+  const [draftReady, setDraftReady] = useState(false);
+  const [lastSyncMessage, setLastSyncMessage] = useState('');
 
   const userUid = auth.currentUser?.uid;
+  const draftKey = useMemo(() => `submission-draft:${userUid ?? 'anonymous'}`, [userUid]);
 
   useEffect(() => {
     if (!userUid) navigate('/auth/login');
@@ -143,6 +160,100 @@ function CreateSubmission() {
     });
   }, []);
 
+  const refreshQueuedItems = useCallback(async () => {
+    if (!userUid) return;
+    setQueuedItems(await listQueuedSubmissions(userUid));
+  }, [userUid]);
+
+  useEffect(() => {
+    if (!userUid) return;
+
+    void (async () => {
+      const draft = await loadSubmissionDraft<{
+        formData: SubmissionFormData;
+        specialNeedInput: string;
+      }>(draftKey);
+
+      if (draft) {
+        setFormData(draft.formData);
+        setSpecialNeedInput(draft.specialNeedInput);
+        toast.info('Restored your local draft on this device.');
+      }
+
+      await refreshQueuedItems();
+      setDraftReady(true);
+    })();
+  }, [draftKey, refreshQueuedItems, userUid]);
+
+  useEffect(() => {
+    if (!draftReady || !userUid) return;
+
+    void saveSubmissionDraft(draftKey, {
+      formData,
+      specialNeedInput,
+    });
+  }, [draftKey, draftReady, formData, specialNeedInput, userUid]);
+
+  const submitSubmissionPayload = useCallback(async (payload: Record<string, unknown>) => {
+    await addDoc(collection(db, 'submissions'), payload);
+  }, []);
+
+  const syncOfflineQueue = useCallback(async () => {
+    if (!userUid || !isOnline) return;
+
+    setSyncingQueue(true);
+    try {
+      const syncedCount = await syncQueuedSubmissions(userUid, submitSubmissionPayload);
+      await refreshQueuedItems();
+
+      if (syncedCount > 0) {
+        setLastSyncMessage(
+          syncedCount === 1
+            ? '1 queued submission synced.'
+            : `${syncedCount} queued submissions synced.`,
+        );
+        toast.success(
+          syncedCount === 1
+            ? '1 queued submission synced.'
+            : `${syncedCount} queued submissions synced.`,
+        );
+      }
+    } finally {
+      setSyncingQueue(false);
+    }
+  }, [isOnline, refreshQueuedItems, submitSubmissionPayload, userUid]);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isOnline) {
+      void syncOfflineQueue();
+    }
+  }, [isOnline, syncOfflineQueue]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (queuedItems.length === 0) return;
+
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [queuedItems.length]);
+
   if (!user?.validated) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center bg-gray-50 text-center">
@@ -157,6 +268,25 @@ function CreateSubmission() {
 
   const selectedCenter = centers.find((center) => center.id === formData.centerId);
   const isCenterCase = formData.locationType === 'center';
+  const failedQueueItems = queuedItems.filter((item) => item.status === 'failed');
+
+  const resetSubmissionState = async () => {
+    setFormData(defaultFormData);
+    setSpecialNeedInput('');
+    await clearSubmissionDraft(draftKey);
+  };
+
+  const buildSubmissionPayload = useCallback(
+    (validatedData: z.output<typeof submissionSchema>) => ({
+      ...validatedData,
+      ...buildSubmissionWorkflowDefaults('agent'),
+      registrationDate: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      agent: auth.currentUser?.uid ?? userUid ?? '',
+    }),
+    [userUid],
+  );
 
   const addSpecialNeed = () => {
     const normalized = specialNeedInput.trim();
@@ -209,19 +339,33 @@ function CreateSubmission() {
 
     setLoading(true);
     try {
-      await addDoc(collection(db, 'submissions'), {
-        ...result.data,
-        ...buildSubmissionWorkflowDefaults('agent'),
-        registrationDate: Timestamp.fromDate(new Date()),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        agent: auth.currentUser?.uid,
-      });
+      const submissionPayload = buildSubmissionPayload(result.data);
+
+      if (!isOnline) {
+        await queueSubmission(userUid ?? 'anonymous', submissionPayload);
+        await refreshQueuedItems();
+        await resetSubmissionState();
+        setLastSyncMessage('Submission saved offline and queued for sync.');
+        toast.success('Submission saved offline. It will sync when you reconnect.');
+        return;
+      }
+
+      await submitSubmissionPayload(submissionPayload);
       toast.success(t('submission.success'));
-      setFormData(defaultFormData);
-      setSpecialNeedInput('');
-    } catch {
-      toast.error(t('submission.error'));
+      await resetSubmissionState();
+    } catch (error) {
+      const errorCode =
+        typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
+
+      if (!isOnline || errorCode === 'unavailable' || errorCode === 'failed-precondition') {
+        await queueSubmission(userUid ?? 'anonymous', buildSubmissionPayload(result.data));
+        await refreshQueuedItems();
+        await resetSubmissionState();
+        setLastSyncMessage('Submission moved to the offline queue after a network failure.');
+        toast.success('Network unavailable. Submission saved offline for retry.');
+      } else {
+        toast.error(t('submission.error'));
+      }
     } finally {
       setLoading(false);
     }
@@ -239,6 +383,42 @@ function CreateSubmission() {
           {t('submission.mySubmissions')}
         </Button>
       </div>
+
+      {!isOnline ? (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          You are offline. New submissions will be queued in this browser and synced automatically
+          when the connection returns.
+        </div>
+      ) : null}
+
+      {queuedItems.length > 0 || syncingQueue || lastSyncMessage ? (
+        <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="space-y-1">
+              <p className="font-medium">
+                {syncingQueue
+                  ? 'Syncing queued submissions...'
+                  : `${queuedItems.length} queued submission${queuedItems.length === 1 ? '' : 's'} on this device`}
+              </p>
+              {lastSyncMessage ? <p>{lastSyncMessage}</p> : null}
+              {failedQueueItems.length > 0 ? (
+                <p className="text-rose-700">
+                  {failedQueueItems.length} queued submission
+                  {failedQueueItems.length === 1 ? ' has' : 's have'} failed and can be retried.
+                </p>
+              ) : null}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void syncOfflineQueue()}
+              disabled={!isOnline || syncingQueue || queuedItems.length === 0}
+            >
+              Retry Sync
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       <form onSubmit={handleAddMember} className="space-y-4">
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
