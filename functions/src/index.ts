@@ -1,1 +1,1 @@
-export { checkDuplicatePhone } from './checkDuplicatePhone';
+export { checkSubmissionDuplicates } from './checkSubmissionDuplicates';

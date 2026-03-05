@@ -23,8 +23,14 @@ import AidTypeCheckboxGrid from '@/Components/AidTypeCheckboxGrid';
 
 const submissionSchema = z.object({
   fullName: z.string().min(1),
-  phoneNumber: z.string().min(1),
-  emailAddress: z.string().email().or(z.literal('')),
+  phoneNumber: z
+    .string()
+    .trim()
+    .regex(/^\+?[0-9\s\-()]{7,20}$/, 'Invalid phone number'),
+  emailAddress: z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+    z.string().trim().email().optional()
+  ),
   gender: z.enum(['Male', 'Female']),
   currentGovernorate: z.string().min(1),
   previousGovernorate: z.string().min(1),

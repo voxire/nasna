@@ -93,11 +93,11 @@ function Home() {
         const checkDuplicate = httpsCallable<
           { phoneNumber: string; emailAddress?: string },
           { phoneDuplicate: boolean; emailDuplicate: boolean }
-        >(functions, 'checkDuplicatePhone');
+        >(functions, 'checkSubmissionDuplicates');
 
         const { data: dupResult } = await checkDuplicate({
           phoneNumber: trimmedPhone,
-          emailAddress: emailAddress || undefined,
+          emailAddress: emailAddress.trim().toLowerCase() || undefined,
         });
 
         if (dupResult.phoneDuplicate) {
@@ -110,7 +110,7 @@ function Home() {
         }
 
         await addDoc(collection(db, 'submissions'), {
-          fullName, phoneNumber: trimmedPhone, emailAddress, gender,
+          fullName, phoneNumber: trimmedPhone, emailAddress: emailAddress.trim().toLowerCase(), gender,
           currentGovernorate, previousGovernorate, city, street, building, floor,
           ageRanges, specialNeeds, needs, aidUrgency, consentGiven,
           comments, registrationDate: Timestamp.fromDate(new Date()), agent: '',

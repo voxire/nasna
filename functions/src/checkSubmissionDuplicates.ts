@@ -18,13 +18,15 @@ interface CheckDuplicateResponse {
   emailDuplicate: boolean;
 }
 
+const normalizeEmail = (value: string) => value.trim().toLowerCase();
+
 /**
  * Callable Cloud Function that checks whether a phone number or email
  * already exists in the submissions collection.
  *
  * Returns boolean flags only — never exposes submission data.
  */
-export const checkDuplicatePhone = onCall<CheckDuplicateRequest>(
+export const checkSubmissionDuplicates = onCall<CheckDuplicateRequest>(
   { region: 'europe-west1' },
   async (request): Promise<CheckDuplicateResponse> => {
     const { phoneNumber, emailAddress } = request.data;
@@ -38,26 +40,24 @@ export const checkDuplicatePhone = onCall<CheckDuplicateRequest>(
       throw new HttpsError('invalid-argument', 'Invalid phone number format');
     }
 
-    // Check phone duplicate — PII: only boolean result returned, no submission data
-    const phoneSnap = await db
+    const normalizedEmail =
+      emailAddress && typeof emailAddress === 'string' && emailAddress.trim()
+        ? normalizeEmail(emailAddress)
+        : null;
+
+    const phoneQuery = db
       .collection('submissions')
       .where('phoneNumber', '==', trimmed)
       .limit(1)
       .get();
-
-    let emailDuplicate = false;
-    if (emailAddress && typeof emailAddress === 'string' && emailAddress.trim()) {
-      const emailSnap = await db
-        .collection('submissions')
-        .where('emailAddress', '==', emailAddress.trim())
-        .limit(1)
-        .get();
-      emailDuplicate = !emailSnap.empty;
-    }
+    const emailQuery = normalizedEmail
+      ? db.collection('submissions').where('emailAddress', '==', normalizedEmail).limit(1).get()
+      : Promise.resolve(null);
+    const [phoneSnap, emailSnap] = await Promise.all([phoneQuery, emailQuery]);
 
     return {
       phoneDuplicate: !phoneSnap.empty,
-      emailDuplicate,
+      emailDuplicate: normalizedEmail ? !emailSnap?.empty : false,
     };
   }
 );
