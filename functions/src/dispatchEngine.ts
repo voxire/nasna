@@ -1,0 +1,381 @@
+import { getApps, initializeApp } from 'firebase-admin/app';
+import {
+  FieldValue,
+  getFirestore,
+  Timestamp,
+  type DocumentSnapshot,
+  type QueryDocumentSnapshot,
+} from 'firebase-admin/firestore';
+import { logger } from 'firebase-functions';
+import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
+
+if (getApps().length === 0) {
+  initializeApp();
+}
+
+const db = getFirestore();
+const GLOBAL_STATS_DOC = db.collection('stats').doc('global');
+const STALE_CASE_THRESHOLD_HOURS = 24;
+
+type SubmissionStatus = 'pending' | 'assigned' | 'in_progress' | 'completed' | 'cancelled';
+
+interface SubmissionRecord {
+  fullName?: string;
+  currentGovernorate?: string;
+  numberOfPeopleInHousehold?: number;
+  assignedTo?: string;
+  status?: SubmissionStatus;
+  staleFlagged?: boolean;
+  updatedAt?: Timestamp | Date;
+  registrationDate?: Timestamp;
+}
+
+interface MemberRecord {
+  email?: string;
+  name?: string;
+  role?: string;
+  validated?: boolean;
+}
+
+async function ensureGlobalStatsDocument() {
+  await GLOBAL_STATS_DOC.set(
+    {
+      submissionsRegistered: 0,
+      submissionsAssigned: 0,
+      submissionsCompleted: 0,
+      peopleHelped: 0,
+      activeNgoCount: 0,
+      housingAvailable: 0,
+      updatedAt: new Date(),
+    },
+    { merge: true },
+  );
+}
+
+async function createNotification(options: {
+  id: string;
+  recipientUid: string;
+  title: string;
+  body: string;
+  channel: 'email' | 'system';
+  relatedSubmissionId: string;
+}) {
+  const notificationRef = db.collection('notifications').doc(options.id);
+  const notificationSnapshot = await notificationRef.get();
+
+  if (notificationSnapshot.exists) {
+    logger.info('Skipping duplicate notification', { notificationId: options.id });
+    return;
+  }
+
+  await notificationRef.set({
+    recipientUid: options.recipientUid,
+    title: options.title,
+    body: options.body,
+    channel: options.channel,
+    status: 'pending',
+    relatedSubmissionId: options.relatedSubmissionId,
+    createdAt: new Date(),
+    sentAt: null,
+  });
+}
+
+async function createAdminNotifications(
+  notificationIdPrefix: string,
+  title: string,
+  body: string,
+  submissionId: string,
+) {
+  const adminSnapshot = await db.collection('members').where('isAdmin', '==', true).limit(20).get();
+
+  await Promise.all(
+    adminSnapshot.docs.map((document) =>
+      createNotification({
+        id: `${notificationIdPrefix}:${document.id}`,
+        recipientUid: document.id,
+        title,
+        body,
+        channel: 'system',
+        relatedSubmissionId: submissionId,
+      }),
+    ),
+  );
+}
+
+async function incrementMemberCaseLoad(memberUid: string, delta: number) {
+  const memberRef = db.collection('members').doc(memberUid);
+
+  await db.runTransaction(async (transaction) => {
+    const memberSnapshot = await transaction.get(memberRef);
+    if (!memberSnapshot.exists) {
+      logger.warn('Skipping caseload update for missing member', { memberUid, delta });
+      return;
+    }
+
+    const currentCaseLoad = Number(memberSnapshot.data()?.currentCaseLoad ?? 0);
+    transaction.set(
+      memberRef,
+      {
+        currentCaseLoad: Math.max(0, currentCaseLoad + delta),
+        updatedAt: new Date(),
+      },
+      { merge: true },
+    );
+  });
+}
+
+async function refreshActiveNgoCount() {
+  const memberSnapshot = await db
+    .collection('members')
+    .where('role', '==', 'member')
+    .where('validated', '==', true)
+    .get();
+
+  const activeNgoCount = memberSnapshot.docs.filter(
+    (document) => Number(document.data().currentCaseLoad ?? 0) > 0,
+  ).length;
+
+  await GLOBAL_STATS_DOC.set(
+    {
+      activeNgoCount,
+      updatedAt: new Date(),
+    },
+    { merge: true },
+  );
+}
+
+function getTimestampValue(
+  value: SubmissionRecord['updatedAt'] | SubmissionRecord['registrationDate'],
+) {
+  if (value instanceof Timestamp) {
+    return value.toMillis();
+  }
+
+  if (value instanceof Date) {
+    return value.getTime();
+  }
+
+  return 0;
+}
+
+function isCaseTerminal(status?: SubmissionStatus) {
+  return status === 'completed' || status === 'cancelled';
+}
+
+async function getMemberDocument(
+  memberUid: string,
+): Promise<QueryDocumentSnapshot | DocumentSnapshot | null> {
+  const memberSnapshot = await db.collection('members').doc(memberUid).get();
+  return memberSnapshot.exists ? memberSnapshot : null;
+}
+
+export const onNewSubmission = onDocumentCreated(
+  {
+    document: 'submissions/{submissionId}',
+    region: 'europe-west1',
+  },
+  async (event) => {
+    if (!event.data) {
+      return;
+    }
+
+    const submissionId = event.params.submissionId;
+    const submission = event.data.data() as SubmissionRecord;
+
+    await ensureGlobalStatsDocument();
+    await GLOBAL_STATS_DOC.set(
+      {
+        submissionsRegistered: FieldValue.increment(1),
+        updatedAt: new Date(),
+      },
+      { merge: true },
+    );
+
+    await createAdminNotifications(
+      `submission-created:${submissionId}`,
+      'New case submitted',
+      `${submission.fullName ?? 'A household'} in ${submission.currentGovernorate ?? 'an unknown area'} needs review.`,
+      submissionId,
+    );
+
+    logger.info('Processed new submission trigger', { submissionId });
+  },
+);
+
+export const onCaseAssigned = onDocumentUpdated(
+  {
+    document: 'submissions/{submissionId}',
+    region: 'europe-west1',
+  },
+  async (event) => {
+    if (!event.data) {
+      return;
+    }
+
+    const before = event.data.before.data() as SubmissionRecord;
+    const after = event.data.after.data() as SubmissionRecord;
+    const submissionId = event.params.submissionId;
+    const previousAssignedTo = before.assignedTo ?? '';
+    const nextAssignedTo = after.assignedTo ?? '';
+
+    if (!nextAssignedTo || previousAssignedTo === nextAssignedTo) {
+      return;
+    }
+
+    await ensureGlobalStatsDocument();
+
+    if (previousAssignedTo) {
+      await incrementMemberCaseLoad(previousAssignedTo, -1);
+    }
+
+    await incrementMemberCaseLoad(nextAssignedTo, 1);
+    await GLOBAL_STATS_DOC.set(
+      {
+        submissionsAssigned: FieldValue.increment(previousAssignedTo ? 0 : 1),
+        updatedAt: new Date(),
+      },
+      { merge: true },
+    );
+
+    const memberSnapshot = await getMemberDocument(nextAssignedTo);
+    const memberData = memberSnapshot?.data() as MemberRecord | undefined;
+
+    await createNotification({
+      id: `case-assigned:${submissionId}:${nextAssignedTo}`,
+      recipientUid: nextAssignedTo,
+      title: 'Case assigned',
+      body: `A new case for ${after.fullName ?? 'a household'} has been assigned to ${memberData?.name ?? 'your organization'}.`,
+      channel: memberData?.email ? 'email' : 'system',
+      relatedSubmissionId: submissionId,
+    });
+
+    await refreshActiveNgoCount();
+
+    logger.info('Processed case assignment trigger', {
+      submissionId,
+      nextAssignedTo,
+      previousAssignedTo,
+    });
+  },
+);
+
+export const onCaseCompleted = onDocumentUpdated(
+  {
+    document: 'submissions/{submissionId}',
+    region: 'europe-west1',
+  },
+  async (event) => {
+    if (!event.data) {
+      return;
+    }
+
+    const before = event.data.before.data() as SubmissionRecord;
+    const after = event.data.after.data() as SubmissionRecord;
+    const submissionId = event.params.submissionId;
+    const previousStatus = before.status ?? 'pending';
+    const nextStatus = after.status ?? 'pending';
+
+    if (!isCaseTerminal(nextStatus) || previousStatus === nextStatus) {
+      return;
+    }
+
+    await ensureGlobalStatsDocument();
+
+    if (after.assignedTo) {
+      await incrementMemberCaseLoad(after.assignedTo, -1);
+    }
+
+    if (nextStatus === 'completed') {
+      await GLOBAL_STATS_DOC.set(
+        {
+          submissionsCompleted: FieldValue.increment(1),
+          peopleHelped: FieldValue.increment(Number(after.numberOfPeopleInHousehold ?? 0)),
+          updatedAt: new Date(),
+        },
+        { merge: true },
+      );
+    } else {
+      await GLOBAL_STATS_DOC.set(
+        {
+          updatedAt: new Date(),
+        },
+        { merge: true },
+      );
+    }
+
+    if (after.assignedTo) {
+      const memberSnapshot = await getMemberDocument(after.assignedTo);
+      const memberData = memberSnapshot?.data() as MemberRecord | undefined;
+
+      await createNotification({
+        id: `case-terminal:${submissionId}:${nextStatus}:${after.assignedTo}`,
+        recipientUid: after.assignedTo,
+        title: nextStatus === 'completed' ? 'Case completed' : 'Case cancelled',
+        body:
+          nextStatus === 'completed'
+            ? `The case for ${after.fullName ?? 'a household'} has been marked complete.`
+            : `The case for ${after.fullName ?? 'a household'} has been cancelled.`,
+        channel: memberData?.email ? 'email' : 'system',
+        relatedSubmissionId: submissionId,
+      });
+    }
+
+    await refreshActiveNgoCount();
+
+    logger.info('Processed terminal case trigger', {
+      submissionId,
+      previousStatus,
+      nextStatus,
+    });
+  },
+);
+
+export const dailyStaleCaseCheck = onSchedule(
+  {
+    schedule: '0 2 * * *',
+    timeZone: 'Asia/Beirut',
+    region: 'europe-west1',
+  },
+  async () => {
+    const staleBefore = Date.now() - STALE_CASE_THRESHOLD_HOURS * 60 * 60 * 1000;
+    const snapshot = await db
+      .collection('submissions')
+      .where('status', 'in', ['pending', 'assigned', 'in_progress'])
+      .get();
+
+    const staleCases = snapshot.docs.filter((document) => {
+      const submission = document.data() as SubmissionRecord;
+      const activityAt = Math.max(
+        getTimestampValue(submission.updatedAt),
+        getTimestampValue(submission.registrationDate),
+      );
+
+      return !submission.staleFlagged && activityAt > 0 && activityAt <= staleBefore;
+    });
+
+    await Promise.all(
+      staleCases.map(async (document) => {
+        await document.ref.set(
+          {
+            staleFlagged: true,
+            updatedAt: new Date(),
+          },
+          { merge: true },
+        );
+
+        const submission = document.data() as SubmissionRecord;
+        await createAdminNotifications(
+          `stale-case:${document.id}`,
+          'Case flagged as stale',
+          `${submission.fullName ?? 'A household'} has not been updated in over ${STALE_CASE_THRESHOLD_HOURS} hours.`,
+          document.id,
+        );
+      }),
+    );
+
+    logger.info('Completed stale case check', {
+      staleCaseCount: staleCases.length,
+    });
+  },
+);

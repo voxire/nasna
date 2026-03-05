@@ -1,5 +1,11 @@
 export { checkSubmissionDuplicates } from './checkSubmissionDuplicates';
 export {
+  dailyStaleCaseCheck,
+  onCaseAssigned,
+  onCaseCompleted,
+  onNewSubmission,
+} from './dispatchEngine';
+export {
   claimMemberCase,
   getMemberCaseDetail,
   listMemberClaimedCases,
