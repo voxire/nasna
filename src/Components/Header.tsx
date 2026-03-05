@@ -19,6 +19,9 @@ import { useTranslation } from 'react-i18next';
 
 const NAV_LINKS = [
   { to: '/about', labelKey: 'header.about' },
+  { to: '/impact', labelKey: null, fallback: 'Impact' },
+  { to: '/housing', labelKey: null, fallback: 'Housing' },
+  { to: '/emergency', labelKey: null, fallback: 'Emergency' },
   { to: '/offer-help', labelKey: 'header.offerHelp' },
   { to: '/resources', labelKey: 'header.resources' },
   { to: '/feedback', labelKey: 'header.feedback' },
@@ -95,12 +98,10 @@ function Header({ dashboard = false }: HeaderProps) {
                 key={to}
                 to={to}
                 className={`text-sm font-medium transition-colors no-underline ${
-                  location.pathname === to
-                    ? 'text-[#12a89d]'
-                    : 'text-gray-600 hover:text-[#12a89d]'
+                  location.pathname === to ? 'text-[#12a89d]' : 'text-gray-600 hover:text-[#12a89d]'
                 }`}
               >
-                {t(labelKey)}
+                {labelKey ? t(labelKey) : NAV_LINKS.find((link) => link.to === to)?.fallback}
               </Link>
             ))}
           </nav>
@@ -129,7 +130,9 @@ function Header({ dashboard = false }: HeaderProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleLanguageChange('en')}>English</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
+                English
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleLanguageChange('ar')}>Arabic</DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleLanguageChange('fr')}>French</DropdownMenuItem>
             </DropdownMenuContent>
@@ -144,14 +147,10 @@ function Header({ dashboard = false }: HeaderProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {NAV_LINKS.map(({ to, labelKey }) => (
+                {NAV_LINKS.map(({ to, labelKey, fallback }) => (
                   <DropdownMenuItem key={to} onClick={() => navigate(to)}>
-                    <span
-                      className={
-                        location.pathname === to ? 'text-[#12a89d] font-medium' : ''
-                      }
-                    >
-                      {t(labelKey)}
+                    <span className={location.pathname === to ? 'text-[#12a89d] font-medium' : ''}>
+                      {labelKey ? t(labelKey) : fallback}
                     </span>
                   </DropdownMenuItem>
                 ))}

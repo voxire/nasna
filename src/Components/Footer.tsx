@@ -30,10 +30,13 @@ function Footer() {
     <footer className="bg-[#12a89d]">
       <div className="max-w-6xl mx-auto px-6 py-10">
         <div className="flex flex-col md:flex-row md:items-start gap-10 md:gap-0 md:justify-between">
-
           {/* Brand */}
           <div className="flex flex-col gap-3">
-            <img src="/Nasna Logo.png" alt="Nasna logo" className="h-14 w-auto max-w-[200px] object-contain brightness-0 invert" />
+            <img
+              src="/Nasna Logo.png"
+              alt="Nasna logo"
+              className="h-14 w-auto max-w-[200px] object-contain brightness-0 invert"
+            />
             <p className="text-white/70 text-sm leading-relaxed max-w-[220px]">
               Connecting individuals with NGO support across Lebanon.
             </p>
@@ -42,18 +45,89 @@ function Footer() {
           {/* Links */}
           <div className="flex gap-16">
             <div>
-              <p className="text-white/50 text-[11px] font-semibold uppercase tracking-widest mb-3">Navigate</p>
+              <p className="text-white/50 text-[11px] font-semibold uppercase tracking-widest mb-3">
+                Navigate
+              </p>
               <ul className="space-y-2 text-sm">
-                <li><Link to="/about" className="text-white/80 hover:text-white transition-colors no-underline">{t('footer.aboutUs')}</Link></li>
-                <li><Link to="/offer-help" className="text-white/80 hover:text-white transition-colors no-underline">{t('footer.offerHelp')}</Link></li>
-                <li><Link to="/resources" className="text-white/80 hover:text-white transition-colors no-underline">{t('footer.resources')}</Link></li>
-                <li><Link to="/feedback" className="text-white/80 hover:text-white transition-colors no-underline">{t('footer.feedback')}</Link></li>
-                <li><Link to="/terms" className="text-white/80 hover:text-white transition-colors no-underline">{t('footer.terms & conditions')}</Link></li>
+                <li>
+                  <Link
+                    to="/about"
+                    className="text-white/80 hover:text-white transition-colors no-underline"
+                  >
+                    {t('footer.aboutUs')}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/impact"
+                    className="text-white/80 hover:text-white transition-colors no-underline"
+                  >
+                    Impact
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/housing"
+                    className="text-white/80 hover:text-white transition-colors no-underline"
+                  >
+                    Housing Directory
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/offer-housing"
+                    className="text-white/80 hover:text-white transition-colors no-underline"
+                  >
+                    Offer Housing
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/emergency"
+                    className="text-white/80 hover:text-white transition-colors no-underline"
+                  >
+                    Emergency
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/offer-help"
+                    className="text-white/80 hover:text-white transition-colors no-underline"
+                  >
+                    {t('footer.offerHelp')}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/resources"
+                    className="text-white/80 hover:text-white transition-colors no-underline"
+                  >
+                    {t('footer.resources')}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/feedback"
+                    className="text-white/80 hover:text-white transition-colors no-underline"
+                  >
+                    {t('footer.feedback')}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/terms"
+                    className="text-white/80 hover:text-white transition-colors no-underline"
+                  >
+                    {t('footer.terms & conditions')}
+                  </Link>
+                </li>
               </ul>
             </div>
 
             <div>
-              <p className="text-white/50 text-[11px] font-semibold uppercase tracking-widest mb-3">Account</p>
+              <p className="text-white/50 text-[11px] font-semibold uppercase tracking-widest mb-3">
+                Account
+              </p>
               <ul className="space-y-2 text-sm">
                 {user ? (
                   <li>
@@ -66,9 +140,30 @@ function Footer() {
                   </li>
                 ) : (
                   <>
-                    <li><Link to="/auth/login" className="text-white/80 hover:text-white transition-colors no-underline">{t('footer.signIn')}</Link></li>
-                    <li><Link to="/auth/register" className="text-white/80 hover:text-white transition-colors no-underline">{t('footer.registerNgo')}</Link></li>
-                    <li><Link to="/auth/agent" className="text-white/80 hover:text-white transition-colors no-underline">{t('footer.becomeAgent')}</Link></li>
+                    <li>
+                      <Link
+                        to="/auth/login"
+                        className="text-white/80 hover:text-white transition-colors no-underline"
+                      >
+                        {t('footer.signIn')}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/auth/register"
+                        className="text-white/80 hover:text-white transition-colors no-underline"
+                      >
+                        {t('footer.registerNgo')}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/auth/agent"
+                        className="text-white/80 hover:text-white transition-colors no-underline"
+                      >
+                        {t('footer.becomeAgent')}
+                      </Link>
+                    </li>
                   </>
                 )}
               </ul>
