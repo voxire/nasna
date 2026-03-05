@@ -1,9 +1,10 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
+import { getCookie } from '../utils/cookies';
 
 interface GuestRouteProps {
   children: ReactNode;
@@ -16,9 +17,18 @@ function GuestRoute({ children }: GuestRouteProps) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user: User | null) => {
       if (!user) {
+        setRedirect(null);
         setLoading(false);
         return;
       }
+
+      if (!getCookie('nasna_session')) {
+        await signOut(auth);
+        setRedirect(null);
+        setLoading(false);
+        return;
+      }
+
       try {
         const tokenResult = await user.getIdTokenResult();
         const role = tokenResult.claims['role'] as string | undefined;
@@ -27,13 +37,19 @@ function GuestRoute({ children }: GuestRouteProps) {
           setLoading(false);
           return;
         }
+
         const memberDoc = await getDoc(doc(db, 'members', user.uid));
-        if (memberDoc.exists() && memberDoc.data().onboarded === true) {
-          setRedirect('/ngo/submissions');
-        } else {
+        const memberData = memberDoc.exists() ? memberDoc.data() : null;
+
+        if (memberData?.onboarded !== true) {
           setRedirect('/auth/onboarding');
+        } else if (role === 'agent') {
+          setRedirect('/agent/create');
+        } else {
+          setRedirect('/ngo/submissions');
         }
       } catch {
+        setRedirect(null);
         setLoading(false);
         return;
       }
