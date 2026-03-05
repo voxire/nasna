@@ -162,37 +162,6 @@ export interface DonationDocument {
   updatedAt?: Date;
 }
 
-export interface ReduxUserData {
-  uid: string;
-  role: UserRole;
-  validated: boolean;
-  email: string;
-  name: string;
-  contactPersonName?: string;
-  phoneNumber?: string;
-  areaOfOperation?: string;
-  kindOfHelp?: string;
-  initiativeOrNgo?: string;
-  numberOfVolunteers?: string;
-  isOfficiallyRegistered?: boolean;
-  coverageType?: CoverageType;
-  coverageGovernorates?: string[];
-  coverageCenterIds?: string[];
-  aidTypes?: string[];
-  currentCaseLoad?: number;
-  maxCaseLoad?: number;
-  deliveryMode?: DeliveryMode;
-  onboarded?: boolean;
-  consentGiven?: boolean;
-  isAdmin?: boolean;
-}
-
-export interface ReduxUserSliceState {
-  user: ReduxUserData | null;
-  loading: boolean;
-  error: string | null;
-}
-
 export interface RouteConfig {
   path: string;
   element: React.ReactElement;

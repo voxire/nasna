@@ -1,36 +1,17 @@
-import { useState, useEffect } from 'react';
-import { auth } from '../firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { resolvePostLoginPath, useAuthStore } from '@/stores/authStore';
 
 function Footer() {
   const { t } = useTranslation();
-  const [user, setUser] = useState<User | null>(null);
-  const [role, setRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser) {
-        try {
-          const tokenResult = await firebaseUser.getIdTokenResult();
-          setRole(tokenResult.claims['role'] as string | null);
-        } catch {
-          // ignore
-        }
-      } else {
-        setRole(null);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
+  const user = useAuthStore((state) => state.firebaseUser);
+  const role = useAuthStore((state) => state.role);
+  const profile = useAuthStore((state) => state.profile);
 
   return (
     <footer className="bg-[#12a89d]">
       <div className="max-w-6xl mx-auto px-6 py-10">
         <div className="flex flex-col md:flex-row md:items-start gap-10 md:gap-0 md:justify-between">
-          {/* Brand */}
           <div className="flex flex-col gap-3">
             <img
               src="/Nasna Logo.png"
@@ -42,7 +23,6 @@ function Footer() {
             </p>
           </div>
 
-          {/* Links */}
           <div className="flex gap-16">
             <div>
               <p className="text-white/50 text-[11px] font-semibold uppercase tracking-widest mb-3">
@@ -132,7 +112,10 @@ function Footer() {
                 {user ? (
                   <li>
                     <Link
-                      to={role === 'admin' ? '/manage' : '/ngo/submissions'}
+                      to={resolvePostLoginPath(
+                        role,
+                        role === 'admin' || profile?.onboarded === true,
+                      )}
                       className="text-white/80 hover:text-white transition-colors no-underline"
                     >
                       {role === 'admin' ? t('footer.adminPanel') : t('footer.dashboard')}

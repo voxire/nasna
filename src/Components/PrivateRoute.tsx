@@ -1,12 +1,9 @@
-import { useEffect, useState, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { auth } from '../firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
 import { useIdleTimeout } from '../hooks/useIdleTimeout';
-import { db } from '../firebase';
-import type { MemberDocument, UserRole } from '../types';
+import type { UserRole } from '../types';
+import { useAuthStore } from '@/stores/authStore';
 
 interface PrivateRouteProps {
   children: ReactNode;
@@ -21,43 +18,15 @@ function PrivateRoute({
   requireValidated = false,
   redirectTo = '/',
 }: PrivateRouteProps) {
-  const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [role, setRole] = useState<UserRole | null>(null);
-  const [memberProfile, setMemberProfile] = useState<MemberDocument | null>(null);
   useIdleTimeout();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
+  const loading = useAuthStore((state) => state.loading);
+  const initialized = useAuthStore((state) => state.initialized);
+  const currentUser = useAuthStore((state) => state.firebaseUser);
+  const role = useAuthStore((state) => state.role);
+  const memberProfile = useAuthStore((state) => state.profile);
 
-      if (user) {
-        const tokenResult = await user.getIdTokenResult();
-        const claimedRole = (tokenResult.claims['role'] as UserRole | undefined) ?? null;
-
-        if (claimedRole === 'admin') {
-          setRole(claimedRole);
-          setMemberProfile(null);
-        } else {
-          const memberSnapshot = await getDoc(doc(db, 'members', user.uid));
-          const profile = memberSnapshot.exists()
-            ? (memberSnapshot.data() as MemberDocument)
-            : null;
-
-          setMemberProfile(profile);
-          setRole(claimedRole ?? profile?.role ?? null);
-        }
-      } else {
-        setRole(null);
-        setMemberProfile(null);
-      }
-
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  if (loading) {
+  if (!initialized || loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />
@@ -66,7 +35,7 @@ function PrivateRoute({
   }
 
   if (!currentUser) {
-    return <Navigate to="/auth/login" />;
+    return <Navigate to="/auth/login" replace />;
   }
 
   if (allowedRoles?.length && (!role || !allowedRoles.includes(role))) {

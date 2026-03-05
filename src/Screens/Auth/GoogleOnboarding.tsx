@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { auth, db } from '../../firebase';
-import { onAuthStateChanged, signOut, User } from 'firebase/auth';
-import { setCookie } from '../../utils/cookies';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
+import { db, auth } from '../../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 import { toast } from 'sonner';
 import { Building2, Loader2, UserCheck } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
@@ -22,6 +21,7 @@ import {
 } from '@/Components/ui/form';
 import { cn } from '@/lib/utils';
 import { buildMemberWorkflowDefaults } from '@/lib/v2Defaults';
+import { useAuthStore } from '@/stores/authStore';
 
 const onboardingSchema = z
   .object({
@@ -35,24 +35,28 @@ const onboardingSchema = z
   })
   .superRefine((data, ctx) => {
     if (data.role === 'member') {
-      if (!data.name?.trim())
+      if (!data.name?.trim()) {
         ctx.addIssue({ code: 'custom', path: ['name'], message: 'Organization name is required' });
-      if (!data.contactPersonName?.trim())
+      }
+      if (!data.contactPersonName?.trim()) {
         ctx.addIssue({
           code: 'custom',
           path: ['contactPersonName'],
           message: 'Contact person name is required',
         });
+      }
     }
     if (data.role === 'agent') {
-      if (!data.fullName?.trim())
+      if (!data.fullName?.trim()) {
         ctx.addIssue({ code: 'custom', path: ['fullName'], message: 'Full name is required' });
-      if (!data.areaOfOperation?.trim())
+      }
+      if (!data.areaOfOperation?.trim()) {
         ctx.addIssue({
           code: 'custom',
           path: ['areaOfOperation'],
           message: 'Area of operation is required',
         });
+      }
     }
   });
 
@@ -60,8 +64,11 @@ type OnboardingFormData = z.infer<typeof onboardingSchema>;
 
 function GoogleOnboarding() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [checking, setChecking] = useState(true);
+  const user = useAuthStore((state) => state.firebaseUser);
+  const profile = useAuthStore((state) => state.profile);
+  const loading = useAuthStore((state) => state.loading);
+  const initialized = useAuthStore((state) => state.initialized);
+  const refreshProfile = useAuthStore((state) => state.refreshProfile);
 
   const form = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
@@ -84,26 +91,24 @@ function GoogleOnboarding() {
   const selectedRole = watch('role');
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (!firebaseUser) {
-        navigate('/auth/login');
-        return;
-      }
-      const memberDoc = await getDoc(doc(db, 'members', firebaseUser.uid));
-      if (memberDoc.exists() && memberDoc.data().onboarded === true) {
-        navigate('/ngo/submissions');
-        return;
-      }
-      setUser(firebaseUser);
-      setChecking(false);
-    });
-    return () => unsubscribe();
-  }, [navigate]);
+    if (!initialized || loading) return;
+
+    if (!user) {
+      navigate('/auth/login', { replace: true });
+      return;
+    }
+
+    if (profile?.onboarded === true) {
+      navigate(profile.role === 'agent' ? '/agent/create' : '/ngo/submissions', { replace: true });
+    }
+  }, [initialized, loading, navigate, profile, user]);
 
   const onSubmit = async (data: OnboardingFormData) => {
     if (!user) return;
+
     try {
       const isMember = data.role === 'member';
+
       await setDoc(doc(db, 'members', user.uid), {
         uid: user.uid,
         name: isMember ? data.name : data.fullName,
@@ -123,9 +128,10 @@ function GoogleOnboarding() {
         createdAt: new Date(),
         updatedAt: new Date(),
       });
-      setCookie('nasna_session', '1', 8 * 60 * 60);
+
+      await refreshProfile(user.uid);
       toast.success('Profile created! Welcome to Nasna.');
-      navigate('/ngo/submissions');
+      navigate(data.role === 'agent' ? '/agent/create' : '/ngo/submissions');
     } catch (error) {
       console.error('Error creating profile:', error);
       toast.error('Failed to create profile. Please try again.');
@@ -137,7 +143,7 @@ function GoogleOnboarding() {
     navigate('/auth/login');
   };
 
-  if (checking) {
+  if (!initialized || loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />
@@ -147,7 +153,6 @@ function GoogleOnboarding() {
 
   return (
     <div className="flex flex-col md:flex-row md:min-h-[85vh]">
-      {/* Teal panel */}
       <div className="flex flex-col items-center justify-center bg-[#12a89d] py-8 px-8 md:w-1/2 md:py-0">
         <img
           src="/Nasna Logo.png"
@@ -155,11 +160,10 @@ function GoogleOnboarding() {
           className="h-16 md:h-24 w-auto brightness-0 invert"
         />
         <p className="hidden md:block text-white/80 text-center text-sm leading-relaxed max-w-xs mt-6">
-          Just a few more details and you're all set.
+          Just a few more details and you&apos;re all set.
         </p>
       </div>
 
-      {/* Form */}
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 bg-white">
         <div className="w-full max-w-sm">
           <h1 className="text-2xl font-bold text-gray-800 mb-1">Complete your profile</h1>
@@ -167,7 +171,6 @@ function GoogleOnboarding() {
             Signed in as <span className="font-medium text-gray-600">{user?.email}</span>
           </p>
 
-          {/* Role selector */}
           <div className="grid grid-cols-2 gap-3 mb-6">
             {[
               { value: 'member', label: 'NGO / Organization', icon: Building2 },
@@ -225,7 +228,7 @@ function GoogleOnboarding() {
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Full name"
+                            placeholder="e.g. Sarah Ahmad"
                             className="border-gray-200 focus-visible:ring-[#12a89d]"
                             {...field}
                           />
@@ -247,7 +250,7 @@ function GoogleOnboarding() {
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Your full name"
+                            placeholder="e.g. Ahmad Ali"
                             className="border-gray-200 focus-visible:ring-[#12a89d]"
                             {...field}
                           />
@@ -266,7 +269,7 @@ function GoogleOnboarding() {
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="e.g. Beirut, South Lebanon"
+                            placeholder="e.g. Beirut"
                             className="border-gray-200 focus-visible:ring-[#12a89d]"
                             {...field}
                           />
@@ -288,7 +291,7 @@ function GoogleOnboarding() {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="+961 XX XXX XXX"
+                        placeholder="e.g. 70 123 456"
                         className="border-gray-200 focus-visible:ring-[#12a89d]"
                         {...field}
                       />
@@ -302,18 +305,13 @@ function GoogleOnboarding() {
                 control={form.control}
                 name="consentGiven"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start gap-3 bg-gray-50 rounded-lg p-3">
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-200 p-4">
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="border-gray-300 data-[state=checked]:bg-[#12a89d] data-[state=checked]:border-[#12a89d] mt-0.5"
-                      />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
-                    <div className="leading-none">
-                      <FormLabel className="text-sm text-gray-700 font-normal cursor-pointer">
-                        I consent to Nasna storing and processing my data to facilitate aid
-                        coordination.
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>
+                        I confirm these details are correct and can be reviewed.
                       </FormLabel>
                       <FormMessage />
                     </div>
@@ -321,21 +319,23 @@ function GoogleOnboarding() {
                 )}
               />
 
-              <Button
-                type="submit"
-                className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white h-10"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Creating profile...' : 'Complete Setup'}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full text-gray-400 hover:text-gray-600"
-                onClick={handleCancel}
-              >
-                Cancel & sign out
-              </Button>
+              <div className="flex gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => void handleCancel()}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-[#12a89d] hover:bg-[#0f978d]"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Saving...' : 'Continue'}
+                </Button>
+              </div>
             </form>
           </Form>
         </div>

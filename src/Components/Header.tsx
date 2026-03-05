@@ -1,12 +1,8 @@
-import { useState, useEffect } from 'react';
-import { auth } from '../firebase';
-import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { useEffect } from 'react';
 import { selectLanguage } from '../services/i18next';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAppDispatch } from '../redux/hooks';
-import { logout } from '../redux/reducers/userSlice';
 import type { SupportedLanguage } from '../types';
-import { getCookie, deleteCookie } from '../utils/cookies';
+import { getCookie } from '../utils/cookies';
 import { Button } from '@/Components/ui/button';
 import {
   DropdownMenu,
@@ -16,6 +12,7 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { Globe, LayoutDashboard, LogOut, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { resolvePostLoginPath, useAuthStore } from '@/stores/authStore';
 
 const NAV_LINKS = [
   { to: '/about', labelKey: 'header.about' },
@@ -32,29 +29,13 @@ interface HeaderProps {
 }
 
 function Header({ dashboard = false }: HeaderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [role, setRole] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useAppDispatch();
   const { t } = useTranslation();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser) {
-        try {
-          const tokenResult = await firebaseUser.getIdTokenResult();
-          setRole(tokenResult.claims['role'] as string | null);
-        } catch (error) {
-          console.error('Error retrieving user role:', error);
-        }
-      } else {
-        setRole(null);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
+  const user = useAuthStore((state) => state.firebaseUser);
+  const role = useAuthStore((state) => state.role);
+  const profile = useAuthStore((state) => state.profile);
+  const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
     const savedLanguage = getCookie('language');
@@ -67,9 +48,7 @@ function Header({ dashboard = false }: HeaderProps) {
 
   const handleLogout = async () => {
     try {
-      deleteCookie('nasna_session');
-      await signOut(auth);
-      dispatch(logout());
+      await logout();
       navigate('/auth/login');
     } catch (error) {
       console.error('Error logging out: ', error);
@@ -79,7 +58,6 @@ function Header({ dashboard = false }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 h-20 bg-white border-b border-gray-200">
       <div className="flex items-center h-full px-6">
-        {/* Logo */}
         <div className="flex-1 flex items-center">
           <img
             src="/Nasna Logo.png"
@@ -89,9 +67,7 @@ function Header({ dashboard = false }: HeaderProps) {
           />
         </div>
 
-        {/* Right controls */}
         <div className="flex items-center gap-1">
-          {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-6 mr-2">
             {NAV_LINKS.map(({ to, labelKey }) => (
               <Link
@@ -111,7 +87,11 @@ function Header({ dashboard = false }: HeaderProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => navigate(role === 'admin' ? '/manage' : '/ngo/submissions')}
+                  onClick={() =>
+                    navigate(
+                      resolvePostLoginPath(role, role === 'admin' || profile?.onboarded === true),
+                    )
+                  }
                 >
                   <LayoutDashboard className="h-5 w-5 text-[#12a89d]" />
                 </Button>
@@ -122,7 +102,6 @@ function Header({ dashboard = false }: HeaderProps) {
             </>
           )}
 
-          {/* Language picker */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -138,7 +117,6 @@ function Header({ dashboard = false }: HeaderProps) {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Mobile hamburger */}
           <div className="md:hidden">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

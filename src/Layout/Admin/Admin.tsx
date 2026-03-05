@@ -1,53 +1,23 @@
-import { useState, useEffect, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { auth, db } from '../../firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from '@/Components/ui/sidebar';
 import AppSidebar from './Sidebar';
 import PageTransition from '../../Components/PageTransition';
 import AdminBreadcrumb from './Navbar';
+import { useAuthStore } from '@/stores/authStore';
 
 interface AdminProps {
   children: ReactNode;
 }
 
 function Admin({ children }: AdminProps) {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
-  const [role, setRole] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const loading = useAuthStore((state) => state.loading);
+  const initialized = useAuthStore((state) => state.initialized);
+  const user = useAuthStore((state) => state.firebaseUser);
+  const role = useAuthStore((state) => state.role);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const tokenResult = await firebaseUser.getIdTokenResult();
-          const memberSnapshot = await getDoc(doc(db, 'members', firebaseUser.uid));
-          const memberData = memberSnapshot.exists() ? memberSnapshot.data() : null;
-          const userRole =
-            (tokenResult.claims['role'] as string | undefined) ??
-            (memberData?.isAdmin === true ? 'admin' : memberData?.role);
-
-          if (userRole !== 'admin') {
-            navigate('/');
-          } else {
-            setUser(firebaseUser);
-            setRole(userRole);
-          }
-        } catch {
-          navigate('/');
-        }
-      } else {
-        navigate('/');
-      }
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, [navigate]);
-
-  if (loading) {
+  if (!initialized || loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />
@@ -55,7 +25,9 @@ function Admin({ children }: AdminProps) {
     );
   }
 
-  if (!user || role !== 'admin') return null;
+  if (!user || role !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <SidebarProvider className="h-screen overflow-hidden">

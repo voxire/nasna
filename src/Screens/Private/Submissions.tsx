@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { auth } from '@/firebase';
 import { Link, useNavigate } from 'react-router-dom';
-import { getCookie } from '@/utils/cookies';
 import type { MemberCase } from '@/services/memberCases';
 import { claimMemberCase, listMemberPendingCases } from '@/services/memberCases';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import CaseStatusBadge from '@/Components/CaseStatusBadge';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function Submissions() {
   const navigate = useNavigate();
@@ -16,15 +16,20 @@ export default function Submissions() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [claimingId, setClaimingId] = useState<string | null>(null);
+  const role = useAuthStore((state) => state.role);
+  const loadingAuth = useAuthStore((state) => state.loading);
+  const initialized = useAuthStore((state) => state.initialized);
 
   useEffect(() => {
     const loadCases = async () => {
+      if (!initialized || loadingAuth) return;
+
       if (!auth.currentUser?.uid) {
         navigate('/auth/login');
         return;
       }
 
-      if (getCookie('userRole') !== 'member') {
+      if (role !== 'member') {
         navigate('/');
         return;
       }
@@ -44,7 +49,7 @@ export default function Submissions() {
     };
 
     void loadCases();
-  }, [navigate]);
+  }, [initialized, loadingAuth, navigate, role]);
 
   const filteredCases = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();

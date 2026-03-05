@@ -1,57 +1,20 @@
-import { useEffect, useState, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { auth, db } from '../firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
+import { resolvePostLoginPath, useAuthStore } from '@/stores/authStore';
 
 interface GuestRouteProps {
   children: ReactNode;
 }
 
 function GuestRoute({ children }: GuestRouteProps) {
-  const [loading, setLoading] = useState(true);
-  const [redirect, setRedirect] = useState<string | null>(null);
+  const firebaseUser = useAuthStore((state) => state.firebaseUser);
+  const profile = useAuthStore((state) => state.profile);
+  const role = useAuthStore((state) => state.role);
+  const loading = useAuthStore((state) => state.loading);
+  const initialized = useAuthStore((state) => state.initialized);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user: User | null) => {
-      if (!user) {
-        setRedirect(null);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const tokenResult = await user.getIdTokenResult();
-        const memberDoc = await getDoc(doc(db, 'members', user.uid));
-        const memberData = memberDoc.exists() ? memberDoc.data() : null;
-        const claimedRole = tokenResult.claims['role'] as string | undefined;
-        const role = claimedRole ?? (memberData?.isAdmin === true ? 'admin' : memberData?.role);
-
-        if (role === 'admin') {
-          setRedirect('/manage');
-          setLoading(false);
-          return;
-        }
-
-        if (memberData?.onboarded !== true) {
-          setRedirect('/auth/onboarding');
-        } else if (role === 'agent') {
-          setRedirect('/agent/create');
-        } else {
-          setRedirect('/ngo/submissions');
-        }
-      } catch {
-        setRedirect(null);
-        setLoading(false);
-        return;
-      }
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  if (loading) {
+  if (!initialized || loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />
@@ -59,7 +22,14 @@ function GuestRoute({ children }: GuestRouteProps) {
     );
   }
 
-  if (redirect) return <Navigate to={redirect} replace />;
+  if (firebaseUser) {
+    return (
+      <Navigate
+        to={resolvePostLoginPath(role, role === 'admin' || profile?.onboarded === true)}
+        replace
+      />
+    );
+  }
 
   return <>{children}</>;
 }

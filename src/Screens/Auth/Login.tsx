@@ -3,14 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
-import { auth, googleProvider, db } from '../../firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { loginUser } from '../../redux/reducers/userSlice';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../../firebase';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { getCookie, setCookie, deleteCookie } from '../../utils/cookies';
+import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import {
@@ -37,18 +35,12 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-const resolvePostLoginPath = (role?: string, onboarded?: boolean) => {
-  if (role === 'admin') return '/manage';
-  if (onboarded !== true) return '/auth/onboarding';
-  if (role === 'agent') return '/agent/create';
-  return '/ngo/submissions';
-};
-
 function Login() {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading } = useAppSelector((state) => state.user);
+  const loading = useAuthStore((state) => state.loading);
+  const loginWithPassword = useAuthStore((state) => state.loginWithPassword);
+  const loginWithGoogle = useAuthStore((state) => state.loginWithGoogle);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
@@ -82,35 +74,9 @@ function Login() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const tokenResult = await result.user.getIdTokenResult();
-      const claimedRole = tokenResult.claims['role'] as string | undefined;
-      if (claimedRole === 'admin') {
-        setCookie('userRole', 'admin', 7 * 24 * 60 * 60);
-        setCookie('nasna_session', '1', 8 * 60 * 60);
-        toast.success(t('login.toast.success'));
-        navigate('/manage');
-        return;
-      }
-
-      const memberDoc = await getDoc(doc(db, 'members', result.user.uid));
-      setCookie('nasna_session', '1', 8 * 60 * 60);
-
-      if (memberDoc.exists()) {
-        const memberData = memberDoc.data() as {
-          role?: string;
-          onboarded?: boolean;
-          isAdmin?: boolean;
-        };
-        const role = claimedRole ?? (memberData.isAdmin === true ? 'admin' : memberData.role);
-        if (role) {
-          setCookie('userRole', role, 7 * 24 * 60 * 60);
-        }
-        toast.success(t('login.toast.success'));
-        navigate(resolvePostLoginPath(role, memberData.onboarded));
-      } else {
-        navigate('/auth/onboarding');
-      }
+      const result = await loginWithGoogle();
+      toast.success(t('login.toast.success'));
+      navigate(result.destination);
     } catch (error: unknown) {
       const code = (error as { code?: string })?.code ?? '';
       if (code === 'auth/account-exists-with-different-credential') {
@@ -134,13 +100,12 @@ function Login() {
       return;
     }
 
-    const result = await dispatch(loginUser({ email: data.email, password: data.password }));
-    if (loginUser.fulfilled.match(result)) {
+    try {
+      const result = await loginWithPassword(data.email, data.password);
       deleteCookie('nasna_login_attempts');
-      setCookie('nasna_session', '1', 8 * 60 * 60);
       toast.success(t('login.toast.success'));
-      navigate(resolvePostLoginPath(result.payload.role, result.payload.onboarded));
-    } else {
+      navigate(result.destination);
+    } catch (error) {
       const attempts = Number(getCookie('nasna_login_attempts') || '0') + 1;
       if (attempts >= 5) {
         setCookie('nasna_login_locked', '1', 15 * 60);
@@ -148,7 +113,7 @@ function Login() {
         toast.error(t('login.toast.tooManyAttempts'));
       } else {
         setCookie('nasna_login_attempts', String(attempts), 15 * 60);
-        handleFirebaseError((result.payload as string) ?? '');
+        handleFirebaseError((error as { code?: string })?.code ?? '');
       }
     }
   };

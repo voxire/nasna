@@ -1,26 +1,20 @@
 import { useEffect, useRef } from 'react';
-import { signOut } from 'firebase/auth';
-import { auth } from '../firebase';
-import { useAppDispatch } from '../redux/hooks';
-import { logout } from '../redux/reducers/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { deleteCookie } from '../utils/cookies';
+import { useAuthStore } from '@/stores/authStore';
 
 const IDLE_MS = 30 * 60 * 1000; // 30 minutes
 
 export function useIdleTimeout() {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
     const reset = () => {
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(async () => {
-        deleteCookie('nasna_session');
-        await signOut(auth);
-        dispatch(logout());
+        await logout();
         toast.info('Session expired due to inactivity.');
         navigate('/auth/login');
       }, IDLE_MS);
@@ -34,5 +28,5 @@ export function useIdleTimeout() {
       if (timer.current) clearTimeout(timer.current);
       events.forEach((e) => window.removeEventListener(e, reset));
     };
-  }, [dispatch, navigate]);
+  }, [logout, navigate]);
 }

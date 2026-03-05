@@ -1,12 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { getCookie } from '../../utils/cookies';
 import { Globe, LogOut } from 'lucide-react';
 import { selectLanguage } from '../../services/i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../redux/hooks';
-import { logout } from '../../redux/reducers/userSlice';
-import { auth } from '../../firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
 import type { SupportedLanguage } from '../../types';
 import { Button } from '@/Components/ui/button';
 import {
@@ -16,13 +12,14 @@ import {
   DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '@/stores/authStore';
 
 function PrivateNavbar() {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const [role, setRole] = useState<string | null>(getCookie('userRole'));
+  const role = useAuthStore((state) => state.role);
+  const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
     const savedLanguage = getCookie('language');
@@ -35,28 +32,13 @@ function PrivateNavbar() {
     selectLanguage(lng);
   };
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        setRole(null);
-        return;
-      }
-
-      const tokenResult = await user.getIdTokenResult();
-      setRole((tokenResult.claims['role'] as string | undefined) ?? null);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
   const handleClickAbout = () => {
     window.location.href = '/';
   };
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
-      dispatch(logout());
+      await logout();
       navigate('/auth/login');
     } catch (error) {
       console.error('Error logging out: ', error);

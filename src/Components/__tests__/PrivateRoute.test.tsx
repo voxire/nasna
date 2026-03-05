@@ -2,29 +2,21 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import PrivateRoute from '../PrivateRoute';
 
-const mockOnAuthStateChanged = jest.fn();
-const mockSignOut = jest.fn();
-const mockGetDoc = jest.fn();
-const mockDoc = jest.fn();
 const mockUseIdleTimeout = jest.fn();
-
-jest.mock('../../firebase', () => ({
-  auth: {},
-  db: {},
-}));
-
-jest.mock('firebase/auth', () => ({
-  onAuthStateChanged: (...args: unknown[]) => mockOnAuthStateChanged(...args),
-  signOut: (...args: unknown[]) => mockSignOut(...args),
-}));
-
-jest.mock('firebase/firestore', () => ({
-  doc: (...args: unknown[]) => mockDoc(...args),
-  getDoc: (...args: unknown[]) => mockGetDoc(...args),
-}));
+const mockAuthState = {
+  firebaseUser: null as unknown,
+  profile: null as unknown,
+  role: null as unknown,
+  loading: false,
+  initialized: true,
+};
 
 jest.mock('../../hooks/useIdleTimeout', () => ({
   useIdleTimeout: () => mockUseIdleTimeout(),
+}));
+
+jest.mock('@/stores/authStore', () => ({
+  useAuthStore: (selector: (state: typeof mockAuthState) => unknown) => selector(mockAuthState),
 }));
 
 function renderRoute(route: React.ReactElement) {
@@ -45,20 +37,14 @@ function renderRoute(route: React.ReactElement) {
 describe('PrivateRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    document.cookie = 'nasna_session=1';
-    mockDoc.mockReturnValue({});
-    mockGetDoc.mockResolvedValue({
-      exists: () => false,
-      data: () => null,
-    });
+    mockAuthState.firebaseUser = null;
+    mockAuthState.profile = null;
+    mockAuthState.role = null;
+    mockAuthState.loading = false;
+    mockAuthState.initialized = true;
   });
 
   it('redirects unauthenticated users to login', async () => {
-    mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-      void callback(null);
-      return jest.fn();
-    });
-
     renderRoute(
       <PrivateRoute>
         <div>protected</div>
@@ -71,13 +57,8 @@ describe('PrivateRoute', () => {
   });
 
   it('redirects users without an allowed role', async () => {
-    mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-      void callback({
-        uid: 'user-1',
-        getIdTokenResult: jest.fn().mockResolvedValue({ claims: { role: 'agent' } }),
-      });
-      return jest.fn();
-    });
+    mockAuthState.firebaseUser = { uid: 'user-1' };
+    mockAuthState.role = 'agent';
 
     renderRoute(
       <PrivateRoute allowedRoles={['member']}>
@@ -91,17 +72,9 @@ describe('PrivateRoute', () => {
   });
 
   it('blocks unvalidated member access when validation is required', async () => {
-    mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-      void callback({
-        uid: 'user-2',
-        getIdTokenResult: jest.fn().mockResolvedValue({ claims: { role: 'member' } }),
-      });
-      return jest.fn();
-    });
-    mockGetDoc.mockResolvedValue({
-      exists: () => true,
-      data: () => ({ validated: false }),
-    });
+    mockAuthState.firebaseUser = { uid: 'user-2' };
+    mockAuthState.role = 'member';
+    mockAuthState.profile = { validated: false };
 
     renderRoute(
       <PrivateRoute allowedRoles={['member']} requireValidated>
@@ -115,17 +88,9 @@ describe('PrivateRoute', () => {
   });
 
   it('renders protected content for validated allowed roles', async () => {
-    mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-      void callback({
-        uid: 'user-3',
-        getIdTokenResult: jest.fn().mockResolvedValue({ claims: { role: 'member' } }),
-      });
-      return jest.fn();
-    });
-    mockGetDoc.mockResolvedValue({
-      exists: () => true,
-      data: () => ({ validated: true }),
-    });
+    mockAuthState.firebaseUser = { uid: 'user-3' };
+    mockAuthState.role = 'member';
+    mockAuthState.profile = { validated: true };
 
     renderRoute(
       <PrivateRoute allowedRoles={['member']} requireValidated>

@@ -1,10 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../firebase';
-import { useAppDispatch } from '../../redux/hooks';
-import { logout } from '../../redux/reducers/userSlice';
 import { toast } from 'sonner';
-import { deleteCookie } from '../../utils/cookies';
 import {
   Home,
   List,
@@ -41,6 +36,7 @@ import {
   DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
+import { useAuthStore } from '@/stores/authStore';
 
 const NAV_ITEMS = [
   { path: '/manage', label: 'Home', icon: Home },
@@ -68,13 +64,11 @@ function getInitials(email: string) {
 export default function AppSidebar({ user }: AppSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  const logout = useAuthStore((state) => state.logout);
 
   const handleLogout = async () => {
     try {
-      deleteCookie('nasna_session');
-      await signOut(auth);
-      dispatch(logout());
+      await logout();
       toast.success('You have been logged out.');
     } catch {
       toast.error('Failed to log out. Please try again.');

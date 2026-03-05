@@ -7,11 +7,17 @@ import AuthRoutes from './Routes/AuthRoutes';
 import AdminRoutes from './Routes/AdminRoutes';
 import NotFound from './Components/NotFound/NotFound';
 import PrivateRoutes from './Routes/PrivateRoutes';
+import { useAuthStore } from './stores/authStore';
 
 export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const initializeAuth = useAuthStore((state) => state.initializeAuth);
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
 
   useEffect(() => {
     if (location.pathname === '/index.html') {
