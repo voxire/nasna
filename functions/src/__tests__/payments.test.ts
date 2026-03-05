@@ -12,7 +12,7 @@ const mockGetFirestore = jest.fn(() => ({
   collection: mockCollection,
 }));
 const mockStripeCreate = jest.fn();
-const mockStripeConstructor = jest.fn(() => ({
+const mockStripeConstructor = jest.fn((_secretKey?: unknown) => ({
   checkout: {
     sessions: {
       create: mockStripeCreate,
