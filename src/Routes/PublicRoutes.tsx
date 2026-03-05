@@ -8,6 +8,7 @@ const About = lazy(() => import('../Screens/Public/About'));
 const Confirmation = lazy(() => import('../Screens/Public/Confirmation'));
 const Donate = lazy(() => import('../Screens/Public/Donate'));
 const OfferHousing = lazy(() => import('../Screens/Public/OfferHousing'));
+const Housing = lazy(() => import('../Screens/Public/Housing'));
 const Terms = lazy(() => import('../Screens/Public/Terms'));
 const OfferHelp = lazy(() => import('../Screens/Public/OfferHelp'));
 const Resources = lazy(() => import('../Screens/Public/Resources'));
@@ -60,6 +61,14 @@ const PublicRoutes: RouteConfig[] = [
     element: (
       <Public>
         <OfferHousing />
+      </Public>
+    ),
+  },
+  {
+    path: '/housing',
+    element: (
+      <Public>
+        <Housing />
       </Public>
     ),
   },
