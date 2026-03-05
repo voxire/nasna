@@ -9,7 +9,15 @@ import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/Components/ui/form';
+import { buildMemberWorkflowDefaults } from '@/lib/v2Defaults';
 
 const agentSchema = z
   .object({
@@ -43,7 +51,9 @@ function AgentRegister() {
     },
   });
 
-  const { formState: { isSubmitting } } = form;
+  const {
+    formState: { isSubmitting },
+  } = form;
 
   const onSubmit = async (data: AgentFormData) => {
     try {
@@ -55,9 +65,9 @@ function AgentRegister() {
         phoneNumber: data.phoneNumber,
         areaOfOperation: data.areaOfOperation,
         role: 'agent',
+        ...buildMemberWorkflowDefaults(),
         isAdmin: false,
         validated: false,
-        onboarded: true,
         createdAt: new Date(),
         updatedAt: new Date(),
         consentGiven: true,
@@ -74,93 +84,97 @@ function AgentRegister() {
   return (
     <div className="max-w-[600px] mx-auto my-8 px-4">
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Become An Agent</h1>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input type="password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phoneNumber"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone Number</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="areaOfOperation"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Area of Operation</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <p className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">{t('home.consent')}</p>
-          <Button type="submit" className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white" disabled={isSubmitting}>
-            {isSubmitting ? 'Registering...' : 'Register'}
-          </Button>
-        </form>
-      </Form>
+        <h1 className="text-2xl font-bold mb-6 text-gray-800">Become An Agent</h1>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="areaOfOperation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Area of Operation</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <p className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">{t('home.consent')}</p>
+            <Button
+              type="submit"
+              className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Registering...' : 'Register'}
+            </Button>
+          </form>
+        </Form>
       </div>
     </div>
   );

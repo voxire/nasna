@@ -12,6 +12,7 @@ import { Input } from '@/Components/ui/input';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
+import { buildSubmissionWorkflowDefaults } from '@/lib/v2Defaults';
 import {
   Select,
   SelectContent,
@@ -113,7 +114,12 @@ function Home() {
           fullName, phoneNumber: trimmedPhone, emailAddress: emailAddress.trim().toLowerCase(), gender,
           currentGovernorate, previousGovernorate, city, street, building, floor,
           ageRanges, specialNeeds, needs, aidUrgency, consentGiven,
-          comments, registrationDate: Timestamp.fromDate(new Date()), agent: '',
+          comments,
+          ...buildSubmissionWorkflowDefaults('web'),
+          registrationDate: Timestamp.fromDate(new Date()),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          agent: '',
         });
         setCookie('nasna_submitted', '1', 86_400);
         toast.success(t('home.toast.memberAddedSuccess'));

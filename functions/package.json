@@ -5,6 +5,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf lib",
+    "backfill:v2": "pnpm build && node lib/backfillV2Data.js",
     "serve": "npm run build && firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions"
   },

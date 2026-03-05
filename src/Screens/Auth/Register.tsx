@@ -10,7 +10,15 @@ import { doc, setDoc } from 'firebase/firestore';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Checkbox } from '@/Components/ui/checkbox';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/Components/ui/form';
+import { buildMemberWorkflowDefaults } from '@/lib/v2Defaults';
 
 const registerSchema = z
   .object({
@@ -46,7 +54,9 @@ function Register() {
     },
   });
 
-  const { formState: { isSubmitting } } = form;
+  const {
+    formState: { isSubmitting },
+  } = form;
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
@@ -65,9 +75,9 @@ function Register() {
         role: 'member',
         numberOfVolunteers: '',
         isOfficiallyRegistered: false,
+        ...buildMemberWorkflowDefaults(),
         isAdmin: false,
         validated: false,
-        onboarded: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -91,9 +101,14 @@ function Register() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.name')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    {t('register.fields.name')}
+                  </FormLabel>
                   <FormControl>
-                    <Input className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                    <Input
+                      className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -104,9 +119,14 @@ function Register() {
               name="contactPersonName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.contactPersonName')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    {t('register.fields.contactPersonName')}
+                  </FormLabel>
                   <FormControl>
-                    <Input className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                    <Input
+                      className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -117,9 +137,15 @@ function Register() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.email')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    {t('register.fields.email')}
+                  </FormLabel>
                   <FormControl>
-                    <Input type="email" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                    <Input
+                      type="email"
+                      className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -131,9 +157,15 @@ function Register() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.password')}</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-700">
+                      {t('register.fields.password')}
+                    </FormLabel>
                     <FormControl>
-                      <Input type="password" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                      <Input
+                        type="password"
+                        className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -144,9 +176,15 @@ function Register() {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.confirmPassword')}</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-700">
+                      {t('register.fields.confirmPassword')}
+                    </FormLabel>
                     <FormControl>
-                      <Input type="password" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                      <Input
+                        type="password"
+                        className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -158,9 +196,14 @@ function Register() {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">{t('register.fields.phoneNumber')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    {t('register.fields.phoneNumber')}
+                  </FormLabel>
                   <FormControl>
-                    <Input className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" {...field} />
+                    <Input
+                      className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -179,13 +222,19 @@ function Register() {
                     />
                   </FormControl>
                   <div className="leading-none">
-                    <FormLabel className="text-sm text-gray-700 font-normal cursor-pointer">{t('register.consent')}</FormLabel>
+                    <FormLabel className="text-sm text-gray-700 font-normal cursor-pointer">
+                      {t('register.consent')}
+                    </FormLabel>
                     <FormMessage />
                   </div>
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white mt-2" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white mt-2"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? t('register.loading') : t('register.submit')}
             </Button>
           </form>
