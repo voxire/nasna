@@ -5,6 +5,7 @@ import type { RouteConfig } from '../types';
 const Dashboard = lazy(() => import('../Screens/Admin/Dashboard'));
 const DispatchCenter = lazy(() => import('../Screens/Admin/DispatchCenter'));
 const CenterManagement = lazy(() => import('../Screens/Admin/CenterManagement'));
+const HousingReview = lazy(() => import('../Screens/Admin/HousingReview'));
 const AdminSubmissions = lazy(() => import('../Screens/Admin/AdminSubmissions'));
 const Members = lazy(() => import('../Screens/Admin/Members'));
 const Agents = lazy(() => import('../Screens/Admin/Agents'));
@@ -36,6 +37,14 @@ const AdminRoutes: RouteConfig[] = [
     element: (
       <Admin>
         <CenterManagement />
+      </Admin>
+    ),
+  },
+  {
+    path: '/manage/housing',
+    element: (
+      <Admin>
+        <HousingReview />
       </Admin>
     ),
   },
