@@ -36,4 +36,4 @@ jobs:
         run: pnpm functions:build
 
       - name: Deploy to Firebase
-        run: pnpm exec firebase deploy --only hosting,firestore,functions --token "${{ secrets.FIREBASE_TOKEN }}"
+        run: pnpm exec firebase deploy --only hosting,firestore,functions --force --token "${{ secrets.FIREBASE_TOKEN }}"
