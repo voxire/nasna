@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -41,7 +41,7 @@ function Login() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { user, loading } = useAppSelector((state) => state.user);
+  const { loading } = useAppSelector((state) => state.user);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
@@ -51,12 +51,6 @@ function Login() {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
   });
-
-  useEffect(() => {
-    if (user) {
-      navigate(-1);
-    }
-  }, [user, navigate]);
 
   const handleFirebaseError = (errorCode: string) => {
     switch (errorCode) {
