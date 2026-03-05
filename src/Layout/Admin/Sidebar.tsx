@@ -18,6 +18,7 @@ import {
   ShieldPlus,
   Building2,
   House,
+  ChartColumn,
 } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import {
@@ -45,6 +46,7 @@ const NAV_ITEMS = [
   { path: '/manage/dispatch', label: 'Dispatch Center', icon: Radar },
   { path: '/manage/centers', label: 'Centers', icon: Building2 },
   { path: '/manage/housing', label: 'Housing Review', icon: House },
+  { path: '/manage/impact', label: 'Impact Dashboard', icon: ChartColumn },
   { path: '/manage/submissions', label: 'Submissions', icon: List },
   { path: '/manage/ngo', label: 'NGO / Initiative', icon: Bell },
   { path: '/manage/agents', label: 'Agents', icon: UserPlus },
