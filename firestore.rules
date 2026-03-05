@@ -170,7 +170,6 @@ service cloud.firestore {
 
       // Duplicate-phone check moved to Cloud Function — no unauthenticated reads
       allow read: if isAdmin()
-        || isValidatedMember()
         || (isAgent() && resource.data.agent == request.auth.uid);
 
       // Only admins may edit; prevent changing the core submission fields
