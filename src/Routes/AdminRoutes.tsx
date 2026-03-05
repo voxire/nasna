@@ -7,6 +7,7 @@ const DispatchCenter = lazy(() => import('../Screens/Admin/DispatchCenter'));
 const CenterManagement = lazy(() => import('../Screens/Admin/CenterManagement'));
 const HousingReview = lazy(() => import('../Screens/Admin/HousingReview'));
 const ImpactDashboard = lazy(() => import('../Screens/Admin/ImpactDashboard'));
+const OperationsMap = lazy(() => import('../Screens/Admin/OperationsMap'));
 const AdminSubmissions = lazy(() => import('../Screens/Admin/AdminSubmissions'));
 const Members = lazy(() => import('../Screens/Admin/Members'));
 const Agents = lazy(() => import('../Screens/Admin/Agents'));
@@ -54,6 +55,14 @@ const AdminRoutes: RouteConfig[] = [
     element: (
       <Admin>
         <ImpactDashboard />
+      </Admin>
+    ),
+  },
+  {
+    path: '/manage/operations-map',
+    element: (
+      <Admin>
+        <OperationsMap />
       </Admin>
     ),
   },
