@@ -179,8 +179,8 @@ async function rebuildGlobalStats() {
   ]);
 
   const submissionsRegistered = submissionSnapshot.size;
-  const submissionsAssigned = submissionSnapshot.docs.filter(
-    (document) => Boolean((document.data() as SubmissionRecord).assignedTo),
+  const submissionsAssigned = submissionSnapshot.docs.filter((document) =>
+    Boolean((document.data() as SubmissionRecord).assignedTo),
   ).length;
   const completedSubmissions = submissionSnapshot.docs.filter(
     (document) => (document.data() as SubmissionRecord).status === 'completed',

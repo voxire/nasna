@@ -15,7 +15,8 @@
     "functions:serve": "pnpm --dir functions serve",
     "functions:deploy": "pnpm --dir functions deploy",
     "check": "pnpm tsc && pnpm functions:build",
-    "format": "prettier --write \"src/**/*.{ts,tsx,scss}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,scss,json}\" \"functions/src/**/*.ts\" \".github/workflows/*.yml\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,scss,json}\" \"functions/src/**/*.ts\" \".github/workflows/*.yml\""
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",

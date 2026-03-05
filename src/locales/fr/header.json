@@ -1,6 +1,13 @@
 {
   "about": "À propos",
+  "impact": "Impact",
+  "housing": "Hébergement",
+  "emergency": "Urgence",
   "offerHelp": "Offrir de l'aide",
   "resources": "Ressources",
-  "feedback": "Commentaires"
+  "feedback": "Commentaires",
+  "caseFeed": "Flux des cas",
+  "myCases": "Mes cas",
+  "coverage": "Couverture",
+  "logout": "Se déconnecter"
 }

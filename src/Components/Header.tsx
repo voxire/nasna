@@ -19,9 +19,9 @@ import { useTranslation } from 'react-i18next';
 
 const NAV_LINKS = [
   { to: '/about', labelKey: 'header.about' },
-  { to: '/impact', labelKey: null, fallback: 'Impact' },
-  { to: '/housing', labelKey: null, fallback: 'Housing' },
-  { to: '/emergency', labelKey: null, fallback: 'Emergency' },
+  { to: '/impact', labelKey: 'header.impact' },
+  { to: '/housing', labelKey: 'header.housing' },
+  { to: '/emergency', labelKey: 'header.emergency' },
   { to: '/offer-help', labelKey: 'header.offerHelp' },
   { to: '/resources', labelKey: 'header.resources' },
   { to: '/feedback', labelKey: 'header.feedback' },
@@ -101,7 +101,7 @@ function Header({ dashboard = false }: HeaderProps) {
                   location.pathname === to ? 'text-[#12a89d]' : 'text-gray-600 hover:text-[#12a89d]'
                 }`}
               >
-                {labelKey ? t(labelKey) : NAV_LINKS.find((link) => link.to === to)?.fallback}
+                {t(labelKey)}
               </Link>
             ))}
           </nav>
@@ -147,10 +147,10 @@ function Header({ dashboard = false }: HeaderProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {NAV_LINKS.map(({ to, labelKey, fallback }) => (
+                {NAV_LINKS.map(({ to, labelKey }) => (
                   <DropdownMenuItem key={to} onClick={() => navigate(to)}>
                     <span className={location.pathname === to ? 'text-[#12a89d] font-medium' : ''}>
-                      {labelKey ? t(labelKey) : fallback}
+                      {t(labelKey)}
                     </span>
                   </DropdownMenuItem>
                 ))}

@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, deleteDoc, updateDoc, Timestamp, query, limit } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+  Timestamp,
+  query,
+  limit,
+} from 'firebase/firestore';
 import { toast } from 'sonner';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -73,7 +82,7 @@ function FeedbackManagement() {
     if (query) {
       const q = query.toLowerCase();
       result = result.filter((f) =>
-        [f.name, f.email, f.message].some((v) => (v ?? '').toLowerCase().includes(q))
+        [f.name, f.email, f.message].some((v) => (v ?? '').toLowerCase().includes(q)),
       );
     }
     if (type && type !== 'all') result = result.filter((f) => f.type === type);
@@ -88,13 +97,19 @@ function FeedbackManagement() {
     applyFilters(q, typeFilter, readFilter, items);
   };
 
-  const handleTypeFilter = (v: string) => { setTypeFilter(v); applyFilters(searchQuery, v, readFilter, items); };
-  const handleReadFilter = (v: string) => { setReadFilter(v); applyFilters(searchQuery, typeFilter, v, items); };
+  const handleTypeFilter = (v: string) => {
+    setTypeFilter(v);
+    applyFilters(searchQuery, v, readFilter, items);
+  };
+  const handleReadFilter = (v: string) => {
+    setReadFilter(v);
+    applyFilters(searchQuery, typeFilter, v, items);
+  };
 
   const handleMarkRead = async (id: string) => {
     try {
       await updateDoc(doc(db, 'feedback', id), { read: true });
-      const updated = items.map((f) => f.id === id ? { ...f, read: true } : f);
+      const updated = items.map((f) => (f.id === id ? { ...f, read: true } : f));
       setItems(updated);
       applyFilters(searchQuery, typeFilter, readFilter, updated);
       toast.success('Marked as read.');
@@ -136,16 +151,22 @@ function FeedbackManagement() {
           className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
         <Select value={typeFilter} onValueChange={handleTypeFilter}>
-          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200"><SelectValue placeholder="Type" /></SelectTrigger>
+          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
             {['General', 'Bug Report', 'Feature Request', 'Complaint', 'Compliment'].map((t) => (
-              <SelectItem key={t} value={t}>{t}</SelectItem>
+              <SelectItem key={t} value={t}>
+                {t}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
         <Select value={readFilter} onValueChange={handleReadFilter}>
-          <SelectTrigger className="w-[140px] bg-gray-50 border-gray-200"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectTrigger className="w-[140px] bg-gray-50 border-gray-200">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
             <SelectItem value="false">Unread</SelectItem>
@@ -172,14 +193,21 @@ function FeedbackManagement() {
             </TableHeader>
             <TableBody>
               {paged.map((item) => (
-                <TableRow key={item.id} className={`hover:bg-gray-50 ${!item.read ? 'font-medium' : ''}`}>
+                <TableRow
+                  key={item.id}
+                  className={`hover:bg-gray-50 ${!item.read ? 'font-medium' : ''}`}
+                >
                   <TableCell>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${item.read ? 'bg-gray-100 text-gray-500' : 'bg-blue-100 text-blue-700'}`}>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${item.read ? 'bg-gray-100 text-gray-500' : 'bg-blue-100 text-blue-700'}`}
+                    >
                       {item.read ? 'Read' : 'Unread'}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">{item.type}</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                      {item.type}
+                    </span>
                   </TableCell>
                   <TableCell>{item.name || '—'}</TableCell>
                   <TableCell>{item.email || '—'}</TableCell>
@@ -188,11 +216,26 @@ function FeedbackManagement() {
                     {item.createdAt?.toDate().toLocaleDateString()}
                   </TableCell>
                   <TableCell className="flex gap-2">
-                    <Button size="sm" variant="outline" className="border-gray-300" onClick={() => handleView(item)}>View</Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-gray-300"
+                      onClick={() => handleView(item)}
+                    >
+                      View
+                    </Button>
                     {!item.read && (
-                      <Button size="sm" className="bg-[#12a89d] hover:bg-[#0e9088] text-white" onClick={() => handleMarkRead(item.id)}>Mark Read</Button>
+                      <Button
+                        size="sm"
+                        className="bg-[#12a89d] hover:bg-[#0e9088] text-white"
+                        onClick={() => handleMarkRead(item.id)}
+                      >
+                        Mark Read
+                      </Button>
                     )}
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(item.id)}>Delete</Button>
+                    <Button size="sm" variant="destructive" onClick={() => handleDelete(item.id)}>
+                      Delete
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -205,24 +248,46 @@ function FeedbackManagement() {
                 : `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length}`}
             </span>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 1}>Previous</Button>
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages}>Next</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => p - 1)}
+                disabled={page === 1}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={page >= totalPages}
+              >
+                Next
+              </Button>
             </div>
           </div>
         </div>
       )}
 
-      <Dialog open={!!viewItem} onOpenChange={(open) => { if (!open) setViewItem(null); }}>
+      <Dialog
+        open={!!viewItem}
+        onOpenChange={(open) => {
+          if (!open) setViewItem(null);
+        }}
+      >
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{viewItem?.type}</DialogTitle>
             <DialogDescription>
               {viewItem?.name ? `From: ${viewItem.name}` : 'Anonymous'}
               {viewItem?.email ? ` · ${viewItem.email}` : ''}
-              {' · '}{viewItem?.createdAt?.toDate().toLocaleString()}
+              {' · '}
+              {viewItem?.createdAt?.toDate().toLocaleString()}
             </DialogDescription>
           </DialogHeader>
-          <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{viewItem?.message}</p>
+          <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+            {viewItem?.message}
+          </p>
         </DialogContent>
       </Dialog>
     </div>

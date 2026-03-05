@@ -69,7 +69,7 @@ function OffersManagement() {
     if (query) {
       const q = query.toLowerCase();
       result = result.filter((o) =>
-        [o.phone, o.region, o.neighborhood].some((v) => (v ?? '').toLowerCase().includes(q))
+        [o.phone, o.region, o.neighborhood].some((v) => (v ?? '').toLowerCase().includes(q)),
       );
     }
     if (type && type !== 'all') result = result.filter((o) => o.type === type);
@@ -83,7 +83,10 @@ function OffersManagement() {
     applyFilters(q, typeFilter, items);
   };
 
-  const handleTypeFilter = (v: string) => { setTypeFilter(v); applyFilters(searchQuery, v, items); };
+  const handleTypeFilter = (v: string) => {
+    setTypeFilter(v);
+    applyFilters(searchQuery, v, items);
+  };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Delete this offer?')) return;
@@ -113,11 +116,15 @@ function OffersManagement() {
           className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
         <Select value={typeFilter} onValueChange={handleTypeFilter}>
-          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200"><SelectValue placeholder="Type" /></SelectTrigger>
+          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
             {OFFER_TYPES.map((t) => (
-              <SelectItem key={t} value={t}>{t}</SelectItem>
+              <SelectItem key={t} value={t}>
+                {t}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -144,18 +151,24 @@ function OffersManagement() {
               {paged.map((item) => (
                 <TableRow key={item.id} className="hover:bg-gray-50">
                   <TableCell>
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">{item.type}</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">
+                      {item.type}
+                    </span>
                   </TableCell>
                   <TableCell>{item.phone}</TableCell>
                   <TableCell>{item.region}</TableCell>
                   <TableCell>{item.neighborhood || '—'}</TableCell>
                   <TableCell>{item.capacity ?? '—'}</TableCell>
-                  <TableCell className="max-w-[200px] truncate text-gray-500 text-xs">{item.description || '—'}</TableCell>
+                  <TableCell className="max-w-[200px] truncate text-gray-500 text-xs">
+                    {item.description || '—'}
+                  </TableCell>
                   <TableCell className="text-gray-500 text-xs whitespace-nowrap">
                     {item.createdAt?.toDate().toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(item.id)}>Delete</Button>
+                    <Button size="sm" variant="destructive" onClick={() => handleDelete(item.id)}>
+                      Delete
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -168,8 +181,22 @@ function OffersManagement() {
                 : `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length}`}
             </span>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 1}>Previous</Button>
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages}>Next</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => p - 1)}
+                disabled={page === 1}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={page >= totalPages}
+              >
+                Next
+              </Button>
             </div>
           </div>
         </div>

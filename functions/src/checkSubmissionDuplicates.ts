@@ -59,5 +59,5 @@ export const checkSubmissionDuplicates = onCall<CheckDuplicateRequest>(
       phoneDuplicate: !phoneSnap.empty,
       emailDuplicate: normalizedEmail ? !emailSnap?.empty : false,
     };
-  }
+  },
 );

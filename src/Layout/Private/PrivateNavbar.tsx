@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { getCookie } from '../../utils/cookies';
 import { Globe, LogOut } from 'lucide-react';
 import { selectLanguage } from '../../services/i18next';
@@ -6,7 +6,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../redux/hooks';
 import { logout } from '../../redux/reducers/userSlice';
 import { auth } from '../../firebase';
-import { signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import type { SupportedLanguage } from '../../types';
 import { Button } from '@/Components/ui/button';
 import {
@@ -15,11 +15,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
+import { useTranslation } from 'react-i18next';
 
 function PrivateNavbar() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
+  const [role, setRole] = useState<string | null>(getCookie('userRole'));
 
   useEffect(() => {
     const savedLanguage = getCookie('language');
@@ -31,6 +34,20 @@ function PrivateNavbar() {
   const handleLanguageChange = (lng: SupportedLanguage) => {
     selectLanguage(lng);
   };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setRole(null);
+        return;
+      }
+
+      const tokenResult = await user.getIdTokenResult();
+      setRole((tokenResult.claims['role'] as string | undefined) ?? null);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleClickAbout = () => {
     window.location.href = '/';
@@ -58,12 +75,12 @@ function PrivateNavbar() {
           />
         </div>
 
-        {getCookie('userRole') === 'member' ? (
+        {role === 'member' ? (
           <nav className="mr-4 hidden items-center gap-2 lg:flex">
             {[
-              { href: '/ngo/submissions', label: 'Case Feed' },
-              { href: '/ngo/my-cases', label: 'My Cases' },
-              { href: '/ngo/profile-coverage', label: 'Coverage' },
+              { href: '/ngo/submissions', label: t('header.caseFeed') },
+              { href: '/ngo/my-cases', label: t('header.myCases') },
+              { href: '/ngo/profile-coverage', label: t('header.coverage') },
             ].map((item) => (
               <Button
                 key={item.href}
@@ -84,7 +101,7 @@ function PrivateNavbar() {
         <div className="flex items-center gap-1">
           <Button variant="ghost" onClick={handleLogout} className="text-[#12a89d]">
             <LogOut className="h-4 w-4 mr-1" />
-            Logout
+            {t('header.logout')}
           </Button>
 
           <DropdownMenu>

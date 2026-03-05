@@ -2,14 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Label } from '@/Components/ui/label';
 
-const AID_TYPES = [
-  'food',
-  'water',
-  'shelter',
-  'hygiene',
-  'medical',
-  'clothing',
-] as const;
+const AID_TYPES = ['food', 'water', 'shelter', 'hygiene', 'medical', 'clothing'] as const;
 
 type AidType = (typeof AID_TYPES)[number];
 
@@ -40,10 +33,7 @@ function AidTypeCheckboxGrid({ selected, onChange, i18nPrefix }: AidTypeCheckbox
             onCheckedChange={(checked) => handleToggle(aidType, Boolean(checked))}
             className="border-gray-300 data-[state=checked]:bg-[#12a89d] data-[state=checked]:border-[#12a89d]"
           />
-          <Label
-            htmlFor={`aid-${aidType}`}
-            className="text-sm text-gray-700 cursor-pointer"
-          >
+          <Label htmlFor={`aid-${aidType}`} className="text-sm text-gray-700 cursor-pointer">
             {t(`${i18nPrefix}.${aidType}`)}
           </Label>
         </div>
