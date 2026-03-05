@@ -36,6 +36,10 @@ service cloud.firestore {
       return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
     }
 
+    function hasField(field) {
+      return request.resource.data.keys().hasAny([field]);
+    }
+
     // ─── /members ───────────────────────────────────────────────────────────
 
     match /members/{userId} {
@@ -48,13 +52,24 @@ service cloud.firestore {
         && onlyFields(['uid', 'name', 'contactPersonName', 'email', 'phoneNumber', 'role',
                        'validated', 'onboarded', 'createdAt', 'updatedAt', 'consentGiven',
                        'areaOfOperation', 'kindOfHelp', 'initiativeOrNgo',
-                       'numberOfVolunteers', 'isOfficiallyRegistered', 'isAdmin'])
-        && request.resource.data.validated == false; // cannot self-validate on create
+                       'numberOfVolunteers', 'isOfficiallyRegistered', 'isAdmin',
+                       'coverageType', 'coverageGovernorates', 'coverageCenterIds',
+                       'aidTypes', 'currentCaseLoad', 'maxCaseLoad', 'deliveryMode'])
+        && request.resource.data.validated == false
+        && (!hasField('coverageType') || request.resource.data.coverageType in ['governorate', 'center', 'hybrid'])
+        && (!hasField('deliveryMode') || request.resource.data.deliveryMode in ['delivery', 'pickup', 'both'])
+        && (!hasField('coverageGovernorates') || request.resource.data.coverageGovernorates is list)
+        && (!hasField('coverageCenterIds') || request.resource.data.coverageCenterIds is list)
+        && (!hasField('aidTypes') || request.resource.data.aidTypes is list)
+        && (!hasField('currentCaseLoad') || request.resource.data.currentCaseLoad is int)
+        && (!hasField('maxCaseLoad') || request.resource.data.maxCaseLoad is int); // cannot self-validate on create
 
       // Users cannot change their own role or validated status — admin only
       allow update: if isAdmin()
         && onlyFields(['name', 'contactPersonName', 'email', 'phoneNumber',
-                       'validated', 'updatedAt']);
+                       'validated', 'updatedAt', 'coverageType', 'coverageGovernorates',
+                       'coverageCenterIds', 'aidTypes', 'currentCaseLoad',
+                       'maxCaseLoad', 'deliveryMode']);
 
       allow delete: if isAdmin();
     }
@@ -75,6 +90,42 @@ service cloud.firestore {
       allow create: if onlyFields(['type', 'phone', 'region', 'lat', 'lng',
                                    'neighborhood', 'capacity', 'description', 'createdAt']);
       allow read, update, delete: if isAdmin();
+    }
+
+    // ─── /centers ───────────────────────────────────────────────────────────
+
+    match /centers/{centerId} {
+      allow read: if isAdmin() || isValidatedMember() || isAgent();
+      allow write: if isAdmin();
+    }
+
+    // ─── /housing ───────────────────────────────────────────────────────────
+
+    match /housing/{housingId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ─── /emergencyContacts ─────────────────────────────────────────────────
+
+    match /emergencyContacts/{contactId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── /notifications ─────────────────────────────────────────────────────
+
+    match /notifications/{notificationId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.recipientUid == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    // ─── /stats ─────────────────────────────────────────────────────────────
+
+    match /stats/{statsId} {
+      allow read: if statsId == 'global';
+      allow write: if isAdmin();
     }
 
     // ─── /businesses ─────────────────────────────────────────────────────────
@@ -100,11 +151,22 @@ service cloud.firestore {
           'currentGovernorate', 'previousGovernorate', 'street', 'building',
           'floor', 'city', 'ageRanges', 'specialNeeds', 'needs', 'aidUrgency',
           'consentGiven', 'comments', 'numberOfPeopleInHousehold',
-          'registrationDate', 'createdAt', 'updatedAt', 'agent'
+          'registrationDate', 'createdAt', 'updatedAt', 'agent', 'status',
+          'locationType', 'centerId', 'assignedTo', 'assignedAt', 'aidDelivered',
+          'lastUpdatedBy', 'staleFlagged', 'source'
         ])
         && request.resource.data.consentGiven == true  // consent is mandatory
         && request.resource.data.aidUrgency in ['High', 'Medium', 'Low']
-        && request.resource.data.gender in ['Male', 'Female', ''];
+        && request.resource.data.gender in ['Male', 'Female', '']
+        && (!hasField('status') || request.resource.data.status in ['pending', 'assigned', 'in_progress', 'completed', 'cancelled'])
+        && (!hasField('locationType') || request.resource.data.locationType in ['with_family', 'center'])
+        && (!hasField('source') || request.resource.data.source in ['web', 'agent', 'admin', 'migration'])
+        && (!hasField('centerId') || request.resource.data.centerId is string)
+        && (!hasField('assignedTo') || request.resource.data.assignedTo is string)
+        && (!hasField('assignedAt') || request.resource.data.assignedAt == null || request.resource.data.assignedAt is timestamp)
+        && (!hasField('aidDelivered') || request.resource.data.aidDelivered is bool)
+        && (!hasField('lastUpdatedBy') || request.resource.data.lastUpdatedBy is string)
+        && (!hasField('staleFlagged') || request.resource.data.staleFlagged is bool);
 
       // Duplicate-phone check moved to Cloud Function — no unauthenticated reads
       allow read: if isAdmin()

@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/Components/ui/select';
 import AidTypeCheckboxGrid from '@/Components/AidTypeCheckboxGrid';
+import { buildSubmissionWorkflowDefaults } from '@/lib/v2Defaults';
 
 const submissionSchema = z.object({
   fullName: z.string().min(1),
@@ -159,6 +160,7 @@ function CreateSubmission() {
     try {
       await addDoc(collection(db, 'submissions'), {
         ...result.data,
+        ...buildSubmissionWorkflowDefaults('agent'),
         registrationDate: Timestamp.fromDate(new Date()),
         createdAt: new Date(),
         updatedAt: new Date(),
