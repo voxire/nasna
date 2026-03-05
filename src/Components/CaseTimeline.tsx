@@ -1,17 +1,18 @@
 import type { Timestamp } from 'firebase/firestore';
 
 interface CaseTimelineProps {
-  registrationDate?: Timestamp | null;
-  assignedAt?: Timestamp | null;
-  updatedAt?: Timestamp | Date | null;
+  registrationDate?: Timestamp | Date | string | null;
+  assignedAt?: Timestamp | Date | string | null;
+  updatedAt?: Timestamp | Date | string | null;
   status?: string;
   aidDelivered?: boolean;
   staleFlagged?: boolean;
 }
 
-function formatDate(value?: Timestamp | Date | null) {
+function formatDate(value?: Timestamp | Date | string | null) {
   if (!value) return 'Not yet recorded';
-  const date = value instanceof Date ? value : value.toDate();
+  const date =
+    typeof value === 'string' ? new Date(value) : value instanceof Date ? value : value.toDate();
   return date.toLocaleString();
 }
 

@@ -90,3 +90,21 @@ export async function recordMemberAidDelivery(submissionId: string) {
   const result = await callable({ submissionId });
   return result.data.case;
 }
+
+interface CoverageProfilePayload {
+  coverageType: 'governorate' | 'center' | 'hybrid';
+  coverageGovernorates: string[];
+  coverageCenterIds: string[];
+  aidTypes: string[];
+  maxCaseLoad: number;
+  deliveryMode: 'delivery' | 'pickup' | 'both';
+}
+
+export async function updateMemberCoverageProfile(payload: CoverageProfilePayload) {
+  const callable = httpsCallable<CoverageProfilePayload, { profile: unknown }>(
+    functions,
+    'updateMemberCoverageProfile',
+  );
+  const result = await callable(payload);
+  return result.data.profile;
+}

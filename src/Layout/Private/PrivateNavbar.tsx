@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { getCookie } from '../../utils/cookies';
 import { Globe, LogOut } from 'lucide-react';
 import { selectLanguage } from '../../services/i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../redux/hooks';
 import { logout } from '../../redux/reducers/userSlice';
 import { auth } from '../../firebase';
@@ -19,6 +19,7 @@ import {
 function PrivateNavbar() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const savedLanguage = getCookie('language');
@@ -57,6 +58,29 @@ function PrivateNavbar() {
           />
         </div>
 
+        {getCookie('userRole') === 'member' ? (
+          <nav className="mr-4 hidden items-center gap-2 lg:flex">
+            {[
+              { href: '/ngo/submissions', label: 'Case Feed' },
+              { href: '/ngo/my-cases', label: 'My Cases' },
+              { href: '/ngo/profile-coverage', label: 'Coverage' },
+            ].map((item) => (
+              <Button
+                key={item.href}
+                variant={location.pathname === item.href ? 'default' : 'ghost'}
+                className={
+                  location.pathname === item.href
+                    ? 'bg-[#12a89d] text-white hover:bg-[#0e9088]'
+                    : 'text-[#12a89d]'
+                }
+                asChild
+              >
+                <Link to={item.href}>{item.label}</Link>
+              </Button>
+            ))}
+          </nav>
+        ) : null}
+
         <div className="flex items-center gap-1">
           <Button variant="ghost" onClick={handleLogout} className="text-[#12a89d]">
             <LogOut className="h-4 w-4 mr-1" />
@@ -70,7 +94,9 @@ function PrivateNavbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleLanguageChange('en')}>English</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
+                English
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleLanguageChange('ar')}>Arabic</DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleLanguageChange('fr')}>French</DropdownMenuItem>
             </DropdownMenuContent>
