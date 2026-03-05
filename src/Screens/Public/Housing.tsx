@@ -142,67 +142,73 @@ export default function Housing() {
         </div>
       </div>
 
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Approved Housing Offers</h2>
-          <p className="text-sm text-gray-500">
-            Reviewed housing listings currently available for placement.
-          </p>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          {filteredHousing.map((housing) => (
-            <HousingCard key={housing.id} housing={housing} />
-          ))}
-        </div>
-
-        {filteredHousing.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
-            No approved housing listings matched the current filters.
+      <div className="grid gap-8 xl:grid-cols-2 xl:items-start">
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900">Approved Housing Offers</h2>
+            <p className="text-sm text-gray-500">
+              Reviewed housing listings currently available for placement.
+            </p>
           </div>
-        ) : null}
-      </section>
 
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Active Centers</h2>
-          <p className="text-sm text-gray-500">
-            Official centers currently active in the system with live occupancy state.
-          </p>
-        </div>
+          <div className="grid gap-4">
+            {filteredHousing.map((housing) => (
+              <HousingCard key={housing.id} housing={housing} />
+            ))}
+          </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {filteredCenters.map((center) => (
-            <div key={center.id} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{center.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    {center.city}, {center.governorate}
-                  </p>
-                </div>
-                <span className="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-medium text-sky-800">
-                  Official center
-                </span>
-              </div>
-
-              <div className="mt-4 space-y-3 text-sm text-gray-600">
-                <p>{center.address}</p>
-                <p>
-                  Contact: {center.contactName || 'No contact name'} · {center.contactPhone || 'No phone'}
-                </p>
-                <CapacityBar capacity={center.capacity} occupied={center.occupiedCapacity} />
-              </div>
+          {filteredHousing.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
+              No approved housing listings matched the current filters.
             </div>
-          ))}
-        </div>
+          ) : null}
+        </section>
 
-        {filteredCenters.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
-            No centers matched the current filters.
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900">Active Centers</h2>
+            <p className="text-sm text-gray-500">
+              Official centers currently active in the system with live occupancy state.
+            </p>
           </div>
-        ) : null}
-      </section>
+
+          <div className="grid gap-4">
+            {filteredCenters.map((center) => (
+              <div
+                key={center.id}
+                className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{center.name}</h3>
+                    <p className="text-sm text-gray-500">
+                      {center.city}, {center.governorate}
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-medium text-sky-800">
+                    Official center
+                  </span>
+                </div>
+
+                <div className="mt-4 space-y-3 text-sm text-gray-600">
+                  <p>{center.address}</p>
+                  <p>
+                    Contact: {center.contactName || 'No contact name'} ·{' '}
+                    {center.contactPhone || 'No phone'}
+                  </p>
+                  <CapacityBar capacity={center.capacity} occupied={center.occupiedCapacity} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {filteredCenters.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
+              No centers matched the current filters.
+            </div>
+          ) : null}
+        </section>
+      </div>
     </div>
   );
 }

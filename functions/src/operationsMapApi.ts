@@ -52,14 +52,115 @@ interface HousingRecord {
   status?: string;
 }
 
+interface NgoCoverageSummaryInput {
+  id: string;
+  name?: string;
+  coverageGovernorates?: string[];
+  coverageCenterIds?: string[];
+}
+
 function assertAdmin(role?: unknown) {
   if (role !== 'admin') {
     throw new HttpsError('permission-denied', 'Admin access is required.');
   }
 }
 
-function getCoordinates(governorate?: string) {
+export function getCoordinates(governorate?: string) {
   return GOVERNORATE_COORDINATES[governorate ?? ''] ?? { lat: 33.8547, lng: 35.8623 };
+}
+
+export function buildSubmissionClusters(submissions: SubmissionRecord[]) {
+  const submissionClustersMap = new Map<
+    string,
+    {
+      governorate: string;
+      count: number;
+      urgentCount: number;
+      pendingCount: number;
+      lat: number;
+      lng: number;
+    }
+  >();
+
+  submissions.forEach((submission) => {
+    const governorate = submission.currentGovernorate ?? 'Unknown';
+    const current = submissionClustersMap.get(governorate) ?? {
+      governorate,
+      count: 0,
+      urgentCount: 0,
+      pendingCount: 0,
+      ...getCoordinates(governorate),
+    };
+
+    current.count += 1;
+    if (submission.aidUrgency === 'High') current.urgentCount += 1;
+    if (submission.status === 'pending') current.pendingCount += 1;
+
+    submissionClustersMap.set(governorate, current);
+  });
+
+  return Array.from(submissionClustersMap.values());
+}
+
+export function buildNgoCoverage(members: NgoCoverageSummaryInput[]) {
+  return members.map((member) => {
+    const governorates = Array.isArray(member.coverageGovernorates)
+      ? member.coverageGovernorates
+      : [];
+
+    return {
+      id: member.id,
+      name: member.name ?? 'NGO',
+      governorates,
+      centerIds: Array.isArray(member.coverageCenterIds) ? member.coverageCenterIds : [],
+      coordinates: governorates.map((governorate) => ({
+        governorate,
+        ...getCoordinates(governorate),
+      })),
+    };
+  });
+}
+
+export function buildCenterMarkers(
+  centers: Array<
+    CenterRecord & {
+      id: string;
+    }
+  >,
+) {
+  return centers.map((center) => ({
+    id: center.id,
+    name: center.name ?? 'Center',
+    governorate: center.governorate ?? '',
+    city: center.city ?? '',
+    address: center.address ?? '',
+    capacity: Number(center.capacity ?? 0),
+    occupiedCapacity: Number(center.occupiedCapacity ?? 0),
+    ...getCoordinates(center.governorate),
+  }));
+}
+
+export function buildHousingAreaSummaries(housingRecords: HousingRecord[]) {
+  const housingAreasMap = new Map<
+    string,
+    { area: string; listingCount: number; availableSpots: number; lat: number; lng: number }
+  >();
+
+  housingRecords.forEach((housing) => {
+    const area = housing.area ?? 'Unknown';
+    const current = housingAreasMap.get(area) ?? {
+      area,
+      listingCount: 0,
+      availableSpots: 0,
+      ...getCoordinates(area),
+    };
+
+    current.listingCount += 1;
+    current.availableSpots += Number(housing.availableSpots ?? 0);
+    housingAreasMap.set(area, current);
+  });
+
+  return Array.from(housingAreasMap.values());
 }
 
 export const getOperationsMapData = onCall(
@@ -78,93 +179,25 @@ export const getOperationsMapData = onCall(
       ],
     );
 
-    const submissionClustersMap = new Map<
-      string,
-      {
-        governorate: string;
-        count: number;
-        urgentCount: number;
-        pendingCount: number;
-        lat: number;
-        lng: number;
-      }
-    >();
-
-    submissionSnapshot.docs.forEach((document) => {
-      const submission = document.data() as SubmissionRecord;
-      const governorate = submission.currentGovernorate ?? 'Unknown';
-      const current = submissionClustersMap.get(governorate) ?? {
-        governorate,
-        count: 0,
-        urgentCount: 0,
-        pendingCount: 0,
-        ...getCoordinates(governorate),
-      };
-
-      current.count += 1;
-      if (submission.aidUrgency === 'High') current.urgentCount += 1;
-      if (submission.status === 'pending') current.pendingCount += 1;
-
-      submissionClustersMap.set(governorate, current);
-    });
-
-    const ngoCoverage = memberSnapshot.docs.map((document) => {
-      const member = document.data() as MemberRecord;
-      const governorates = Array.isArray(member.coverageGovernorates)
-        ? member.coverageGovernorates
-        : [];
-
-      return {
-        id: document.id,
-        name: member.name ?? 'NGO',
-        governorates,
-        centerIds: Array.isArray(member.coverageCenterIds) ? member.coverageCenterIds : [],
-        coordinates: governorates.map((governorate) => ({
-          governorate,
-          ...getCoordinates(governorate),
-        })),
-      };
-    });
-
-    const centers = centerSnapshot.docs.map((document) => {
-      const center = document.data() as CenterRecord;
-      return {
-        id: document.id,
-        name: center.name ?? 'Center',
-        governorate: center.governorate ?? '',
-        city: center.city ?? '',
-        address: center.address ?? '',
-        capacity: Number(center.capacity ?? 0),
-        occupiedCapacity: Number(center.occupiedCapacity ?? 0),
-        ...getCoordinates(center.governorate),
-      };
-    });
-
-    const housingAreasMap = new Map<
-      string,
-      { area: string; listingCount: number; availableSpots: number; lat: number; lng: number }
-    >();
-
-    housingSnapshot.docs.forEach((document) => {
-      const housing = document.data() as HousingRecord;
-      const area = housing.area ?? 'Unknown';
-      const current = housingAreasMap.get(area) ?? {
-        area,
-        listingCount: 0,
-        availableSpots: 0,
-        ...getCoordinates(area),
-      };
-
-      current.listingCount += 1;
-      current.availableSpots += Number(housing.availableSpots ?? 0);
-      housingAreasMap.set(area, current);
-    });
-
     return {
-      submissionClusters: Array.from(submissionClustersMap.values()),
-      ngoCoverage,
-      centers,
-      housingAreas: Array.from(housingAreasMap.values()),
+      submissionClusters: buildSubmissionClusters(
+        submissionSnapshot.docs.map((document) => document.data() as SubmissionRecord),
+      ),
+      ngoCoverage: buildNgoCoverage(
+        memberSnapshot.docs.map((document) => ({
+          id: document.id,
+          ...(document.data() as MemberRecord),
+        })),
+      ),
+      centers: buildCenterMarkers(
+        centerSnapshot.docs.map((document) => ({
+          id: document.id,
+          ...(document.data() as CenterRecord),
+        })),
+      ),
+      housingAreas: buildHousingAreaSummaries(
+        housingSnapshot.docs.map((document) => document.data() as HousingRecord),
+      ),
     };
   },
 );

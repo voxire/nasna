@@ -1,0 +1,72 @@
+name: PR Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck and functions build
+        run: pnpm check
+
+      - name: Build app
+        run: pnpm build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+
+      - name: App tests with coverage
+        run: pnpm test:app:coverage
+
+      - name: Functions tests with coverage
+        run: pnpm test:functions:coverage
+
+      - name: Coverage summary
+        run: |
+          node <<'EOF'
+          const fs = require('fs');
+          const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+          const readSummary = (path) => JSON.parse(fs.readFileSync(path, 'utf8')).total;
+          const app = readSummary('coverage/app/coverage-summary.json');
+          const functions = readSummary('coverage/functions/coverage-summary.json');
+          const row = (name, metric) => `| ${name} | ${metric.lines.pct}% | ${metric.statements.pct}% | ${metric.functions.pct}% | ${metric.branches.pct}% |`;
+          fs.appendFileSync(
+            summaryPath,
+            [
+              '## Coverage Summary',
+              '',
+              '| Project | Lines | Statements | Functions | Branches |',
+              '| --- | ---: | ---: | ---: | ---: |',
+              row('App', app),
+              row('Functions', functions),
+              '',
+            ].join('\n'),
+          );
+          EOF
