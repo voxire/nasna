@@ -28,6 +28,11 @@
   "submitting": "Envoi en cours...",
   "submit": "Soumettre",
   "needsTitle": "Besoins immédiats",
+  "specialNeedsTitle": "Besoins particuliers",
+  "specialNeedsPlaceholder": "Ajouter une condition ou un besoin particulier",
+  "specialNeedsHint": "Exemples : fauteuil roulant, traitement chronique, grossesse, personne âgée, nourrisson.",
+  "addSpecialNeed": "Ajouter",
+  "removeSpecialNeed": "Retirer",
   "needs": {
     "food": "Aide alimentaire",
     "water": "Approvisionnement en eau",

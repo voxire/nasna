@@ -28,6 +28,11 @@
   "submitting": "جاري الإرسال...",
   "submit": "إرسال",
   "needsTitle": "الاحتياجات العاجلة",
+  "specialNeedsTitle": "الاحتياجات الخاصة",
+  "specialNeedsPlaceholder": "أضف حالة أو احتياجاً خاصاً",
+  "specialNeedsHint": "أمثلة: كرسي متحرك، دواء مزمن، حمل، مسن، رضيع.",
+  "addSpecialNeed": "إضافة",
+  "removeSpecialNeed": "إزالة",
   "needs": {
     "food": "مساعدات غذائية",
     "water": "إمدادات المياه",

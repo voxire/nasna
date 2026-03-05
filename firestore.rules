@@ -62,9 +62,10 @@ service cloud.firestore {
     // ─── /feedback ───────────────────────────────────────────────────────────
 
     match /feedback/{docId} {
-      allow create: if onlyFields(['type', 'name', 'email', 'message', 'createdAt'])
+      allow create: if onlyFields(['type', 'name', 'email', 'message', 'read', 'createdAt'])
         && request.resource.data.message is string
-        && request.resource.data.message.size() >= 10;
+        && request.resource.data.message.size() >= 10
+        && request.resource.data.read == false;
       allow read, update, delete: if isAdmin();
     }
 

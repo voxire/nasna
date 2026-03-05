@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { db, auth } from '../../firebase';
-import { collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, limit } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
@@ -26,29 +26,36 @@ function AgentSubmissions() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSubmissions = async () => {
-      setLoading(true);
-      try {
-        const agentUid = auth.currentUser?.uid;
-        if (!agentUid) {
-          navigate('/');
-          return;
-        }
-        const q = query(collection(db, 'submissions'), where('agent', '==', agentUid), limit(20));
-        const snapshot = await getDocs(q);
+    setLoading(true);
+    const agentUid = auth.currentUser?.uid;
+    if (!agentUid) {
+      navigate('/');
+      return;
+    }
+
+    const submissionQuery = query(
+      collection(db, 'submissions'),
+      where('agent', '==', agentUid),
+      limit(20),
+    );
+    const unsubscribe = onSnapshot(
+      submissionQuery,
+      (snapshot) => {
         const data = snapshot.docs.map((d) => ({
           id: d.id,
           ...(d.data() as SubmissionDocument),
         }));
         setSubmissions(data);
-      } catch (err) {
-        console.error('Error fetching submissions:', err);
-        setError('Failed to load submissions');
-      } finally {
         setLoading(false);
-      }
-    };
-    fetchSubmissions();
+      },
+      (snapshotError) => {
+        console.error('Error fetching submissions:', snapshotError);
+        setError('Failed to load submissions');
+        setLoading(false);
+      },
+    );
+
+    return unsubscribe;
   }, [navigate]);
 
   if (loading) {
@@ -66,7 +73,12 @@ function AgentSubmissions() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-gray-600 hover:bg-gray-100">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate(-1)}
+          className="text-gray-600 hover:bg-gray-100"
+        >
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="text-2xl font-bold text-gray-800">Agent Submissions</h1>
@@ -84,7 +96,9 @@ function AgentSubmissions() {
           <TableBody>
             {submissions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-12 text-gray-500">No submissions found.</TableCell>
+                <TableCell colSpan={4} className="text-center py-12 text-gray-500">
+                  No submissions found.
+                </TableCell>
               </TableRow>
             ) : (
               submissions.map((submission) => (
@@ -92,7 +106,9 @@ function AgentSubmissions() {
                   <TableCell className="font-medium">{submission.fullName}</TableCell>
                   <TableCell>{submission.emailAddress}</TableCell>
                   <TableCell>{submission.phoneNumber}</TableCell>
-                  <TableCell>{submission.registrationDate?.toDate().toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    {submission.registrationDate?.toDate().toLocaleDateString()}
+                  </TableCell>
                 </TableRow>
               ))
             )}

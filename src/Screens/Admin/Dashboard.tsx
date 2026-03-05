@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { List, Building2, Bell, MessageSquare } from 'lucide-react';
 import { db } from '../../firebase';
-import { collection, getCountFromServer, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { Card, CardContent } from '@/Components/ui/card';
 
 const STATS = [
@@ -15,25 +15,38 @@ function Dashboard() {
   const [counts, setCounts] = useState({ submissions: 0, ngoCount: 0, pendingNgo: 0, feedback: 0 });
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [submissionsSnap, ngoSnap, pendingSnap, feedbackSnap] = await Promise.all([
-          getCountFromServer(collection(db, 'submissions')),
-          getCountFromServer(query(collection(db, 'members'), where('role', '==', 'member'), where('validated', '==', true))),
-          getCountFromServer(query(collection(db, 'members'), where('role', '==', 'member'), where('validated', '==', false))),
-          getCountFromServer(query(collection(db, 'feedback'), where('read', '==', false))),
-        ]);
-        setCounts({
-          submissions: submissionsSnap.data().count,
-          ngoCount: ngoSnap.data().count,
-          pendingNgo: pendingSnap.data().count,
-          feedback: feedbackSnap.data().count,
-        });
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      }
+    const subscriptions = [
+      onSnapshot(collection(db, 'submissions'), (snapshot) => {
+        setCounts((current) => ({ ...current, submissions: snapshot.size }));
+      }),
+      onSnapshot(
+        query(
+          collection(db, 'members'),
+          where('role', '==', 'member'),
+          where('validated', '==', true),
+        ),
+        (snapshot) => {
+          setCounts((current) => ({ ...current, ngoCount: snapshot.size }));
+        },
+      ),
+      onSnapshot(
+        query(
+          collection(db, 'members'),
+          where('role', '==', 'member'),
+          where('validated', '==', false),
+        ),
+        (snapshot) => {
+          setCounts((current) => ({ ...current, pendingNgo: snapshot.size }));
+        },
+      ),
+      onSnapshot(query(collection(db, 'feedback'), where('read', '==', false)), (snapshot) => {
+        setCounts((current) => ({ ...current, feedback: snapshot.size }));
+      }),
+    ];
+
+    return () => {
+      subscriptions.forEach((unsubscribe) => unsubscribe());
     };
-    fetchData();
   }, []);
 
   return (
