@@ -7,7 +7,11 @@ import {
   type QueryDocumentSnapshot,
 } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
-import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
+import {
+  onDocumentCreated,
+  onDocumentUpdated,
+  onDocumentWritten,
+} from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 if (getApps().length === 0) {
@@ -36,6 +40,12 @@ interface MemberRecord {
   name?: string;
   role?: string;
   validated?: boolean;
+  currentCaseLoad?: number;
+}
+
+interface HousingRecord {
+  availableSpots?: number;
+  status?: 'pending_review' | 'approved' | 'rejected' | 'reserved' | 'filled';
 }
 
 async function ensureGlobalStatsDocument() {
@@ -139,6 +149,64 @@ async function refreshActiveNgoCount() {
   await GLOBAL_STATS_DOC.set(
     {
       activeNgoCount,
+      updatedAt: new Date(),
+    },
+    { merge: true },
+  );
+}
+
+async function refreshHousingAvailability() {
+  const housingSnapshot = await db.collection('housing').where('status', '==', 'approved').get();
+  const housingAvailable = housingSnapshot.docs.reduce(
+    (total, document) => total + Number((document.data() as HousingRecord).availableSpots ?? 0),
+    0,
+  );
+
+  await GLOBAL_STATS_DOC.set(
+    {
+      housingAvailable,
+      updatedAt: new Date(),
+    },
+    { merge: true },
+  );
+}
+
+async function rebuildGlobalStats() {
+  const [submissionSnapshot, housingSnapshot, memberSnapshot] = await Promise.all([
+    db.collection('submissions').get(),
+    db.collection('housing').where('status', '==', 'approved').get(),
+    db.collection('members').where('role', '==', 'member').where('validated', '==', true).get(),
+  ]);
+
+  const submissionsRegistered = submissionSnapshot.size;
+  const submissionsAssigned = submissionSnapshot.docs.filter(
+    (document) => Boolean((document.data() as SubmissionRecord).assignedTo),
+  ).length;
+  const completedSubmissions = submissionSnapshot.docs.filter(
+    (document) => (document.data() as SubmissionRecord).status === 'completed',
+  );
+  const submissionsCompleted = completedSubmissions.length;
+  const peopleHelped = completedSubmissions.reduce(
+    (total, document) =>
+      total + Number((document.data() as SubmissionRecord).numberOfPeopleInHousehold ?? 0),
+    0,
+  );
+  const activeNgoCount = memberSnapshot.docs.filter(
+    (document) => Number((document.data() as MemberRecord).currentCaseLoad ?? 0) > 0,
+  ).length;
+  const housingAvailable = housingSnapshot.docs.reduce(
+    (total, document) => total + Number((document.data() as HousingRecord).availableSpots ?? 0),
+    0,
+  );
+
+  await GLOBAL_STATS_DOC.set(
+    {
+      submissionsRegistered,
+      submissionsAssigned,
+      submissionsCompleted,
+      peopleHelped,
+      activeNgoCount,
+      housingAvailable,
       updatedAt: new Date(),
     },
     { merge: true },
@@ -377,5 +445,42 @@ export const dailyStaleCaseCheck = onSchedule(
     logger.info('Completed stale case check', {
       staleCaseCount: staleCases.length,
     });
+  },
+);
+
+export const onHousingStatsChanged = onDocumentWritten(
+  {
+    document: 'housing/{housingId}',
+    region: 'europe-west1',
+  },
+  async () => {
+    await ensureGlobalStatsDocument();
+    await refreshHousingAvailability();
+    logger.info('Refreshed housing availability stats');
+  },
+);
+
+export const onMemberStatsChanged = onDocumentWritten(
+  {
+    document: 'members/{memberUid}',
+    region: 'europe-west1',
+  },
+  async () => {
+    await ensureGlobalStatsDocument();
+    await refreshActiveNgoCount();
+    logger.info('Refreshed active NGO stats');
+  },
+);
+
+export const nightlyGlobalStatsRebuild = onSchedule(
+  {
+    schedule: '0 3 * * *',
+    timeZone: 'Asia/Beirut',
+    region: 'europe-west1',
+  },
+  async () => {
+    await ensureGlobalStatsDocument();
+    await rebuildGlobalStats();
+    logger.info('Rebuilt global stats document from source collections');
   },
 );
