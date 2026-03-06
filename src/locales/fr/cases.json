@@ -1,0 +1,48 @@
+{
+  "feed": {
+    "title": "Flux des cas",
+    "description": "Examinez les nouveaux cas correspondant à votre couverture et réclamez ceux que votre équipe peut gérer.",
+    "myCases": "Mes cas",
+    "coverageProfile": "Profil de couverture",
+    "searchPlaceholder": "Rechercher par ménage, téléphone ou gouvernorat",
+    "loading": "Chargement des cas correspondants...",
+    "noResults": "Aucun cas en attente ne correspond à votre couverture actuelle.",
+    "error": "Impossible de charger les cas en attente pour le moment.",
+    "urgency": "Urgence",
+    "householdSize": "Taille du ménage",
+    "needs": "Besoins",
+    "noneListed": "Aucun mentionné",
+    "viewDetails": "Voir les détails",
+    "claiming": "Réclamation en cours...",
+    "claimCase": "Réclamer le cas"
+  },
+  "mine": {
+    "title": "Mes cas",
+    "description": "Suivez les cas réclamés par votre organisation et faites-les progresser dans le workflow.",
+    "backToFeed": "Retour au flux",
+    "loading": "Chargement des cas réclamés...",
+    "empty": "Vous n'avez encore réclamé aucun cas.",
+    "noNotes": "Pas encore de notes.",
+    "openCase": "Ouvrir le cas",
+    "startWork": "Commencer le travail",
+    "complete": "Terminer",
+    "cancel": "Annuler"
+  },
+  "detail": {
+    "loading": "Chargement des détails du cas...",
+    "notFound": "Cas introuvable.",
+    "backToMyCases": "Retour à mes cas",
+    "caseDetails": "Détails du cas",
+    "needs": "Besoins",
+    "specialNeeds": "Besoins spéciaux",
+    "urgency": "Urgence",
+    "householdSize": "Taille du ménage",
+    "comments": "Commentaires",
+    "noneListed": "Aucun mentionné",
+    "noComments": "Pas encore de commentaires.",
+    "markInProgress": "Marquer en cours",
+    "markCompleted": "Marquer terminé",
+    "cancelCase": "Annuler le cas",
+    "timeline": "Chronologie"
+  }
+}

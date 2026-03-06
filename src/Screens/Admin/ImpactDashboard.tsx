@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '@/firebase';
 import type { GlobalStatsDocument, HousingDocument, SubmissionDocument } from '@/types';
@@ -15,6 +16,7 @@ const DEFAULT_STATS: GlobalStatsDocument = {
 };
 
 export default function ImpactDashboard() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<GlobalStatsDocument>(DEFAULT_STATS);
   const [pendingUrgentCases, setPendingUrgentCases] = useState(0);
   const [staleCases, setStaleCases] = useState(0);
@@ -99,43 +101,57 @@ export default function ImpactDashboard() {
 
   const topCards = [
     {
-      label: 'Registered cases',
+      id: 'registered',
+      label: t('impact.admin.registeredCases'),
       value: stats.submissionsRegistered,
       tone: 'bg-slate-100 text-slate-900',
     },
-    { label: 'Assigned cases', value: stats.submissionsAssigned, tone: 'bg-sky-100 text-sky-900' },
     {
-      label: 'Completed cases',
+      id: 'assigned',
+      label: t('impact.admin.assignedCases'),
+      value: stats.submissionsAssigned,
+      tone: 'bg-sky-100 text-sky-900',
+    },
+    {
+      id: 'completed',
+      label: t('impact.admin.completedCases'),
       value: stats.submissionsCompleted,
       tone: 'bg-emerald-100 text-emerald-900',
     },
-    { label: 'People helped', value: stats.peopleHelped, tone: 'bg-amber-100 text-amber-900' },
+    {
+      id: 'helped',
+      label: t('impact.admin.peopleHelped'),
+      value: stats.peopleHelped,
+      tone: 'bg-amber-100 text-amber-900',
+    },
   ];
 
   const queueCards = [
-    { label: 'Pending urgent cases', value: pendingUrgentCases },
-    { label: 'Stale pending cases', value: staleCases },
-    { label: 'Housing pending review', value: housingPendingReview },
-    { label: 'Reserved housing spots', value: reservedHousing },
+    { id: 'pendingUrgent', label: t('impact.admin.pendingUrgent'), value: pendingUrgentCases },
+    { id: 'stalePending', label: t('impact.admin.stalePending'), value: staleCases },
+    {
+      id: 'housingReview',
+      label: t('impact.admin.housingPendingReview'),
+      value: housingPendingReview,
+    },
+    { id: 'reservedHousing', label: t('impact.admin.reservedHousing'), value: reservedHousing },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Impact Dashboard</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Aggregate operational analytics across cases, NGOs, and housing capacity.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('impact.admin.title')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('impact.admin.description')}</p>
         </div>
         <Button className="bg-[#12a89d] text-white hover:bg-[#0e9088]" onClick={exportCsv}>
-          Export CSV
+          {t('impact.admin.exportCsv')}
         </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {topCards.map((card) => (
-          <Card key={card.label} className={card.tone}>
+          <Card key={card.id} className={card.tone}>
             <CardContent className="p-6">
               <p className="text-sm font-medium opacity-80">{card.label}</p>
               <p className="mt-3 text-4xl font-bold">{card.value.toLocaleString()}</p>
@@ -147,14 +163,24 @@ export default function ImpactDashboard() {
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <Card>
           <CardHeader>
-            <CardTitle>Pipeline health</CardTitle>
+            <CardTitle>{t('impact.admin.pipelineHealth')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             {[
-              { label: 'Assignment rate', value: assignmentRate, color: 'bg-sky-500' },
-              { label: 'Completion rate', value: completionRate, color: 'bg-emerald-500' },
+              {
+                id: 'assignment',
+                label: t('impact.admin.assignmentRate'),
+                value: assignmentRate,
+                color: 'bg-sky-500',
+              },
+              {
+                id: 'completion',
+                label: t('impact.admin.completionRate'),
+                value: completionRate,
+                color: 'bg-emerald-500',
+              },
             ].map((item) => (
-              <div key={item.label} className="space-y-2">
+              <div key={item.id} className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium text-gray-800">{item.label}</span>
                   <span className="text-gray-500">{item.value}%</span>
@@ -170,13 +196,13 @@ export default function ImpactDashboard() {
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-2xl bg-gray-50 p-5">
-                <p className="text-sm text-gray-500">Active NGOs with case load</p>
+                <p className="text-sm text-gray-500">{t('impact.admin.activeNgos')}</p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">
                   {stats.activeNgoCount.toLocaleString()}
                 </p>
               </div>
               <div className="rounded-2xl bg-gray-50 p-5">
-                <p className="text-sm text-gray-500">Available housing spots</p>
+                <p className="text-sm text-gray-500">{t('impact.admin.housingSpots')}</p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">
                   {stats.housingAvailable.toLocaleString()}
                 </p>
@@ -187,11 +213,11 @@ export default function ImpactDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Operational queues</CardTitle>
+            <CardTitle>{t('impact.admin.operationalQueues')}</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4">
             {queueCards.map((card) => (
-              <div key={card.label} className="rounded-2xl border border-gray-200 bg-white p-5">
+              <div key={card.id} className="rounded-2xl border border-gray-200 bg-white p-5">
                 <p className="text-sm text-gray-500">{card.label}</p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">
                   {card.value.toLocaleString()}

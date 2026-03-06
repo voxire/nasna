@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db } from '@/firebase';
 import { updateMemberCoverageProfile } from '@/services/memberCases';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
@@ -16,6 +17,7 @@ import {
 import type { CenterDocument } from '@/types';
 
 export default function ProfileCoverage() {
+  const { t } = useTranslation();
   const [coverageType, setCoverageType] = useState<'governorate' | 'center' | 'hybrid'>(
     'governorate',
   );
@@ -77,17 +79,14 @@ export default function ProfileCoverage() {
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Coverage Profile</h1>
-        <p className="text-sm text-gray-500">
-          Define where your organization operates, what aid types you can handle, and your active
-          case capacity.
-        </p>
+        <h1 className="text-2xl font-bold text-gray-800">{t('profile.title')}</h1>
+        <p className="text-sm text-gray-500">{t('profile.description')}</p>
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Coverage Type</Label>
+            <Label>{t('profile.coverageType')}</Label>
             <Select
               value={coverageType}
               onValueChange={(value) => setCoverageType(value as typeof coverageType)}
@@ -96,14 +95,14 @@ export default function ProfileCoverage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="governorate">Governorate</SelectItem>
-                <SelectItem value="center">Center</SelectItem>
-                <SelectItem value="hybrid">Hybrid</SelectItem>
+                <SelectItem value="governorate">{t('profile.governorate')}</SelectItem>
+                <SelectItem value="center">{t('profile.center')}</SelectItem>
+                <SelectItem value="hybrid">{t('profile.hybrid')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Delivery Mode</Label>
+            <Label>{t('profile.deliveryMode')}</Label>
             <Select
               value={deliveryMode}
               onValueChange={(value) => setDeliveryMode(value as typeof deliveryMode)}
@@ -112,25 +111,25 @@ export default function ProfileCoverage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="delivery">Delivery</SelectItem>
-                <SelectItem value="pickup">Pickup</SelectItem>
-                <SelectItem value="both">Both</SelectItem>
+                <SelectItem value="delivery">{t('profile.delivery')}</SelectItem>
+                <SelectItem value="pickup">{t('profile.pickup')}</SelectItem>
+                <SelectItem value="both">{t('profile.both')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2 md:col-span-2">
-            <Label>Coverage Governorates</Label>
+            <Label>{t('profile.coverageGovernorates')}</Label>
             <Input
               value={coverageGovernorates}
               onChange={(event) => setCoverageGovernorates(event.target.value)}
-              placeholder="Beirut, Mount Lebanon, North Lebanon"
+              placeholder={t('profile.governoratesPlaceholder')}
             />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <Label>Coverage Center IDs</Label>
+            <Label>{t('profile.coverageCenterIds')}</Label>
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
               {centers.length === 0 ? (
-                <p className="text-sm text-gray-500">No active centers available.</p>
+                <p className="text-sm text-gray-500">{t('profile.noCenters')}</p>
               ) : (
                 <div className="grid gap-3 md:grid-cols-2">
                   {centers.map((center) => (
@@ -155,15 +154,15 @@ export default function ProfileCoverage() {
             </div>
           </div>
           <div className="space-y-2 md:col-span-2">
-            <Label>Aid Types</Label>
+            <Label>{t('profile.aidTypes')}</Label>
             <Input
               value={aidTypes}
               onChange={(event) => setAidTypes(event.target.value)}
-              placeholder="food, shelter, medicine"
+              placeholder={t('profile.aidTypesPlaceholder')}
             />
           </div>
           <div className="space-y-2">
-            <Label>Max Active Case Load</Label>
+            <Label>{t('profile.maxCaseLoad')}</Label>
             <Input
               type="number"
               min={1}
@@ -178,7 +177,7 @@ export default function ProfileCoverage() {
             onClick={handleSave}
             disabled={saving}
           >
-            {saving ? 'Saving...' : 'Save coverage profile'}
+            {saving ? t('profile.saving') : t('profile.save')}
           </Button>
         </div>
       </div>

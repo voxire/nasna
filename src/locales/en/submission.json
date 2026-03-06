@@ -58,5 +58,14 @@
   "queueFailed_other": "{{count}} queued submissions have failed and can be retried.",
   "validationError": "Please fill in all required fields correctly.",
   "success": "Submission successful!",
-  "error": "Error creating submission."
+  "error": "Error creating submission.",
+  "agent": {
+    "title": "Agent Submissions",
+    "fullName": "Full Name",
+    "email": "Email",
+    "phoneNumber": "Phone Number",
+    "dateRegistered": "Date Registered",
+    "noSubmissions": "No submissions found.",
+    "loadError": "Failed to load submissions"
+  }
 }

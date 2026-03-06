@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { auth, db } from '@/firebase';
-import { collection, doc, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
+import { collection, doc, limit, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
 import type { HousingDocument, HousingStatus } from '@/types';
 import HousingCard from '@/Components/HousingCard';
 import { Input } from '@/Components/ui/input';
@@ -17,22 +18,23 @@ interface HousingRow extends HousingDocument {
   id: string;
 }
 
-const STATUS_FILTERS: Array<{ label: string; value: HousingStatus | 'all' }> = [
-  { label: 'All statuses', value: 'all' },
-  { label: 'Pending review', value: 'pending_review' },
-  { label: 'Approved', value: 'approved' },
-  { label: 'Rejected', value: 'rejected' },
-  { label: 'Reserved', value: 'reserved' },
-  { label: 'Filled', value: 'filled' },
-];
-
 export default function HousingReview() {
+  const { t } = useTranslation();
   const [housingItems, setHousingItems] = useState<HousingRow[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<HousingStatus | 'all'>('pending_review');
 
+  const STATUS_FILTERS: Array<{ label: string; value: HousingStatus | 'all' }> = [
+    { label: t('housing.review.allStatuses'), value: 'all' },
+    { label: t('housing.review.pendingReview'), value: 'pending_review' },
+    { label: t('housing.review.approved'), value: 'approved' },
+    { label: t('housing.review.rejected'), value: 'rejected' },
+    { label: t('housing.review.reserved'), value: 'reserved' },
+    { label: t('housing.review.filled'), value: 'filled' },
+  ];
+
   useEffect(() => {
-    const housingQuery = query(collection(db, 'housing'), orderBy('createdAt', 'desc'));
+    const housingQuery = query(collection(db, 'housing'), orderBy('createdAt', 'desc'), limit(50));
 
     return onSnapshot(housingQuery, (snapshot) => {
       setHousingItems(
@@ -68,26 +70,23 @@ export default function HousingReview() {
         updatedAt: new Date(),
       });
 
-      toast.success(`Housing listing marked ${status.replace('_', ' ')}.`);
+      toast.success(t('housing.review.statusUpdated', { status: status.replace('_', ' ') }));
     } catch (error) {
       console.error(error);
-      toast.error('Failed to update housing listing.');
+      toast.error(t('housing.review.errorUpdate'));
     }
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Housing Review</h1>
-        <p className="text-sm text-gray-500">
-          Review submitted housing offers, approve trusted capacity, and track reserved or filled
-          inventory.
-        </p>
+        <h1 className="text-2xl font-bold text-gray-800">{t('housing.review.title')}</h1>
+        <p className="text-sm text-gray-500">{t('housing.review.description')}</p>
       </div>
 
       <div className="flex flex-wrap gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <Input
-          placeholder="Search by host, phone, area, or address"
+          placeholder={t('housing.review.searchPlaceholder')}
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
           className="min-w-[240px] flex-1 bg-gray-50"
@@ -117,7 +116,7 @@ export default function HousingReview() {
             primaryAction={
               housing.status !== 'approved'
                 ? {
-                    label: 'Approve',
+                    label: t('housing.review.approve'),
                     onClick: () => void updateHousingStatus(housing, 'approved'),
                   }
                 : undefined
@@ -125,12 +124,12 @@ export default function HousingReview() {
             secondaryAction={
               housing.status === 'approved'
                 ? {
-                    label: 'Reserve',
+                    label: t('housing.review.reserve'),
                     onClick: () => void updateHousingStatus(housing, 'reserved'),
                   }
                 : housing.status === 'reserved'
                   ? {
-                      label: 'Mark Filled',
+                      label: t('housing.review.markFilled'),
                       onClick: () => void updateHousingStatus(housing, 'filled'),
                     }
                   : undefined
@@ -138,7 +137,7 @@ export default function HousingReview() {
             tertiaryAction={
               housing.status !== 'rejected'
                 ? {
-                    label: 'Reject',
+                    label: t('housing.review.reject'),
                     onClick: () => void updateHousingStatus(housing, 'rejected'),
                   }
                 : undefined
@@ -149,7 +148,7 @@ export default function HousingReview() {
 
       {filteredItems.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
-          No housing offers matched the current filters.
+          {t('housing.review.noResults')}
         </div>
       ) : null}
     </div>

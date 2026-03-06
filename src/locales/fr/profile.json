@@ -1,0 +1,21 @@
+{
+  "title": "Profil de couverture",
+  "description": "Définissez où votre organisation opère, les types d'aide que vous pouvez gérer et votre capacité de cas actifs.",
+  "coverageType": "Type de couverture",
+  "governorate": "Gouvernorat",
+  "center": "Centre",
+  "hybrid": "Hybride",
+  "deliveryMode": "Mode de livraison",
+  "delivery": "Livraison",
+  "pickup": "Collecte",
+  "both": "Les deux",
+  "coverageGovernorates": "Gouvernorats de couverture",
+  "governoratesPlaceholder": "Beyrouth, Mont Liban, Liban-Nord",
+  "coverageCenterIds": "ID des centres de couverture",
+  "noCenters": "Aucun centre actif disponible.",
+  "aidTypes": "Types d'aide",
+  "aidTypesPlaceholder": "nourriture, hébergement, médicaments",
+  "maxCaseLoad": "Charge de cas maximale",
+  "saving": "Enregistrement...",
+  "save": "Enregistrer le profil de couverture"
+}

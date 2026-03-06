@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db } from '../../firebase';
 import {
   collection,
@@ -45,6 +46,7 @@ interface AgentRow extends MemberDocument {
 }
 
 function Agents() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [validatedFilter, setValidatedFilter] = useState('');
   const [editAgent, setEditAgent] = useState<AgentRow | null>(null);
@@ -99,23 +101,23 @@ function Agents() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this agent?')) return;
+    if (!window.confirm(t('admin.agents.deleteConfirm'))) return;
     try {
       await deleteDoc(doc(db, 'members', id));
-      toast.success('Agent deleted successfully.');
+      toast.success(t('admin.agents.deleteSuccess'));
     } catch (error) {
       console.error('Error deleting agent: ', error);
-      toast.error('Error deleting agent. Please try again.');
+      toast.error(t('admin.agents.deleteError'));
     }
   };
 
   const handleValidate = async (id: string) => {
     try {
       await updateDoc(doc(db, 'members', id), { validated: true, updatedAt: new Date() });
-      toast.success('Agent validated successfully.');
+      toast.success(t('admin.agents.validateSuccess'));
     } catch (error) {
       console.error('Error validating agent: ', error);
-      toast.error('Error validating agent. Please try again.');
+      toast.error(t('admin.agents.validateError'));
     }
   };
 
@@ -135,40 +137,50 @@ function Agents() {
         phoneNumber: editAgent.phoneNumber,
         updatedAt: new Date(),
       });
-      toast.success('Agent updated successfully.');
+      toast.success(t('admin.agents.updateSuccess'));
       setModalOpen(false);
       setEditAgent(null);
     } catch (error) {
       console.error('Error updating agent: ', error);
-      toast.error('Error updating agent. Please try again.');
+      toast.error(t('admin.agents.updateError'));
     }
   };
 
+  const editFormFields = useMemo(
+    () => [
+      { name: 'name', label: t('admin.agents.name') },
+      { name: 'contactPersonName', label: t('admin.agents.contactPerson') },
+      { name: 'email', label: t('admin.agents.email') },
+      { name: 'phoneNumber', label: t('admin.agents.phoneNumber') },
+    ],
+    [t],
+  );
+
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-5 text-gray-800">Field Agents</h1>
+      <h1 className="text-2xl font-bold mb-5 text-gray-800">{t('admin.agents.title')}</h1>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4 flex gap-3 flex-wrap">
         <Input
-          placeholder="Search by Name, Contact Person, or Email"
+          placeholder={t('admin.agents.searchPlaceholder')}
           value={searchQuery}
           onChange={handleSearch}
           className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
         <Select value={validatedFilter} onValueChange={handleFilterChange}>
           <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
-            <SelectValue placeholder="Validated" />
+            <SelectValue placeholder={t('admin.agents.validatedFilter')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="true">Validated</SelectItem>
-            <SelectItem value="false">Not Validated</SelectItem>
+            <SelectItem value="all">{t('admin.agents.all')}</SelectItem>
+            <SelectItem value="true">{t('admin.agents.validated')}</SelectItem>
+            <SelectItem value="false">{t('admin.agents.notValidated')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading...</p>
+        <p className="text-gray-500">{t('admin.agents.loading')}</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (
@@ -176,12 +188,24 @@ function Agents() {
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="font-semibold text-gray-700">Name</TableHead>
-                <TableHead className="font-semibold text-gray-700">Contact Person</TableHead>
-                <TableHead className="font-semibold text-gray-700">Email</TableHead>
-                <TableHead className="font-semibold text-gray-700">Phone Number</TableHead>
-                <TableHead className="font-semibold text-gray-700">Validated</TableHead>
-                <TableHead className="font-semibold text-gray-700">Actions</TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.agents.name')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.agents.contactPerson')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.agents.email')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.agents.phoneNumber')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.agents.validatedLabel')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.agents.actions')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -195,7 +219,9 @@ function Agents() {
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${agent.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}
                     >
-                      {agent.validated ? 'Validated' : 'Pending'}
+                      {agent.validated
+                        ? t('admin.agents.validatedBadge')
+                        : t('admin.agents.pendingBadge')}
                     </span>
                   </TableCell>
                   <TableCell className="flex gap-2">
@@ -205,7 +231,7 @@ function Agents() {
                         className="bg-[#12a89d] hover:bg-[#0e9088] text-white"
                         onClick={() => handleValidate(agent.id)}
                       >
-                        Validate
+                        {t('admin.agents.validate')}
                       </Button>
                     )}
                     {agent.validated && (
@@ -219,14 +245,14 @@ function Agents() {
                             setModalOpen(true);
                           }}
                         >
-                          Edit
+                          {t('admin.agents.edit')}
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
                           onClick={() => handleDelete(agent.id)}
                         >
-                          Delete
+                          {t('admin.agents.delete')}
                         </Button>
                       </>
                     )}
@@ -238,8 +264,8 @@ function Agents() {
           <div className="flex items-center justify-between px-4 py-3 border-t text-sm text-gray-500">
             <span>
               {filteredAgents.length === 0
-                ? `No results on page ${page}`
-                : `${filteredAgents.length} result(s) on page ${page}`}
+                ? t('admin.agents.noResultsPage', { page })
+                : t('admin.agents.resultsPage', { count: filteredAgents.length, page })}
             </span>
             <div className="flex gap-2">
               <Button
@@ -248,10 +274,10 @@ function Agents() {
                 onClick={previousPage}
                 disabled={!hasPreviousPage}
               >
-                Previous
+                {t('admin.agents.previous')}
               </Button>
               <Button variant="outline" size="sm" onClick={nextPage} disabled={!hasNextPage}>
-                Next
+                {t('admin.agents.next')}
               </Button>
             </div>
           </div>
@@ -267,15 +293,10 @@ function Agents() {
       >
         <DialogContent className="max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Edit Agent</DialogTitle>
+            <DialogTitle>{t('admin.agents.editTitle')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleEditSubmit} className="space-y-3">
-            {[
-              { name: 'name', label: 'Name' },
-              { name: 'contactPersonName', label: 'Contact Person' },
-              { name: 'email', label: 'Email' },
-              { name: 'phoneNumber', label: 'Phone Number' },
-            ].map(({ name, label }) => (
+            {editFormFields.map(({ name, label }) => (
               <div key={name} className="space-y-1">
                 <Label>{label}</Label>
                 <Input
@@ -287,7 +308,7 @@ function Agents() {
               </div>
             ))}
             <DialogFooter>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit">{t('admin.agents.saveChanges')}</Button>
             </DialogFooter>
           </form>
         </DialogContent>

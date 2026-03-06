@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db } from '../../firebase';
 import {
   collection,
@@ -49,6 +50,7 @@ interface FeedbackRow {
 }
 
 function FeedbackManagement() {
+  const { t } = useTranslation();
   const [items, setItems] = useState<FeedbackRow[]>([]);
   const [filtered, setFiltered] = useState<FeedbackRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +59,14 @@ function FeedbackManagement() {
   const [readFilter, setReadFilter] = useState('');
   const [viewItem, setViewItem] = useState<FeedbackRow | null>(null);
   const [page, setPage] = useState(1);
+
+  const typeLabels: Record<string, string> = {
+    General: t('admin.feedbackMgmt.general'),
+    'Bug Report': t('admin.feedbackMgmt.bugReport'),
+    'Feature Request': t('admin.feedbackMgmt.featureRequest'),
+    Complaint: t('admin.feedbackMgmt.complaint'),
+    Compliment: t('admin.feedbackMgmt.compliment'),
+  };
 
   useEffect(() => {
     fetchFeedback();
@@ -71,7 +81,7 @@ function FeedbackManagement() {
       setItems(data);
       setFiltered(data);
     } catch {
-      toast.error('Failed to load feedback.');
+      toast.error(t('admin.feedbackMgmt.loadError'));
     } finally {
       setLoading(false);
     }
@@ -112,22 +122,22 @@ function FeedbackManagement() {
       const updated = items.map((f) => (f.id === id ? { ...f, read: true } : f));
       setItems(updated);
       applyFilters(searchQuery, typeFilter, readFilter, updated);
-      toast.success('Marked as read.');
+      toast.success(t('admin.feedbackMgmt.markedRead'));
     } catch {
-      toast.error('Failed to update.');
+      toast.error(t('admin.feedbackMgmt.updateError'));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this feedback?')) return;
+    if (!window.confirm(t('admin.feedbackMgmt.deleteConfirm'))) return;
     try {
       await deleteDoc(doc(db, 'feedback', id));
       const updated = items.filter((f) => f.id !== id);
       setItems(updated);
       applyFilters(searchQuery, typeFilter, readFilter, updated);
-      toast.success('Feedback deleted.');
+      toast.success(t('admin.feedbackMgmt.deleteSuccess'));
     } catch {
-      toast.error('Failed to delete.');
+      toast.error(t('admin.feedbackMgmt.deleteError'));
     }
   };
 
@@ -141,54 +151,70 @@ function FeedbackManagement() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-5 text-gray-800">Feedback</h1>
+      <h1 className="text-2xl font-bold mb-5 text-gray-800">{t('admin.feedbackMgmt.title')}</h1>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4 flex gap-3 flex-wrap">
         <Input
-          placeholder="Search by name, email, or message"
+          placeholder={t('admin.feedbackMgmt.searchPlaceholder')}
           value={searchQuery}
           onChange={handleSearch}
           className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
         <Select value={typeFilter} onValueChange={handleTypeFilter}>
           <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
-            <SelectValue placeholder="Type" />
+            <SelectValue placeholder={t('admin.feedbackMgmt.typePlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            {['General', 'Bug Report', 'Feature Request', 'Complaint', 'Compliment'].map((t) => (
-              <SelectItem key={t} value={t}>
-                {t}
-              </SelectItem>
-            ))}
+            <SelectItem value="all">{t('admin.feedbackMgmt.allTypes')}</SelectItem>
+            {['General', 'Bug Report', 'Feature Request', 'Complaint', 'Compliment'].map(
+              (t_type) => (
+                <SelectItem key={t_type} value={t_type}>
+                  {typeLabels[t_type]}
+                </SelectItem>
+              ),
+            )}
           </SelectContent>
         </Select>
         <Select value={readFilter} onValueChange={handleReadFilter}>
           <SelectTrigger className="w-[140px] bg-gray-50 border-gray-200">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t('admin.feedbackMgmt.statusPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="false">Unread</SelectItem>
-            <SelectItem value="true">Read</SelectItem>
+            <SelectItem value="all">{t('admin.feedbackMgmt.all')}</SelectItem>
+            <SelectItem value="false">{t('admin.feedbackMgmt.unread')}</SelectItem>
+            <SelectItem value="true">{t('admin.feedbackMgmt.read')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading...</p>
+        <p className="text-gray-500">{t('admin.feedbackMgmt.loading')}</p>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="font-semibold text-gray-700">Status</TableHead>
-                <TableHead className="font-semibold text-gray-700">Type</TableHead>
-                <TableHead className="font-semibold text-gray-700">Name</TableHead>
-                <TableHead className="font-semibold text-gray-700">Email</TableHead>
-                <TableHead className="font-semibold text-gray-700">Message</TableHead>
-                <TableHead className="font-semibold text-gray-700">Date</TableHead>
-                <TableHead className="font-semibold text-gray-700">Actions</TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.statusHeader')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.type')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.name')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.email')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.message')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.date')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.actions')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -201,7 +227,9 @@ function FeedbackManagement() {
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${item.read ? 'bg-gray-100 text-gray-500' : 'bg-blue-100 text-blue-700'}`}
                     >
-                      {item.read ? 'Read' : 'Unread'}
+                      {item.read
+                        ? t('admin.feedbackMgmt.readBadge')
+                        : t('admin.feedbackMgmt.unreadBadge')}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -222,7 +250,7 @@ function FeedbackManagement() {
                       className="border-gray-300"
                       onClick={() => handleView(item)}
                     >
-                      View
+                      {t('admin.feedbackMgmt.view')}
                     </Button>
                     {!item.read && (
                       <Button
@@ -230,11 +258,11 @@ function FeedbackManagement() {
                         className="bg-[#12a89d] hover:bg-[#0e9088] text-white"
                         onClick={() => handleMarkRead(item.id)}
                       >
-                        Mark Read
+                        {t('admin.feedbackMgmt.markRead')}
                       </Button>
                     )}
                     <Button size="sm" variant="destructive" onClick={() => handleDelete(item.id)}>
-                      Delete
+                      {t('admin.feedbackMgmt.delete')}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -244,8 +272,12 @@ function FeedbackManagement() {
           <div className="flex items-center justify-between px-4 py-3 border-t text-sm text-gray-500">
             <span>
               {filtered.length === 0
-                ? '0 results'
-                : `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length}`}
+                ? t('admin.feedbackMgmt.zeroResults')
+                : t('admin.feedbackMgmt.paginationRange', {
+                    start: (page - 1) * PAGE_SIZE + 1,
+                    end: Math.min(page * PAGE_SIZE, filtered.length),
+                    total: filtered.length,
+                  })}
             </span>
             <div className="flex gap-2">
               <Button
@@ -254,7 +286,7 @@ function FeedbackManagement() {
                 onClick={() => setPage((p) => p - 1)}
                 disabled={page === 1}
               >
-                Previous
+                {t('admin.feedbackMgmt.previous')}
               </Button>
               <Button
                 variant="outline"
@@ -262,7 +294,7 @@ function FeedbackManagement() {
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= totalPages}
               >
-                Next
+                {t('admin.feedbackMgmt.next')}
               </Button>
             </div>
           </div>
@@ -279,7 +311,9 @@ function FeedbackManagement() {
           <DialogHeader>
             <DialogTitle>{viewItem?.type}</DialogTitle>
             <DialogDescription>
-              {viewItem?.name ? `From: ${viewItem.name}` : 'Anonymous'}
+              {viewItem?.name
+                ? t('admin.feedbackMgmt.from', { name: viewItem.name })
+                : t('admin.feedbackMgmt.anonymous')}
               {viewItem?.email ? ` · ${viewItem.email}` : ''}
               {' · '}
               {viewItem?.createdAt?.toDate().toLocaleString()}

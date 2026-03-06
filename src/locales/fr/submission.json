@@ -58,5 +58,14 @@
   "queueFailed_other": "{{count}} soumissions en attente ont échoué et peuvent être relancées.",
   "validationError": "Veuillez remplir tous les champs obligatoires correctement.",
   "success": "Soumission réussie !",
-  "error": "Erreur lors de la soumission."
+  "error": "Erreur lors de la soumission.",
+  "agent": {
+    "title": "Soumissions de l'agent",
+    "fullName": "Nom complet",
+    "email": "E-mail",
+    "phoneNumber": "Numéro de téléphone",
+    "dateRegistered": "Date d'inscription",
+    "noSubmissions": "Aucune soumission trouvée.",
+    "loadError": "Échec du chargement des soumissions"
+  }
 }

@@ -1,0 +1,21 @@
+{
+  "title": "Coverage Profile",
+  "description": "Define where your organization operates, what aid types you can handle, and your active case capacity.",
+  "coverageType": "Coverage Type",
+  "governorate": "Governorate",
+  "center": "Center",
+  "hybrid": "Hybrid",
+  "deliveryMode": "Delivery Mode",
+  "delivery": "Delivery",
+  "pickup": "Pickup",
+  "both": "Both",
+  "coverageGovernorates": "Coverage Governorates",
+  "governoratesPlaceholder": "Beirut, Mount Lebanon, North Lebanon",
+  "coverageCenterIds": "Coverage Center IDs",
+  "noCenters": "No active centers available.",
+  "aidTypes": "Aid Types",
+  "aidTypesPlaceholder": "food, shelter, medicine",
+  "maxCaseLoad": "Max Active Case Load",
+  "saving": "Saving...",
+  "save": "Save coverage profile"
+}

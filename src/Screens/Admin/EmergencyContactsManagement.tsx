@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db } from '@/firebase';
 import {
   addDoc,
@@ -46,6 +47,7 @@ const DEFAULT_FORM = {
 };
 
 export default function EmergencyContactsManagement() {
+  const { t } = useTranslation();
   const [contacts, setContacts] = useState<ContactRow[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingContact, setEditingContact] = useState<ContactRow | null>(null);
@@ -91,7 +93,7 @@ export default function EmergencyContactsManagement() {
           lastVerifiedAt: formState.verified ? new Date() : null,
           updatedAt: new Date(),
         });
-        toast.success('Emergency contact updated.');
+        toast.success(t('admin.emergencyContacts.updateSuccess'));
       } else {
         await addDoc(collection(db, 'emergencyContacts'), {
           ...formState,
@@ -99,13 +101,13 @@ export default function EmergencyContactsManagement() {
           createdAt: new Date(),
           updatedAt: new Date(),
         });
-        toast.success('Emergency contact added.');
+        toast.success(t('admin.emergencyContacts.addSuccess'));
       }
 
       resetForm();
     } catch (error) {
       console.error(error);
-      toast.error('Failed to save emergency contact.');
+      toast.error(t('admin.emergencyContacts.saveError'));
     } finally {
       setSaving(false);
     }
@@ -114,10 +116,10 @@ export default function EmergencyContactsManagement() {
   const handleDelete = async (contactId: string) => {
     try {
       await deleteDoc(doc(db, 'emergencyContacts', contactId));
-      toast.success('Emergency contact deleted.');
+      toast.success(t('admin.emergencyContacts.deleteSuccess'));
     } catch (error) {
       console.error(error);
-      toast.error('Failed to delete emergency contact.');
+      toast.error(t('admin.emergencyContacts.deleteError'));
     }
   };
 
@@ -125,10 +127,8 @@ export default function EmergencyContactsManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Emergency Contacts</h1>
-          <p className="text-sm text-gray-500">
-            Maintain the public emergency directory and keep contact verification current.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-800">{t('admin.emergencyContacts.title')}</h1>
+          <p className="text-sm text-gray-500">{t('admin.emergencyContacts.description')}</p>
         </div>
         <Button
           className="bg-[#12a89d] text-white hover:bg-[#0e9088]"
@@ -137,12 +137,12 @@ export default function EmergencyContactsManagement() {
             setEditingContact({ id: '', ...DEFAULT_FORM });
           }}
         >
-          Add Contact
+          {t('admin.emergencyContacts.addContact')}
         </Button>
       </div>
 
       <Input
-        placeholder="Search by name, number, category, or coverage"
+        placeholder={t('admin.emergencyContacts.searchPlaceholder')}
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.target.value)}
         className="bg-white"
@@ -166,14 +166,18 @@ export default function EmergencyContactsManagement() {
                       : 'bg-amber-100 text-amber-800'
                   }`}
                 >
-                  {contact.verified ? 'Verified' : 'Needs review'}
+                  {contact.verified
+                    ? t('admin.emergencyContacts.verified')
+                    : t('admin.emergencyContacts.needsReview')}
                 </span>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <p className="text-sm font-medium text-gray-900">{contact.phoneNumber}</p>
-                <p className="text-sm text-gray-500">{contact.notes || 'No notes added.'}</p>
+                <p className="text-sm text-gray-500">
+                  {contact.notes || t('admin.emergencyContacts.noNotes')}
+                </p>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -190,10 +194,10 @@ export default function EmergencyContactsManagement() {
                     });
                   }}
                 >
-                  Edit
+                  {t('admin.emergencyContacts.edit')}
                 </Button>
                 <Button variant="destructive" onClick={() => void handleDelete(contact.id)}>
-                  Delete
+                  {t('admin.emergencyContacts.delete')}
                 </Button>
               </div>
             </CardContent>
@@ -210,16 +214,16 @@ export default function EmergencyContactsManagement() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingContact?.id ? 'Edit Contact' : 'Add Emergency Contact'}
+              {editingContact?.id
+                ? t('admin.emergencyContacts.editTitle')
+                : t('admin.emergencyContacts.addTitle')}
             </DialogTitle>
-            <DialogDescription>
-              Publish verified hotlines and response points to the public directory.
-            </DialogDescription>
+            <DialogDescription>{t('admin.emergencyContacts.dialogDescription')}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Name</Label>
+              <Label>{t('admin.emergencyContacts.name')}</Label>
               <Input
                 value={formState.name}
                 onChange={(event) =>
@@ -228,7 +232,7 @@ export default function EmergencyContactsManagement() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Phone Number</Label>
+              <Label>{t('admin.emergencyContacts.phoneNumber')}</Label>
               <Input
                 value={formState.phoneNumber}
                 onChange={(event) =>
@@ -237,7 +241,7 @@ export default function EmergencyContactsManagement() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Category</Label>
+              <Label>{t('admin.emergencyContacts.category')}</Label>
               <Select
                 value={formState.category}
                 onValueChange={(value) =>
@@ -248,26 +252,28 @@ export default function EmergencyContactsManagement() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="medical">Medical</SelectItem>
-                  <SelectItem value="shelter">Shelter</SelectItem>
-                  <SelectItem value="food">Food</SelectItem>
-                  <SelectItem value="legal">Legal</SelectItem>
-                  <SelectItem value="protection">Protection</SelectItem>
+                  <SelectItem value="medical">{t('admin.emergencyContacts.medical')}</SelectItem>
+                  <SelectItem value="shelter">{t('admin.emergencyContacts.shelter')}</SelectItem>
+                  <SelectItem value="food">{t('admin.emergencyContacts.food')}</SelectItem>
+                  <SelectItem value="legal">{t('admin.emergencyContacts.legal')}</SelectItem>
+                  <SelectItem value="protection">
+                    {t('admin.emergencyContacts.protection')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Coverage</Label>
+              <Label>{t('admin.emergencyContacts.coverage')}</Label>
               <Input
                 value={formState.coverage}
                 onChange={(event) =>
                   setFormState((current) => ({ ...current, coverage: event.target.value }))
                 }
-                placeholder="Beirut, Lebanon-wide, South Lebanon..."
+                placeholder={t('admin.emergencyContacts.coveragePlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label>Notes</Label>
+              <Label>{t('admin.emergencyContacts.notes')}</Label>
               <Textarea
                 value={formState.notes}
                 onChange={(event) =>
@@ -276,7 +282,7 @@ export default function EmergencyContactsManagement() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Verification Status</Label>
+              <Label>{t('admin.emergencyContacts.verificationStatus')}</Label>
               <Select
                 value={String(formState.verified)}
                 onValueChange={(value) =>
@@ -287,8 +293,8 @@ export default function EmergencyContactsManagement() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="true">Verified</SelectItem>
-                  <SelectItem value="false">Needs review</SelectItem>
+                  <SelectItem value="true">{t('admin.emergencyContacts.verified')}</SelectItem>
+                  <SelectItem value="false">{t('admin.emergencyContacts.needsReview')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -298,7 +304,9 @@ export default function EmergencyContactsManagement() {
                 onClick={() => void handleSave()}
                 disabled={saving}
               >
-                {saving ? 'Saving...' : 'Save contact'}
+                {saving
+                  ? t('admin.emergencyContacts.saving')
+                  : t('admin.emergencyContacts.saveContact')}
               </Button>
             </div>
           </div>

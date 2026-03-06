@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '@/firebase';
 import HousingCard from '@/Components/HousingCard';
@@ -23,6 +24,7 @@ interface CenterRow extends CenterDocument {
 }
 
 export default function Housing() {
+  const { t } = useTranslation();
   const [housingItems, setHousingItems] = useState<HousingRow[]>([]);
   const [centers, setCenters] = useState<CenterRow[]>([]);
   const [areaFilter, setAreaFilter] = useState('');
@@ -97,23 +99,23 @@ export default function Housing() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-gray-900">Housing Directory</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('housing.directory.title')}</h1>
         <p className="text-gray-500">
-          Browse approved host housing and active centers with current capacity.
+          {t('housing.directory.description')}
         </p>
       </div>
 
       <div className="grid gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm md:grid-cols-3">
         <div className="space-y-1.5">
-          <Label>Area</Label>
+          <Label>{t('housing.directory.areaLabel')}</Label>
           <Input
             value={areaFilter}
             onChange={(event) => setAreaFilter(event.target.value)}
-            placeholder="Search by area, city, governorate, or address"
+            placeholder={t('housing.directory.areaPlaceholder')}
           />
         </div>
         <div className="space-y-1.5">
-          <Label>Price Type</Label>
+          <Label>{t('housing.directory.priceTypeLabel')}</Label>
           <Select
             value={priceFilter}
             onValueChange={(value) =>
@@ -124,15 +126,15 @@ export default function Housing() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All price types</SelectItem>
-              <SelectItem value="free">Free</SelectItem>
-              <SelectItem value="subsidized">Subsidized</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="all">{t('housing.directory.allPriceTypes')}</SelectItem>
+              <SelectItem value="free">{t('housing.directory.free')}</SelectItem>
+              <SelectItem value="subsidized">{t('housing.directory.subsidized')}</SelectItem>
+              <SelectItem value="paid">{t('housing.directory.paid')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Minimum Spots</Label>
+          <Label>{t('housing.directory.minSpots')}</Label>
           <Input
             type="number"
             min={1}
@@ -145,9 +147,9 @@ export default function Housing() {
       <div className="grid gap-8 xl:grid-cols-2 xl:items-start">
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900">Approved Housing Offers</h2>
+            <h2 className="text-2xl font-semibold text-gray-900">{t('housing.directory.approvedTitle')}</h2>
             <p className="text-sm text-gray-500">
-              Reviewed housing listings currently available for placement.
+              {t('housing.directory.approvedDescription')}
             </p>
           </div>
 
@@ -159,16 +161,16 @@ export default function Housing() {
 
           {filteredHousing.length === 0 ? (
             <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
-              No approved housing listings matched the current filters.
+              {t('housing.directory.noHousingResults')}
             </div>
           ) : null}
         </section>
 
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900">Active Centers</h2>
+            <h2 className="text-2xl font-semibold text-gray-900">{t('housing.directory.centersTitle')}</h2>
             <p className="text-sm text-gray-500">
-              Official centers currently active in the system with live occupancy state.
+              {t('housing.directory.centersDescription')}
             </p>
           </div>
 
@@ -186,15 +188,15 @@ export default function Housing() {
                     </p>
                   </div>
                   <span className="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-medium text-sky-800">
-                    Official center
+                    {t('housing.directory.officialCenter')}
                   </span>
                 </div>
 
                 <div className="mt-4 space-y-3 text-sm text-gray-600">
                   <p>{center.address}</p>
                   <p>
-                    Contact: {center.contactName || 'No contact name'} ·{' '}
-                    {center.contactPhone || 'No phone'}
+                    {t('housing.directory.contact')} {center.contactName || t('housing.directory.noContactName')} ·{' '}
+                    {center.contactPhone || t('housing.directory.noPhone')}
                   </p>
                   <CapacityBar capacity={center.capacity} occupied={center.occupiedCapacity} />
                 </div>
@@ -204,7 +206,7 @@ export default function Housing() {
 
           {filteredCenters.length === 0 ? (
             <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
-              No centers matched the current filters.
+              {t('housing.directory.noCenterResults')}
             </div>
           ) : null}
         </section>

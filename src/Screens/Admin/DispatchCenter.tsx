@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { auth, db } from '@/firebase';
 import {
   collection,
@@ -54,16 +55,21 @@ interface NgoMemberRow extends MemberDocument {
   id: string;
 }
 
-const STATUS_OPTIONS: Array<{ label: string; value: SubmissionStatus | 'all' }> = [
-  { label: 'All statuses', value: 'all' },
-  { label: 'Pending', value: 'pending' },
-  { label: 'Assigned', value: 'assigned' },
-  { label: 'In Progress', value: 'in_progress' },
-  { label: 'Completed', value: 'completed' },
-  { label: 'Cancelled', value: 'cancelled' },
-];
-
 export default function DispatchCenter() {
+  const { t } = useTranslation();
+
+  const STATUS_OPTIONS: Array<{ label: string; value: SubmissionStatus | 'all' }> = useMemo(
+    () => [
+      { label: t('admin.dispatch.allStatuses'), value: 'all' },
+      { label: t('admin.dispatch.pending'), value: 'pending' },
+      { label: t('admin.dispatch.assigned'), value: 'assigned' },
+      { label: t('admin.dispatch.inProgress'), value: 'in_progress' },
+      { label: t('admin.dispatch.completed'), value: 'completed' },
+      { label: t('admin.dispatch.cancelled'), value: 'cancelled' },
+    ],
+    [t],
+  );
+
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<SubmissionStatus | 'all'>('pending');
   const [urgencyFilter, setUrgencyFilter] = useState<string>('all');
@@ -184,7 +190,7 @@ export default function DispatchCenter() {
       toast.success(successMessage);
     } catch (updateError) {
       console.error(updateError);
-      toast.error('Failed to update the case.');
+      toast.error(t('admin.dispatch.errorUpdate'));
     } finally {
       setSaving(false);
     }
@@ -200,7 +206,7 @@ export default function DispatchCenter() {
         assignedAt: new Date(),
         status: 'assigned',
       },
-      `Assigned to ${selectedNgo?.name ?? 'the selected NGO'}.`,
+      t('admin.dispatch.assignedSuccess', { name: selectedNgo?.name ?? 'NGO' }),
     );
   };
 
@@ -211,7 +217,7 @@ export default function DispatchCenter() {
         status,
         aidDelivered: status === 'completed',
       },
-      `Case marked ${status.replace('_', ' ')}.`,
+      t('admin.dispatch.statusUpdated', { status: status.replace('_', ' ') }),
     );
   };
 
@@ -225,7 +231,7 @@ export default function DispatchCenter() {
           ? `${selectedCase.comments ?? ''}\n\nDelivery note: ${notes}`.trim()
           : (selectedCase.comments ?? ''),
       },
-      'Delivery note saved.',
+      t('admin.dispatch.deliveryNoteSaved'),
     );
   };
 
@@ -233,29 +239,27 @@ export default function DispatchCenter() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Dispatch Center</h1>
-          <p className="text-sm text-gray-500">
-            Review incoming cases, assign them to NGOs, and track stale or completed work.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-800">{t('admin.dispatch.title')}</h1>
+          <p className="text-sm text-gray-500">{t('admin.dispatch.description')}</p>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardDescription>Cases on this page</CardDescription>
+            <CardDescription>{t('admin.dispatch.casesOnPage')}</CardDescription>
             <CardTitle>{filteredCases.length}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Stale flagged</CardDescription>
+            <CardDescription>{t('admin.dispatch.staleFlagged')}</CardDescription>
             <CardTitle>{filteredCases.filter((item) => item.staleFlagged).length}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Unassigned</CardDescription>
+            <CardDescription>{t('admin.dispatch.unassigned')}</CardDescription>
             <CardTitle>{filteredCases.filter((item) => !item.assignedTo).length}</CardTitle>
           </CardHeader>
         </Card>
@@ -264,7 +268,7 @@ export default function DispatchCenter() {
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <div className="flex flex-wrap gap-3">
           <Input
-            placeholder="Search by household, phone, governorate, or assigned NGO"
+            placeholder={t('admin.dispatch.searchPlaceholder')}
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             className="min-w-[240px] flex-1 bg-gray-50"
@@ -274,7 +278,7 @@ export default function DispatchCenter() {
             onValueChange={(value) => setStatusFilter(value as SubmissionStatus | 'all')}
           >
             <SelectTrigger className="w-[180px] bg-gray-50">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t('admin.dispatch.status')} />
             </SelectTrigger>
             <SelectContent>
               {STATUS_OPTIONS.map((option) => (
@@ -286,13 +290,13 @@ export default function DispatchCenter() {
           </Select>
           <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
             <SelectTrigger className="w-[160px] bg-gray-50">
-              <SelectValue placeholder="Urgency" />
+              <SelectValue placeholder={t('admin.dispatch.urgency')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All urgency</SelectItem>
-              <SelectItem value="High">High</SelectItem>
-              <SelectItem value="Medium">Medium</SelectItem>
-              <SelectItem value="Low">Low</SelectItem>
+              <SelectItem value="all">{t('admin.dispatch.allUrgency')}</SelectItem>
+              <SelectItem value="High">{t('admin.dispatch.high')}</SelectItem>
+              <SelectItem value="Medium">{t('admin.dispatch.medium')}</SelectItem>
+              <SelectItem value="Low">{t('admin.dispatch.low')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -302,19 +306,19 @@ export default function DispatchCenter() {
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50 hover:bg-gray-50">
-              <TableHead>Household</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Urgency</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Assigned NGO</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>{t('admin.dispatch.household')}</TableHead>
+              <TableHead>{t('admin.dispatch.location')}</TableHead>
+              <TableHead>{t('admin.dispatch.urgency')}</TableHead>
+              <TableHead>{t('admin.dispatch.status')}</TableHead>
+              <TableHead>{t('admin.dispatch.assignedNgo')}</TableHead>
+              <TableHead>{t('admin.dispatch.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
                 <TableCell colSpan={6} className="py-12 text-center text-gray-500">
-                  Loading dispatch queue...
+                  {t('admin.dispatch.loadingQueue')}
                 </TableCell>
               </TableRow>
             ) : error ? (
@@ -326,7 +330,7 @@ export default function DispatchCenter() {
             ) : filteredCases.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="py-12 text-center text-gray-500">
-                  No cases matched the current filters.
+                  {t('admin.dispatch.noResults')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -341,11 +345,11 @@ export default function DispatchCenter() {
                   <TableCell>
                     <p className="text-sm text-gray-900">
                       {submission.locationType === 'center' && submission.centerId
-                        ? `${submission.currentGovernorate} · Center case`
+                        ? `${submission.currentGovernorate} · ${t('admin.dispatch.centerCase')}`
                         : submission.currentGovernorate}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {submission.city || submission.street || 'Address pending'}
+                      {submission.city || submission.street || t('admin.dispatch.addressPending')}
                     </p>
                   </TableCell>
                   <TableCell>{submission.aidUrgency}</TableCell>
@@ -357,7 +361,7 @@ export default function DispatchCenter() {
                   </TableCell>
                   <TableCell>
                     {ngoMembers.find((member) => member.id === submission.assignedTo)?.name ??
-                      'Unassigned'}
+                      t('admin.dispatch.unassignedNgo')}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-2">
@@ -369,7 +373,7 @@ export default function DispatchCenter() {
                           setAssigningNgoId(submission.assignedTo ?? '');
                         }}
                       >
-                        Open
+                        {t('admin.dispatch.open')}
                       </Button>
                       {submission.status === 'pending' ? (
                         <Button
@@ -380,7 +384,7 @@ export default function DispatchCenter() {
                             setAssigningNgoId(submission.assignedTo ?? '');
                           }}
                         >
-                          Assign
+                          {t('admin.dispatch.assign')}
                         </Button>
                       ) : null}
                     </div>
@@ -393,15 +397,15 @@ export default function DispatchCenter() {
         <div className="flex items-center justify-between border-t px-4 py-3 text-sm text-gray-500">
           <span>
             {filteredCases.length === 0
-              ? `No results on page ${page}`
-              : `${filteredCases.length} result(s) on page ${page}`}
+              ? t('admin.dispatch.noResultsPage', { page })
+              : t('admin.dispatch.resultsPage', { count: filteredCases.length, page })}
           </span>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={previousPage} disabled={!hasPreviousPage}>
-              Previous
+              {t('admin.dispatch.previous')}
             </Button>
             <Button variant="outline" size="sm" onClick={nextPage} disabled={!hasNextPage}>
-              Next
+              {t('admin.dispatch.next')}
             </Button>
           </div>
         </div>
@@ -421,33 +425,31 @@ export default function DispatchCenter() {
             <>
               <DialogHeader>
                 <DialogTitle>{selectedCase.fullName}</DialogTitle>
-                <DialogDescription>
-                  Review case context, suggested NGO matches, and dispatch updates.
-                </DialogDescription>
+                <DialogDescription>{t('admin.dispatch.dialogDescription')}</DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Case Overview</CardTitle>
+                      <CardTitle className="text-lg">{t('admin.dispatch.caseOverview')}</CardTitle>
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
                       <div>
                         <Label className="text-xs uppercase tracking-wide text-gray-500">
-                          Phone
+                          {t('admin.dispatch.phone')}
                         </Label>
                         <p className="text-sm text-gray-900">{selectedCase.phoneNumber}</p>
                       </div>
                       <div>
                         <Label className="text-xs uppercase tracking-wide text-gray-500">
-                          Urgency
+                          {t('admin.dispatch.urgency')}
                         </Label>
                         <p className="text-sm text-gray-900">{selectedCase.aidUrgency}</p>
                       </div>
                       <div>
                         <Label className="text-xs uppercase tracking-wide text-gray-500">
-                          Location
+                          {t('admin.dispatch.location')}
                         </Label>
                         <p className="text-sm text-gray-900">
                           {selectedCase.currentGovernorate},{' '}
@@ -456,18 +458,18 @@ export default function DispatchCenter() {
                       </div>
                       <div>
                         <Label className="text-xs uppercase tracking-wide text-gray-500">
-                          Needs
+                          {t('admin.dispatch.needs')}
                         </Label>
                         <p className="text-sm text-gray-900">
-                          {selectedCase.needs?.join(', ') || 'None listed'}
+                          {selectedCase.needs?.join(', ') || t('admin.dispatch.noneListed')}
                         </p>
                       </div>
                       <div className="md:col-span-2">
                         <Label className="text-xs uppercase tracking-wide text-gray-500">
-                          Comments
+                          {t('admin.dispatch.comments')}
                         </Label>
                         <p className="whitespace-pre-wrap text-sm text-gray-900">
-                          {selectedCase.comments || 'No comments provided.'}
+                          {selectedCase.comments || t('admin.dispatch.noComments')}
                         </p>
                       </div>
                     </CardContent>
@@ -477,14 +479,16 @@ export default function DispatchCenter() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Dispatch Actions</CardTitle>
+                      <CardTitle className="text-lg">
+                        {t('admin.dispatch.dispatchActions')}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Assign to NGO</Label>
+                        <Label>{t('admin.dispatch.assignToNgo')}</Label>
                         <Select value={assigningNgoId} onValueChange={setAssigningNgoId}>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a validated NGO" />
+                            <SelectValue placeholder={t('admin.dispatch.selectNgo')} />
                           </SelectTrigger>
                           <SelectContent>
                             {suggestedNgoMembers.map((member) => (
@@ -502,28 +506,28 @@ export default function DispatchCenter() {
                           onClick={handleAssignCase}
                           disabled={!assigningNgoId || saving}
                         >
-                          {saving ? 'Saving...' : 'Assign case'}
+                          {saving ? t('admin.dispatch.saving') : t('admin.dispatch.assignCase')}
                         </Button>
                         <Button
                           variant="outline"
                           onClick={() => void handleStatusChange(selectedCase.id, 'in_progress')}
                           disabled={saving}
                         >
-                          Mark In Progress
+                          {t('admin.dispatch.markInProgress')}
                         </Button>
                         <Button
                           variant="outline"
                           onClick={() => void handleStatusChange(selectedCase.id, 'completed')}
                           disabled={saving}
                         >
-                          Mark Completed
+                          {t('admin.dispatch.markCompleted')}
                         </Button>
                         <Button
                           variant="outline"
                           onClick={() => void handleStatusChange(selectedCase.id, 'cancelled')}
                           disabled={saving}
                         >
-                          Cancel
+                          {t('admin.dispatch.cancel')}
                         </Button>
                       </div>
                     </CardContent>
@@ -533,7 +537,7 @@ export default function DispatchCenter() {
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Case Timeline</CardTitle>
+                      <CardTitle className="text-lg">{t('admin.dispatch.caseTimeline')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <CaseTimeline
@@ -549,23 +553,26 @@ export default function DispatchCenter() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Suggested NGOs</CardTitle>
-                      <CardDescription>
-                        Suggested by coverage and current case load.
-                      </CardDescription>
+                      <CardTitle className="text-lg">{t('admin.dispatch.suggestedNgos')}</CardTitle>
+                      <CardDescription>{t('admin.dispatch.suggestedDescription')}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {suggestedNgoMembers.length === 0 ? (
-                        <p className="text-sm text-gray-500">No coverage matches yet.</p>
+                        <p className="text-sm text-gray-500">
+                          {t('admin.dispatch.noCoverageMatches')}
+                        </p>
                       ) : (
                         suggestedNgoMembers.slice(0, 5).map((member) => (
                           <div key={member.id} className="rounded-lg border border-gray-200 p-3">
                             <p className="font-medium text-gray-900">{member.name}</p>
                             <p className="text-sm text-gray-500">
-                              Load: {member.currentCaseLoad ?? 0}/{member.maxCaseLoad ?? 10}
+                              {`${t('admin.dispatch.load')} `}
+                              {member.currentCaseLoad ?? 0}/{member.maxCaseLoad ?? 10}
                             </p>
                             <p className="text-sm text-gray-500">
-                              Coverage: {(member.coverageGovernorates ?? []).join(', ') || 'Open'}
+                              {`${t('admin.dispatch.coverageLabel')} `}
+                              {(member.coverageGovernorates ?? []).join(', ') ||
+                                t('admin.dispatch.openCoverage')}
                             </p>
                           </div>
                         ))

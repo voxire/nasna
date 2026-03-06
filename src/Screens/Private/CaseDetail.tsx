@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import type { MemberCase } from '@/services/memberCases';
 import {
@@ -13,6 +14,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 
 export default function CaseDetail() {
+  const { t } = useTranslation();
   const { caseId } = useParams();
   const [memberCase, setMemberCase] = useState<MemberCase | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +52,7 @@ export default function CaseDetail() {
   if (loading) {
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
-        Loading case details...
+        {t('cases.detail.loading')}
       </div>
     );
   }
@@ -58,7 +60,7 @@ export default function CaseDetail() {
   if (!memberCase) {
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
-        Case not found.
+        {t('cases.detail.notFound')}
       </div>
     );
   }
@@ -75,7 +77,7 @@ export default function CaseDetail() {
         <div className="flex items-center gap-3">
           <CaseStatusBadge status={memberCase.status} staleFlagged={memberCase.staleFlagged} />
           <Button variant="outline" asChild>
-            <Link to="/ngo/my-cases">Back to my cases</Link>
+            <Link to="/ngo/my-cases">{t('cases.detail.backToMyCases')}</Link>
           </Button>
         </div>
       </div>
@@ -84,33 +86,43 @@ export default function CaseDetail() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Case Details</CardTitle>
+              <CardTitle className="text-lg">{t('cases.detail.caseDetails')}</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500">Needs</p>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  {t('cases.detail.needs')}
+                </p>
                 <p className="text-sm text-gray-900">
-                  {memberCase.needs.join(', ') || 'None listed'}
+                  {memberCase.needs.join(', ') || t('cases.detail.noneListed')}
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500">Special Needs</p>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  {t('cases.detail.specialNeeds')}
+                </p>
                 <p className="text-sm text-gray-900">
-                  {memberCase.specialNeeds.join(', ') || 'None listed'}
+                  {memberCase.specialNeeds.join(', ') || t('cases.detail.noneListed')}
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500">Urgency</p>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  {t('cases.detail.urgency')}
+                </p>
                 <p className="text-sm text-gray-900">{memberCase.aidUrgency}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500">Household Size</p>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  {t('cases.detail.householdSize')}
+                </p>
                 <p className="text-sm text-gray-900">{memberCase.numberOfPeopleInHousehold}</p>
               </div>
               <div className="md:col-span-2">
-                <p className="text-xs uppercase tracking-wide text-gray-500">Comments</p>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  {t('cases.detail.comments')}
+                </p>
                 <p className="whitespace-pre-wrap text-sm text-gray-900">
-                  {memberCase.comments || 'No comments yet.'}
+                  {memberCase.comments || t('cases.detail.noComments')}
                 </p>
               </div>
             </CardContent>
@@ -120,23 +132,23 @@ export default function CaseDetail() {
 
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => void handleStatusChange('in_progress')}>
-              Mark In Progress
+              {t('cases.detail.markInProgress')}
             </Button>
             <Button
               className="bg-[#12a89d] text-white hover:bg-[#0e9088]"
               onClick={() => void handleStatusChange('completed')}
             >
-              Mark Completed
+              {t('cases.detail.markCompleted')}
             </Button>
             <Button variant="outline" onClick={() => void handleStatusChange('cancelled')}>
-              Cancel Case
+              {t('cases.detail.cancelCase')}
             </Button>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Timeline</CardTitle>
+            <CardTitle className="text-lg">{t('cases.detail.timeline')}</CardTitle>
           </CardHeader>
           <CardContent>
             <CaseTimeline

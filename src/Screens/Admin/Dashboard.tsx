@@ -1,18 +1,40 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { List, Building2, Bell, MessageSquare } from 'lucide-react';
 import { db } from '../../firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { Card, CardContent } from '@/Components/ui/card';
 
-const STATS = [
-  { label: 'Submissions', icon: List, key: 'submissions' as const },
-  { label: 'Validated NGOs', icon: Building2, key: 'ngoCount' as const },
-  { label: 'Pending NGO Approvals', icon: Bell, key: 'pendingNgo' as const },
-  { label: 'Unread Feedback', icon: MessageSquare, key: 'feedback' as const },
-];
-
 function Dashboard() {
+  const { t } = useTranslation();
   const [counts, setCounts] = useState({ submissions: 0, ngoCount: 0, pendingNgo: 0, feedback: 0 });
+
+  const STATS = [
+    {
+      id: 'submissions',
+      label: t('admin.dashboard.submissions'),
+      icon: List,
+      key: 'submissions' as const,
+    },
+    {
+      id: 'ngoCount',
+      label: t('admin.dashboard.validatedNgos'),
+      icon: Building2,
+      key: 'ngoCount' as const,
+    },
+    {
+      id: 'pendingNgo',
+      label: t('admin.dashboard.pendingApprovals'),
+      icon: Bell,
+      key: 'pendingNgo' as const,
+    },
+    {
+      id: 'feedback',
+      label: t('admin.dashboard.unreadFeedback'),
+      icon: MessageSquare,
+      key: 'feedback' as const,
+    },
+  ];
 
   useEffect(() => {
     const subscriptions = [
@@ -52,13 +74,13 @@ function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">Welcome to your admin panel.</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('admin.dashboard.title')}</h1>
+        <p className="text-sm text-muted-foreground mt-1">{t('admin.dashboard.welcome')}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {STATS.map(({ label, icon: Icon, key }) => (
-          <Card key={key}>
+        {STATS.map(({ id, label, icon: Icon, key }) => (
+          <Card key={id}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
