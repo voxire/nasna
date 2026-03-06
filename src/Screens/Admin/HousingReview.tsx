@@ -81,9 +81,7 @@ export default function HousingReview() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-800">{t('housing.review.title')}</h1>
-        <p className="text-sm text-gray-500">
-          {t('housing.review.description')}
-        </p>
+        <p className="text-sm text-gray-500">{t('housing.review.description')}</p>
       </div>
 
       <div className="flex flex-wrap gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">

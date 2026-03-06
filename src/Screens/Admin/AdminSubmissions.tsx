@@ -188,21 +188,24 @@ function AdminSubmissions() {
     label: string;
     isArray?: boolean;
     disabled?: boolean;
-  }> = useMemo(() => [
-    { key: 'fullName', label: t('admin.submissions.fullName'), disabled: true },
-    { key: 'phoneNumber', label: t('admin.submissions.phoneNumber'), disabled: true },
-    { key: 'emailAddress', label: t('admin.submissions.emailAddress'), disabled: true },
-    { key: 'gender', label: t('admin.submissions.gender') },
-    { key: 'currentGovernorate', label: t('admin.submissions.currentGovernorate') },
-    { key: 'previousGovernorate', label: t('admin.submissions.previousGovernorate') },
-    { key: 'street', label: t('admin.submissions.street') },
-    { key: 'building', label: t('admin.submissions.building') },
-    { key: 'floor', label: t('admin.submissions.floor') },
-    { key: 'specialNeeds', label: t('admin.submissions.specialNeeds'), isArray: true },
-    { key: 'needs', label: t('admin.submissions.immediateNeeds'), isArray: true },
-    { key: 'aidUrgency', label: t('admin.submissions.aidUrgency') },
-    { key: 'comments', label: t('admin.submissions.comments') },
-  ], [t]);
+  }> = useMemo(
+    () => [
+      { key: 'fullName', label: t('admin.submissions.fullName'), disabled: true },
+      { key: 'phoneNumber', label: t('admin.submissions.phoneNumber'), disabled: true },
+      { key: 'emailAddress', label: t('admin.submissions.emailAddress'), disabled: true },
+      { key: 'gender', label: t('admin.submissions.gender') },
+      { key: 'currentGovernorate', label: t('admin.submissions.currentGovernorate') },
+      { key: 'previousGovernorate', label: t('admin.submissions.previousGovernorate') },
+      { key: 'street', label: t('admin.submissions.street') },
+      { key: 'building', label: t('admin.submissions.building') },
+      { key: 'floor', label: t('admin.submissions.floor') },
+      { key: 'specialNeeds', label: t('admin.submissions.specialNeeds'), isArray: true },
+      { key: 'needs', label: t('admin.submissions.immediateNeeds'), isArray: true },
+      { key: 'aidUrgency', label: t('admin.submissions.aidUrgency') },
+      { key: 'comments', label: t('admin.submissions.comments') },
+    ],
+    [t],
+  );
 
   const ageRangeKeys = Object.keys(editMember.ageRanges) as Array<
     keyof typeof editMember.ageRanges
@@ -242,22 +245,54 @@ function AdminSubmissions() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50 hover:bg-gray-50">
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.fullName')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.phoneNumber')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.email')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.gender')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.currentGov')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.previousGov')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.street')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.building')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.floor')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.ageRanges')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.specialNeeds')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.immediateNeeds')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.aidUrgency')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.comments')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.regDate')}</TableHead>
-                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.actions')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.fullName')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.phoneNumber')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.email')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.gender')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.currentGov')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.previousGov')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.street')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.building')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.floor')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.ageRanges')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.specialNeeds')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.immediateNeeds')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.aidUrgency')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.comments')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.regDate')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.actions')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

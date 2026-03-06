@@ -56,9 +56,7 @@ export default function OperationsMap() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{t('admin.map.title')}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t('admin.map.description')}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{t('admin.map.description')}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
@@ -115,8 +113,18 @@ export default function OperationsMap() {
                 checked: showNgoCoverage,
                 set: setShowNgoCoverage,
               },
-              { id: 'centers', label: t('admin.map.centers'), checked: showCenters, set: setShowCenters },
-              { id: 'housing', label: t('admin.map.housingAreas'), checked: showHousing, set: setShowHousing },
+              {
+                id: 'centers',
+                label: t('admin.map.centers'),
+                checked: showCenters,
+                set: setShowCenters,
+              },
+              {
+                id: 'housing',
+                label: t('admin.map.housingAreas'),
+                checked: showHousing,
+                set: setShowHousing,
+              },
             ].map((layer) => (
               <div key={layer.id} className="flex items-center gap-3">
                 <Checkbox
@@ -129,9 +137,7 @@ export default function OperationsMap() {
 
             <div className="rounded-2xl bg-gray-50 p-4 text-sm text-gray-600">
               <p className="font-medium text-gray-800">{t('admin.map.privacyModel')}</p>
-              <p className="mt-2">
-                {t('admin.map.privacyDescription')}
-              </p>
+              <p className="mt-2">{t('admin.map.privacyDescription')}</p>
             </div>
           </CardContent>
         </Card>
@@ -163,9 +169,15 @@ export default function OperationsMap() {
                     <Popup>
                       <div className="space-y-1 text-sm">
                         <p className="font-semibold">{cluster.governorate}</p>
-                        <p>{t('admin.map.totalCases')} {cluster.count}</p>
-                        <p>{t('admin.map.pending')} {cluster.pendingCount}</p>
-                        <p>{t('admin.map.urgent')} {cluster.urgentCount}</p>
+                        <p>
+                          {t('admin.map.totalCases')} {cluster.count}
+                        </p>
+                        <p>
+                          {t('admin.map.pending')} {cluster.pendingCount}
+                        </p>
+                        <p>
+                          {t('admin.map.urgent')} {cluster.urgentCount}
+                        </p>
                       </div>
                     </Popup>
                   </CircleMarker>
@@ -203,8 +215,12 @@ export default function OperationsMap() {
                     <Popup>
                       <div className="space-y-1 text-sm">
                         <p className="font-semibold">{area.area}</p>
-                        <p>{t('admin.map.listings')} {area.listingCount}</p>
-                        <p>{t('admin.map.availableSpots')} {area.availableSpots}</p>
+                        <p>
+                          {t('admin.map.listings')} {area.listingCount}
+                        </p>
+                        <p>
+                          {t('admin.map.availableSpots')} {area.availableSpots}
+                        </p>
                       </div>
                     </Popup>
                   </CircleMarker>
@@ -222,8 +238,12 @@ export default function OperationsMap() {
                       <Popup>
                         <div className="space-y-1 text-sm">
                           <p className="font-semibold">{ngo.name}</p>
-                          <p>{t('admin.map.coverage')} {coordinate.governorate}</p>
-                          <p>{t('admin.map.centerIds')} {ngo.centerIds.length}</p>
+                          <p>
+                            {t('admin.map.coverage')} {coordinate.governorate}
+                          </p>
+                          <p>
+                            {t('admin.map.centerIds')} {ngo.centerIds.length}
+                          </p>
                         </div>
                       </Popup>
                     </CircleMarker>

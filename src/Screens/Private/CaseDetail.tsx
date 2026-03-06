@@ -90,27 +90,37 @@ export default function CaseDetail() {
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500">{t('cases.detail.needs')}</p>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  {t('cases.detail.needs')}
+                </p>
                 <p className="text-sm text-gray-900">
                   {memberCase.needs.join(', ') || t('cases.detail.noneListed')}
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500">{t('cases.detail.specialNeeds')}</p>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  {t('cases.detail.specialNeeds')}
+                </p>
                 <p className="text-sm text-gray-900">
                   {memberCase.specialNeeds.join(', ') || t('cases.detail.noneListed')}
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500">{t('cases.detail.urgency')}</p>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  {t('cases.detail.urgency')}
+                </p>
                 <p className="text-sm text-gray-900">{memberCase.aidUrgency}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500">{t('cases.detail.householdSize')}</p>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  {t('cases.detail.householdSize')}
+                </p>
                 <p className="text-sm text-gray-900">{memberCase.numberOfPeopleInHousehold}</p>
               </div>
               <div className="md:col-span-2">
-                <p className="text-xs uppercase tracking-wide text-gray-500">{t('cases.detail.comments')}</p>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  {t('cases.detail.comments')}
+                </p>
                 <p className="whitespace-pre-wrap text-sm text-gray-900">
                   {memberCase.comments || t('cases.detail.noComments')}
                 </p>

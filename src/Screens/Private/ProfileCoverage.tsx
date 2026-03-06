@@ -80,9 +80,7 @@ export default function ProfileCoverage() {
     <div className="max-w-3xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-800">{t('profile.title')}</h1>
-        <p className="text-sm text-gray-500">
-          {t('profile.description')}
-        </p>
+        <p className="text-sm text-gray-500">{t('profile.description')}</p>
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">

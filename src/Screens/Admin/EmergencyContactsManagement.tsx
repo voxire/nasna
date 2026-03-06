@@ -128,9 +128,7 @@ export default function EmergencyContactsManagement() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">{t('admin.emergencyContacts.title')}</h1>
-          <p className="text-sm text-gray-500">
-            {t('admin.emergencyContacts.description')}
-          </p>
+          <p className="text-sm text-gray-500">{t('admin.emergencyContacts.description')}</p>
         </div>
         <Button
           className="bg-[#12a89d] text-white hover:bg-[#0e9088]"
@@ -168,14 +166,18 @@ export default function EmergencyContactsManagement() {
                       : 'bg-amber-100 text-amber-800'
                   }`}
                 >
-                  {contact.verified ? t('admin.emergencyContacts.verified') : t('admin.emergencyContacts.needsReview')}
+                  {contact.verified
+                    ? t('admin.emergencyContacts.verified')
+                    : t('admin.emergencyContacts.needsReview')}
                 </span>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <p className="text-sm font-medium text-gray-900">{contact.phoneNumber}</p>
-                <p className="text-sm text-gray-500">{contact.notes || t('admin.emergencyContacts.noNotes')}</p>
+                <p className="text-sm text-gray-500">
+                  {contact.notes || t('admin.emergencyContacts.noNotes')}
+                </p>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -212,11 +214,11 @@ export default function EmergencyContactsManagement() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingContact?.id ? t('admin.emergencyContacts.editTitle') : t('admin.emergencyContacts.addTitle')}
+              {editingContact?.id
+                ? t('admin.emergencyContacts.editTitle')
+                : t('admin.emergencyContacts.addTitle')}
             </DialogTitle>
-            <DialogDescription>
-              {t('admin.emergencyContacts.dialogDescription')}
-            </DialogDescription>
+            <DialogDescription>{t('admin.emergencyContacts.dialogDescription')}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -254,7 +256,9 @@ export default function EmergencyContactsManagement() {
                   <SelectItem value="shelter">{t('admin.emergencyContacts.shelter')}</SelectItem>
                   <SelectItem value="food">{t('admin.emergencyContacts.food')}</SelectItem>
                   <SelectItem value="legal">{t('admin.emergencyContacts.legal')}</SelectItem>
-                  <SelectItem value="protection">{t('admin.emergencyContacts.protection')}</SelectItem>
+                  <SelectItem value="protection">
+                    {t('admin.emergencyContacts.protection')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -300,7 +304,9 @@ export default function EmergencyContactsManagement() {
                 onClick={() => void handleSave()}
                 disabled={saving}
               >
-                {saving ? t('admin.emergencyContacts.saving') : t('admin.emergencyContacts.saveContact')}
+                {saving
+                  ? t('admin.emergencyContacts.saving')
+                  : t('admin.emergencyContacts.saveContact')}
               </Button>
             </div>
           </div>

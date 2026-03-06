@@ -81,9 +81,7 @@ export default function Submissions() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">{t('cases.feed.title')}</h1>
-          <p className="text-sm text-gray-500">
-            {t('cases.feed.description')}
-          </p>
+          <p className="text-sm text-gray-500">{t('cases.feed.description')}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
@@ -160,7 +158,9 @@ export default function Submissions() {
                     onClick={() => void handleClaimCase(memberCase.id)}
                     disabled={claimingId === memberCase.id}
                   >
-                    {claimingId === memberCase.id ? t('cases.feed.claiming') : t('cases.feed.claimCase')}
+                    {claimingId === memberCase.id
+                      ? t('cases.feed.claiming')
+                      : t('cases.feed.claimCase')}
                   </Button>
                 </div>
               </CardContent>

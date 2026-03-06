@@ -48,12 +48,12 @@ function OffersManagement() {
   const [page, setPage] = useState(1);
 
   const typeLabels: Record<string, string> = {
-    'Shelter': t('admin.offers.shelter'),
-    'Food': t('admin.offers.food'),
-    'Medical': t('admin.offers.medical'),
-    'Clothing': t('admin.offers.clothing'),
-    'Water': t('admin.offers.water'),
-    'Other': t('admin.offers.other'),
+    Shelter: t('admin.offers.shelter'),
+    Food: t('admin.offers.food'),
+    Medical: t('admin.offers.medical'),
+    Clothing: t('admin.offers.clothing'),
+    Water: t('admin.offers.water'),
+    Other: t('admin.offers.other'),
   };
 
   useEffect(() => {
@@ -148,14 +148,30 @@ function OffersManagement() {
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="font-semibold text-gray-700">{t('admin.offers.typeHeader')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.offers.phone')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.offers.region')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.offers.neighborhood')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.offers.capacity')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.offers.description')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.offers.date')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.offers.actions')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.offers.typeHeader')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.offers.phone')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.offers.region')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.offers.neighborhood')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.offers.capacity')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.offers.description')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.offers.date')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.offers.actions')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

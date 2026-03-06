@@ -61,11 +61,11 @@ function FeedbackManagement() {
   const [page, setPage] = useState(1);
 
   const typeLabels: Record<string, string> = {
-    'General': t('admin.feedbackMgmt.general'),
+    General: t('admin.feedbackMgmt.general'),
     'Bug Report': t('admin.feedbackMgmt.bugReport'),
     'Feature Request': t('admin.feedbackMgmt.featureRequest'),
-    'Complaint': t('admin.feedbackMgmt.complaint'),
-    'Compliment': t('admin.feedbackMgmt.compliment'),
+    Complaint: t('admin.feedbackMgmt.complaint'),
+    Compliment: t('admin.feedbackMgmt.compliment'),
   };
 
   useEffect(() => {
@@ -166,11 +166,13 @@ function FeedbackManagement() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('admin.feedbackMgmt.allTypes')}</SelectItem>
-            {['General', 'Bug Report', 'Feature Request', 'Complaint', 'Compliment'].map((t_type) => (
-              <SelectItem key={t_type} value={t_type}>
-                {typeLabels[t_type]}
-              </SelectItem>
-            ))}
+            {['General', 'Bug Report', 'Feature Request', 'Complaint', 'Compliment'].map(
+              (t_type) => (
+                <SelectItem key={t_type} value={t_type}>
+                  {typeLabels[t_type]}
+                </SelectItem>
+              ),
+            )}
           </SelectContent>
         </Select>
         <Select value={readFilter} onValueChange={handleReadFilter}>
@@ -192,13 +194,27 @@ function FeedbackManagement() {
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="font-semibold text-gray-700">{t('admin.feedbackMgmt.statusHeader')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.feedbackMgmt.type')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.feedbackMgmt.name')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.feedbackMgmt.email')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.feedbackMgmt.message')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.feedbackMgmt.date')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.feedbackMgmt.actions')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.statusHeader')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.type')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.name')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.email')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.message')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.date')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.feedbackMgmt.actions')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -211,7 +227,9 @@ function FeedbackManagement() {
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${item.read ? 'bg-gray-100 text-gray-500' : 'bg-blue-100 text-blue-700'}`}
                     >
-                      {item.read ? t('admin.feedbackMgmt.readBadge') : t('admin.feedbackMgmt.unreadBadge')}
+                      {item.read
+                        ? t('admin.feedbackMgmt.readBadge')
+                        : t('admin.feedbackMgmt.unreadBadge')}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -293,7 +311,9 @@ function FeedbackManagement() {
           <DialogHeader>
             <DialogTitle>{viewItem?.type}</DialogTitle>
             <DialogDescription>
-              {viewItem?.name ? t('admin.feedbackMgmt.from', { name: viewItem.name }) : t('admin.feedbackMgmt.anonymous')}
+              {viewItem?.name
+                ? t('admin.feedbackMgmt.from', { name: viewItem.name })
+                : t('admin.feedbackMgmt.anonymous')}
               {viewItem?.email ? ` · ${viewItem.email}` : ''}
               {' · '}
               {viewItem?.createdAt?.toDate().toLocaleString()}

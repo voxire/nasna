@@ -89,10 +89,18 @@ function AgentSubmissions() {
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50 hover:bg-gray-50">
-              <TableHead className="font-semibold text-gray-700">{t('submission.agent.fullName')}</TableHead>
-              <TableHead className="font-semibold text-gray-700">{t('submission.agent.email')}</TableHead>
-              <TableHead className="font-semibold text-gray-700">{t('submission.agent.phoneNumber')}</TableHead>
-              <TableHead className="font-semibold text-gray-700">{t('submission.agent.dateRegistered')}</TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('submission.agent.fullName')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('submission.agent.email')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('submission.agent.phoneNumber')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('submission.agent.dateRegistered')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

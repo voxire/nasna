@@ -47,9 +47,7 @@ export default function MyCases() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">{t('cases.mine.title')}</h1>
-          <p className="text-sm text-gray-500">
-            {t('cases.mine.description')}
-          </p>
+          <p className="text-sm text-gray-500">{t('cases.mine.description')}</p>
         </div>
         <Button variant="outline" asChild>
           <Link to="/ngo/submissions">{t('cases.mine.backToFeed')}</Link>
@@ -83,7 +81,9 @@ export default function MyCases() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-gray-600">{memberCase.comments || t('cases.mine.noNotes')}</p>
+                <p className="text-sm text-gray-600">
+                  {memberCase.comments || t('cases.mine.noNotes')}
+                </p>
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outline" asChild>
                     <Link to={`/ngo/cases/${memberCase.id}`}>{t('cases.mine.openCase')}</Link>

@@ -240,9 +240,7 @@ export default function DispatchCenter() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">{t('admin.dispatch.title')}</h1>
-          <p className="text-sm text-gray-500">
-            {t('admin.dispatch.description')}
-          </p>
+          <p className="text-sm text-gray-500">{t('admin.dispatch.description')}</p>
         </div>
       </div>
 
@@ -427,9 +425,7 @@ export default function DispatchCenter() {
             <>
               <DialogHeader>
                 <DialogTitle>{selectedCase.fullName}</DialogTitle>
-                <DialogDescription>
-                  {t('admin.dispatch.dialogDescription')}
-                </DialogDescription>
+                <DialogDescription>{t('admin.dispatch.dialogDescription')}</DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -483,7 +479,9 @@ export default function DispatchCenter() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">{t('admin.dispatch.dispatchActions')}</CardTitle>
+                      <CardTitle className="text-lg">
+                        {t('admin.dispatch.dispatchActions')}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
@@ -556,22 +554,25 @@ export default function DispatchCenter() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg">{t('admin.dispatch.suggestedNgos')}</CardTitle>
-                      <CardDescription>
-                        {t('admin.dispatch.suggestedDescription')}
-                      </CardDescription>
+                      <CardDescription>{t('admin.dispatch.suggestedDescription')}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {suggestedNgoMembers.length === 0 ? (
-                        <p className="text-sm text-gray-500">{t('admin.dispatch.noCoverageMatches')}</p>
+                        <p className="text-sm text-gray-500">
+                          {t('admin.dispatch.noCoverageMatches')}
+                        </p>
                       ) : (
                         suggestedNgoMembers.slice(0, 5).map((member) => (
                           <div key={member.id} className="rounded-lg border border-gray-200 p-3">
                             <p className="font-medium text-gray-900">{member.name}</p>
                             <p className="text-sm text-gray-500">
-                              {`${t('admin.dispatch.load')} `}{member.currentCaseLoad ?? 0}/{member.maxCaseLoad ?? 10}
+                              {`${t('admin.dispatch.load')} `}
+                              {member.currentCaseLoad ?? 0}/{member.maxCaseLoad ?? 10}
                             </p>
                             <p className="text-sm text-gray-500">
-                              {`${t('admin.dispatch.coverageLabel')} `}{(member.coverageGovernorates ?? []).join(', ') || t('admin.dispatch.openCoverage')}
+                              {`${t('admin.dispatch.coverageLabel')} `}
+                              {(member.coverageGovernorates ?? []).join(', ') ||
+                                t('admin.dispatch.openCoverage')}
                             </p>
                           </div>
                         ))

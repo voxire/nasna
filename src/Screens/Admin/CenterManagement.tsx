@@ -138,9 +138,7 @@ export default function CenterManagement() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">{t('admin.centers.title')}</h1>
-          <p className="text-sm text-gray-500">
-            {t('admin.centers.description')}
-          </p>
+          <p className="text-sm text-gray-500">{t('admin.centers.description')}</p>
         </div>
         <Button
           className="bg-[#12a89d] text-white hover:bg-[#0e9088]"
@@ -195,7 +193,8 @@ export default function CenterManagement() {
                     {`${t('admin.centers.capacity')} ${center.occupiedCapacity}/${center.capacity} · ${available} ${t('admin.centers.available')}`}
                   </p>
                   <p>
-                    {center.contactName || t('admin.centers.noContactName')} · {center.contactPhone || t('admin.centers.noPhone')}
+                    {center.contactName || t('admin.centers.noContactName')} ·{' '}
+                    {center.contactPhone || t('admin.centers.noPhone')}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -236,10 +235,10 @@ export default function CenterManagement() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingCenter?.id ? t('admin.centers.editTitle') : t('admin.centers.addTitle')}</DialogTitle>
-            <DialogDescription>
-              {t('admin.centers.dialogDescription')}
-            </DialogDescription>
+            <DialogTitle>
+              {editingCenter?.id ? t('admin.centers.editTitle') : t('admin.centers.addTitle')}
+            </DialogTitle>
+            <DialogDescription>{t('admin.centers.dialogDescription')}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -348,7 +347,11 @@ export default function CenterManagement() {
               onClick={() => void handleSave()}
               disabled={saving}
             >
-              {saving ? t('admin.centers.saving') : editingCenter?.id ? t('admin.centers.saveChanges') : t('admin.centers.createCenter')}
+              {saving
+                ? t('admin.centers.saving')
+                : editingCenter?.id
+                  ? t('admin.centers.saveChanges')
+                  : t('admin.centers.createCenter')}
             </Button>
           </div>
         </DialogContent>

@@ -10,10 +10,30 @@ function Dashboard() {
   const [counts, setCounts] = useState({ submissions: 0, ngoCount: 0, pendingNgo: 0, feedback: 0 });
 
   const STATS = [
-    { id: 'submissions', label: t('admin.dashboard.submissions'), icon: List, key: 'submissions' as const },
-    { id: 'ngoCount', label: t('admin.dashboard.validatedNgos'), icon: Building2, key: 'ngoCount' as const },
-    { id: 'pendingNgo', label: t('admin.dashboard.pendingApprovals'), icon: Bell, key: 'pendingNgo' as const },
-    { id: 'feedback', label: t('admin.dashboard.unreadFeedback'), icon: MessageSquare, key: 'feedback' as const },
+    {
+      id: 'submissions',
+      label: t('admin.dashboard.submissions'),
+      icon: List,
+      key: 'submissions' as const,
+    },
+    {
+      id: 'ngoCount',
+      label: t('admin.dashboard.validatedNgos'),
+      icon: Building2,
+      key: 'ngoCount' as const,
+    },
+    {
+      id: 'pendingNgo',
+      label: t('admin.dashboard.pendingApprovals'),
+      icon: Bell,
+      key: 'pendingNgo' as const,
+    },
+    {
+      id: 'feedback',
+      label: t('admin.dashboard.unreadFeedback'),
+      icon: MessageSquare,
+      key: 'feedback' as const,
+    },
   ];
 
   useEffect(() => {

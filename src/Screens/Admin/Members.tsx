@@ -146,12 +146,15 @@ function Members() {
     }
   };
 
-  const editFormFields = useMemo(() => [
-    { name: 'name', label: t('admin.members.name') },
-    { name: 'contactPersonName', label: t('admin.members.contactPerson') },
-    { name: 'email', label: t('admin.members.email') },
-    { name: 'phoneNumber', label: t('admin.members.phoneNumber') },
-  ], [t]);
+  const editFormFields = useMemo(
+    () => [
+      { name: 'name', label: t('admin.members.name') },
+      { name: 'contactPersonName', label: t('admin.members.contactPerson') },
+      { name: 'email', label: t('admin.members.email') },
+      { name: 'phoneNumber', label: t('admin.members.phoneNumber') },
+    ],
+    [t],
+  );
 
   return (
     <div>
@@ -185,12 +188,24 @@ function Members() {
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="font-semibold text-gray-700">{t('admin.members.name')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.members.contactPerson')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.members.email')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.members.phoneNumber')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.members.validatedLabel')}</TableHead>
-                <TableHead className="font-semibold text-gray-700">{t('admin.members.actions')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.members.name')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.members.contactPerson')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.members.email')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.members.phoneNumber')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.members.validatedLabel')}
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
+                  {t('admin.members.actions')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -204,7 +219,9 @@ function Members() {
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${member.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}
                     >
-                      {member.validated ? t('admin.members.validatedBadge') : t('admin.members.pendingBadge')}
+                      {member.validated
+                        ? t('admin.members.validatedBadge')
+                        : t('admin.members.pendingBadge')}
                     </span>
                   </TableCell>
                   <TableCell className="flex gap-2">

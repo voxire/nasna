@@ -129,7 +129,11 @@ export default function ImpactDashboard() {
   const queueCards = [
     { id: 'pendingUrgent', label: t('impact.admin.pendingUrgent'), value: pendingUrgentCases },
     { id: 'stalePending', label: t('impact.admin.stalePending'), value: staleCases },
-    { id: 'housingReview', label: t('impact.admin.housingPendingReview'), value: housingPendingReview },
+    {
+      id: 'housingReview',
+      label: t('impact.admin.housingPendingReview'),
+      value: housingPendingReview,
+    },
     { id: 'reservedHousing', label: t('impact.admin.reservedHousing'), value: reservedHousing },
   ];
 
@@ -138,9 +142,7 @@ export default function ImpactDashboard() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('impact.admin.title')}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t('impact.admin.description')}
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t('impact.admin.description')}</p>
         </div>
         <Button className="bg-[#12a89d] text-white hover:bg-[#0e9088]" onClick={exportCsv}>
           {t('impact.admin.exportCsv')}
@@ -165,8 +167,18 @@ export default function ImpactDashboard() {
           </CardHeader>
           <CardContent className="space-y-5">
             {[
-              { id: 'assignment', label: t('impact.admin.assignmentRate'), value: assignmentRate, color: 'bg-sky-500' },
-              { id: 'completion', label: t('impact.admin.completionRate'), value: completionRate, color: 'bg-emerald-500' },
+              {
+                id: 'assignment',
+                label: t('impact.admin.assignmentRate'),
+                value: assignmentRate,
+                color: 'bg-sky-500',
+              },
+              {
+                id: 'completion',
+                label: t('impact.admin.completionRate'),
+                value: completionRate,
+                color: 'bg-emerald-500',
+              },
             ].map((item) => (
               <div key={item.id} className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
