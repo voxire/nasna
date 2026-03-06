@@ -1,4 +1,6 @@
 {
+  "statusUpdateFailed": "Échec de la mise à jour du statut du cas. Veuillez réessayer.",
+  "claimFailed": "Échec de la réclamation du cas. Veuillez réessayer.",
   "feed": {
     "title": "Flux des cas",
     "description": "Examinez les nouveaux cas correspondant à votre couverture et réclamez ceux que votre équipe peut gérer.",

@@ -11,6 +11,10 @@ const mockAuthState = {
   initialized: true,
 };
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (key: string) => key }),
+}));
+
 jest.mock('../../hooks/useIdleTimeout', () => ({
   useIdleTimeout: () => mockUseIdleTimeout(),
 }));
@@ -83,7 +87,7 @@ describe('PrivateRoute', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/your account is being verified/i)).toBeInTheDocument();
+      expect(screen.getByText('auth.accountUnderReview')).toBeInTheDocument();
     });
   });
 

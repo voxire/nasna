@@ -1,4 +1,6 @@
 {
+  "statusUpdateFailed": "Failed to update case status. Please try again.",
+  "claimFailed": "Failed to claim case. Please try again.",
   "feed": {
     "title": "Case Feed",
     "description": "Review new cases that match your coverage and claim the ones your team can handle.",
