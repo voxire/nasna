@@ -106,7 +106,7 @@ export default function EmergencyContactsManagement() {
 
       resetForm();
     } catch (error) {
-      console.error(error);
+      console.error('Failed to save emergency contact:', error);
       toast.error(t('admin.emergencyContacts.saveError'));
     } finally {
       setSaving(false);
@@ -118,7 +118,7 @@ export default function EmergencyContactsManagement() {
       await deleteDoc(doc(db, 'emergencyContacts', contactId));
       toast.success(t('admin.emergencyContacts.deleteSuccess'));
     } catch (error) {
-      console.error(error);
+      console.error('Failed to delete emergency contact:', error);
       toast.error(t('admin.emergencyContacts.deleteError'));
     }
   };

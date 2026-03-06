@@ -99,7 +99,7 @@ export default function OfferHelp() {
       reset();
       setPin(null);
     } catch (err) {
-      console.error(err);
+      console.error('Failed to submit aid offer:', err);
       toast.error('Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);

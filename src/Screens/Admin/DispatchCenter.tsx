@@ -189,7 +189,7 @@ export default function DispatchCenter() {
       });
       toast.success(successMessage);
     } catch (updateError) {
-      console.error(updateError);
+      console.error('Failed to update case status:', updateError);
       toast.error(t('admin.dispatch.errorUpdate'));
     } finally {
       setSaving(false);
