@@ -69,7 +69,7 @@ function Donate() {
       const { data } = await startCheckout({
         donorName,
         donorPhone: phoneNumber,
-        fundingTarget,
+        fundingTarget: validationResult.data.fundingTarget,
         amountUsd,
         reason: donationReason,
       });
