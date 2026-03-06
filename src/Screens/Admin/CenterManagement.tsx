@@ -116,7 +116,7 @@ export default function CenterManagement() {
 
       resetForm();
     } catch (error) {
-      console.error(error);
+      console.error('Failed to save center:', error);
       toast.error(t('admin.centers.errorSave'));
     } finally {
       setSaving(false);
@@ -128,7 +128,7 @@ export default function CenterManagement() {
       await deleteDoc(doc(db, 'centers', centerId));
       toast.success(t('admin.centers.successDeleted'));
     } catch (error) {
-      console.error(error);
+      console.error('Failed to delete center:', error);
       toast.error(t('admin.centers.errorDelete'));
     }
   };

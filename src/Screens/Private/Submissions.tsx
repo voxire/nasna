@@ -59,8 +59,8 @@ export default function Submissions() {
     return cases.filter((memberCase) =>
       normalizedQuery.length === 0
         ? true
-        : [memberCase.fullName, memberCase.phoneNumber, memberCase.currentGovernorate].some(
-            (field) => (field ?? '').toLowerCase().includes(normalizedQuery),
+        : [memberCase.fullName, memberCase.currentGovernorate].some((field) =>
+            (field ?? '').toLowerCase().includes(normalizedQuery),
           ),
     );
   }, [cases, searchQuery]);

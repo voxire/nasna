@@ -69,7 +69,7 @@ export default function OfferHousing() {
       toast.success(t('housing.offer.success'));
       setFormState(DEFAULT_FORM);
     } catch (error) {
-      console.error(error);
+      console.error('Failed to submit housing offer:', error);
       toast.error(t('housing.offer.errorSubmit'));
     } finally {
       setSubmitting(false);

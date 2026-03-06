@@ -70,7 +70,7 @@ export default function Feedback() {
       toast.success(t('feedback.successTitle'), { description: t('feedback.successMessage') });
       reset();
     } catch (err) {
-      console.error(err);
+      console.error('Failed to submit feedback:', err);
       toast.error('Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);

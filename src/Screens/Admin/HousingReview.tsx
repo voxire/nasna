@@ -72,7 +72,7 @@ export default function HousingReview() {
 
       toast.success(t('housing.review.statusUpdated', { status: status.replace('_', ' ') }));
     } catch (error) {
-      console.error(error);
+      console.error('Failed to update housing status:', error);
       toast.error(t('housing.review.errorUpdate'));
     }
   };
