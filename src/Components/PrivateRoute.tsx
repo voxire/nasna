@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { useIdleTimeout } from '../hooks/useIdleTimeout';
 import type { UserRole } from '../types';
@@ -18,6 +19,7 @@ function PrivateRoute({
   requireValidated = false,
   redirectTo = '/',
 }: PrivateRouteProps) {
+  const { t } = useTranslation();
   useIdleTimeout();
 
   const loading = useAuthStore((state) => state.loading);
@@ -45,9 +47,7 @@ function PrivateRoute({
   if (requireValidated && (role === 'member' || role === 'agent') && !memberProfile?.validated) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-gray-50 text-center">
-        <h2 className="text-xl font-semibold">
-          Your account is being verified. Please try again later.
-        </h2>
+        <h2 className="text-xl font-semibold">{t('auth.accountUnderReview')}</h2>
       </div>
     );
   }

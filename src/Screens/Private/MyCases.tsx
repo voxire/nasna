@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import type { MemberCase } from '@/services/memberCases';
 import { listMemberClaimedCases, updateMemberCaseStatus } from '@/services/memberCases';
 import { Button } from '@/Components/ui/button';
@@ -39,6 +40,7 @@ export default function MyCases() {
       );
     } catch (error) {
       console.error(error);
+      toast.error(t('cases.statusUpdateFailed'));
     }
   };
 

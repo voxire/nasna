@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { auth } from '@/firebase';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import type { MemberCase } from '@/services/memberCases';
 import { claimMemberCase, listMemberPendingCases } from '@/services/memberCases';
 import { Button } from '@/Components/ui/button';
@@ -71,6 +72,7 @@ export default function Submissions() {
       setCases((current) => current.filter((memberCase) => memberCase.id !== caseId));
     } catch (claimError) {
       console.error(claimError);
+      toast.error(t('cases.claimFailed'));
     } finally {
       setClaimingId(null);
     }

@@ -28,7 +28,9 @@
     "listings": "Annonces :",
     "availableSpots": "Places disponibles :",
     "coverage": "Couverture :",
-    "centerIds": "ID des centres :"
+    "centerIds": "ID des centres :",
+    "loadError": "Échec du chargement des données de la carte des opérations.",
+    "loading": "Chargement de la carte des opérations..."
   },
   "dispatch": {
     "title": "Centre de dispatch",

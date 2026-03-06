@@ -28,7 +28,9 @@
     "listings": "Listings:",
     "availableSpots": "Available spots:",
     "coverage": "Coverage:",
-    "centerIds": "Center IDs:"
+    "centerIds": "Center IDs:",
+    "loadError": "Failed to load operations map data.",
+    "loading": "Loading operations map..."
   },
   "dispatch": {
     "title": "Dispatch Center",

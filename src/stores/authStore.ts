@@ -139,17 +139,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return null;
     }
 
-    const profile = await fetchProfile(targetUid);
-    const claimedRole = activeUser
-      ? (await activeUser.getIdTokenResult()).claims['role']
-      : undefined;
+    set({ loading: true });
+    try {
+      const profile = await fetchProfile(targetUid);
+      const claimedRole = activeUser
+        ? (await activeUser.getIdTokenResult()).claims['role']
+        : undefined;
 
-    set({
-      profile,
-      role: resolveRole(profile, claimedRole),
-    });
+      set({
+        profile,
+        role: resolveRole(profile, claimedRole),
+      });
 
-    return profile;
+      return profile;
+    } finally {
+      set({ loading: false });
+    }
   },
 
   loginWithPassword: async (email, password) => {

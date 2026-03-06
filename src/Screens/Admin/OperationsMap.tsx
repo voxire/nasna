@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CircleMarker, MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   getOperationsMapData,
   type CenterMarker,
@@ -31,16 +33,26 @@ export default function OperationsMap() {
   const [showCenters, setShowCenters] = useState(true);
   const [showHousing, setShowHousing] = useState(true);
   const [showNgoCoverage, setShowNgoCoverage] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
-      const data = await getOperationsMapData();
-      setSubmissionClusters(data.submissionClusters);
-      setNgoCoverage(data.ngoCoverage);
-      setCenters(data.centers);
-      setHousingAreas(data.housingAreas);
+      setLoading(true);
+      try {
+        const data = await getOperationsMapData();
+        setSubmissionClusters(data.submissionClusters);
+        setNgoCoverage(data.ngoCoverage);
+        setCenters(data.centers);
+        setHousingAreas(data.housingAreas);
+      } catch {
+        setError(t('admin.map.loadError'));
+        toast.error(t('admin.map.loadError'));
+      } finally {
+        setLoading(false);
+      }
     })();
-  }, []);
+  }, [t]);
 
   const summary = useMemo(
     () => ({
@@ -51,6 +63,28 @@ export default function OperationsMap() {
     }),
     [housingAreas, submissionClusters],
   );
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">{t('admin.map.title')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('admin.map.description')}</p>
+        </div>
+        <Card>
+          <CardContent className="p-8 text-center text-red-600">{error}</CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
