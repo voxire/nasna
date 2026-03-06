@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import type { MemberCase } from '@/services/memberCases';
 import { listMemberClaimedCases, updateMemberCaseStatus } from '@/services/memberCases';
@@ -7,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Com
 import CaseStatusBadge from '@/Components/CaseStatusBadge';
 
 export default function MyCases() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [cases, setCases] = useState<MemberCase[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,23 +46,23 @@ export default function MyCases() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">My Cases</h1>
+          <h1 className="text-2xl font-bold text-gray-800">{t('cases.mine.title')}</h1>
           <p className="text-sm text-gray-500">
-            Track the cases your organization has claimed and move them through the workflow.
+            {t('cases.mine.description')}
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link to="/ngo/submissions">Back to feed</Link>
+          <Link to="/ngo/submissions">{t('cases.mine.backToFeed')}</Link>
         </Button>
       </div>
 
       {loading ? (
         <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
-          Loading claimed cases...
+          {t('cases.mine.loading')}
         </div>
       ) : cases.length === 0 ? (
         <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
-          You have not claimed any cases yet.
+          {t('cases.mine.empty')}
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
@@ -81,28 +83,28 @@ export default function MyCases() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-gray-600">{memberCase.comments || 'No notes yet.'}</p>
+                <p className="text-sm text-gray-600">{memberCase.comments || t('cases.mine.noNotes')}</p>
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outline" asChild>
-                    <Link to={`/ngo/cases/${memberCase.id}`}>Open case</Link>
+                    <Link to={`/ngo/cases/${memberCase.id}`}>{t('cases.mine.openCase')}</Link>
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => void handleStatusChange(memberCase.id, 'in_progress')}
                   >
-                    Start work
+                    {t('cases.mine.startWork')}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => void handleStatusChange(memberCase.id, 'completed')}
                   >
-                    Complete
+                    {t('cases.mine.complete')}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => void handleStatusChange(memberCase.id, 'cancelled')}
                   >
-                    Cancel
+                    {t('cases.mine.cancel')}
                   </Button>
                 </div>
               </CardContent>

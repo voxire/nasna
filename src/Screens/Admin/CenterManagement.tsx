@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db } from '@/firebase';
 import {
   addDoc,
   collection,
   deleteDoc,
   doc,
+  limit,
   onSnapshot,
   orderBy,
   query,
@@ -42,6 +44,7 @@ const DEFAULT_FORM = {
 };
 
 export default function CenterManagement() {
+  const { t } = useTranslation();
   const [centers, setCenters] = useState<CenterRow[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingCenter, setEditingCenter] = useState<CenterRow | null>(null);
@@ -49,7 +52,7 @@ export default function CenterManagement() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), orderBy('name'));
+    const centerQuery = query(collection(db, 'centers'), orderBy('name'), limit(100));
 
     return onSnapshot(centerQuery, (snapshot) => {
       setCenters(
@@ -80,17 +83,17 @@ export default function CenterManagement() {
 
   const handleSave = async () => {
     if (!formState.name.trim() || !formState.governorate.trim() || !formState.city.trim()) {
-      toast.error('Name, governorate, and city are required.');
+      toast.error(t('admin.centers.errorRequired'));
       return;
     }
 
     if (formState.capacity < 0 || formState.occupiedCapacity < 0) {
-      toast.error('Capacity values cannot be negative.');
+      toast.error(t('admin.centers.errorNegativeCapacity'));
       return;
     }
 
     if (formState.occupiedCapacity > formState.capacity) {
-      toast.error('Occupied capacity cannot exceed total capacity.');
+      toast.error(t('admin.centers.errorCapacityExceeded'));
       return;
     }
 
@@ -101,20 +104,20 @@ export default function CenterManagement() {
           ...formState,
           updatedAt: new Date(),
         });
-        toast.success('Center updated.');
+        toast.success(t('admin.centers.successUpdated'));
       } else {
         await addDoc(collection(db, 'centers'), {
           ...formState,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
-        toast.success('Center added.');
+        toast.success(t('admin.centers.successAdded'));
       }
 
       resetForm();
     } catch (error) {
       console.error(error);
-      toast.error('Failed to save center.');
+      toast.error(t('admin.centers.errorSave'));
     } finally {
       setSaving(false);
     }
@@ -123,10 +126,10 @@ export default function CenterManagement() {
   const handleDelete = async (centerId: string) => {
     try {
       await deleteDoc(doc(db, 'centers', centerId));
-      toast.success('Center deleted.');
+      toast.success(t('admin.centers.successDeleted'));
     } catch (error) {
       console.error(error);
-      toast.error('Failed to delete center.');
+      toast.error(t('admin.centers.errorDelete'));
     }
   };
 
@@ -134,9 +137,9 @@ export default function CenterManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Center Management</h1>
+          <h1 className="text-2xl font-bold text-gray-800">{t('admin.centers.title')}</h1>
           <p className="text-sm text-gray-500">
-            Maintain active centers used in submissions, dispatch, and NGO coverage matching.
+            {t('admin.centers.description')}
           </p>
         </div>
         <Button
@@ -146,12 +149,12 @@ export default function CenterManagement() {
             setEditingCenter({ id: '', ...DEFAULT_FORM });
           }}
         >
-          Add Center
+          {t('admin.centers.addCenter')}
         </Button>
       </div>
 
       <Input
-        placeholder="Search by center, city, governorate, or address"
+        placeholder={t('admin.centers.searchPlaceholder')}
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.target.value)}
         className="bg-white"
@@ -181,7 +184,7 @@ export default function CenterManagement() {
                         : 'bg-gray-100 text-gray-700'
                     }`}
                   >
-                    {center.active ? 'Active' : 'Inactive'}
+                    {center.active ? t('admin.centers.active') : t('admin.centers.inactive')}
                   </span>
                 </div>
               </CardHeader>
@@ -189,10 +192,10 @@ export default function CenterManagement() {
                 <div className="space-y-1 text-sm text-gray-600">
                   <p>{center.address}</p>
                   <p>
-                    Capacity {center.occupiedCapacity}/{center.capacity} · {available} available
+                    {`${t('admin.centers.capacity')} ${center.occupiedCapacity}/${center.capacity} · ${available} ${t('admin.centers.available')}`}
                   </p>
                   <p>
-                    {center.contactName || 'No contact name'} · {center.contactPhone || 'No phone'}
+                    {center.contactName || t('admin.centers.noContactName')} · {center.contactPhone || t('admin.centers.noPhone')}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -213,10 +216,10 @@ export default function CenterManagement() {
                       });
                     }}
                   >
-                    Edit
+                    {t('admin.centers.edit')}
                   </Button>
                   <Button variant="destructive" onClick={() => void handleDelete(center.id)}>
-                    Delete
+                    {t('admin.centers.delete')}
                   </Button>
                 </div>
               </CardContent>
@@ -233,15 +236,15 @@ export default function CenterManagement() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingCenter?.id ? 'Edit Center' : 'Add Center'}</DialogTitle>
+            <DialogTitle>{editingCenter?.id ? t('admin.centers.editTitle') : t('admin.centers.addTitle')}</DialogTitle>
             <DialogDescription>
-              These center records are used by intake, dispatch, and NGO coverage matching.
+              {t('admin.centers.dialogDescription')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Name</Label>
+              <Label>{t('admin.centers.name')}</Label>
               <Input
                 value={formState.name}
                 onChange={(event) =>
@@ -251,7 +254,7 @@ export default function CenterManagement() {
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label>Governorate</Label>
+                <Label>{t('admin.centers.governorate')}</Label>
                 <Input
                   value={formState.governorate}
                   onChange={(event) =>
@@ -260,7 +263,7 @@ export default function CenterManagement() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>City</Label>
+                <Label>{t('admin.centers.city')}</Label>
                 <Input
                   value={formState.city}
                   onChange={(event) =>
@@ -270,7 +273,7 @@ export default function CenterManagement() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Address</Label>
+              <Label>{t('admin.centers.address')}</Label>
               <Input
                 value={formState.address}
                 onChange={(event) =>
@@ -280,7 +283,7 @@ export default function CenterManagement() {
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label>Total Capacity</Label>
+                <Label>{t('admin.centers.totalCapacity')}</Label>
                 <Input
                   type="number"
                   min={0}
@@ -294,7 +297,7 @@ export default function CenterManagement() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Occupied Capacity</Label>
+                <Label>{t('admin.centers.occupiedCapacity')}</Label>
                 <Input
                   type="number"
                   min={0}
@@ -310,7 +313,7 @@ export default function CenterManagement() {
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label>Contact Name</Label>
+                <Label>{t('admin.centers.contactName')}</Label>
                 <Input
                   value={formState.contactName}
                   onChange={(event) =>
@@ -319,7 +322,7 @@ export default function CenterManagement() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Contact Phone</Label>
+                <Label>{t('admin.centers.contactPhone')}</Label>
                 <Input
                   value={formState.contactPhone}
                   onChange={(event) =>
@@ -337,7 +340,7 @@ export default function CenterManagement() {
                 }
               />
               <Label htmlFor="center-active" className="cursor-pointer">
-                Center is active and available for intake
+                {t('admin.centers.activeCheckbox')}
               </Label>
             </div>
             <Button
@@ -345,7 +348,7 @@ export default function CenterManagement() {
               onClick={() => void handleSave()}
               disabled={saving}
             >
-              {saving ? 'Saving...' : editingCenter?.id ? 'Save Changes' : 'Create Center'}
+              {saving ? t('admin.centers.saving') : editingCenter?.id ? t('admin.centers.saveChanges') : t('admin.centers.createCenter')}
             </Button>
           </div>
         </DialogContent>

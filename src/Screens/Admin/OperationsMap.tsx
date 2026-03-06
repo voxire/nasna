@@ -1,5 +1,6 @@
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CircleMarker, MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 import {
@@ -21,6 +22,7 @@ const centerIcon = new L.Icon({
 });
 
 export default function OperationsMap() {
+  const { t } = useTranslation();
   const [submissionClusters, setSubmissionClusters] = useState<SubmissionCluster[]>([]);
   const [ngoCoverage, setNgoCoverage] = useState<NgoCoverageSummary[]>([]);
   const [centers, setCenters] = useState<CenterMarker[]>([]);
@@ -53,16 +55,16 @@ export default function OperationsMap() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Operations Map</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('admin.map.title')}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Governorate-level operational geography for cases, NGO coverage, centers, and housing.
+          {t('admin.map.description')}
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Mapped governorates</CardTitle>
+            <CardTitle className="text-sm">{t('admin.map.mappedGovernorates')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{summary.mappedGovernorates}</p>
@@ -70,7 +72,7 @@ export default function OperationsMap() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Pending cases</CardTitle>
+            <CardTitle className="text-sm">{t('admin.map.pendingCases')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{summary.totalPending}</p>
@@ -78,7 +80,7 @@ export default function OperationsMap() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Urgent cases</CardTitle>
+            <CardTitle className="text-sm">{t('admin.map.urgentCases')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{summary.totalUrgent}</p>
@@ -86,7 +88,7 @@ export default function OperationsMap() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Housing spots</CardTitle>
+            <CardTitle className="text-sm">{t('admin.map.housingSpots')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{summary.totalHousing}</p>
@@ -97,24 +99,24 @@ export default function OperationsMap() {
       <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
         <Card>
           <CardHeader>
-            <CardTitle>Layers</CardTitle>
+            <CardTitle>{t('admin.map.layers')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {[
               {
                 id: 'submissions',
-                label: 'Submission clusters',
+                label: t('admin.map.submissionClusters'),
                 checked: showSubmissions,
                 set: setShowSubmissions,
               },
               {
                 id: 'ngoCoverage',
-                label: 'NGO coverage',
+                label: t('admin.map.ngoCoverage'),
                 checked: showNgoCoverage,
                 set: setShowNgoCoverage,
               },
-              { id: 'centers', label: 'Centers', checked: showCenters, set: setShowCenters },
-              { id: 'housing', label: 'Housing areas', checked: showHousing, set: setShowHousing },
+              { id: 'centers', label: t('admin.map.centers'), checked: showCenters, set: setShowCenters },
+              { id: 'housing', label: t('admin.map.housingAreas'), checked: showHousing, set: setShowHousing },
             ].map((layer) => (
               <div key={layer.id} className="flex items-center gap-3">
                 <Checkbox
@@ -126,10 +128,9 @@ export default function OperationsMap() {
             ))}
 
             <div className="rounded-2xl bg-gray-50 p-4 text-sm text-gray-600">
-              <p className="font-medium text-gray-800">Privacy model</p>
+              <p className="font-medium text-gray-800">{t('admin.map.privacyModel')}</p>
               <p className="mt-2">
-                Household cases are aggregated by governorate. Exact family addresses are not shown
-                on this map.
+                {t('admin.map.privacyDescription')}
               </p>
             </div>
           </CardContent>
@@ -162,9 +163,9 @@ export default function OperationsMap() {
                     <Popup>
                       <div className="space-y-1 text-sm">
                         <p className="font-semibold">{cluster.governorate}</p>
-                        <p>Total cases: {cluster.count}</p>
-                        <p>Pending: {cluster.pendingCount}</p>
-                        <p>Urgent: {cluster.urgentCount}</p>
+                        <p>{t('admin.map.totalCases')} {cluster.count}</p>
+                        <p>{t('admin.map.pending')} {cluster.pendingCount}</p>
+                        <p>{t('admin.map.urgent')} {cluster.urgentCount}</p>
                       </div>
                     </Popup>
                   </CircleMarker>
@@ -184,7 +185,7 @@ export default function OperationsMap() {
                           {center.city}, {center.governorate}
                         </p>
                         <p>
-                          Capacity: {center.occupiedCapacity}/{center.capacity}
+                          {t('admin.map.capacity')} {center.occupiedCapacity}/{center.capacity}
                         </p>
                       </div>
                     </Popup>
@@ -202,8 +203,8 @@ export default function OperationsMap() {
                     <Popup>
                       <div className="space-y-1 text-sm">
                         <p className="font-semibold">{area.area}</p>
-                        <p>Listings: {area.listingCount}</p>
-                        <p>Available spots: {area.availableSpots}</p>
+                        <p>{t('admin.map.listings')} {area.listingCount}</p>
+                        <p>{t('admin.map.availableSpots')} {area.availableSpots}</p>
                       </div>
                     </Popup>
                   </CircleMarker>
@@ -221,8 +222,8 @@ export default function OperationsMap() {
                       <Popup>
                         <div className="space-y-1 text-sm">
                           <p className="font-semibold">{ngo.name}</p>
-                          <p>Coverage: {coordinate.governorate}</p>
-                          <p>Center IDs: {ngo.centerIds.length}</p>
+                          <p>{t('admin.map.coverage')} {coordinate.governorate}</p>
+                          <p>{t('admin.map.centerIds')} {ngo.centerIds.length}</p>
                         </div>
                       </Popup>
                     </CircleMarker>

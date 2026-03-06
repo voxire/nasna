@@ -1,0 +1,48 @@
+{
+  "feed": {
+    "title": "Case Feed",
+    "description": "Review new cases that match your coverage and claim the ones your team can handle.",
+    "myCases": "My Cases",
+    "coverageProfile": "Coverage Profile",
+    "searchPlaceholder": "Search by household, phone, or governorate",
+    "loading": "Loading matching cases...",
+    "noResults": "No pending cases matched your current coverage.",
+    "error": "Unable to load pending cases right now.",
+    "urgency": "Urgency",
+    "householdSize": "Household size",
+    "needs": "Needs",
+    "noneListed": "None listed",
+    "viewDetails": "View details",
+    "claiming": "Claiming...",
+    "claimCase": "Claim case"
+  },
+  "mine": {
+    "title": "My Cases",
+    "description": "Track the cases your organization has claimed and move them through the workflow.",
+    "backToFeed": "Back to feed",
+    "loading": "Loading claimed cases...",
+    "empty": "You have not claimed any cases yet.",
+    "noNotes": "No notes yet.",
+    "openCase": "Open case",
+    "startWork": "Start work",
+    "complete": "Complete",
+    "cancel": "Cancel"
+  },
+  "detail": {
+    "loading": "Loading case details...",
+    "notFound": "Case not found.",
+    "backToMyCases": "Back to my cases",
+    "caseDetails": "Case Details",
+    "needs": "Needs",
+    "specialNeeds": "Special Needs",
+    "urgency": "Urgency",
+    "householdSize": "Household Size",
+    "comments": "Comments",
+    "noneListed": "None listed",
+    "noComments": "No comments yet.",
+    "markInProgress": "Mark In Progress",
+    "markCompleted": "Mark Completed",
+    "cancelCase": "Cancel Case",
+    "timeline": "Timeline"
+  }
+}

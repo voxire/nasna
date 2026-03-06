@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db } from '../../firebase';
 import {
   collection,
@@ -64,6 +65,7 @@ interface EditState {
 }
 
 function AdminSubmissions() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [urgencyFilter, setUrgencyFilter] = useState('');
   const [editMember, setEditMember] = useState<EditState>({
@@ -147,10 +149,10 @@ function AdminSubmissions() {
     if (!memberToDelete) return;
     try {
       await deleteDoc(doc(db, 'submissions', memberToDelete));
-      toast.success('Submission deleted successfully.');
+      toast.success(t('admin.submissions.deleteSuccess'));
       setConfirmDeleteOpen(false);
     } catch {
-      toast.error('Failed to delete submission.');
+      toast.error(t('admin.submissions.deleteError'));
     }
   };
 
@@ -174,10 +176,10 @@ function AdminSubmissions() {
       await updateDoc(doc(db, 'submissions', editMember.id), {
         ...updatePayload,
       });
-      toast.success('Submission updated successfully.');
+      toast.success(t('admin.submissions.updateSuccess'));
       setModalOpen(false);
     } catch {
-      toast.error('Failed to update submission.');
+      toast.error(t('admin.submissions.updateError'));
     }
   };
 
@@ -186,51 +188,52 @@ function AdminSubmissions() {
     label: string;
     isArray?: boolean;
     disabled?: boolean;
-  }> = [
-    { key: 'fullName', label: 'Full Name', disabled: true },
-    { key: 'phoneNumber', label: 'Phone Number', disabled: true },
-    { key: 'emailAddress', label: 'Email Address', disabled: true },
-    { key: 'gender', label: 'Gender' },
-    { key: 'currentGovernorate', label: 'Current Governorate' },
-    { key: 'previousGovernorate', label: 'Previous Governorate' },
-    { key: 'street', label: 'Street' },
-    { key: 'building', label: 'Building' },
-    { key: 'floor', label: 'Floor' },
-    { key: 'specialNeeds', label: 'Special Needs', isArray: true },
-    { key: 'needs', label: 'Immediate Needs', isArray: true },
-    { key: 'aidUrgency', label: 'Aid Urgency' },
-    { key: 'comments', label: 'Comments' },
-  ];
+  }> = useMemo(() => [
+    { key: 'fullName', label: t('admin.submissions.fullName'), disabled: true },
+    { key: 'phoneNumber', label: t('admin.submissions.phoneNumber'), disabled: true },
+    { key: 'emailAddress', label: t('admin.submissions.emailAddress'), disabled: true },
+    { key: 'gender', label: t('admin.submissions.gender') },
+    { key: 'currentGovernorate', label: t('admin.submissions.currentGovernorate') },
+    { key: 'previousGovernorate', label: t('admin.submissions.previousGovernorate') },
+    { key: 'street', label: t('admin.submissions.street') },
+    { key: 'building', label: t('admin.submissions.building') },
+    { key: 'floor', label: t('admin.submissions.floor') },
+    { key: 'specialNeeds', label: t('admin.submissions.specialNeeds'), isArray: true },
+    { key: 'needs', label: t('admin.submissions.immediateNeeds'), isArray: true },
+    { key: 'aidUrgency', label: t('admin.submissions.aidUrgency') },
+    { key: 'comments', label: t('admin.submissions.comments') },
+  ], [t]);
+
   const ageRangeKeys = Object.keys(editMember.ageRanges) as Array<
     keyof typeof editMember.ageRanges
   >;
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-5 text-gray-800">Submissions</h1>
+      <h1 className="text-2xl font-bold mb-5 text-gray-800">{t('admin.submissions.title')}</h1>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4 flex gap-3 flex-wrap">
         <Input
-          placeholder="Search by Name, Phone, Email, or Governorate"
+          placeholder={t('admin.submissions.searchPlaceholder')}
           value={searchQuery}
           onChange={handleSearch}
           className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
         <Select value={urgencyFilter} onValueChange={handleUrgencyFilter}>
           <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
-            <SelectValue placeholder="Urgency" />
+            <SelectValue placeholder={t('admin.submissions.aidUrgency')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="High">High</SelectItem>
-            <SelectItem value="Medium">Medium</SelectItem>
-            <SelectItem value="Low">Low</SelectItem>
+            <SelectItem value="all">{t('admin.submissions.all')}</SelectItem>
+            <SelectItem value="High">{t('admin.submissions.high')}</SelectItem>
+            <SelectItem value="Medium">{t('admin.submissions.medium')}</SelectItem>
+            <SelectItem value="Low">{t('admin.submissions.low')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading...</p>
+        <p className="text-gray-500">{t('admin.submissions.loading')}</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (
@@ -239,22 +242,22 @@ function AdminSubmissions() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50 hover:bg-gray-50">
-                  <TableHead className="font-semibold text-gray-700">Full Name</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Phone Number</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Email</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Gender</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Current Gov.</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Previous Gov.</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Street</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Building</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Floor</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Age Ranges</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Special Needs</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Immediate Needs</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Aid Urgency</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Comments</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Reg. Date</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Actions</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.fullName')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.phoneNumber')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.email')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.gender')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.currentGov')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.previousGov')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.street')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.building')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.floor')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.ageRanges')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.specialNeeds')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.immediateNeeds')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.aidUrgency')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.comments')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.regDate')}</TableHead>
+                  <TableHead className="font-semibold text-gray-700">{t('admin.submissions.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -300,14 +303,14 @@ function AdminSubmissions() {
                         className="bg-[#12a89d] hover:bg-[#0e9088] text-white"
                         onClick={() => handleEditClick(member)}
                       >
-                        Edit
+                        {t('admin.submissions.edit')}
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => handleDeleteClick(member.id)}
                       >
-                        Delete
+                        {t('admin.submissions.delete')}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -318,8 +321,8 @@ function AdminSubmissions() {
           <div className="flex items-center justify-between px-4 py-3 border-t text-sm text-gray-500">
             <span>
               {filtered.length === 0
-                ? `No results on page ${page}`
-                : `${filtered.length} result(s) on page ${page}`}
+                ? t('admin.submissions.noResultsPage', { page })
+                : t('admin.submissions.resultsPage', { count: filtered.length, page })}
             </span>
             <div className="flex gap-2">
               <Button
@@ -328,10 +331,10 @@ function AdminSubmissions() {
                 onClick={previousPage}
                 disabled={!hasPreviousPage}
               >
-                Previous
+                {t('admin.submissions.previous')}
               </Button>
               <Button variant="outline" size="sm" onClick={nextPage} disabled={!hasNextPage}>
-                Next
+                {t('admin.submissions.next')}
               </Button>
             </div>
           </div>
@@ -342,7 +345,7 @@ function AdminSubmissions() {
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-[500px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Submission</DialogTitle>
+            <DialogTitle>{t('admin.submissions.editTitle')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             {editFields.map(({ key, label, isArray, disabled }) => (
@@ -371,7 +374,7 @@ function AdminSubmissions() {
               </div>
             ))}
             <div className="space-y-2">
-              <Label>Age Ranges</Label>
+              <Label>{t('admin.submissions.ageRanges')}</Label>
               <div className="grid grid-cols-2 gap-3">
                 {ageRangeKeys.map((range) => (
                   <div key={range} className="space-y-1">
@@ -396,9 +399,9 @@ function AdminSubmissions() {
             </div>
           </div>
           <DialogFooter className="flex justify-between">
-            <Button onClick={handleSaveEdit}>Save</Button>
+            <Button onClick={handleSaveEdit}>{t('admin.submissions.save')}</Button>
             <Button variant="secondary" onClick={() => setModalOpen(false)}>
-              Close
+              {t('admin.submissions.close')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -408,15 +411,15 @@ function AdminSubmissions() {
       <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
         <DialogContent className="max-w-[300px] text-center">
           <DialogHeader>
-            <DialogTitle>Delete Submission</DialogTitle>
-            <DialogDescription>Are you sure you want to delete this submission?</DialogDescription>
+            <DialogTitle>{t('admin.submissions.deleteTitle')}</DialogTitle>
+            <DialogDescription>{t('admin.submissions.deleteConfirm')}</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-between">
             <Button variant="destructive" onClick={confirmDelete}>
-              Confirm
+              {t('admin.submissions.confirm')}
             </Button>
             <Button variant="secondary" onClick={() => setConfirmDeleteOpen(false)}>
-              Cancel
+              {t('admin.submissions.cancel')}
             </Button>
           </DialogFooter>
         </DialogContent>

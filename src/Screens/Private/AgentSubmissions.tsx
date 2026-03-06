@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db, auth } from '../../firebase';
 import { collection, onSnapshot, query, where, limit } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +21,7 @@ interface SubmissionRow extends SubmissionDocument {
 }
 
 function AgentSubmissions() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [submissions, setSubmissions] = useState<SubmissionRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +52,7 @@ function AgentSubmissions() {
       },
       (snapshotError) => {
         console.error('Error fetching submissions:', snapshotError);
-        setError('Failed to load submissions');
+        setError(t('submission.agent.loadError'));
         setLoading(false);
       },
     );
@@ -81,23 +83,23 @@ function AgentSubmissions() {
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-2xl font-bold text-gray-800">Agent Submissions</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t('submission.agent.title')}</h1>
       </div>
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50 hover:bg-gray-50">
-              <TableHead className="font-semibold text-gray-700">Full Name</TableHead>
-              <TableHead className="font-semibold text-gray-700">Email</TableHead>
-              <TableHead className="font-semibold text-gray-700">Phone Number</TableHead>
-              <TableHead className="font-semibold text-gray-700">Date Registered</TableHead>
+              <TableHead className="font-semibold text-gray-700">{t('submission.agent.fullName')}</TableHead>
+              <TableHead className="font-semibold text-gray-700">{t('submission.agent.email')}</TableHead>
+              <TableHead className="font-semibold text-gray-700">{t('submission.agent.phoneNumber')}</TableHead>
+              <TableHead className="font-semibold text-gray-700">{t('submission.agent.dateRegistered')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {submissions.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="text-center py-12 text-gray-500">
-                  No submissions found.
+                  {t('submission.agent.noSubmissions')}
                 </TableCell>
               </TableRow>
             ) : (

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/firebase';
 import type { GlobalStatsDocument } from '@/types';
@@ -13,6 +14,7 @@ const DEFAULT_STATS: GlobalStatsDocument = {
 };
 
 export default function Impact() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<GlobalStatsDocument>(DEFAULT_STATS);
 
   useEffect(() => {
@@ -40,12 +42,12 @@ export default function Impact() {
   }, [stats.submissionsAssigned, stats.submissionsRegistered]);
 
   const impactCards = [
-    { label: 'Cases registered', value: stats.submissionsRegistered, tone: 'bg-slate-100 text-slate-900' },
-    { label: 'Cases assigned', value: stats.submissionsAssigned, tone: 'bg-sky-100 text-sky-900' },
-    { label: 'Cases completed', value: stats.submissionsCompleted, tone: 'bg-emerald-100 text-emerald-900' },
-    { label: 'People helped', value: stats.peopleHelped, tone: 'bg-amber-100 text-amber-900' },
-    { label: 'Active NGOs', value: stats.activeNgoCount, tone: 'bg-violet-100 text-violet-900' },
-    { label: 'Housing spots available', value: stats.housingAvailable, tone: 'bg-rose-100 text-rose-900' },
+    { id: 'registered', label: t('impact.public.casesRegistered'), value: stats.submissionsRegistered, tone: 'bg-slate-100 text-slate-900' },
+    { id: 'assigned', label: t('impact.public.casesAssigned'), value: stats.submissionsAssigned, tone: 'bg-sky-100 text-sky-900' },
+    { id: 'completed', label: t('impact.public.casesCompleted'), value: stats.submissionsCompleted, tone: 'bg-emerald-100 text-emerald-900' },
+    { id: 'people', label: t('impact.public.peopleHelped'), value: stats.peopleHelped, tone: 'bg-amber-100 text-amber-900' },
+    { id: 'ngos', label: t('impact.public.activeNgos'), value: stats.activeNgoCount, tone: 'bg-violet-100 text-violet-900' },
+    { id: 'housing', label: t('impact.public.housingSpots'), value: stats.housingAvailable, tone: 'bg-rose-100 text-rose-900' },
   ];
 
   return (
@@ -53,24 +55,23 @@ export default function Impact() {
       <section className="grid gap-6 rounded-[2rem] bg-gradient-to-br from-[#0f766e] via-[#12a89d] to-[#7dd3c7] px-6 py-10 text-white shadow-lg md:grid-cols-[1.4fr_0.9fr] md:px-10">
         <div className="space-y-4">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white/70">
-            Public Impact
+            {t('impact.public.eyebrow')}
           </p>
           <h1 className="max-w-2xl text-4xl font-bold leading-tight md:text-5xl">
-            Real operational signals from the Nasna support network.
+            {t('impact.public.headline')}
           </h1>
           <p className="max-w-2xl text-base leading-7 text-white/85">
-            These figures show aggregate progress only. They do not expose household addresses,
-            personal details, or private case histories.
+            {t('impact.public.privacyNote')}
           </p>
         </div>
 
         <div className="grid gap-4 rounded-[1.5rem] bg-black/10 p-5 backdrop-blur-sm">
           <div>
-            <p className="text-sm text-white/70">Assignment rate</p>
+            <p className="text-sm text-white/70">{t('impact.public.assignmentRate')}</p>
             <p className="text-4xl font-bold">{assignmentRate}%</p>
           </div>
           <div>
-            <p className="text-sm text-white/70">Completion rate</p>
+            <p className="text-sm text-white/70">{t('impact.public.completionRate')}</p>
             <p className="text-4xl font-bold">{completionRate}%</p>
           </div>
         </div>
@@ -79,7 +80,7 @@ export default function Impact() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {impactCards.map((card) => (
           <div
-            key={card.label}
+            key={card.id}
             className={`rounded-3xl p-6 shadow-sm ${card.tone}`}
           >
             <p className="text-sm font-medium opacity-80">{card.label}</p>
@@ -91,17 +92,17 @@ export default function Impact() {
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="mb-5">
-            <h2 className="text-2xl font-semibold text-gray-900">Case pipeline</h2>
+            <h2 className="text-2xl font-semibold text-gray-900">{t('impact.public.pipelineTitle')}</h2>
             <p className="text-sm text-gray-500">
-              Aggregate movement from registration to assignment and completion.
+              {t('impact.public.pipelineDescription')}
             </p>
           </div>
 
           <div className="space-y-4">
             {[
-              { label: 'Registered', value: stats.submissionsRegistered, color: 'bg-slate-500' },
-              { label: 'Assigned', value: stats.submissionsAssigned, color: 'bg-sky-500' },
-              { label: 'Completed', value: stats.submissionsCompleted, color: 'bg-emerald-500' },
+              { id: 'reg', label: t('impact.public.registered'), value: stats.submissionsRegistered, color: 'bg-slate-500' },
+              { id: 'asgn', label: t('impact.public.assigned'), value: stats.submissionsAssigned, color: 'bg-sky-500' },
+              { id: 'done', label: t('impact.public.completed'), value: stats.submissionsCompleted, color: 'bg-emerald-500' },
             ].map((item) => {
               const percentage =
                 stats.submissionsRegistered === 0
@@ -109,7 +110,7 @@ export default function Impact() {
                   : Math.min(100, Math.round((item.value / stats.submissionsRegistered) * 100));
 
               return (
-                <div key={item.label} className="space-y-2">
+                <div key={item.id} className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-gray-800">{item.label}</span>
                     <span className="text-gray-500">
@@ -127,15 +128,15 @@ export default function Impact() {
 
         <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="mb-5">
-            <h2 className="text-2xl font-semibold text-gray-900">Operational snapshot</h2>
+            <h2 className="text-2xl font-semibold text-gray-900">{t('impact.public.snapshotTitle')}</h2>
             <p className="text-sm text-gray-500">
-              High-level capacity indicators across NGOs and housing resources.
+              {t('impact.public.snapshotDescription')}
             </p>
           </div>
 
           <div className="grid gap-4">
             <div className="rounded-2xl bg-gray-50 p-5">
-              <p className="text-sm text-gray-500">Average people helped per completed case</p>
+              <p className="text-sm text-gray-500">{t('impact.public.avgPeopleHelped')}</p>
               <p className="mt-2 text-3xl font-bold text-gray-900">
                 {stats.submissionsCompleted === 0
                   ? '0'
@@ -143,13 +144,13 @@ export default function Impact() {
               </p>
             </div>
             <div className="rounded-2xl bg-gray-50 p-5">
-              <p className="text-sm text-gray-500">Available housing capacity</p>
+              <p className="text-sm text-gray-500">{t('impact.public.availableHousing')}</p>
               <p className="mt-2 text-3xl font-bold text-gray-900">
                 {stats.housingAvailable.toLocaleString()}
               </p>
             </div>
             <div className="rounded-2xl bg-gray-50 p-5">
-              <p className="text-sm text-gray-500">Active NGOs with live cases</p>
+              <p className="text-sm text-gray-500">{t('impact.public.activeNgosLive')}</p>
               <p className="mt-2 text-3xl font-bold text-gray-900">
                 {stats.activeNgoCount.toLocaleString()}
               </p>

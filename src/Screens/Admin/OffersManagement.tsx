@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db } from '../../firebase';
 import { collection, getDocs, doc, deleteDoc, Timestamp, query, limit } from 'firebase/firestore';
 import { toast } from 'sonner';
@@ -38,12 +39,22 @@ interface OfferRow {
 }
 
 function OffersManagement() {
+  const { t } = useTranslation();
   const [items, setItems] = useState<OfferRow[]>([]);
   const [filtered, setFiltered] = useState<OfferRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [page, setPage] = useState(1);
+
+  const typeLabels: Record<string, string> = {
+    'Shelter': t('admin.offers.shelter'),
+    'Food': t('admin.offers.food'),
+    'Medical': t('admin.offers.medical'),
+    'Clothing': t('admin.offers.clothing'),
+    'Water': t('admin.offers.water'),
+    'Other': t('admin.offers.other'),
+  };
 
   useEffect(() => {
     fetchOffers();
@@ -58,7 +69,7 @@ function OffersManagement() {
       setItems(data);
       setFiltered(data);
     } catch {
-      toast.error('Failed to load offers.');
+      toast.error(t('admin.offers.loadError'));
     } finally {
       setLoading(false);
     }
@@ -89,15 +100,15 @@ function OffersManagement() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this offer?')) return;
+    if (!window.confirm(t('admin.offers.deleteConfirm'))) return;
     try {
       await deleteDoc(doc(db, 'offers', id));
       const updated = items.filter((o) => o.id !== id);
       setItems(updated);
       applyFilters(searchQuery, typeFilter, updated);
-      toast.success('Offer deleted.');
+      toast.success(t('admin.offers.deleteSuccess'));
     } catch {
-      toast.error('Failed to delete.');
+      toast.error(t('admin.offers.deleteError'));
     }
   };
 
@@ -106,24 +117,24 @@ function OffersManagement() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-5 text-gray-800">Aid Offers</h1>
+      <h1 className="text-2xl font-bold mb-5 text-gray-800">{t('admin.offers.title')}</h1>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4 flex gap-3 flex-wrap">
         <Input
-          placeholder="Search by phone, region, or neighborhood"
+          placeholder={t('admin.offers.searchPlaceholder')}
           value={searchQuery}
           onChange={handleSearch}
           className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
         <Select value={typeFilter} onValueChange={handleTypeFilter}>
           <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
-            <SelectValue placeholder="Type" />
+            <SelectValue placeholder={t('admin.offers.typePlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            {OFFER_TYPES.map((t) => (
-              <SelectItem key={t} value={t}>
-                {t}
+            <SelectItem value="all">{t('admin.offers.allTypes')}</SelectItem>
+            {OFFER_TYPES.map((t_type) => (
+              <SelectItem key={t_type} value={t_type}>
+                {typeLabels[t_type]}
               </SelectItem>
             ))}
           </SelectContent>
@@ -131,20 +142,20 @@ function OffersManagement() {
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading...</p>
+        <p className="text-gray-500">{t('admin.offers.loading')}</p>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="font-semibold text-gray-700">Type</TableHead>
-                <TableHead className="font-semibold text-gray-700">Phone</TableHead>
-                <TableHead className="font-semibold text-gray-700">Region</TableHead>
-                <TableHead className="font-semibold text-gray-700">Neighborhood</TableHead>
-                <TableHead className="font-semibold text-gray-700">Capacity</TableHead>
-                <TableHead className="font-semibold text-gray-700">Description</TableHead>
-                <TableHead className="font-semibold text-gray-700">Date</TableHead>
-                <TableHead className="font-semibold text-gray-700">Actions</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.offers.typeHeader')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.offers.phone')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.offers.region')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.offers.neighborhood')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.offers.capacity')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.offers.description')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.offers.date')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.offers.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -167,7 +178,7 @@ function OffersManagement() {
                   </TableCell>
                   <TableCell>
                     <Button size="sm" variant="destructive" onClick={() => handleDelete(item.id)}>
-                      Delete
+                      {t('admin.offers.delete')}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -177,8 +188,12 @@ function OffersManagement() {
           <div className="flex items-center justify-between px-4 py-3 border-t text-sm text-gray-500">
             <span>
               {filtered.length === 0
-                ? '0 results'
-                : `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length}`}
+                ? t('admin.offers.zeroResults')
+                : t('admin.offers.paginationRange', {
+                    start: (page - 1) * PAGE_SIZE + 1,
+                    end: Math.min(page * PAGE_SIZE, filtered.length),
+                    total: filtered.length,
+                  })}
             </span>
             <div className="flex gap-2">
               <Button
@@ -187,7 +202,7 @@ function OffersManagement() {
                 onClick={() => setPage((p) => p - 1)}
                 disabled={page === 1}
               >
-                Previous
+                {t('admin.offers.previous')}
               </Button>
               <Button
                 variant="outline"
@@ -195,7 +210,7 @@ function OffersManagement() {
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= totalPages}
               >
-                Next
+                {t('admin.offers.next')}
               </Button>
             </div>
           </div>

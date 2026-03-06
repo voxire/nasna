@@ -1,0 +1,21 @@
+{
+  "title": "ملف التغطية",
+  "description": "حدّد أين تعمل منظمتك، وأنواع المساعدات التي يمكنك التعامل معها، وسعة الحالات النشطة.",
+  "coverageType": "نوع التغطية",
+  "governorate": "محافظة",
+  "center": "مركز",
+  "hybrid": "مختلط",
+  "deliveryMode": "طريقة التسليم",
+  "delivery": "توصيل",
+  "pickup": "استلام",
+  "both": "كلاهما",
+  "coverageGovernorates": "محافظات التغطية",
+  "governoratesPlaceholder": "بيروت، جبل لبنان، شمال لبنان",
+  "coverageCenterIds": "معرفات مراكز التغطية",
+  "noCenters": "لا توجد مراكز نشطة متاحة.",
+  "aidTypes": "أنواع المساعدات",
+  "aidTypesPlaceholder": "غذاء، مأوى، أدوية",
+  "maxCaseLoad": "الحد الأقصى للحالات النشطة",
+  "saving": "جارٍ الحفظ...",
+  "save": "حفظ ملف التغطية"
+}

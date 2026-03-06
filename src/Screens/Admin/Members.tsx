@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db } from '../../firebase';
 import {
   collection,
@@ -45,6 +46,7 @@ interface MemberRow extends MemberDocument {
 }
 
 function Members() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [validatedFilter, setValidatedFilter] = useState('');
   const [editMember, setEditMember] = useState<MemberRow | null>(null);
@@ -99,23 +101,23 @@ function Members() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this member?')) return;
+    if (!window.confirm(t('admin.members.deleteConfirm'))) return;
     try {
       await deleteDoc(doc(db, 'members', id));
-      toast.success('Member deleted successfully.');
+      toast.success(t('admin.members.deleteSuccess'));
     } catch (error) {
       console.error('Error deleting member: ', error);
-      toast.error('Error deleting member. Please try again.');
+      toast.error(t('admin.members.deleteError'));
     }
   };
 
   const handleValidate = async (id: string) => {
     try {
       await updateDoc(doc(db, 'members', id), { validated: true, updatedAt: new Date() });
-      toast.success('Member validated successfully.');
+      toast.success(t('admin.members.validateSuccess'));
     } catch (error) {
       console.error('Error validating member: ', error);
-      toast.error('Error validating member. Please try again.');
+      toast.error(t('admin.members.validateError'));
     }
   };
 
@@ -135,40 +137,47 @@ function Members() {
         phoneNumber: editMember.phoneNumber,
         updatedAt: new Date(),
       });
-      toast.success('Member updated successfully.');
+      toast.success(t('admin.members.updateSuccess'));
       setModalOpen(false);
       setEditMember(null);
     } catch (error) {
       console.error('Error updating member: ', error);
-      toast.error('Error updating member. Please try again.');
+      toast.error(t('admin.members.updateError'));
     }
   };
 
+  const editFormFields = useMemo(() => [
+    { name: 'name', label: t('admin.members.name') },
+    { name: 'contactPersonName', label: t('admin.members.contactPerson') },
+    { name: 'email', label: t('admin.members.email') },
+    { name: 'phoneNumber', label: t('admin.members.phoneNumber') },
+  ], [t]);
+
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-5 text-gray-800">NGO Members</h1>
+      <h1 className="text-2xl font-bold mb-5 text-gray-800">{t('admin.members.title')}</h1>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4 flex gap-3 flex-wrap">
         <Input
-          placeholder="Search by Name, Contact Person, or Email"
+          placeholder={t('admin.members.searchPlaceholder')}
           value={searchQuery}
           onChange={handleSearch}
           className="flex-1 min-w-[200px] bg-gray-50 border-gray-200"
         />
         <Select value={validatedFilter} onValueChange={handleFilterChange}>
           <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
-            <SelectValue placeholder="Validated" />
+            <SelectValue placeholder={t('admin.members.validatedFilter')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="true">Validated</SelectItem>
-            <SelectItem value="false">Not Validated</SelectItem>
+            <SelectItem value="all">{t('admin.members.all')}</SelectItem>
+            <SelectItem value="true">{t('admin.members.validated')}</SelectItem>
+            <SelectItem value="false">{t('admin.members.notValidated')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading...</p>
+        <p className="text-gray-500">{t('admin.members.loading')}</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (
@@ -176,12 +185,12 @@ function Members() {
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="font-semibold text-gray-700">Name</TableHead>
-                <TableHead className="font-semibold text-gray-700">Contact Person</TableHead>
-                <TableHead className="font-semibold text-gray-700">Email</TableHead>
-                <TableHead className="font-semibold text-gray-700">Phone Number</TableHead>
-                <TableHead className="font-semibold text-gray-700">Validated</TableHead>
-                <TableHead className="font-semibold text-gray-700">Actions</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.members.name')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.members.contactPerson')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.members.email')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.members.phoneNumber')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.members.validatedLabel')}</TableHead>
+                <TableHead className="font-semibold text-gray-700">{t('admin.members.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -195,7 +204,7 @@ function Members() {
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${member.validated ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}
                     >
-                      {member.validated ? 'Validated' : 'Pending'}
+                      {member.validated ? t('admin.members.validatedBadge') : t('admin.members.pendingBadge')}
                     </span>
                   </TableCell>
                   <TableCell className="flex gap-2">
@@ -205,7 +214,7 @@ function Members() {
                         className="bg-[#12a89d] hover:bg-[#0e9088] text-white"
                         onClick={() => handleValidate(member.id)}
                       >
-                        Validate
+                        {t('admin.members.validate')}
                       </Button>
                     )}
                     {member.validated && (
@@ -219,14 +228,14 @@ function Members() {
                             setModalOpen(true);
                           }}
                         >
-                          Edit
+                          {t('admin.members.edit')}
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
                           onClick={() => handleDelete(member.id)}
                         >
-                          Delete
+                          {t('admin.members.delete')}
                         </Button>
                       </>
                     )}
@@ -238,8 +247,8 @@ function Members() {
           <div className="flex items-center justify-between px-4 py-3 border-t text-sm text-gray-500">
             <span>
               {filteredMembers.length === 0
-                ? `No results on page ${page}`
-                : `${filteredMembers.length} result(s) on page ${page}`}
+                ? t('admin.members.noResultsPage', { page })
+                : t('admin.members.resultsPage', { count: filteredMembers.length, page })}
             </span>
             <div className="flex gap-2">
               <Button
@@ -248,10 +257,10 @@ function Members() {
                 onClick={previousPage}
                 disabled={!hasPreviousPage}
               >
-                Previous
+                {t('admin.members.previous')}
               </Button>
               <Button variant="outline" size="sm" onClick={nextPage} disabled={!hasNextPage}>
-                Next
+                {t('admin.members.next')}
               </Button>
             </div>
           </div>
@@ -267,15 +276,10 @@ function Members() {
       >
         <DialogContent className="max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Edit Member</DialogTitle>
+            <DialogTitle>{t('admin.members.editTitle')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleEditSubmit} className="space-y-3">
-            {[
-              { name: 'name', label: 'Name' },
-              { name: 'contactPersonName', label: 'Contact Person' },
-              { name: 'email', label: 'Email' },
-              { name: 'phoneNumber', label: 'Phone Number' },
-            ].map(({ name, label }) => (
+            {editFormFields.map(({ name, label }) => (
               <div key={name} className="space-y-1">
                 <Label>{label}</Label>
                 <Input
@@ -287,7 +291,7 @@ function Members() {
               </div>
             ))}
             <DialogFooter>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit">{t('admin.members.saveChanges')}</Button>
             </DialogFooter>
           </form>
         </DialogContent>

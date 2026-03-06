@@ -1,0 +1,6 @@
+{
+  "nameTooShort": "Le nom doit comporter au moins 2 caractères.",
+  "invalidPhone": "Veuillez entrer un numéro de téléphone valide.",
+  "amountTooLow": "Le montant doit être d'au moins 1 $.",
+  "fixErrors": "Veuillez corriger les erreurs avant de soumettre."
+}

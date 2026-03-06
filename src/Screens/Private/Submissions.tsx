@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { auth } from '@/firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import type { MemberCase } from '@/services/memberCases';
@@ -10,6 +11,7 @@ import CaseStatusBadge from '@/Components/CaseStatusBadge';
 import { useAuthStore } from '@/stores/authStore';
 
 export default function Submissions() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [cases, setCases] = useState<MemberCase[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +44,7 @@ export default function Submissions() {
         setCases(pendingCases);
       } catch (loadError) {
         console.error(loadError);
-        setError('Unable to load pending cases right now.');
+        setError(t('cases.feed.error'));
       } finally {
         setLoading(false);
       }
@@ -78,23 +80,23 @@ export default function Submissions() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Case Feed</h1>
+          <h1 className="text-2xl font-bold text-gray-800">{t('cases.feed.title')}</h1>
           <p className="text-sm text-gray-500">
-            Review new cases that match your coverage and claim the ones your team can handle.
+            {t('cases.feed.description')}
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link to="/ngo/my-cases">My Cases</Link>
+            <Link to="/ngo/my-cases">{t('cases.feed.myCases')}</Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link to="/ngo/profile-coverage">Coverage Profile</Link>
+            <Link to="/ngo/profile-coverage">{t('cases.feed.coverageProfile')}</Link>
           </Button>
         </div>
       </div>
 
       <Input
-        placeholder="Search by household, phone, or governorate"
+        placeholder={t('cases.feed.searchPlaceholder')}
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.target.value)}
         className="bg-white"
@@ -102,7 +104,7 @@ export default function Submissions() {
 
       {loading ? (
         <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
-          Loading matching cases...
+          {t('cases.feed.loading')}
         </div>
       ) : error ? (
         <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center text-red-600">
@@ -110,7 +112,7 @@ export default function Submissions() {
         </div>
       ) : filteredCases.length === 0 ? (
         <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
-          No pending cases matched your current coverage.
+          {t('cases.feed.noResults')}
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
@@ -133,32 +135,32 @@ export default function Submissions() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-gray-500">Urgency</p>
+                    <p className="text-gray-500">{t('cases.feed.urgency')}</p>
                     <p className="font-medium text-gray-900">{memberCase.aidUrgency}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Household size</p>
+                    <p className="text-gray-500">{t('cases.feed.householdSize')}</p>
                     <p className="font-medium text-gray-900">
                       {memberCase.numberOfPeopleInHousehold}
                     </p>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-gray-500">Needs</p>
+                    <p className="text-gray-500">{t('cases.feed.needs')}</p>
                     <p className="font-medium text-gray-900">
-                      {memberCase.needs.join(', ') || 'None listed'}
+                      {memberCase.needs.join(', ') || t('cases.feed.noneListed')}
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outline" asChild>
-                    <Link to={`/ngo/cases/${memberCase.id}`}>View details</Link>
+                    <Link to={`/ngo/cases/${memberCase.id}`}>{t('cases.feed.viewDetails')}</Link>
                   </Button>
                   <Button
                     className="bg-[#12a89d] text-white hover:bg-[#0e9088]"
                     onClick={() => void handleClaimCase(memberCase.id)}
                     disabled={claimingId === memberCase.id}
                   >
-                    {claimingId === memberCase.id ? 'Claiming...' : 'Claim case'}
+                    {claimingId === memberCase.id ? t('cases.feed.claiming') : t('cases.feed.claimCase')}
                   </Button>
                 </div>
               </CardContent>
