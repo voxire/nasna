@@ -27,7 +27,7 @@ const donationSchema = z.object({
 function Donate() {
   const { t } = useTranslation();
   const [reason, setReason] = useState('');
-  const [fundingTarget, setFundingTarget] = useState<'family' | 'center' | 'ngo' | ''>('');
+  const [fundingTarget, setFundingTarget] = useState<'family' | 'center' | 'ngo' | undefined>(undefined);
   const [customReason, setCustomReason] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [donorName, setDonorName] = useState('');
@@ -120,7 +120,7 @@ function Donate() {
 
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">{t('donate.fundingTarget')}</Label>
-            <Select value={fundingTarget} onValueChange={(value) => setFundingTarget(value as typeof fundingTarget)}>
+            <Select value={fundingTarget ?? ''} onValueChange={(value) => setFundingTarget(value as 'family' | 'center' | 'ngo')}>
               <SelectTrigger className="bg-gray-50 border-gray-200">
                 <SelectValue placeholder={t('donate.fundingTargetPlaceholder')} />
               </SelectTrigger>
