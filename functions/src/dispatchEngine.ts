@@ -49,6 +49,7 @@ interface MemberRecord {
   validated?: boolean;
   currentCaseLoad?: number;
   coverageGovernorates?: string[];
+  phoneNumber?: string;
 }
 
 interface HousingRecord {
@@ -538,6 +539,30 @@ export const dailyStaleCaseCheck = onSchedule(
       return !submission.staleFlagged && activityAt > 0 && activityAt <= staleBefore;
     });
 
+    // Pre-fetch assigned NGO members to avoid duplicate Firestore reads
+    const assignedMemberUids = [
+      ...new Set(
+        staleCases
+          .map((doc) => {
+            const s = doc.data() as SubmissionRecord;
+            return s.assignedTo && (s.status === 'assigned' || s.status === 'in_progress')
+              ? s.assignedTo
+              : null;
+          })
+          .filter((uid): uid is string => uid !== null),
+      ),
+    ];
+
+    const memberMap = new Map<string, MemberRecord>();
+    await Promise.all(
+      assignedMemberUids.map(async (uid) => {
+        const snap = await db.collection('members').doc(uid).get();
+        if (snap.exists) {
+          memberMap.set(uid, snap.data() as MemberRecord);
+        }
+      }),
+    );
+
     await Promise.all(
       staleCases.map(async (document) => {
         await document.ref.set(
@@ -555,6 +580,30 @@ export const dailyStaleCaseCheck = onSchedule(
           `${submission.fullName ?? 'A household'} has not been updated in over ${STALE_CASE_THRESHOLD_HOURS} hours.`,
           document.id,
         );
+
+        // WhatsApp reminder to assigned NGO
+        if (
+          submission.assignedTo &&
+          (submission.status === 'assigned' || submission.status === 'in_progress')
+        ) {
+          const member = memberMap.get(submission.assignedTo);
+          if (member?.phoneNumber) {
+            try {
+              await sendWhatsApp(
+                member.phoneNumber,
+                `تذكير: الحالة (#${document.id}) لم تُحدَّث منذ ${STALE_CASE_THRESHOLD_HOURS} ساعة. يرجى تحديث الحالة في نسنا.`,
+              );
+              logger.info('Sent stale case WhatsApp to NGO', {
+                submissionId: document.id,
+              });
+            } catch (error) {
+              logger.error('Failed to send stale case WhatsApp to NGO', {
+                submissionId: document.id,
+                error,
+              });
+            }
+          }
+        }
       }),
     );
 
