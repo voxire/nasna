@@ -10,6 +10,7 @@
   "forgotSending": "Sending...",
   "googleButton": "Continue with Google",
   "googleLoading": "Signing in...",
+  "or": "or",
   "noAccount": "Don't have an account?",
   "registerLink": "Register",
   "fields": {
@@ -31,6 +32,7 @@
     "success": "Login successful!",
     "tooManyAttempts": "Too many failed attempts. Please wait 15 minutes before trying again.",
     "resetSent": "Password reset email sent! Check your inbox.",
-    "resetError": "Failed to send reset email. Make sure the email is registered."
+    "resetError": "Failed to send reset email. Make sure the email is registered.",
+    "accountExistsDifferentCredential": "This email is already registered. Please sign in with your email and password below."
   }
 }

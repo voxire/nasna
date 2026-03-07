@@ -13,5 +13,53 @@
     "aboutUs": "À propos de nous",
     "quote": "Dans les moments les plus sombres, nous nous tenons ensemble, plus forts et unis.",
     "FormButton": "Retour au formulaire"
+  },
+  "content": {
+    "title": "À propos de Nasna : Ensemble pour un avenir meilleur",
+    "missionStatement": "Notre mission est de connecter, soutenir et autonomiser les ONG et les initiatives au Liban pour fournir une aide organisée et efficace aux personnes touchées par les crises. Nous visons à combler le fossé entre les données et l'action, en veillant à ce que chaque effort compte pour aider les plus nécessiteux.",
+    "visionStatement": "Notre vision est un Liban où chaque individu touché par une crise trouve un soutien rapide et l'espoir d'un avenir meilleur. Nous nous efforçons de créer un réseau de collaboration, de résilience et de transparence, en construisant une base pour la récupération et l'unité.",
+    "volunteerButton": "Devenir bénévole"
+  },
+  "howWeOperate": {
+    "title": "Comment nous fonctionnons",
+    "intro": "Nous travaillons à travers des processus structurés pour garantir que l'aide atteigne ceux qui en ont besoin de la manière la plus efficace. Voici un aperçu de notre approche.",
+    "registrationTitle": "Processus d'inscription",
+    "registrationDescription": "Nasna facilite un processus d'inscription simple pour les personnes déplacées, en donnant la priorité à ceux qui n'ont pas accès à d'autres aides.",
+    "partnershipsTitle": "Partenariats",
+    "partnershipsDescription": "Nous collaborons avec des organisations locales et internationales pour maximiser l'impact de nos efforts de secours et fournir de l'aide là où elle est le plus nécessaire.",
+    "supportTitle": "Soutien aux bénéficiaires",
+    "supportDescription": "Nous offrons un système de soutien aux personnes déplacées et à nos donateurs, garantissant la transparence et la responsabilité à chaque étape de notre processus."
+  },
+  "faq": {
+    "title": "Questions fréquemment posées",
+    "intro": "Trouvez des réponses aux questions courantes sur les opérations, l'éligibilité et la sécurité des données de Nasna.",
+    "questions": {
+      "eligibility": "Qui est éligible à l'aide de Nasna ?",
+      "legitimacy": "Comment puis-je vérifier la légitimité de Nasna ?",
+      "dataHandling": "Comment Nasna gère-t-elle mes informations personnelles ?"
+    },
+    "answers": {
+      "eligibility": "Nasna fournit de l'aide principalement aux personnes déplacées touchées par le conflit en cours au Liban, en particulier celles vivant chez des proches ou dans des abris temporaires.",
+      "legitimacy": "Nasna est une organisation enregistrée et transparente travaillant en collaboration avec des partenaires de confiance. Vous pouvez vérifier nos activités sur notre site web et auprès des organisations partenaires.",
+      "dataHandling": "Nous donnons la priorité à la sécurité et à la confidentialité des données. Les informations personnelles sont traitées conformément aux lois sur la vie privée et utilisées uniquement à des fins de distribution d'aide."
+    }
+  },
+  "getInvolved": {
+    "title": "Participez",
+    "intro": "Rejoignez-nous pour faire la différence ! Il existe plusieurs façons de contribuer à la mission de Nasna :",
+    "volunteerTitle": "Bénévolat",
+    "volunteerDescription": "Devenez bénévole et aidez-nous à distribuer l'aide et le soutien aux personnes déplacées.",
+    "volunteerButton": "Rejoindre en tant que bénévole",
+    "donateTitle": "Don",
+    "donateDescription": "Votre don va directement au soutien des familles touchées par le déplacement.",
+    "donateButton": "Faire un don",
+    "partnerTitle": "Partenariat",
+    "partnerDescription": "Devenez partenaire de Nasna pour étendre notre impact grâce à des collaborations stratégiques.",
+    "partnerButton": "Devenir partenaire"
+  },
+  "legalStatus": {
+    "title": "Notre statut juridique et conformité",
+    "description": "Nasna s'engage pour la transparence et la conformité légale. Nous travaillons avec des partenaires locaux et internationaux pour garantir que toutes les activités sont menées de manière responsable et dans le cadre légal.",
+    "disclaimer": "Les dons et les fonds sont gérés en partenariat avec des tiers de confiance. Les fonds collectés sont exclusivement utilisés aux fins désignées du projet et ne sont pas alloués ailleurs."
   }
 }

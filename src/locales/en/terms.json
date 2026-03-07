@@ -1,0 +1,38 @@
+{
+  "title": "Terms & Conditions",
+  "lastUpdated": "Last updated: March 2026",
+  "sections": {
+    "acceptance": {
+      "title": "1. Acceptance of Terms",
+      "body": "By accessing or using the Nasna platform, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you may not use our services."
+    },
+    "purpose": {
+      "title": "2. Platform Purpose",
+      "body": "Nasna is a humanitarian aid coordination platform that connects displaced individuals in Lebanon with NGOs and aid initiatives. The platform facilitates the submission and management of aid requests but does not directly provide aid or guarantee the fulfillment of any request."
+    },
+    "dataCollection": {
+      "title": "3. Data Collection & Privacy",
+      "body": "We collect personal information necessary to coordinate aid delivery, including names, contact details, location data, and household information. All data is handled securely, shared only with verified aid organizations, and used exclusively for humanitarian coordination purposes. We comply with applicable data protection regulations."
+    },
+    "consent": {
+      "title": "4. Consent",
+      "body": "By submitting information through the platform, you explicitly consent to the collection, processing, and sharing of your data with trusted partner organizations for the sole purpose of coordinating humanitarian aid. You may withdraw your consent at any time by contacting us."
+    },
+    "userResponsibilities": {
+      "title": "5. User Responsibilities",
+      "body": "Users must provide accurate and truthful information. Submitting false or misleading information may result in the removal of your request and potential restriction from the platform. Users must not misuse the platform or attempt to access data belonging to other users."
+    },
+    "limitations": {
+      "title": "6. Limitations of Liability",
+      "body": "Nasna serves as a coordination platform and does not guarantee the availability, timing, or quality of aid provided by partner organizations. We are not liable for any delays, interruptions, or failures in aid delivery. The platform is provided on an \"as-is\" basis."
+    },
+    "modifications": {
+      "title": "7. Modifications",
+      "body": "We reserve the right to modify these terms at any time. Changes will be posted on this page with an updated revision date. Continued use of the platform after changes constitutes acceptance of the new terms."
+    },
+    "contact": {
+      "title": "8. Contact",
+      "body": "For questions about these terms, please contact the Nasna team through the platform or at our official communication channels."
+    }
+  }
+}

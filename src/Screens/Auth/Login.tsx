@@ -82,10 +82,7 @@ function Login() {
       if (code === 'auth/account-exists-with-different-credential') {
         const email = (error as { customData?: { email?: string } })?.customData?.email ?? '';
         if (email) form.setValue('email', email);
-        toast.error(
-          'This email is already registered. Please sign in with your email and password below.',
-          { duration: 7000 },
-        );
+        toast.error(t('login.toast.accountExistsDifferentCredential'), { duration: 7000 });
       } else if (code !== 'auth/popup-closed-by-user') {
         toast.error(t('login.toast.genericError'));
       }
@@ -221,7 +218,7 @@ function Login() {
               <span className="w-full border-t border-gray-200" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-400">or</span>
+              <span className="bg-white px-2 text-gray-400">{t('login.or')}</span>
             </div>
           </div>
 
@@ -290,7 +287,7 @@ function Login() {
           />
           <DialogFooter>
             <Button variant="outline" onClick={() => setForgotOpen(false)}>
-              {t('login.buttons.cancel') || 'Cancel'}
+              {t('login.buttons.cancel')}
             </Button>
             <Button
               className="bg-[#12a89d] hover:bg-[#0e9088] text-white"

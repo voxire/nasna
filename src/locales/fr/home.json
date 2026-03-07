@@ -68,5 +68,10 @@
   "aidUrgency": "Urgence de l'aide",
   "high": "Élevée",
   "medium": "Moyenne",
-  "low": "Faible"
+  "low": "Faible",
+  "locationType": "Situation de logement actuelle",
+  "locationWithFamily": "Hébergé chez la famille ou un hôte",
+  "locationCenter": "Hébergé dans un centre",
+  "center": "Centre",
+  "invalidEmail": "Veuillez entrer une adresse e-mail valide."
 }

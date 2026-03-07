@@ -29,7 +29,6 @@ const agentSchema = z
     areaOfOperation: z.string().min(1),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
     path: ['confirmPassword'],
   });
 
@@ -73,18 +72,18 @@ function AgentRegister() {
         consentGiven: true,
       });
       await signOut(auth);
-      toast.success('Registration successful! Please log in.');
+      toast.success(t('auth.agent.successToast'));
       navigate('/auth/login');
     } catch (error) {
-      console.error('Error registering agent: ', error);
-      toast.error('Error registering. Please try again.');
+      console.error('Error registering agent:', error);
+      toast.error(t('auth.agent.errorToast'));
     }
   };
 
   return (
     <div className="max-w-[600px] mx-auto my-8 px-4">
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">Become An Agent</h1>
+        <h1 className="text-2xl font-bold mb-6 text-gray-800">{t('auth.agent.title')}</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -92,7 +91,7 @@ function AgentRegister() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>{t('auth.agent.fullName')}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -105,7 +104,7 @@ function AgentRegister() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t('auth.agent.email')}</FormLabel>
                   <FormControl>
                     <Input type="email" {...field} />
                   </FormControl>
@@ -118,7 +117,7 @@ function AgentRegister() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t('auth.agent.password')}</FormLabel>
                   <FormControl>
                     <Input type="password" {...field} />
                   </FormControl>
@@ -131,7 +130,7 @@ function AgentRegister() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>{t('auth.agent.confirmPassword')}</FormLabel>
                   <FormControl>
                     <Input type="password" {...field} />
                   </FormControl>
@@ -144,7 +143,7 @@ function AgentRegister() {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel>{t('auth.agent.phoneNumber')}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -157,7 +156,7 @@ function AgentRegister() {
               name="areaOfOperation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Area of Operation</FormLabel>
+                  <FormLabel>{t('auth.agent.areaOfOperation')}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -171,7 +170,7 @@ function AgentRegister() {
               className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Registering...' : 'Register'}
+              {isSubmitting ? t('auth.agent.registering') : t('auth.agent.register')}
             </Button>
           </form>
         </Form>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { db } from '@/firebase';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import type { EmergencyContactDocument } from '@/types';
@@ -18,6 +19,7 @@ interface ContactRow extends EmergencyContactDocument {
 }
 
 export default function Emergency() {
+  const { t } = useTranslation();
   const [contacts, setContacts] = useState<ContactRow[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -63,43 +65,42 @@ export default function Emergency() {
     <div className="mx-auto max-w-6xl px-4 py-10">
       <div className="mb-8 max-w-3xl">
         <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-[#12a89d]">
-          Emergency Directory
+          {t('emergency.badge')}
         </p>
         <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-          Verified emergency and response contacts
+          {t('emergency.title')}
         </h1>
         <p className="mt-3 text-base text-gray-600">
-          Browse trusted hotlines, shelters, medical responders, and protection contacts. Call the
-          numbers directly from your phone when you need urgent support.
+          {t('emergency.subtitle')}
         </p>
       </div>
 
       <div className="mb-6 grid gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:grid-cols-[1fr_220px_220px]">
         <Input
-          placeholder="Search by name, phone, category, or area"
+          placeholder={t('emergency.searchPlaceholder')}
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
           className="bg-gray-50"
         />
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
           <SelectTrigger className="bg-gray-50">
-            <SelectValue placeholder="Category" />
+            <SelectValue placeholder={t('emergency.categoryPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
-            <SelectItem value="medical">Medical</SelectItem>
-            <SelectItem value="shelter">Shelter</SelectItem>
-            <SelectItem value="food">Food</SelectItem>
-            <SelectItem value="legal">Legal</SelectItem>
-            <SelectItem value="protection">Protection</SelectItem>
+            <SelectItem value="all">{t('emergency.allCategories')}</SelectItem>
+            <SelectItem value="medical">{t('emergency.categories.medical')}</SelectItem>
+            <SelectItem value="shelter">{t('emergency.categories.shelter')}</SelectItem>
+            <SelectItem value="food">{t('emergency.categories.food')}</SelectItem>
+            <SelectItem value="legal">{t('emergency.categories.legal')}</SelectItem>
+            <SelectItem value="protection">{t('emergency.categories.protection')}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={coverageFilter} onValueChange={setCoverageFilter}>
           <SelectTrigger className="bg-gray-50">
-            <SelectValue placeholder="Coverage" />
+            <SelectValue placeholder={t('emergency.coveragePlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All coverage</SelectItem>
+            <SelectItem value="all">{t('emergency.allCoverage')}</SelectItem>
             {coverageOptions.map((coverage) => (
               <SelectItem key={coverage} value={coverage}>
                 {coverage}
@@ -127,7 +128,7 @@ export default function Emergency() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm leading-relaxed text-gray-600">
-                {contact.notes || 'No extra notes provided.'}
+                {contact.notes || t('emergency.noNotes')}
               </p>
               <a
                 href={`tel:${contact.phoneNumber}`}
@@ -143,7 +144,7 @@ export default function Emergency() {
 
       {filteredContacts.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center text-gray-500">
-          No emergency contacts matched the current filters.
+          {t('emergency.emptyState')}
         </div>
       ) : null}
     </div>

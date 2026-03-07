@@ -1,0 +1,19 @@
+{
+  "badge": "Répertoire d'urgence",
+  "title": "Contacts d'urgence et d'intervention vérifiés",
+  "subtitle": "Parcourez les lignes d'urgence, les refuges, les intervenants médicaux et les contacts de protection de confiance. Appelez les numéros directement depuis votre téléphone en cas de besoin urgent.",
+  "searchPlaceholder": "Rechercher par nom, téléphone, catégorie ou zone",
+  "categoryPlaceholder": "Catégorie",
+  "coveragePlaceholder": "Couverture",
+  "allCategories": "Toutes les catégories",
+  "allCoverage": "Toute la couverture",
+  "categories": {
+    "medical": "Médical",
+    "shelter": "Hébergement",
+    "food": "Alimentation",
+    "legal": "Juridique",
+    "protection": "Protection"
+  },
+  "noNotes": "Aucune note supplémentaire fournie.",
+  "emptyState": "Aucun contact d'urgence ne correspond aux filtres actuels."
+}

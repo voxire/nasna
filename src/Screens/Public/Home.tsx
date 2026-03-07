@@ -203,7 +203,7 @@ function Home() {
             }}
             className={`bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d] ${emailError ? 'border-red-400' : ''}`}
           />
-          {emailError && <p className="text-xs text-red-500 mt-1">Please enter a valid email address.</p>}
+          {emailError && <p className="text-xs text-red-500 mt-1">{t('home.invalidEmail')}</p>}
         </div>
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.gender')}</Label>
@@ -220,7 +220,7 @@ function Home() {
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-4 space-y-4">
         <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.locationDetails')}</h2>
         <div className="space-y-1.5">
-          <Label className="text-sm font-medium text-gray-700">Current living situation</Label>
+          <Label className="text-sm font-medium text-gray-700">{t('home.locationType')}</Label>
           <Select
             value={locationType}
             onValueChange={(value) => {
@@ -230,8 +230,8 @@ function Home() {
           >
             <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="with_family">Staying with family or host</SelectItem>
-              <SelectItem value="center">Staying in a center</SelectItem>
+              <SelectItem value="with_family">{t('home.locationWithFamily')}</SelectItem>
+              <SelectItem value="center">{t('home.locationCenter')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -249,7 +249,7 @@ function Home() {
         {isCenterCase ? (
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-gray-700">Center</Label>
+              <Label className="text-sm font-medium text-gray-700">{t('home.center')}</Label>
               <CenterPicker value={centerId} onValueChange={setCenterId} />
             </div>
             {selectedCenter ? (
