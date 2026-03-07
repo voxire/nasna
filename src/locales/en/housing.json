@@ -34,6 +34,7 @@
     "free": "Free",
     "subsidized": "Subsidized",
     "paid": "Paid",
+    "availableFrom": "Available From",
     "notes": "Notes",
     "notesPlaceholder": "Accessibility, household constraints, utilities, or anything intake should know.",
     "submitting": "Submitting...",
