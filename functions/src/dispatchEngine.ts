@@ -13,6 +13,7 @@ import {
   onDocumentWritten,
 } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { sendAdminStaleCasesAlert, sendNgoNewCaseAlert } from './email';
 
 if (getApps().length === 0) {
   initializeApp();
@@ -28,6 +29,8 @@ interface SubmissionRecord {
   fullName?: string;
   currentGovernorate?: string;
   numberOfPeopleInHousehold?: number;
+  needs?: string[];
+  aidUrgency?: string;
   assignedTo?: string;
   status?: SubmissionStatus;
   staleFlagged?: boolean;
@@ -41,6 +44,7 @@ interface MemberRecord {
   role?: string;
   validated?: boolean;
   currentCaseLoad?: number;
+  coverageGovernorates?: string[];
 }
 
 interface HousingRecord {
@@ -70,13 +74,13 @@ async function createNotification(options: {
   body: string;
   channel: 'email' | 'system';
   relatedSubmissionId: string;
-}) {
+}): Promise<boolean> {
   const notificationRef = db.collection('notifications').doc(options.id);
   const notificationSnapshot = await notificationRef.get();
 
   if (notificationSnapshot.exists) {
     logger.info('Skipping duplicate notification', { notificationId: options.id });
-    return;
+    return false;
   }
 
   await notificationRef.set({
@@ -89,6 +93,22 @@ async function createNotification(options: {
     createdAt: new Date(),
     sentAt: null,
   });
+
+  return true;
+}
+
+async function updateNotificationStatus(
+  notificationId: string,
+  status: 'sent' | 'failed',
+): Promise<void> {
+  const notificationRef = db.collection('notifications').doc(notificationId);
+  await notificationRef.set(
+    {
+      status,
+      ...(status === 'sent' ? { sentAt: Timestamp.now() } : {}),
+    },
+    { merge: true },
+  );
 }
 
 async function createAdminNotifications(
@@ -267,6 +287,67 @@ export const onNewSubmission = onDocumentCreated(
       submissionId,
     );
 
+    // Email matched NGO members in the submission's governorate
+    const governorate = submission.currentGovernorate ?? 'Unknown';
+    const membersSnapshot = await db
+      .collection('members')
+      .where('role', '==', 'member')
+      .where('validated', '==', true)
+      .where('coverageGovernorates', 'array-contains', governorate)
+      .limit(50)
+      .get();
+
+    const pendingInAreaSnapshot = await db
+      .collection('submissions')
+      .where('currentGovernorate', '==', governorate)
+      .where('status', '==', 'pending')
+      .limit(1000)
+      .get();
+
+    const caseCount = pendingInAreaSnapshot.size;
+
+    await Promise.all(
+      membersSnapshot.docs
+        .filter((doc) => {
+          const member = doc.data() as MemberRecord;
+          return Boolean(member.email);
+        })
+        .map(async (doc) => {
+          const member = doc.data() as MemberRecord;
+          const notificationId = `ngo-new-case:${submissionId}:${doc.id}`;
+
+          const created = await createNotification({
+            id: notificationId,
+            recipientUid: doc.id,
+            title: 'New case in your area',
+            body: `New case in ${governorate} — needs: ${(submission.needs ?? []).join(', ') || 'unspecified'} — ${submission.aidUrgency ?? 'Unknown'} urgency`,
+            channel: 'email',
+            relatedSubmissionId: submissionId,
+          });
+
+          if (!created) return;
+
+          try {
+            await sendNgoNewCaseAlert({
+              recipientEmail: member.email!,
+              recipientName: member.name ?? 'Team',
+              governorate,
+              needs: submission.needs ?? [],
+              urgency: submission.aidUrgency ?? 'Unknown',
+              caseCount,
+            });
+            await updateNotificationStatus(notificationId, 'sent');
+          } catch (error) {
+            logger.error('Failed to send NGO new case alert email', {
+              recipientUid: doc.id,
+              submissionId,
+              error,
+            });
+            await updateNotificationStatus(notificationId, 'failed');
+          }
+        }),
+    );
+
     logger.info('Processed new submission trigger', { submissionId });
   },
 );
@@ -441,6 +522,23 @@ export const dailyStaleCaseCheck = onSchedule(
         );
       }),
     );
+
+    // Send admin email alert if there are stale cases
+    if (staleCases.length > 0) {
+      const adminEmail = process.env.ADMIN_EMAIL;
+      if (adminEmail) {
+        const staleCaseIds = staleCases.map((doc) => doc.id);
+        try {
+          await sendAdminStaleCasesAlert({
+            adminEmail,
+            staleCaseIds,
+            staleCaseCount: staleCases.length,
+          });
+        } catch (error) {
+          logger.error('Failed to send admin stale cases alert email', { error });
+        }
+      }
+    }
 
     logger.info('Completed stale case check', {
       staleCaseCount: staleCases.length,
