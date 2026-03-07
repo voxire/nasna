@@ -1,5 +1,5 @@
 import { useEffect, useState, Suspense } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import ScrollToTop from './Components/ScrollToTop';
 import PublicRoutes from './Routes/PublicRoutes';
@@ -58,6 +58,11 @@ export default function App() {
           {PrivateRoutes.map((route, index) => (
             <Route key={index} path={route.path} element={route.element} />
           ))}
+
+          <Route path="/login" element={<Navigate to="/auth/login" replace />} />
+          <Route path="/register" element={<Navigate to="/auth/register" replace />} />
+          <Route path="/admin" element={<Navigate to="/manage" replace />} />
+          <Route path="/dashboard" element={<Navigate to="/manage" replace />} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>
