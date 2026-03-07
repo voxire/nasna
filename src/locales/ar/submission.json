@@ -66,6 +66,32 @@
     "phoneNumber": "رقم الهاتف",
     "dateRegistered": "تاريخ التسجيل",
     "noSubmissions": "لا توجد طلبات.",
-    "loadError": "فشل تحميل الطلبات"
+    "loadError": "فشل تحميل الطلبات",
+    "viewDetails": "عرض التفاصيل",
+    "detail": {
+      "title": "تفاصيل الطلب",
+      "loading": "جارٍ تحميل الطلب...",
+      "loadError": "فشل تحميل تفاصيل الطلب.",
+      "notFound": "لم يتم العثور على الطلب.",
+      "accessDenied": "ليس لديك صلاحية لعرض هذا الطلب.",
+      "backToSubmissions": "العودة إلى طلباتي",
+      "personalInfo": "المعلومات الشخصية",
+      "locationInfo": "الموقع",
+      "householdNeeds": "الأسرة والاحتياجات",
+      "timeline": "الجدول الزمني",
+      "status": "الحالة",
+      "governorate": "المحافظة",
+      "locationType": "وضع السكن",
+      "withFamily": "مع العائلة أو مستضيف",
+      "inCenter": "في مركز",
+      "centerName": "المركز",
+      "ageRanges": "الفئات العمرية",
+      "needs": "الاحتياجات العاجلة",
+      "urgency": "مدى الحاجة إلى المساعدة",
+      "registrationDate": "تاريخ التسجيل",
+      "comments": "التعليقات",
+      "noComments": "لا توجد تعليقات.",
+      "household": "عدد أفراد الأسرة"
+    }
   }
 }
