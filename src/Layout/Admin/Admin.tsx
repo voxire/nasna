@@ -25,7 +25,11 @@ function Admin({ children }: AdminProps) {
     );
   }
 
-  if (!user || role !== 'admin') {
+  if (!user) {
+    return <Navigate to="/auth/login" replace />;
+  }
+
+  if (role !== 'admin') {
     return <Navigate to="/" replace />;
   }
 
