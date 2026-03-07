@@ -26,6 +26,8 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { toast } from 'sonner';
+import { QrCode } from 'lucide-react';
+import WhatsAppQRCode from '@/Components/WhatsAppQRCode';
 
 interface CenterRow extends CenterDocument {
   id: string;
@@ -50,6 +52,7 @@ export default function CenterManagement() {
   const [editingCenter, setEditingCenter] = useState<CenterRow | null>(null);
   const [formState, setFormState] = useState(DEFAULT_FORM);
   const [saving, setSaving] = useState(false);
+  const [qrCenter, setQrCenter] = useState<CenterRow | null>(null);
 
   useEffect(() => {
     const centerQuery = query(collection(db, 'centers'), orderBy('name'), limit(100));
@@ -198,6 +201,14 @@ export default function CenterManagement() {
                   </p>
                 </div>
                 <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setQrCenter(center)}
+                    title={t('admin.centers.qrCode')}
+                  >
+                    <QrCode className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="outline"
                     onClick={() => {
@@ -354,6 +365,16 @@ export default function CenterManagement() {
                   : t('admin.centers.createCenter')}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={qrCenter !== null} onOpenChange={(open) => !open && setQrCenter(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('admin.centers.qrCode')}</DialogTitle>
+            <DialogDescription>{t('admin.centers.qrDescription')}</DialogDescription>
+          </DialogHeader>
+          {qrCenter && <WhatsAppQRCode centerName={qrCenter.name} />}
         </DialogContent>
       </Dialog>
     </div>

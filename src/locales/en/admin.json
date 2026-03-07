@@ -242,7 +242,12 @@
     "addSuccess": "Center added.",
     "saveError": "Failed to save center.",
     "deleteSuccess": "Center deleted.",
-    "deleteError": "Failed to delete center."
+    "deleteError": "Failed to delete center.",
+    "qrCode": "QR Code",
+    "qrDescription": "Print this QR code and post it at the center so displaced persons can register via WhatsApp.",
+    "qrScanLabel": "Scan to register on Nasna",
+    "qrPrint": "Print",
+    "qrError": "Could not generate QR code. Check the VITE_WHATSAPP_NUMBER setting."
   },
   "emergencyContacts": {
     "title": "Emergency Contacts",

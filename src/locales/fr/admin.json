@@ -242,7 +242,12 @@
     "addSuccess": "Centre ajouté.",
     "saveError": "Échec de l'enregistrement du centre.",
     "deleteSuccess": "Centre supprimé.",
-    "deleteError": "Échec de la suppression du centre."
+    "deleteError": "Échec de la suppression du centre.",
+    "qrCode": "Code QR",
+    "qrDescription": "Imprimez ce code QR et affichez-le au centre pour que les personnes déplacées puissent s'inscrire via WhatsApp.",
+    "qrScanLabel": "Scannez pour vous inscrire sur Nasna",
+    "qrPrint": "Imprimer",
+    "qrError": "Impossible de générer le code QR. Vérifiez le paramètre VITE_WHATSAPP_NUMBER."
   },
   "emergencyContacts": {
     "title": "Contacts d'urgence",

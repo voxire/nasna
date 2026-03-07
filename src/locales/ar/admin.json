@@ -242,7 +242,12 @@
     "addSuccess": "تم إضافة المركز.",
     "saveError": "فشل حفظ المركز.",
     "deleteSuccess": "تم حذف المركز.",
-    "deleteError": "فشل حذف المركز."
+    "deleteError": "فشل حذف المركز.",
+    "qrCode": "رمز QR",
+    "qrDescription": "اطبع رمز QR هذا وعلّقه في المركز ليتمكن النازحون من التسجيل عبر واتساب.",
+    "qrScanLabel": "مسح للتسجيل في نسنا",
+    "qrPrint": "طباعة",
+    "qrError": "تعذّر إنشاء رمز QR. تحقق من إعداد VITE_WHATSAPP_NUMBER."
   },
   "emergencyContacts": {
     "title": "جهات الاتصال الطارئة",
