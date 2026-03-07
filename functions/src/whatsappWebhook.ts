@@ -2,7 +2,7 @@ import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { onRequest } from 'firebase-functions/v2/https';
-import twilio from 'twilio';
+import { sendWhatsApp } from './utils/twilio';
 
 if (getApps().length === 0) {
   initializeApp();
@@ -132,24 +132,6 @@ function t(lang: BotLanguage, key: string, vars?: Record<string, string>): strin
 
 function stripWhatsAppPrefix(from: string): string {
   return from.replace(/^whatsapp:/, '');
-}
-
-function getTwilioClient(): twilio.Twilio {
-  const sid = process.env.TWILIO_ACCOUNT_SID;
-  const token = process.env.TWILIO_AUTH_TOKEN;
-  if (!sid || !token) {
-    throw new Error('Missing Twilio credentials in environment variables');
-  }
-  return twilio(sid, token);
-}
-
-async function sendWhatsApp(to: string, body: string): Promise<void> {
-  const client = getTwilioClient();
-  const from = process.env.TWILIO_WHATSAPP_FROM;
-  if (!from) {
-    throw new Error('Missing TWILIO_WHATSAPP_FROM environment variable');
-  }
-  await client.messages.create({ body, from, to });
 }
 
 async function getOrCreateSession(phone: string): Promise<WaSession> {

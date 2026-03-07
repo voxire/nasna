@@ -14,6 +14,7 @@ import {
 } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { sendAdminStaleCasesAlert, sendNgoNewCaseAlert } from './email';
+import { sendWhatsApp } from './utils/twilio';
 
 if (getApps().length === 0) {
   initializeApp();
@@ -36,6 +37,9 @@ interface SubmissionRecord {
   staleFlagged?: boolean;
   updatedAt?: Timestamp | Date;
   registrationDate?: Timestamp;
+  source?: string;
+  // PII: admin + assigned agent only. Never expose to members.
+  whatsappPhone?: string;
 }
 
 interface MemberRecord {
@@ -399,6 +403,22 @@ export const onCaseAssigned = onDocumentUpdated(
       relatedSubmissionId: submissionId,
     });
 
+    if (after.source === 'whatsapp' && after.whatsappPhone) {
+      try {
+        const ngoName = memberData?.name ?? 'فريق المساعدة';
+        await sendWhatsApp(
+          after.whatsappPhone,
+          `تم تعيين حالتك (#${submissionId}) 🤝\n${ngoName} سيتواصل معك قريباً.`,
+        );
+        logger.info('Sent WhatsApp assignment notification', { submissionId, status: 'assigned' });
+      } catch (error) {
+        logger.error('Failed to send WhatsApp assignment notification', {
+          submissionId,
+          error,
+        });
+      }
+    }
+
     await refreshActiveNgoCount();
 
     logger.info('Processed case assignment trigger', {
@@ -468,6 +488,21 @@ export const onCaseCompleted = onDocumentUpdated(
         channel: memberData?.email ? 'email' : 'system',
         relatedSubmissionId: submissionId,
       });
+    }
+
+    if (nextStatus === 'completed' && after.source === 'whatsapp' && after.whatsappPhone) {
+      try {
+        await sendWhatsApp(
+          after.whatsappPhone,
+          `تم إغلاق حالتك (#${submissionId}) ✅\nنشكرك على ثقتك بنسنا.`,
+        );
+        logger.info('Sent WhatsApp completion notification', { submissionId, status: 'completed' });
+      } catch (error) {
+        logger.error('Failed to send WhatsApp completion notification', {
+          submissionId,
+          error,
+        });
+      }
     }
 
     await refreshActiveNgoCount();
