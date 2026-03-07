@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { db } from '@/firebase';
 import { updateMemberCoverageProfile } from '@/services/memberCases';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Input } from '@/Components/ui/input';
@@ -18,6 +21,9 @@ import type { CenterDocument } from '@/types';
 
 export default function ProfileCoverage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const firebaseUser = useAuthStore((state) => state.firebaseUser);
+  const refreshProfile = useAuthStore((state) => state.refreshProfile);
   const [coverageType, setCoverageType] = useState<'governorate' | 'center' | 'hybrid'>(
     'governorate',
   );
@@ -71,6 +77,13 @@ export default function ProfileCoverage() {
         maxCaseLoad,
         deliveryMode,
       });
+
+      if (firebaseUser) {
+        await refreshProfile();
+      }
+
+      toast.success(t('profile.saveSuccess'));
+      navigate('/ngo/submissions');
     } finally {
       setSaving(false);
     }
