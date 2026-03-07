@@ -30,7 +30,10 @@
     "coverage": "Coverage:",
     "centerIds": "Center IDs:",
     "loadError": "Failed to load operations map data.",
-    "loading": "Loading operations map..."
+    "loading": "Loading operations map...",
+    "displacementSites": "Displacement sites",
+    "contact": "Contact:",
+    "phone": "Phone:"
   },
   "dispatch": {
     "title": "Dispatch Center",
