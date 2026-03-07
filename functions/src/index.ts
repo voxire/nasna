@@ -19,3 +19,4 @@ export {
   updateMemberCaseStatus,
   updateMemberCoverageProfile,
 } from './memberCaseApi';
+export { whatsappWebhook } from './whatsappWebhook';
