@@ -66,6 +66,32 @@
     "phoneNumber": "Numéro de téléphone",
     "dateRegistered": "Date d'inscription",
     "noSubmissions": "Aucune soumission trouvée.",
-    "loadError": "Échec du chargement des soumissions"
+    "loadError": "Échec du chargement des soumissions",
+    "viewDetails": "Voir les détails",
+    "detail": {
+      "title": "Détails de la soumission",
+      "loading": "Chargement de la soumission...",
+      "loadError": "Échec du chargement des détails de la soumission.",
+      "notFound": "Soumission introuvable.",
+      "accessDenied": "Vous n'avez pas la permission de voir cette soumission.",
+      "backToSubmissions": "Retour à mes soumissions",
+      "personalInfo": "Informations personnelles",
+      "locationInfo": "Localisation",
+      "householdNeeds": "Ménage et besoins",
+      "timeline": "Chronologie",
+      "status": "Statut",
+      "governorate": "Gouvernorat",
+      "locationType": "Situation de logement",
+      "withFamily": "Avec la famille ou un hôte",
+      "inCenter": "Dans un centre",
+      "centerName": "Centre",
+      "ageRanges": "Tranches d'âge",
+      "needs": "Besoins immédiats",
+      "urgency": "Urgence de l'aide",
+      "registrationDate": "Date d'inscription",
+      "comments": "Commentaires",
+      "noComments": "Aucun commentaire.",
+      "household": "Taille du ménage"
+    }
   }
 }

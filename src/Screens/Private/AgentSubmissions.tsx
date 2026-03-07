@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { db, auth } from '../../firebase';
 import { collection, onSnapshot, query, where, limit } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { Loader2 } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
 import type { SubmissionDocument } from '../../types';
 import { Button } from '@/Components/ui/button';
 import {
@@ -101,23 +100,31 @@ function AgentSubmissions() {
               <TableHead className="font-semibold text-gray-700">
                 {t('submission.agent.dateRegistered')}
               </TableHead>
+              <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {submissions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-12 text-gray-500">
+                <TableCell colSpan={5} className="text-center py-12 text-gray-500">
                   {t('submission.agent.noSubmissions')}
                 </TableCell>
               </TableRow>
             ) : (
               submissions.map((submission) => (
-                <TableRow key={submission.id} className="hover:bg-gray-50">
+                <TableRow
+                  key={submission.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => navigate(`/agent/submissions/${submission.id}`)}
+                >
                   <TableCell className="font-medium">{submission.fullName}</TableCell>
                   <TableCell>{submission.emailAddress}</TableCell>
                   <TableCell>{submission.phoneNumber}</TableCell>
                   <TableCell>
                     {submission.registrationDate?.toDate().toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <ChevronRight className="h-4 w-4 text-gray-400" />
                   </TableCell>
                 </TableRow>
               ))

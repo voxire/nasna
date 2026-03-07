@@ -66,6 +66,32 @@
     "phoneNumber": "Phone Number",
     "dateRegistered": "Date Registered",
     "noSubmissions": "No submissions found.",
-    "loadError": "Failed to load submissions"
+    "loadError": "Failed to load submissions",
+    "viewDetails": "View details",
+    "detail": {
+      "title": "Submission Detail",
+      "loading": "Loading submission...",
+      "loadError": "Failed to load submission details.",
+      "notFound": "Submission not found.",
+      "accessDenied": "You do not have permission to view this submission.",
+      "backToSubmissions": "Back to my submissions",
+      "personalInfo": "Personal Information",
+      "locationInfo": "Location",
+      "householdNeeds": "Household & Needs",
+      "timeline": "Timeline",
+      "status": "Status",
+      "governorate": "Governorate",
+      "locationType": "Living Situation",
+      "withFamily": "With family or host",
+      "inCenter": "In a center",
+      "centerName": "Center",
+      "ageRanges": "Age Ranges",
+      "needs": "Immediate Needs",
+      "urgency": "Aid Urgency",
+      "registrationDate": "Registration Date",
+      "comments": "Comments",
+      "noComments": "No comments.",
+      "household": "Household Size"
+    }
   }
 }

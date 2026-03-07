@@ -9,6 +9,7 @@ const CaseDetail = lazy(() => import('../Screens/Private/CaseDetail'));
 const ProfileCoverage = lazy(() => import('../Screens/Private/ProfileCoverage'));
 const CreateSubmission = lazy(() => import('../Screens/Private/CreateSubmission'));
 const AgentSubmissions = lazy(() => import('../Screens/Private/AgentSubmissions'));
+const AgentSubmissionDetail = lazy(() => import('../Screens/Private/AgentSubmissionDetail'));
 
 const NGORoutes: RouteConfig[] = [
   {
@@ -67,6 +68,16 @@ const NGORoutes: RouteConfig[] = [
       <PrivateRoute allowedRoles={['agent']} requireValidated>
         <Private>
           <AgentSubmissions />
+        </Private>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/agent/submissions/:id',
+    element: (
+      <PrivateRoute allowedRoles={['agent']} requireValidated>
+        <Private>
+          <AgentSubmissionDetail />
         </Private>
       </PrivateRoute>
     ),

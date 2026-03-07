@@ -105,7 +105,7 @@ function About() {
           onClick={() => navigate('/submit')}
           className="bg-white text-[#12a89d] font-semibold text-sm px-6 py-2.5 rounded-lg hover:bg-gray-50 transition-colors"
         >
-          {t('about.banner.FormButton')}
+          {t('about.getInvolved.ctaButton')}
         </button>
       </section>
     </div>
