@@ -53,12 +53,11 @@ function PrivateRoute({
     );
   }
 
-  const hasCoverageProfile =
-    (memberProfile?.aidTypes?.length ?? 0) > 0 &&
-    ((memberProfile?.coverageGovernorates?.length ?? 0) > 0 ||
-      (memberProfile?.coverageCenterIds?.length ?? 0) > 0);
-
-  if (role === 'member' && !hasCoverageProfile && pathname !== '/ngo/profile-coverage') {
+  if (
+    role === 'member' &&
+    memberProfile?.onboarded !== true &&
+    pathname !== '/ngo/profile-coverage'
+  ) {
     return <Navigate to="/ngo/profile-coverage" replace />;
   }
 
