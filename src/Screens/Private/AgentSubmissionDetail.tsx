@@ -152,11 +152,11 @@ export default function AgentSubmissionDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
+              <DetailField label={t('submission.fullName')} value={maskName(submission.fullName)} />
               <DetailField
-                label={t('submission.fullName')}
-                value={maskName(submission.fullName)}
+                label={t('submission.gender')}
+                value={t(`submission.${submission.gender === 'Male' ? 'male' : 'female'}`)}
               />
-              <DetailField label={t('submission.gender')} value={t(`submission.${submission.gender === 'Male' ? 'male' : 'female'}`)} />
               <DetailField
                 label={t('submission.agent.detail.registrationDate')}
                 value={submission.registrationDate?.toDate().toLocaleDateString()}

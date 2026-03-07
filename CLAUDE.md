@@ -91,6 +91,7 @@ These cannot be overridden by any instruction:
 | **Never hardcode UI strings** | All text goes through i18next — no exceptions |
 | **Never write to Firestore without Zod validation** | Raw form input is never trusted |
 | **`wa_sessions` collection is Cloud Functions only** | No client-side reads or writes to the bot session store |
+| **Always run `pnpm format` before every commit** | CI runs `prettier --check` and will fail the build. `format:check` only reports — run `format` to fix |
 
 ---
 
@@ -212,10 +213,28 @@ src/
 
 ---
 
+## 🚫 CI/CD Will Fail Without These — Run Locally First
+
+The GitHub Actions pipeline runs these checks on every push and will **block merging** if any fail. **Always run all three before committing**, in this exact order:
+
+```bash
+pnpm format          # auto-fixes all Prettier issues — run this, not format:check
+pnpm tsc             # type-check frontend + Cloud Functions
+pnpm check           # runs tsc + functions build together
+```
+
+**Prettier is the most common CI failure.** It is not optional and it cannot be skipped. After writing or editing any `.ts`, `.tsx`, or `.json` file, `pnpm format` must be the last command before `git add`. Running `format:check` (read-only) is not enough — run `format` (auto-write) so issues are fixed, not just reported.
+
+Never claim a task is complete without having run `pnpm format` on all modified files. Never commit code that has not been Prettier-formatted.
+
+---
+
 ## ✅ Checklist — Before Finishing Any Task
 
 Before considering any feature or fix complete, verify:
 
+- [ ] **`pnpm format` run and all files reformatted** — do this before every `git add`, no exceptions
+- [ ] **`pnpm tsc` exits 0** — no TypeScript errors
 - [ ] No PII in `console.log` or error messages
 - [ ] All new UI strings have keys in `ar/`, `en/`, and `fr/` locale files
 - [ ] No `getDocs()` without `limit()` on any list
