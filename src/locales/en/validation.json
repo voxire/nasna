@@ -2,5 +2,10 @@
   "nameTooShort": "Name must be at least 2 characters.",
   "invalidPhone": "Please enter a valid phone number.",
   "amountTooLow": "Amount must be at least $1.",
-  "fixErrors": "Please fix the errors before submitting."
+  "fixErrors": "Please fix the errors before submitting.",
+  "fieldTooShort": "This field is too short.",
+  "addressTooShort": "Address must be at least 5 characters.",
+  "minOne": "Must be at least 1.",
+  "selectOption": "Please select an option.",
+  "dateRequired": "Please select a date."
 }

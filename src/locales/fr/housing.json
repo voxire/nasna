@@ -34,6 +34,7 @@
     "free": "Gratuit",
     "subsidized": "Subventionné",
     "paid": "Payant",
+    "availableFrom": "Disponible à partir du",
     "notes": "Notes",
     "notesPlaceholder": "Accessibilité, contraintes du ménage, services, ou tout ce que l'accueil doit savoir.",
     "submitting": "Envoi en cours...",

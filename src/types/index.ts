@@ -106,6 +106,7 @@ export interface HousingDocument {
   capacity: number;
   availableSpots: number;
   priceType: 'free' | 'subsidized' | 'paid';
+  availableFrom: Date;
   notes?: string;
   status: HousingStatus;
   approvedBy?: string;
