@@ -52,6 +52,8 @@ export interface SubmissionDocument {
   id?: string;
   fullName: string;
   phoneNumber: string;
+  // PII: admin + Cloud Functions only. Never return to member-facing queries.
+  whatsappPhone?: string;
   emailAddress: string;
   gender: Gender;
   currentGovernorate: string;
@@ -161,6 +163,35 @@ export interface DonationDocument {
   stripeSessionId?: string;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+// PII: Cloud Functions service account only. Never expose to client.
+export type BotStep =
+  | 'new'
+  | 'awaiting_name'
+  | 'awaiting_area'
+  | 'awaiting_household'
+  | 'awaiting_need'
+  | 'complete'
+  | 'status_check';
+
+export type BotLanguage = 'ar' | 'en' | 'fr';
+
+export interface WaSessionDocument {
+  // PII: Cloud Functions only
+  phone: string;
+  step: BotStep;
+  language: BotLanguage;
+  data: {
+    // PII: Cloud Functions only
+    name?: string;
+    area?: string;
+    householdSize?: number;
+    mainNeed?: string;
+  };
+  submissionId?: string; // set after registration completes
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 export interface RouteConfig {

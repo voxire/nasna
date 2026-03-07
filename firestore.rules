@@ -161,7 +161,18 @@ service cloud.firestore {
       allow create: if false;
     }
 
+    // ─── /wa_sessions ──────────────────────────────────────────────────────────
+
+    match /wa_sessions/{phone} {
+      allow read, write: if false;
+      // This collection is managed exclusively by Cloud Functions service account.
+      // No client — authenticated or not — may read or write to this collection.
+    }
+
     // ─── /submissions ────────────────────────────────────────────────────────
+    // NOTE: whatsappPhone is not readable by members. Firestore rules cannot
+    // mask individual fields, so Cloud Functions must strip whatsappPhone
+    // before returning submission data to member-facing queries.
 
     match /submissions/{submissionId} {
       // Validate all fields on create — prevents garbage data injection
