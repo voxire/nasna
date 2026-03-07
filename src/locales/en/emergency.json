@@ -1,0 +1,19 @@
+{
+  "badge": "Emergency Directory",
+  "title": "Verified emergency and response contacts",
+  "subtitle": "Browse trusted hotlines, shelters, medical responders, and protection contacts. Call the numbers directly from your phone when you need urgent support.",
+  "searchPlaceholder": "Search by name, phone, category, or area",
+  "categoryPlaceholder": "Category",
+  "coveragePlaceholder": "Coverage",
+  "allCategories": "All categories",
+  "allCoverage": "All coverage",
+  "categories": {
+    "medical": "Medical",
+    "shelter": "Shelter",
+    "food": "Food",
+    "legal": "Legal",
+    "protection": "Protection"
+  },
+  "noNotes": "No extra notes provided.",
+  "emptyState": "No emergency contacts matched the current filters."
+}

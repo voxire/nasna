@@ -10,6 +10,7 @@
   "forgotSending": "Envoi en cours...",
   "googleButton": "Continuer avec Google",
   "googleLoading": "Connexion en cours...",
+  "or": "ou",
   "noAccount": "Pas encore de compte ?",
   "registerLink": "S'inscrire",
   "fields": {
@@ -31,6 +32,7 @@
     "success": "Connexion réussie !",
     "tooManyAttempts": "Trop de tentatives échouées. Veuillez attendre 15 minutes avant de réessayer.",
     "resetSent": "E-mail de réinitialisation envoyé ! Vérifiez votre boîte de réception.",
-    "resetError": "Échec de l'envoi. Assurez-vous que l'e-mail est bien enregistré."
+    "resetError": "Échec de l'envoi. Assurez-vous que l'e-mail est bien enregistré.",
+    "accountExistsDifferentCredential": "Cet e-mail est déjà enregistré. Veuillez vous connecter avec votre e-mail et mot de passe ci-dessous."
   }
 }

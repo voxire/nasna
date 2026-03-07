@@ -68,5 +68,10 @@
   "aidUrgency": "Urgency of Aid",
   "high": "High",
   "medium": "Medium",
-  "low": "Low"
+  "low": "Low",
+  "locationType": "Current living situation",
+  "locationWithFamily": "Staying with family or host",
+  "locationCenter": "Staying in a center",
+  "center": "Center",
+  "invalidEmail": "Please enter a valid email address."
 }

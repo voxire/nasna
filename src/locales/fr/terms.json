@@ -1,0 +1,38 @@
+{
+  "title": "Conditions générales",
+  "lastUpdated": "Dernière mise à jour : mars 2026",
+  "sections": {
+    "acceptance": {
+      "title": "1. Acceptation des conditions",
+      "body": "En accédant ou en utilisant la plateforme Nasna, vous acceptez d'être lié par ces conditions générales. Si vous n'acceptez pas une partie de ces conditions, vous ne pouvez pas utiliser nos services."
+    },
+    "purpose": {
+      "title": "2. Objectif de la plateforme",
+      "body": "Nasna est une plateforme de coordination de l'aide humanitaire qui relie les personnes déplacées au Liban avec les ONG et les initiatives d'aide. La plateforme facilite la soumission et la gestion des demandes d'aide mais ne fournit pas directement d'aide et ne garantit pas la satisfaction de toute demande."
+    },
+    "dataCollection": {
+      "title": "3. Collecte de données et confidentialité",
+      "body": "Nous collectons les informations personnelles nécessaires à la coordination de la livraison de l'aide, y compris les noms, les coordonnées, les données de localisation et les informations sur le ménage. Toutes les données sont traitées de manière sécurisée, partagées uniquement avec des organisations d'aide vérifiées et utilisées exclusivement à des fins de coordination humanitaire."
+    },
+    "consent": {
+      "title": "4. Consentement",
+      "body": "En soumettant des informations via la plateforme, vous consentez explicitement à la collecte, au traitement et au partage de vos données avec des organisations partenaires de confiance dans le seul but de coordonner l'aide humanitaire. Vous pouvez retirer votre consentement à tout moment en nous contactant."
+    },
+    "userResponsibilities": {
+      "title": "5. Responsabilités de l'utilisateur",
+      "body": "Les utilisateurs doivent fournir des informations exactes et véridiques. La soumission d'informations fausses ou trompeuses peut entraîner la suppression de votre demande et une restriction potentielle de la plateforme. Les utilisateurs ne doivent pas abuser de la plateforme ni tenter d'accéder aux données d'autres utilisateurs."
+    },
+    "limitations": {
+      "title": "6. Limitations de responsabilité",
+      "body": "Nasna sert de plateforme de coordination et ne garantit pas la disponibilité, le délai ou la qualité de l'aide fournie par les organisations partenaires. Nous ne sommes pas responsables des retards, interruptions ou défaillances dans la livraison de l'aide. La plateforme est fournie en l'état."
+    },
+    "modifications": {
+      "title": "7. Modifications",
+      "body": "Nous nous réservons le droit de modifier ces conditions à tout moment. Les modifications seront publiées sur cette page avec une date de révision mise à jour. L'utilisation continue de la plateforme après les modifications constitue l'acceptation des nouvelles conditions."
+    },
+    "contact": {
+      "title": "8. Contact",
+      "body": "Pour toute question concernant ces conditions, veuillez contacter l'équipe Nasna via la plateforme ou sur nos canaux de communication officiels."
+    }
+  }
+}
