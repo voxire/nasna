@@ -30,7 +30,10 @@
     "coverage": "Couverture :",
     "centerIds": "ID des centres :",
     "loadError": "Échec du chargement des données de la carte des opérations.",
-    "loading": "Chargement de la carte des opérations..."
+    "loading": "Chargement de la carte des opérations...",
+    "displacementSites": "Sites de déplacement",
+    "contact": "Contact :",
+    "phone": "Téléphone :"
   },
   "dispatch": {
     "title": "Centre de dispatch",

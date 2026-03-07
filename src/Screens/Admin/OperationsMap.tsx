@@ -12,6 +12,18 @@ import {
   type NgoCoverageSummary,
   type SubmissionCluster,
 } from '@/services/operationsMap';
+import displacementSitesData from '@/data/displacementSites.json';
+
+interface DisplacementSite {
+  place_name_arabic: string;
+  place_name_english: string;
+  contact_person: string;
+  phone_number: string;
+  latitude: number;
+  longitude: number;
+}
+
+const displacementSites = displacementSitesData as DisplacementSite[];
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Label } from '@/Components/ui/label';
@@ -33,6 +45,7 @@ export default function OperationsMap() {
   const [showCenters, setShowCenters] = useState(true);
   const [showHousing, setShowHousing] = useState(true);
   const [showNgoCoverage, setShowNgoCoverage] = useState(true);
+  const [showDisplacementSites, setShowDisplacementSites] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -159,6 +172,12 @@ export default function OperationsMap() {
                 checked: showHousing,
                 set: setShowHousing,
               },
+              {
+                id: 'displacementSites',
+                label: t('admin.map.displacementSites'),
+                checked: showDisplacementSites,
+                set: setShowDisplacementSites,
+              },
             ].map((layer) => (
               <div key={layer.id} className="flex items-center gap-3">
                 <Checkbox
@@ -283,6 +302,29 @@ export default function OperationsMap() {
                     </CircleMarker>
                   )),
                 )}
+
+              {showDisplacementSites &&
+                displacementSites.map((site, index) => (
+                  <CircleMarker
+                    key={`site-${index}`}
+                    center={[site.latitude, site.longitude]}
+                    radius={7}
+                    pathOptions={{ color: '#ea580c', fillColor: '#fb923c', fillOpacity: 0.8 }}
+                  >
+                    <Popup>
+                      <div className="space-y-1 text-sm">
+                        <p className="font-semibold">{site.place_name_arabic}</p>
+                        <p className="text-muted-foreground">{site.place_name_english}</p>
+                        <p>
+                          {t('admin.map.contact')} {site.contact_person}
+                        </p>
+                        <p>
+                          {t('admin.map.phone')} {site.phone_number}
+                        </p>
+                      </div>
+                    </Popup>
+                  </CircleMarker>
+                ))}
             </MapContainer>
           </CardContent>
         </Card>
