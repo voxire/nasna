@@ -17,5 +17,6 @@
   "aidTypesPlaceholder": "food, shelter, medicine",
   "maxCaseLoad": "Max Active Case Load",
   "saving": "Saving...",
-  "save": "Save coverage profile"
+  "save": "Save coverage profile",
+  "saveSuccess": "Coverage profile saved successfully"
 }

@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { useIdleTimeout } from '../hooks/useIdleTimeout';
@@ -20,6 +20,7 @@ function PrivateRoute({
   redirectTo = '/',
 }: PrivateRouteProps) {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
   useIdleTimeout();
 
   const loading = useAuthStore((state) => state.loading);
@@ -50,6 +51,14 @@ function PrivateRoute({
         <h2 className="text-xl font-semibold">{t('auth.accountUnderReview')}</h2>
       </div>
     );
+  }
+
+  if (
+    role === 'member' &&
+    memberProfile?.onboarded !== true &&
+    pathname !== '/ngo/profile-coverage'
+  ) {
+    return <Navigate to="/ngo/profile-coverage" replace />;
   }
 
   return <>{children}</>;

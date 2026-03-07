@@ -33,6 +33,7 @@ function renderRoute(route: React.ReactElement) {
         <Route path="/" element={<div>home</div>} />
         <Route path="/auth/login" element={<div>login</div>} />
         <Route path="/private" element={route} />
+        <Route path="/ngo/profile-coverage" element={<div>onboarding</div>} />
       </Routes>
     </MemoryRouter>,
   );
@@ -94,10 +95,42 @@ describe('PrivateRoute', () => {
   it('renders protected content for validated allowed roles', async () => {
     mockAuthState.firebaseUser = { uid: 'user-3' };
     mockAuthState.role = 'member';
-    mockAuthState.profile = { validated: true };
+    mockAuthState.profile = { validated: true, onboarded: true };
 
     renderRoute(
       <PrivateRoute allowedRoles={['member']} requireValidated>
+        <div>protected</div>
+      </PrivateRoute>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('protected')).toBeInTheDocument();
+    });
+  });
+
+  it('redirects non-onboarded members to profile-coverage', async () => {
+    mockAuthState.firebaseUser = { uid: 'user-4' };
+    mockAuthState.role = 'member';
+    mockAuthState.profile = { validated: true, onboarded: false };
+
+    renderRoute(
+      <PrivateRoute allowedRoles={['member']} requireValidated>
+        <div>protected</div>
+      </PrivateRoute>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('onboarding')).toBeInTheDocument();
+    });
+  });
+
+  it('does not redirect non-onboarded agents', async () => {
+    mockAuthState.firebaseUser = { uid: 'user-5' };
+    mockAuthState.role = 'agent';
+    mockAuthState.profile = { validated: true, onboarded: false };
+
+    renderRoute(
+      <PrivateRoute allowedRoles={['agent']} requireValidated>
         <div>protected</div>
       </PrivateRoute>,
     );
