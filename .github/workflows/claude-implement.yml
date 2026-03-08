@@ -1,0 +1,79 @@
+name: Claude Implement Feature
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: "Feature description for Claude Code to implement"
+        required: true
+        type: string
+      branch_name:
+        description: "Branch name (e.g. feat/my-feature)"
+        required: true
+        type: string
+
+jobs:
+  implement:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup git identity
+        run: |
+          git config user.name "Claude Code Bot"
+          git config user.email "claude-bot@nasna.app"
+
+      - name: Create feature branch
+        run: git checkout -b ${{ inputs.branch_name }}
+
+      - name: Implement feature with Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          allowed_tools: "Bash,Read,Edit,Write"
+          direct_prompt: |
+            You are implementing a feature for Nasna, a humanitarian aid coordination platform.
+            Read CLAUDE.md first — all rules there are non-negotiable.
+
+            ## Feature to implement
+            ${{ inputs.prompt }}
+
+            ## Steps you must follow after implementing
+            1. Run: pnpm format
+               This auto-fixes all Prettier issues. Never use format:check — that only reports.
+            2. Run: pnpm tsc
+               Fix ALL TypeScript errors. No `any` types ever.
+            3. Run: pnpm build
+               Fix any build errors before proceeding.
+            4. Commit everything:
+               git add -A
+               git commit -m "feat: ${{ inputs.branch_name }}"
+            5. Push:
+               git push origin ${{ inputs.branch_name }}
+            6. Open a PR:
+               gh pr create --title "feat: ${{ inputs.branch_name }}" --body "${{ inputs.prompt }}" --base main
+
+            ## Non-negotiable Nasna rules
+            - pnpm format must run before every commit
+            - No any types — use unknown and narrow, or define a proper type
+            - All UI strings must be in all three locales: src/locales/ar/, src/locales/en/, src/locales/fr/
+            - Never log PII (names, phones, locations) — log document IDs only
+            - Never use getDocs() without limit()
+            - All Firestore writes go through Zod validation first
