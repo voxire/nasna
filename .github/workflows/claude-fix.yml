@@ -2,7 +2,7 @@ name: Claude CI Auto-Fix
 
 on:
   workflow_run:
-    workflows: ["PR Checks"]
+    workflows: ['PR Checks']
     types: [completed]
 
 jobs:
@@ -34,7 +34,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          allowed_tools: "Bash,Read,Edit,Write"
+          allowed_tools: 'Bash,Read,Edit,Write'
           direct_prompt: |
             The "PR Checks" CI workflow just failed on branch ${{ github.event.workflow_run.head_branch }}.
 
