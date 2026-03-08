@@ -93,5 +93,7 @@
       "noComments": "Aucun commentaire.",
       "household": "Taille du ménage"
     }
-  }
+  },
+  "copyPhone": "Copier le numero",
+  "phoneCopied": "Numero copie"
 }
