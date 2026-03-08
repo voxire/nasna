@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
       - name: Setup git identity
         run: |
           git config user.name "Claude Code Bot"
@@ -43,37 +46,42 @@ jobs:
       - name: Create feature branch
         run: git checkout -b ${{ inputs.branch_name }}
 
+      - name: Write prompt to file
+        env:
+          PROMPT: ${{ inputs.prompt }}
+          BRANCH: ${{ inputs.branch_name }}
+        run: |
+          cat > /tmp/claude-prompt.txt << 'ENDMARKER'
+          You are implementing a feature for Nasna, a humanitarian aid coordination platform.
+          Read CLAUDE.md first - all rules there are non-negotiable.
+          ENDMARKER
+          echo "" >> /tmp/claude-prompt.txt
+          echo "## Feature to implement" >> /tmp/claude-prompt.txt
+          echo "$PROMPT" >> /tmp/claude-prompt.txt
+          cat >> /tmp/claude-prompt.txt << 'ENDMARKER'
+
+          ## Steps you MUST follow after implementing
+          1. Run: pnpm format
+             Auto-fixes all Prettier issues. Never use format:check.
+          2. Run: pnpm tsc
+             Fix ALL TypeScript errors. No any types ever.
+          3. Run: pnpm build
+             Fix any build errors before proceeding.
+          4. Commit: git add -A && git commit -m "feat: implement feature"
+          5. Push: git push origin HEAD
+          6. Open PR: gh pr create --title "feat: implement feature" --body "$(cat /tmp/claude-prompt.txt)" --base main
+
+          ## Non-negotiable Nasna rules
+          - pnpm format must run before every commit
+          - No any types in TypeScript
+          - All UI strings in src/locales/ar/, en/, fr/
+          - Never log PII
+          - Never getDocs() without limit()
+          - All Firestore writes through Zod
+          ENDMARKER
+
       - name: Implement feature with Claude Code
-        uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          allowed_tools: "Bash,Read,Edit,Write"
-          direct_prompt: |
-            You are implementing a feature for Nasna, a humanitarian aid coordination platform.
-            Read CLAUDE.md first — all rules there are non-negotiable.
-
-            ## Feature to implement
-            ${{ inputs.prompt }}
-
-            ## Steps you must follow after implementing
-            1. Run: pnpm format
-               This auto-fixes all Prettier issues. Never use format:check — that only reports.
-            2. Run: pnpm tsc
-               Fix ALL TypeScript errors. No `any` types ever.
-            3. Run: pnpm build
-               Fix any build errors before proceeding.
-            4. Commit everything:
-               git add -A
-               git commit -m "feat: ${{ inputs.branch_name }}"
-            5. Push:
-               git push origin ${{ inputs.branch_name }}
-            6. Open a PR:
-               gh pr create --title "feat: ${{ inputs.branch_name }}" --body "${{ inputs.prompt }}" --base main
-
-            ## Non-negotiable Nasna rules
-            - pnpm format must run before every commit
-            - No any types — use unknown and narrow, or define a proper type
-            - All UI strings must be in all three locales: src/locales/ar/, src/locales/en/, src/locales/fr/
-            - Never log PII (names, phones, locations) — log document IDs only
-            - Never use getDocs() without limit()
-            - All Firestore writes go through Zod validation first
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: claude --dangerously-skip-permissions -p "$(cat /tmp/claude-prompt.txt)"
