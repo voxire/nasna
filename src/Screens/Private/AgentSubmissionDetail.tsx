@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Copy } from 'lucide-react';
+import { toast } from 'sonner';
 import type { SubmissionDocument, AgeRanges } from '../../types';
 import CaseStatusBadge from '@/Components/CaseStatusBadge';
 import CaseTimeline from '@/Components/CaseTimeline';
@@ -165,6 +166,28 @@ export default function AgentSubmissionDetail() {
                 label={t('submission.agent.detail.household')}
                 value={String(submission.numberOfPeopleInHousehold)}
               />
+              {submission.phoneNumber && (
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-gray-500">
+                    {t('submission.phoneNumber')}
+                  </p>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <p className="text-sm text-gray-900">{submission.phoneNumber}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      aria-label={t('submission.copyPhone')}
+                      onClick={() => {
+                        void navigator.clipboard.writeText(submission.phoneNumber);
+                        toast.success(t('submission.phoneCopied'));
+                      }}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

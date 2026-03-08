@@ -93,5 +93,7 @@
       "noComments": "No comments.",
       "household": "Household Size"
     }
-  }
+  },
+  "copyPhone": "Copy phone number",
+  "phoneCopied": "Phone number copied"
 }
