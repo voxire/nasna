@@ -2,5 +2,6 @@
   "notFound": "La page que vous recherchez n'existe pas.",
   "goBack": "Retour",
   "offlineBanner": "Vous êtes hors ligne. Les modifications seront synchronisées à la reconnexion.",
-  "syncingBanner": "Synchronisation... Ne fermez pas cet onglet."
+  "syncingBanner": "Synchronisation... Ne fermez pas cet onglet.",
+  "loading": "Chargement"
 }
