@@ -324,9 +324,9 @@ function Home() {
     <div>
       <h1 className="text-2xl font-bold mb-5 text-gray-800">{t('home.householdAndNeedsDetails')}</h1>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-4 space-y-4">
-        <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.householdInformation')}</h2>
-        {!isCenterCase ? (
+      {!isCenterCase ? (
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-4 space-y-4">
+          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.householdInformation')}</h2>
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">{t('home.numberOfPeopleInHousehold')}</Label>
             <Input
@@ -336,22 +336,22 @@ function Home() {
               className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
             />
           </div>
-        ) : null}
-        <p className="text-sm font-semibold text-gray-700">{t('home.ageRanges')}</p>
-        <div className="grid grid-cols-2 gap-3">
-          {(Object.keys(ageRanges) as Array<keyof AgeRanges>).map((range) => (
-            <div key={range} className="space-y-1.5">
-              <Label className="text-xs font-medium text-gray-600">{`${range} (${t('home.numberOfMembers')})`}</Label>
-              <Input
-                type="number"
-                value={ageRanges[range]}
-                onChange={(e) => setAgeRanges({ ...ageRanges, [range]: Number(e.target.value) })}
-                className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
-              />
-            </div>
-          ))}
+          <p className="text-sm font-semibold text-gray-700">{t('home.ageRanges')}</p>
+          <div className="grid grid-cols-2 gap-3">
+            {(Object.keys(ageRanges) as Array<keyof AgeRanges>).map((range) => (
+              <div key={range} className="space-y-1.5">
+                <Label className="text-xs font-medium text-gray-600">{`${range} (${t('home.numberOfMembers')})`}</Label>
+                <Input
+                  type="number"
+                  value={ageRanges[range]}
+                  onChange={(e) => setAgeRanges({ ...ageRanges, [range]: Number(e.target.value) })}
+                  className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-4 space-y-4">
         <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.needs.special.title')}</h2>

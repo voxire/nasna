@@ -4,6 +4,7 @@
   "feed": {
     "title": "Flux des cas",
     "description": "Examinez les nouveaux cas correspondant à votre couverture et réclamez ceux que votre équipe peut gérer.",
+    "addCase": "Ajouter un cas",
     "myCases": "Mes cas",
     "coverageProfile": "Profil de couverture",
     "searchPlaceholder": "Rechercher par ménage, téléphone ou gouvernorat",
@@ -29,6 +30,13 @@
     "startWork": "Commencer le travail",
     "complete": "Terminer",
     "cancel": "Annuler"
+  },
+  "create": {
+    "title": "Ajouter un cas",
+    "submit": "Créer le cas",
+    "creating": "Création du cas...",
+    "success": "Le cas a été créé et attribué à votre ONG.",
+    "error": "Échec de la création du cas."
   },
   "detail": {
     "loading": "Chargement des détails du cas...",

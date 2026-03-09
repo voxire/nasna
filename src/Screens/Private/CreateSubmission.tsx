@@ -528,11 +528,11 @@ function CreateSubmission() {
           )}
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
-          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">
-            {t('submission.householdAndNeeds')}
-          </h2>
-          {!isCenterCase ? (
+        {!isCenterCase ? (
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
+            <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">
+              {t('submission.householdAndNeeds')}
+            </h2>
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-gray-700">
                 {t('submission.numberOfPeopleInHousehold')}
@@ -545,27 +545,28 @@ function CreateSubmission() {
                 className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
               />
             </div>
-          ) : null}
-
-          <div className="grid grid-cols-2 gap-3">
-            {(Object.keys(formData.ageRanges) as Array<keyof AgeRanges>).map((range) => (
-              <div key={range} className="space-y-1.5">
-                <Label className="text-xs font-medium text-gray-600">{`${range} (${t('submission.numberOfMembers')})`}</Label>
-                <Input
-                  type="number"
-                  value={formData.ageRanges[range]}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      ageRanges: { ...prev.ageRanges, [range]: Number(e.target.value) },
-                    }))
-                  }
-                  className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
-                />
-              </div>
-            ))}
+            <div className="grid grid-cols-2 gap-3">
+              {(Object.keys(formData.ageRanges) as Array<keyof AgeRanges>).map((range) => (
+                <div key={range} className="space-y-1.5">
+                  <Label className="text-xs font-medium text-gray-600">{`${range} (${t('submission.numberOfMembers')})`}</Label>
+                  <Input
+                    type="number"
+                    value={formData.ageRanges[range]}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        ageRanges: { ...prev.ageRanges, [range]: Number(e.target.value) },
+                      }))
+                    }
+                    className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
+        ) : null}
 
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-gray-700">
               {t('submission.needsTitle')}

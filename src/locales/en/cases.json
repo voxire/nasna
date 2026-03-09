@@ -4,6 +4,7 @@
   "feed": {
     "title": "Case Feed",
     "description": "Review new cases that match your coverage and claim the ones your team can handle.",
+    "addCase": "Add Case",
     "myCases": "My Cases",
     "coverageProfile": "Coverage Profile",
     "searchPlaceholder": "Search by household, phone, or governorate",
@@ -29,6 +30,13 @@
     "startWork": "Start work",
     "complete": "Complete",
     "cancel": "Cancel"
+  },
+  "create": {
+    "title": "Add Case",
+    "submit": "Create Case",
+    "creating": "Creating case...",
+    "success": "Case created and assigned to your NGO.",
+    "error": "Failed to create case."
   },
   "detail": {
     "loading": "Loading case details...",

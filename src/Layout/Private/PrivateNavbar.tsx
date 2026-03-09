@@ -62,7 +62,7 @@ function PrivateNavbar() {
             {[
               { href: '/ngo/submissions', label: t('header.caseFeed') },
               { href: '/ngo/my-cases', label: t('header.myCases') },
-              { href: '/ngo/add-case', label: 'Add Case' },
+              { href: '/ngo/add-case', label: t('cases.feed.addCase') },
               { href: '/ngo/profile-coverage', label: t('header.coverage') },
             ].map((item) => (
               <Button

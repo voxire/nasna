@@ -92,7 +92,7 @@ export default function Submissions() {
         </div>
         <div className="flex gap-2">
           <Button className="bg-[#12a89d] text-white hover:bg-[#0e9088]" asChild>
-            <Link to="/ngo/add-case">Add Case</Link>
+            <Link to="/ngo/add-case">{t('cases.feed.addCase')}</Link>
           </Button>
           <Button variant="outline" asChild>
             <Link to="/ngo/my-cases">{t('cases.feed.myCases')}</Link>

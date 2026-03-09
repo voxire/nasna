@@ -197,11 +197,11 @@ function CreateMemberCase() {
         ...result.data,
         emailAddress: result.data.emailAddress ?? '',
       });
-      toast.success('Case created and assigned to your NGO.');
+      toast.success(t('cases.create.success'));
       navigate('/ngo/my-cases');
     } catch (error) {
       console.error(error);
-      toast.error('Failed to create case.');
+      toast.error(t('cases.create.error'));
     } finally {
       setLoading(false);
     }
@@ -210,9 +210,9 @@ function CreateMemberCase() {
   return (
     <div className="max-w-[600px] mx-auto my-5 px-4">
       <div className="flex items-center justify-between mb-5">
-        <h1 className="text-2xl font-bold text-gray-800">Add Case</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t('cases.create.title')}</h1>
         <Button variant="outline" onClick={() => navigate('/ngo/my-cases')}>
-          My Cases
+          {t('cases.feed.myCases')}
         </Button>
       </div>
 
@@ -337,11 +337,11 @@ function CreateMemberCase() {
           )}
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
-          <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">
-            {t('submission.householdInformation')}
-          </h2>
-          {!isCenterCase ? (
+        {!isCenterCase ? (
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
+            <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">
+              {t('submission.householdAndNeeds')}
+            </h2>
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-gray-700">
                 {t('submission.numberOfPeopleInHousehold')}
@@ -357,37 +357,37 @@ function CreateMemberCase() {
                 className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
               />
             </div>
-          ) : null}
-          <div className="grid grid-cols-2 gap-3">
-            {Object.entries(formData.ageRanges).map(([range, value]) => (
-              <div key={range} className="space-y-1.5">
-                <Label className="text-sm font-medium text-gray-700">{range}</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={value}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      ageRanges: {
-                        ...prev.ageRanges,
-                        [range]: Number(e.target.value),
-                      },
-                    }))
-                  }
-                  className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
-                />
-              </div>
-            ))}
+            <div className="grid grid-cols-2 gap-3">
+              {Object.entries(formData.ageRanges).map(([range, value]) => (
+                <div key={range} className="space-y-1.5">
+                  <Label className="text-sm font-medium text-gray-700">{range}</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={value}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        ageRanges: {
+                          ...prev.ageRanges,
+                          [range]: Number(e.target.value),
+                        },
+                      }))
+                    }
+                    className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 space-y-4">
           <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">
-            {t('submission.assistanceNeeds')}
+            {t('submission.needsTitle')}
           </h2>
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">{t('submission.needs')}</Label>
+            <Label className="text-sm font-medium text-gray-700">{t('submission.needsTitle')}</Label>
             <AidTypeCheckboxGrid
               selected={formData.needs}
               onChange={(selected) => setFormData((prev) => ({ ...prev, needs: selected }))}
@@ -396,16 +396,17 @@ function CreateMemberCase() {
           </div>
           <div className="space-y-2">
             <Label className="text-sm font-medium text-gray-700">
-              {t('submission.specialNeeds')}
+              {t('submission.specialNeedsTitle')}
             </Label>
             <div className="flex gap-2">
               <Input
                 value={specialNeedInput}
                 onChange={(e) => setSpecialNeedInput(e.target.value)}
                 className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+                placeholder={t('submission.specialNeedsPlaceholder')}
               />
               <Button type="button" variant="outline" onClick={addSpecialNeed}>
-                {t('submission.add')}
+                {t('submission.addSpecialNeed')}
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -462,7 +463,7 @@ function CreateMemberCase() {
           className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white"
           disabled={loading}
         >
-          {loading ? 'Creating case...' : 'Create Case'}
+          {loading ? t('cases.create.creating') : t('cases.create.submit')}
         </Button>
       </form>
     </div>
