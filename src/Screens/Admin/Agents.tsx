@@ -51,6 +51,7 @@ function Agents() {
   const [validatedFilter, setValidatedFilter] = useState('');
   const [editAgent, setEditAgent] = useState<AgentRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const membersCollectionRef = useMemo(() => collection(db, 'members'), []);
   const agentConstraints = useMemo(() => [where('role', '==', 'agent')], []);
   const mapAgent = useCallback(
     (documentSnapshot: QueryDocumentSnapshot<DocumentData>) => ({
@@ -69,7 +70,7 @@ function Agents() {
     nextPage,
     previousPage,
   } = usePaginatedQuery<AgentRow>({
-    collectionRef: collection(db, 'members'),
+    collectionRef: membersCollectionRef,
     constraints: agentConstraints,
     orderByField: 'createdAt',
     pageSize: PAGE_SIZE,

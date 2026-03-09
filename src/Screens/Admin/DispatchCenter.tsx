@@ -77,6 +77,11 @@ export default function DispatchCenter() {
   const [ngoMembers, setNgoMembers] = useState<NgoMemberRow[]>([]);
   const [assigningNgoId, setAssigningNgoId] = useState('');
   const [saving, setSaving] = useState(false);
+  const submissionsCollectionRef = useMemo(() => collection(db, 'submissions'), []);
+  const caseConstraints = useMemo(
+    () => (statusFilter === 'all' ? [] : [where('status', '==', statusFilter)]),
+    [statusFilter],
+  );
 
   const mapCase = useCallback(
     (snapshot: QueryDocumentSnapshot<DocumentData>) => ({
@@ -96,12 +101,12 @@ export default function DispatchCenter() {
     nextPage,
     previousPage,
   } = usePaginatedQuery<DispatchCaseRow>({
-    collectionRef: collection(db, 'submissions'),
+    collectionRef: submissionsCollectionRef,
     orderByField: 'registrationDate',
     pageSize: PAGE_SIZE,
     mapDoc: mapCase,
     resetKeys: [statusFilter],
-    constraints: statusFilter === 'all' ? [] : [where('status', '==', statusFilter)],
+    constraints: caseConstraints,
   });
 
   useEffect(() => {

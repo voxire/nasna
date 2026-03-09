@@ -31,6 +31,7 @@ interface AuthState {
   profile: MemberDocument | null;
   role: UserRole | null;
   loading: boolean;
+  profileLoading: boolean;
   initialized: boolean;
   initializeAuth: () => void;
   refreshProfile: (uid?: string) => Promise<MemberDocument | null>;
@@ -84,6 +85,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   profile: null,
   role: null,
   loading: true,
+  profileLoading: false,
   initialized: false,
 
   initializeAuth: () => {
@@ -100,12 +102,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           profile: null,
           role: null,
           loading: false,
+          profileLoading: false,
           initialized: true,
         });
         return;
       }
 
       try {
+        set({
+          firebaseUser,
+          loading: false,
+          profileLoading: true,
+          initialized: true,
+        });
+
         const resolved = await resolveAuthUser(firebaseUser);
         if (currentVersion !== authResolutionVersion) return;
 
@@ -114,6 +124,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           profile: resolved.profile,
           role: resolved.role,
           loading: false,
+          profileLoading: false,
           initialized: true,
         });
       } catch {
@@ -124,6 +135,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           profile: null,
           role: null,
           loading: false,
+          profileLoading: false,
           initialized: true,
         });
       }
@@ -139,7 +151,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return null;
     }
 
-    set({ loading: true });
     try {
       const profile = await fetchProfile(targetUid);
       const claimedRole = activeUser
@@ -152,8 +163,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
 
       return profile;
-    } finally {
-      set({ loading: false });
+    } catch (error) {
+      set({
+        profile: null,
+        role: resolveRole(null, undefined),
+      });
+      throw error;
     }
   },
 
@@ -169,6 +184,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         profile: resolved.profile,
         role: resolved.role,
         loading: false,
+        profileLoading: false,
         initialized: true,
       });
 
@@ -196,6 +212,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         profile: resolved.profile,
         role: resolved.role,
         loading: false,
+        profileLoading: false,
         initialized: true,
       });
 
@@ -221,6 +238,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       profile: null,
       role: null,
       loading: false,
+      profileLoading: false,
       initialized: true,
     });
   },

@@ -83,6 +83,7 @@ function AdminSubmissions() {
     }),
     [],
   );
+  const submissionsCollectionRef = useMemo(() => collection(db, 'submissions'), []);
 
   const {
     items: submissions,
@@ -94,7 +95,7 @@ function AdminSubmissions() {
     nextPage,
     previousPage,
   } = usePaginatedQuery<SubmissionRow>({
-    collectionRef: collection(db, 'submissions'),
+    collectionRef: submissionsCollectionRef,
     orderByField: 'registrationDate',
     pageSize: PAGE_SIZE,
     mapDoc: mapSubmission,

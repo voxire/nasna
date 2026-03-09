@@ -32,7 +32,7 @@ interface UsePaginatedQueryResult<T> {
 
 export function usePaginatedQuery<T>({
   collectionRef,
-  constraints = [],
+  constraints,
   pageSize = 10,
   orderByField,
   orderDirection = 'desc',
@@ -49,6 +49,7 @@ export function usePaginatedQuery<T>({
   const [hasNextPage, setHasNextPage] = useState(false);
 
   const resetKey = useMemo(() => JSON.stringify(resetKeys), [resetKeys]);
+  const activeConstraints = useMemo(() => constraints ?? [], [constraints]);
   const pageCursor = cursorStack[page - 1] ?? null;
 
   useEffect(() => {
@@ -62,7 +63,7 @@ export function usePaginatedQuery<T>({
 
     const pageQuery = query(
       collectionRef,
-      ...constraints,
+      ...activeConstraints,
       orderBy(orderByField, orderDirection),
       ...(pageCursor ? [startAfter(pageCursor)] : []),
       limit(pageSize + 1),
@@ -100,7 +101,7 @@ export function usePaginatedQuery<T>({
     return unsubscribe;
   }, [
     collectionRef,
-    constraints,
+    activeConstraints,
     mapDoc,
     orderByField,
     orderDirection,

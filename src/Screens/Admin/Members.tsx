@@ -51,6 +51,7 @@ function Members() {
   const [validatedFilter, setValidatedFilter] = useState('');
   const [editMember, setEditMember] = useState<MemberRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const membersCollectionRef = useMemo(() => collection(db, 'members'), []);
   const memberConstraints = useMemo(() => [where('role', '==', 'member')], []);
   const mapMember = useCallback(
     (documentSnapshot: QueryDocumentSnapshot<DocumentData>) => ({
@@ -69,7 +70,7 @@ function Members() {
     nextPage,
     previousPage,
   } = usePaginatedQuery<MemberRow>({
-    collectionRef: collection(db, 'members'),
+    collectionRef: membersCollectionRef,
     constraints: memberConstraints,
     orderByField: 'createdAt',
     pageSize: PAGE_SIZE,
