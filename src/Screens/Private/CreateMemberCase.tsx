@@ -207,6 +207,13 @@ function CreateMemberCase() {
     }
   };
 
+  const renderLabel = (label: string, required = false) => (
+    <Label className="text-sm font-medium text-gray-700">
+      {label}
+      {required ? <span className="ml-1 text-red-600">*</span> : null}
+    </Label>
+  );
+
   return (
     <div className="max-w-[600px] mx-auto my-5 px-4">
       <div className="flex items-center justify-between mb-5">
@@ -227,7 +234,7 @@ function CreateMemberCase() {
             { name: 'emailAddress', label: t('submission.emailAddress'), type: 'email' },
           ].map(({ name, label, type }) => (
             <div key={name} className="space-y-1.5">
-              <Label className="text-sm font-medium text-gray-700">{label}</Label>
+              {renderLabel(label, name !== 'emailAddress')}
               <Input
                 type={type ?? 'text'}
                 value={String(formData[name as keyof SubmissionFormData] ?? '')}
@@ -238,7 +245,7 @@ function CreateMemberCase() {
             </div>
           ))}
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">{t('submission.gender')}</Label>
+            {renderLabel(t('submission.gender'), true)}
             <Select value={formData.gender} onValueChange={(v) => handleChange('gender', v)}>
               <SelectTrigger className="bg-gray-50 border-gray-200">
                 <SelectValue />
@@ -256,9 +263,7 @@ function CreateMemberCase() {
             {t('submission.locationDetails')}
           </h2>
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">
-              {t('submission.locationType')}
-            </Label>
+            {renderLabel(t('submission.locationType'), true)}
             <Select
               value={formData.locationType}
               onValueChange={(value) =>
@@ -282,9 +287,7 @@ function CreateMemberCase() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-gray-700">
-                {t('submission.previousGovernorate')}
-              </Label>
+              {renderLabel(t('submission.previousGovernorate'), true)}
               <Input
                 value={formData.previousGovernorate}
                 onChange={(e) => handleChange('previousGovernorate', e.target.value)}
@@ -296,9 +299,7 @@ function CreateMemberCase() {
           {isCenterCase ? (
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium text-gray-700">
-                  {t('submission.center')}
-                </Label>
+                {renderLabel(t('submission.center'), true)}
                 <CenterPicker
                   value={formData.centerId}
                   onValueChange={(value) => handleChange('centerId', value)}
@@ -324,7 +325,7 @@ function CreateMemberCase() {
                 { name: 'city', label: t('submission.city') },
               ].map(({ name, label }) => (
                 <div key={name} className="space-y-1.5">
-                  <Label className="text-sm font-medium text-gray-700">{label}</Label>
+                  {renderLabel(label, true)}
                   <Input
                     value={String(formData[name as keyof SubmissionFormData] ?? '')}
                     onChange={(e) => handleChange(name, e.target.value)}
@@ -343,9 +344,7 @@ function CreateMemberCase() {
               {t('submission.householdAndNeeds')}
             </h2>
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-gray-700">
-                {t('submission.numberOfPeopleInHousehold')}
-              </Label>
+              {renderLabel(t('submission.numberOfPeopleInHousehold'), true)}
               <Input
                 type="number"
                 min={0}
@@ -387,7 +386,7 @@ function CreateMemberCase() {
             {t('submission.needsTitle')}
           </h2>
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">{t('submission.needsTitle')}</Label>
+            {renderLabel(t('submission.needsTitle'), true)}
             <AidTypeCheckboxGrid
               selected={formData.needs}
               onChange={(selected) => setFormData((prev) => ({ ...prev, needs: selected }))}
@@ -421,9 +420,7 @@ function CreateMemberCase() {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">
-              {t('submission.aidUrgency')}
-            </Label>
+            {renderLabel(t('submission.aidUrgency'), true)}
             <Select
               value={formData.aidUrgency}
               onValueChange={(v) => handleChange('aidUrgency', v)}
