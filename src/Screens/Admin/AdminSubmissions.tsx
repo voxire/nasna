@@ -76,6 +76,7 @@ function AdminSubmissions() {
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
+  const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const mapSubmission = useCallback(
     (documentSnapshot: QueryDocumentSnapshot<DocumentData>) => ({
       id: documentSnapshot.id,
@@ -102,7 +103,7 @@ function AdminSubmissions() {
   });
 
   const filtered = useMemo(() => {
-    let result = submissions;
+    let result = submissions.filter((submission) => !deletedIds.includes(submission.id));
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter((submission) =>
@@ -118,7 +119,7 @@ function AdminSubmissions() {
       result = result.filter((submission) => submission.aidUrgency === urgencyFilter);
     }
     return result;
-  }, [searchQuery, submissions, urgencyFilter]);
+  }, [deletedIds, searchQuery, submissions, urgencyFilter]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -150,8 +151,10 @@ function AdminSubmissions() {
     if (!memberToDelete) return;
     try {
       await deleteDoc(doc(db, 'submissions', memberToDelete));
+      setDeletedIds((current) => [...current, memberToDelete]);
       toast.success(t('admin.submissions.deleteSuccess'));
       setConfirmDeleteOpen(false);
+      setMemberToDelete(null);
     } catch {
       toast.error(t('admin.submissions.deleteError'));
     }

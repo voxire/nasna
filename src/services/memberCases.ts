@@ -73,6 +73,37 @@ export async function claimMemberCase(submissionId: string) {
   return result.data.case;
 }
 
+export interface CreateMemberCasePayload {
+  fullName: string;
+  phoneNumber: string;
+  emailAddress: string;
+  gender: string;
+  currentGovernorate: string;
+  previousGovernorate: string;
+  street: string;
+  building: string;
+  floor: string;
+  city: string;
+  ageRanges: Record<string, number>;
+  specialNeeds: string[];
+  needs: string[];
+  aidUrgency: string;
+  consentGiven: boolean;
+  comments: string;
+  numberOfPeopleInHousehold: number;
+  locationType: string;
+  centerId: string;
+}
+
+export async function createMemberCase(payload: CreateMemberCasePayload) {
+  const callable = httpsCallable<CreateMemberCasePayload, CaseDetailResponse>(
+    functions,
+    'createMemberCase',
+  );
+  const result = await callable(payload);
+  return result.data.case;
+}
+
 export async function updateMemberCaseStatus(submissionId: string, status: string) {
   const callable = httpsCallable<{ submissionId: string; status: string }, CaseDetailResponse>(
     functions,

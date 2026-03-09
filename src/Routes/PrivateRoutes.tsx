@@ -8,6 +8,7 @@ const Submissions = lazy(() => import('../Screens/Private/Submissions'));
 const MyCases = lazy(() => import('../Screens/Private/MyCases'));
 const CaseDetail = lazy(() => import('../Screens/Private/CaseDetail'));
 const ProfileCoverage = lazy(() => import('../Screens/Private/ProfileCoverage'));
+const CreateMemberCase = lazy(() => import('../Screens/Private/CreateMemberCase'));
 const CreateSubmission = lazy(() => import('../Screens/Private/CreateSubmission'));
 const AgentSubmissions = lazy(() => import('../Screens/Private/AgentSubmissions'));
 const AgentSubmissionDetail = lazy(() => import('../Screens/Private/AgentSubmissionDetail'));
@@ -44,6 +45,18 @@ const NGORoutes: RouteConfig[] = [
         <Private>
           <LazyBoundary>
             <CaseDetail />
+          </LazyBoundary>
+        </Private>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/ngo/add-case',
+    element: (
+      <PrivateRoute allowedRoles={['member']} requireValidated>
+        <Private>
+          <LazyBoundary>
+            <CreateMemberCase />
           </LazyBoundary>
         </Private>
       </PrivateRoute>

@@ -51,9 +51,14 @@ export default function MyCases() {
           <h1 className="text-2xl font-bold text-gray-800">{t('cases.mine.title')}</h1>
           <p className="text-sm text-gray-500">{t('cases.mine.description')}</p>
         </div>
-        <Button variant="outline" asChild>
-          <Link to="/ngo/submissions">{t('cases.mine.backToFeed')}</Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button className="bg-[#12a89d] text-white hover:bg-[#0e9088]" asChild>
+            <Link to="/ngo/add-case">Add Case</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/ngo/submissions">{t('cases.mine.backToFeed')}</Link>
+          </Button>
+        </div>
       </div>
 
       {loading ? (

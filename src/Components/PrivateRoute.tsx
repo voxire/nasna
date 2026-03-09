@@ -24,12 +24,13 @@ function PrivateRoute({
   useIdleTimeout();
 
   const loading = useAuthStore((state) => state.loading);
+  const profileLoading = useAuthStore((state) => state.profileLoading);
   const initialized = useAuthStore((state) => state.initialized);
   const currentUser = useAuthStore((state) => state.firebaseUser);
   const role = useAuthStore((state) => state.role);
   const memberProfile = useAuthStore((state) => state.profile);
 
-  if (!initialized || loading) {
+  if (!initialized || loading || (currentUser && profileLoading)) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />

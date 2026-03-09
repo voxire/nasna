@@ -13,6 +13,7 @@ export {
 } from './dispatchEngine';
 export {
   claimMemberCase,
+  createMemberCase,
   getMemberCaseDetail,
   listMemberClaimedCases,
   listMemberPendingCases,

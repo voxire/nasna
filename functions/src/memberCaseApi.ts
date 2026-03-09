@@ -1,5 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { FieldValue, getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp, getApps } from 'firebase-admin/app';
 
 if (getApps().length === 0) {
@@ -76,6 +76,28 @@ interface UpdateMemberCoverageProfileRequest {
   aidTypes: string[];
   maxCaseLoad: number;
   deliveryMode: 'delivery' | 'pickup' | 'both';
+}
+
+interface CreateMemberCaseRequest {
+  fullName: string;
+  phoneNumber: string;
+  emailAddress?: string;
+  gender: string;
+  currentGovernorate: string;
+  previousGovernorate: string;
+  street: string;
+  building: string;
+  floor: string;
+  city: string;
+  ageRanges: Record<string, number>;
+  specialNeeds: string[];
+  needs: string[];
+  aidUrgency: string;
+  consentGiven: boolean;
+  comments: string;
+  numberOfPeopleInHousehold: number;
+  locationType?: string;
+  centerId?: string;
 }
 
 interface MemberCaseResponse {
@@ -479,6 +501,104 @@ export const updateMemberCoverageProfile = onCall<UpdateMemberCoverageProfileReq
 
     return {
       profile: snapshot.data(),
+    };
+  },
+);
+
+export const createMemberCase = onCall<CreateMemberCaseRequest>(
+  { region: 'europe-west1' },
+  async (request) => {
+    const uid = assertSignedIn(request.auth?.uid);
+    await getValidatedMemberProfile(uid);
+
+    const data = request.data;
+
+    if (
+      !data?.fullName ||
+      !data.phoneNumber ||
+      !data.gender ||
+      !data.currentGovernorate ||
+      !data.previousGovernorate ||
+      !data.street ||
+      !data.building ||
+      !data.floor ||
+      !data.city ||
+      !Array.isArray(data.specialNeeds) ||
+      !Array.isArray(data.needs) ||
+      !data.aidUrgency ||
+      data.consentGiven !== true ||
+      !Number.isFinite(data.numberOfPeopleInHousehold)
+    ) {
+      throw new HttpsError('invalid-argument', 'Case data is incomplete.');
+    }
+
+    const submissionRef = db.collection('submissions').doc();
+    const statsRef = db.collection('stats').doc('global');
+    const memberRef = db.collection('members').doc(uid);
+    const now = Timestamp.now();
+
+    await db.runTransaction(async (transaction) => {
+      const memberSnapshot = await transaction.get(memberRef);
+      const currentCaseLoad = Number(memberSnapshot.data()?.currentCaseLoad ?? 0);
+
+      transaction.set(submissionRef, {
+        fullName: data.fullName.trim(),
+        phoneNumber: data.phoneNumber.trim(),
+        emailAddress: data.emailAddress?.trim() ?? '',
+        gender: data.gender,
+        currentGovernorate: data.currentGovernorate.trim(),
+        previousGovernorate: data.previousGovernorate.trim(),
+        street: data.street.trim(),
+        building: data.building.trim(),
+        floor: data.floor.trim(),
+        city: data.city.trim(),
+        ageRanges: data.ageRanges ?? {},
+        specialNeeds: data.specialNeeds,
+        needs: data.needs,
+        aidUrgency: data.aidUrgency,
+        consentGiven: true,
+        comments: data.comments?.trim() ?? '',
+        numberOfPeopleInHousehold: Number(data.numberOfPeopleInHousehold),
+        registrationDate: now,
+        createdAt: now,
+        updatedAt: now,
+        agent: '',
+        status: 'assigned',
+        locationType: data.locationType ?? 'with_family',
+        centerId: data.centerId ?? '',
+        assignedTo: uid,
+        assignedAt: now,
+        aidDelivered: false,
+        lastUpdatedBy: uid,
+        staleFlagged: false,
+        source: 'web',
+      });
+
+      transaction.set(
+        memberRef,
+        {
+          currentCaseLoad: currentCaseLoad + 1,
+          updatedAt: new Date(),
+        },
+        { merge: true },
+      );
+
+      transaction.set(
+        statsRef,
+        {
+          submissionsRegistered: FieldValue.increment(1),
+          submissionsAssigned: FieldValue.increment(1),
+          updatedAt: new Date(),
+        },
+        { merge: true },
+      );
+    });
+
+    return {
+      case: sanitizeSubmission(
+        submissionRef.id,
+        (await submissionRef.get()).data() as SubmissionRecord,
+      ),
     };
   },
 );
