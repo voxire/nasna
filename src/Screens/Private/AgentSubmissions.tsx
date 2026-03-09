@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { db, auth } from '../../firebase';
+import { db } from '../../firebase';
 import { collection, onSnapshot, query, where, limit } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/Components/ui/table';
+import { useAuthStore } from '@/stores/authStore';
 
 interface SubmissionRow extends SubmissionDocument {
   id: string;
@@ -25,11 +26,29 @@ function AgentSubmissions() {
   const [submissions, setSubmissions] = useState<SubmissionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const currentUser = useAuthStore((state) => state.firebaseUser);
+  const role = useAuthStore((state) => state.role);
+  const initialized = useAuthStore((state) => state.initialized);
+  const authLoading = useAuthStore((state) => state.loading);
+  const profileLoading = useAuthStore((state) => state.profileLoading);
 
   useEffect(() => {
+    if (!initialized || authLoading || (currentUser && profileLoading)) {
+      return;
+    }
+
     setLoading(true);
-    const agentUid = auth.currentUser?.uid;
+    const agentUid = currentUser?.uid;
     if (!agentUid) {
+      navigate('/auth/login');
+      return;
+    }
+
+    if (!role) {
+      return;
+    }
+
+    if (role !== 'agent') {
       navigate('/');
       return;
     }
@@ -57,7 +76,7 @@ function AgentSubmissions() {
     );
 
     return unsubscribe;
-  }, [navigate]);
+  }, [authLoading, currentUser, initialized, navigate, profileLoading, role]);
 
   if (loading) {
     return (

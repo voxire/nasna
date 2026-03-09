@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { auth } from '@/firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import type { MemberCase } from '@/services/memberCases';
@@ -19,16 +18,22 @@ export default function Submissions() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [claimingId, setClaimingId] = useState<string | null>(null);
+  const currentUser = useAuthStore((state) => state.firebaseUser);
   const role = useAuthStore((state) => state.role);
   const loadingAuth = useAuthStore((state) => state.loading);
+  const profileLoading = useAuthStore((state) => state.profileLoading);
   const initialized = useAuthStore((state) => state.initialized);
 
   useEffect(() => {
     const loadCases = async () => {
-      if (!initialized || loadingAuth) return;
+      if (!initialized || loadingAuth || (currentUser && profileLoading)) return;
 
-      if (!auth.currentUser?.uid) {
+      if (!currentUser?.uid) {
         navigate('/auth/login');
+        return;
+      }
+
+      if (!role) {
         return;
       }
 
@@ -52,7 +57,7 @@ export default function Submissions() {
     };
 
     void loadCases();
-  }, [initialized, loadingAuth, navigate, role]);
+  }, [currentUser, initialized, loadingAuth, navigate, profileLoading, role]);
 
   const filteredCases = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -141,12 +146,14 @@ export default function Submissions() {
                     <p className="text-gray-500">{t('cases.feed.urgency')}</p>
                     <p className="font-medium text-gray-900">{memberCase.aidUrgency}</p>
                   </div>
-                  <div>
-                    <p className="text-gray-500">{t('cases.feed.householdSize')}</p>
-                    <p className="font-medium text-gray-900">
-                      {memberCase.numberOfPeopleInHousehold}
-                    </p>
-                  </div>
+                  {memberCase.locationType !== 'center' ? (
+                    <div>
+                      <p className="text-gray-500">{t('cases.feed.householdSize')}</p>
+                      <p className="font-medium text-gray-900">
+                        {memberCase.numberOfPeopleInHousehold}
+                      </p>
+                    </div>
+                  ) : null}
                   <div className="col-span-2">
                     <p className="text-gray-500">{t('cases.feed.needs')}</p>
                     <p className="font-medium text-gray-900">

@@ -162,10 +162,12 @@ export default function AgentSubmissionDetail() {
                 label={t('submission.agent.detail.registrationDate')}
                 value={submission.registrationDate?.toDate().toLocaleDateString()}
               />
-              <DetailField
-                label={t('submission.agent.detail.household')}
-                value={String(submission.numberOfPeopleInHousehold)}
-              />
+              {submission.locationType !== 'center' ? (
+                <DetailField
+                  label={t('submission.agent.detail.household')}
+                  value={String(submission.numberOfPeopleInHousehold)}
+                />
+              ) : null}
               {submission.phoneNumber && (
                 <div>
                   <p className="text-xs uppercase tracking-wide text-gray-500">

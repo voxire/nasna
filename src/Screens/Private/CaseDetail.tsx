@@ -111,12 +111,14 @@ export default function CaseDetail() {
                 </p>
                 <p className="text-sm text-gray-900">{memberCase.aidUrgency}</p>
               </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500">
-                  {t('cases.detail.householdSize')}
-                </p>
-                <p className="text-sm text-gray-900">{memberCase.numberOfPeopleInHousehold}</p>
-              </div>
+              {memberCase.locationType !== 'center' ? (
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-gray-500">
+                    {t('cases.detail.householdSize')}
+                  </p>
+                  <p className="text-sm text-gray-900">{memberCase.numberOfPeopleInHousehold}</p>
+                </div>
+              ) : null}
               <div className="md:col-span-2">
                 <p className="text-xs uppercase tracking-wide text-gray-500">
                   {t('cases.detail.comments')}

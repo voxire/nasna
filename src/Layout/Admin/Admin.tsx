@@ -13,11 +13,12 @@ interface AdminProps {
 
 function Admin({ children }: AdminProps) {
   const loading = useAuthStore((state) => state.loading);
+  const profileLoading = useAuthStore((state) => state.profileLoading);
   const initialized = useAuthStore((state) => state.initialized);
   const user = useAuthStore((state) => state.firebaseUser);
   const role = useAuthStore((state) => state.role);
 
-  if (!initialized || loading) {
+  if (!initialized || loading || (user && profileLoading)) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />

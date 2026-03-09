@@ -312,12 +312,14 @@ function AdminSubmissions() {
                     <TableCell>{member.building}</TableCell>
                     <TableCell>{member.floor}</TableCell>
                     <TableCell className="text-xs">
-                      {member.ageRanges && typeof member.ageRanges === 'object'
-                        ? Object.entries(member.ageRanges)
-                            .filter(([, v]) => Number(v) > 0)
-                            .map(([range, count]) => `${range}: ${count}`)
-                            .join(', ') || '—'
-                        : '—'}
+                      {member.locationType === 'center'
+                        ? '—'
+                        : member.ageRanges && typeof member.ageRanges === 'object'
+                          ? Object.entries(member.ageRanges)
+                              .filter(([, v]) => Number(v) > 0)
+                              .map(([range, count]) => `${range}: ${count}`)
+                              .join(', ') || '—'
+                          : '—'}
                     </TableCell>
                     <TableCell>{member.specialNeeds?.join(', ') || ''}</TableCell>
                     <TableCell>{member.needs?.join(', ') || ''}</TableCell>

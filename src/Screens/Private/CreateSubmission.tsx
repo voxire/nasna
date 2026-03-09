@@ -455,6 +455,8 @@ function CreateSubmission() {
                   ...prev,
                   locationType: value as LocationType,
                   centerId: '',
+                  numberOfPeopleInHousehold:
+                    value === 'center' ? 0 : prev.numberOfPeopleInHousehold,
                 }))
               }
             >
@@ -530,18 +532,20 @@ function CreateSubmission() {
           <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">
             {t('submission.householdAndNeeds')}
           </h2>
-          <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-gray-700">
-              {t('submission.numberOfPeopleInHousehold')}
-            </Label>
-            <Input
-              type="number"
-              value={formData.numberOfPeopleInHousehold}
-              onChange={(e) => handleChange('numberOfPeopleInHousehold', Number(e.target.value))}
-              required
-              className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
-            />
-          </div>
+          {!isCenterCase ? (
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-gray-700">
+                {t('submission.numberOfPeopleInHousehold')}
+              </Label>
+              <Input
+                type="number"
+                value={formData.numberOfPeopleInHousehold}
+                onChange={(e) => handleChange('numberOfPeopleInHousehold', Number(e.target.value))}
+                required
+                className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+              />
+            </div>
+          ) : null}
 
           <div className="grid grid-cols-2 gap-3">
             {(Object.keys(formData.ageRanges) as Array<keyof AgeRanges>).map((range) => (

@@ -326,15 +326,17 @@ function Home() {
 
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-4 space-y-4">
         <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.householdInformation')}</h2>
-        <div className="space-y-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t('home.numberOfPeopleInHousehold')}</Label>
-          <Input
-            type="number"
-            value={numberOfPeopleInHousehold}
-            onChange={(e) => setNumberOfPeopleInHousehold(Number(e.target.value))}
-            className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
-          />
-        </div>
+        {!isCenterCase ? (
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-700">{t('home.numberOfPeopleInHousehold')}</Label>
+            <Input
+              type="number"
+              value={numberOfPeopleInHousehold}
+              onChange={(e) => setNumberOfPeopleInHousehold(Number(e.target.value))}
+              className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+            />
+          </div>
+        ) : null}
         <p className="text-sm font-semibold text-gray-700">{t('home.ageRanges')}</p>
         <div className="grid grid-cols-2 gap-3">
           {(Object.keys(ageRanges) as Array<keyof AgeRanges>).map((range) => (
