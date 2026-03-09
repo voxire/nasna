@@ -240,7 +240,7 @@ function assertAllowedStatusTransition(current: SubmissionStatus, next: Submissi
     assigned: ['in_progress', 'completed', 'cancelled'],
     in_progress: ['completed', 'cancelled'],
     completed: [],
-    cancelled: [],
+    cancelled: ['assigned'],
   };
 
   if (!transitions[current].includes(next)) {

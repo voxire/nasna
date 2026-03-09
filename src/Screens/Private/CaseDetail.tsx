@@ -32,7 +32,9 @@ export default function CaseDetail() {
     void loadCase();
   }, [caseId]);
 
-  const handleStatusChange = async (status: 'in_progress' | 'completed' | 'cancelled') => {
+  const handleStatusChange = async (
+    status: 'assigned' | 'in_progress' | 'completed' | 'cancelled',
+  ) => {
     if (!caseId) return;
     const updatedCase = await updateMemberCaseStatus(caseId, status);
     setMemberCase(updatedCase);
@@ -135,6 +137,11 @@ export default function CaseDetail() {
           <AidDeliveryForm onSubmit={handleRecordAid} />
 
           <div className="flex flex-wrap gap-2">
+            {memberCase.status === 'cancelled' ? (
+              <Button variant="outline" onClick={() => void handleStatusChange('assigned')}>
+                {t('cases.detail.reopenCase')}
+              </Button>
+            ) : null}
             <Button
               variant="outline"
               onClick={() => void handleStatusChange('in_progress')}

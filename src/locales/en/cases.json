@@ -27,6 +27,7 @@
     "empty": "You have not claimed any cases yet.",
     "noNotes": "No notes yet.",
     "cancelledNote": "This case is cancelled and remains in your case list for record keeping.",
+    "reopen": "Reopen",
     "openCase": "Open case",
     "startWork": "Start work",
     "complete": "Complete",
@@ -54,6 +55,7 @@
     "markInProgress": "Mark In Progress",
     "markCompleted": "Mark Completed",
     "cancelCase": "Cancel Case",
+    "reopenCase": "Reopen Case",
     "timeline": "Timeline"
   }
 }

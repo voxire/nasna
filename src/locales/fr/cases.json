@@ -27,6 +27,7 @@
     "empty": "Vous n'avez encore réclamé aucun cas.",
     "noNotes": "Pas encore de notes.",
     "cancelledNote": "Ce cas est annulé et reste visible dans votre liste pour le suivi.",
+    "reopen": "Rouvrir",
     "openCase": "Ouvrir le cas",
     "startWork": "Commencer le travail",
     "complete": "Terminer",
@@ -54,6 +55,7 @@
     "markInProgress": "Marquer en cours",
     "markCompleted": "Marquer terminé",
     "cancelCase": "Annuler le cas",
+    "reopenCase": "Rouvrir le cas",
     "timeline": "Chronologie"
   }
 }

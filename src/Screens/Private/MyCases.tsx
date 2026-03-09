@@ -31,7 +31,7 @@ export default function MyCases() {
 
   const handleStatusChange = async (
     caseId: string,
-    status: 'in_progress' | 'completed' | 'cancelled',
+    status: 'assigned' | 'in_progress' | 'completed' | 'cancelled',
   ) => {
     try {
       const updatedCase = await updateMemberCaseStatus(caseId, status);
@@ -98,6 +98,14 @@ export default function MyCases() {
                   <Button variant="outline" asChild>
                     <Link to={`/ngo/cases/${memberCase.id}`}>{t('cases.mine.openCase')}</Link>
                   </Button>
+                  {memberCase.status === 'cancelled' ? (
+                    <Button
+                      variant="outline"
+                      onClick={() => void handleStatusChange(memberCase.id, 'assigned')}
+                    >
+                      {t('cases.mine.reopen')}
+                    </Button>
+                  ) : null}
                   <Button
                     variant="outline"
                     onClick={() => void handleStatusChange(memberCase.id, 'in_progress')}
