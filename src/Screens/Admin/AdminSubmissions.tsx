@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { db } from '../../firebase';
 import {
@@ -6,6 +6,7 @@ import {
   doc,
   type DocumentData,
   deleteDoc,
+  getDoc,
   type QueryDocumentSnapshot,
   updateDoc,
 } from 'firebase/firestore';
@@ -68,6 +69,7 @@ function AdminSubmissions() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [urgencyFilter, setUrgencyFilter] = useState('');
+  const [assignedNgoNames, setAssignedNgoNames] = useState<Record<string, string>>({});
   const [editMember, setEditMember] = useState<EditState>({
     ageRanges: {},
     specialNeeds: [],
@@ -102,6 +104,46 @@ function AdminSubmissions() {
     mapDoc: mapSubmission,
   });
 
+  useEffect(() => {
+    const assignedNgoIds = Array.from(
+      new Set(
+        submissions
+          .map((submission) => submission.assignedTo?.trim() ?? '')
+          .filter((assignedTo) => assignedTo.length > 0),
+      ),
+    );
+
+    if (assignedNgoIds.length === 0) {
+      setAssignedNgoNames({});
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadAssignedNgoNames = async () => {
+      const names = await Promise.all(
+        assignedNgoIds.map(async (ngoId) => {
+          const snapshot = await getDoc(doc(db, 'members', ngoId));
+          const ngoName =
+            snapshot.exists() && typeof snapshot.data().name === 'string'
+              ? snapshot.data().name
+              : ngoId;
+          return [ngoId, ngoName] as const;
+        }),
+      );
+
+      if (!cancelled) {
+        setAssignedNgoNames(Object.fromEntries(names));
+      }
+    };
+
+    void loadAssignedNgoNames();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [submissions]);
+
   const filtered = useMemo(() => {
     let result = submissions.filter((submission) => !deletedIds.includes(submission.id));
     if (searchQuery) {
@@ -112,6 +154,7 @@ function AdminSubmissions() {
           submission.phoneNumber,
           submission.emailAddress,
           submission.currentGovernorate,
+          submission.assignedTo ? assignedNgoNames[submission.assignedTo] ?? submission.assignedTo : '',
         ].some((field) => (field ?? '').toLowerCase().includes(q)),
       );
     }
@@ -119,7 +162,7 @@ function AdminSubmissions() {
       result = result.filter((submission) => submission.aidUrgency === urgencyFilter);
     }
     return result;
-  }, [deletedIds, searchQuery, submissions, urgencyFilter]);
+  }, [assignedNgoNames, deletedIds, searchQuery, submissions, urgencyFilter]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -289,6 +332,9 @@ function AdminSubmissions() {
                     {t('admin.submissions.aidUrgency')}
                   </TableHead>
                   <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.assignedNgo')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
                     {t('admin.submissions.comments')}
                   </TableHead>
                   <TableHead className="font-semibold text-gray-700">
@@ -335,6 +381,11 @@ function AdminSubmissions() {
                       >
                         {member.aidUrgency}
                       </span>
+                    </TableCell>
+                    <TableCell>
+                      {member.assignedTo
+                        ? assignedNgoNames[member.assignedTo] ?? member.assignedTo
+                        : '—'}
                     </TableCell>
                     <TableCell>{member.comments}</TableCell>
                     <TableCell>{member.registrationDate?.toDate().toLocaleDateString()}</TableCell>
