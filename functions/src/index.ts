@@ -1,4 +1,5 @@
 export { checkSubmissionDuplicates } from './checkSubmissionDuplicates';
+export { createManagedUser } from './adminUserManagement';
 export { getOperationsMapData } from './operationsMapApi';
 export { createDonationCheckoutSession } from './payments';
 export {

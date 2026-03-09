@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner';
 import type { MemberDocument } from '../../types';
 import { Button } from '@/Components/ui/button';
+import { Checkbox } from '@/Components/ui/checkbox';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import {
@@ -33,11 +34,13 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from '@/Components/ui/dialog';
 import { usePaginatedQuery } from '@/hooks/usePaginatedQuery';
+import { createManagedUser as createManagedUserAccount } from '@/services/adminUsers';
 
 const PAGE_SIZE = 10;
 
@@ -51,6 +54,16 @@ function Agents() {
   const [validatedFilter, setValidatedFilter] = useState('');
   const [editAgent, setEditAgent] = useState<AgentRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newAgent, setNewAgent] = useState({
+    name: '',
+    email: '',
+    phoneNumber: '',
+    areaOfOperation: '',
+    password: '',
+    validateImmediately: true,
+  });
   const membersCollectionRef = useMemo(() => collection(db, 'members'), []);
   const agentConstraints = useMemo(() => [where('role', '==', 'agent')], []);
   const mapAgent = useCallback(
@@ -147,6 +160,47 @@ function Agents() {
     }
   };
 
+  const handleCreateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewAgent((previous) => ({ ...previous, [name]: value }));
+  };
+
+  const resetCreateForm = () => {
+    setNewAgent({
+      name: '',
+      email: '',
+      phoneNumber: '',
+      areaOfOperation: '',
+      password: '',
+      validateImmediately: true,
+    });
+  };
+
+  const handleCreateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+
+    try {
+      await createManagedUserAccount({
+        role: 'agent',
+        name: newAgent.name,
+        email: newAgent.email,
+        phoneNumber: newAgent.phoneNumber,
+        areaOfOperation: newAgent.areaOfOperation,
+        password: newAgent.password,
+        validateImmediately: newAgent.validateImmediately,
+      });
+      toast.success('Agent account created.');
+      setCreateModalOpen(false);
+      resetCreateForm();
+    } catch (error) {
+      console.error('Error creating agent: ', error);
+      toast.error('Failed to create agent account.');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const editFormFields = useMemo(
     () => [
       { name: 'name', label: t('admin.agents.name') },
@@ -159,7 +213,15 @@ function Agents() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-5 text-gray-800">{t('admin.agents.title')}</h1>
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold text-gray-800">{t('admin.agents.title')}</h1>
+        <Button
+          className="bg-[#12a89d] hover:bg-[#0e9088]"
+          onClick={() => setCreateModalOpen(true)}
+        >
+          Create Agent
+        </Button>
+      </div>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4 flex gap-3 flex-wrap">
         <Input
@@ -284,6 +346,85 @@ function Agents() {
           </div>
         </div>
       )}
+
+      <Dialog
+        open={createModalOpen}
+        onOpenChange={(open) => {
+          setCreateModalOpen(open);
+          if (!open) resetCreateForm();
+        }}
+      >
+        <DialogContent className="max-w-[440px]">
+          <DialogHeader>
+            <DialogTitle>Create Agent</DialogTitle>
+            <DialogDescription>
+              This creates both the Firebase Auth account and the agent profile.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateSubmit} className="space-y-3">
+            <div className="space-y-1">
+              <Label>Full name</Label>
+              <Input name="name" value={newAgent.name} onChange={handleCreateChange} required />
+            </div>
+            <div className="space-y-1">
+              <Label>Email</Label>
+              <Input
+                type="email"
+                name="email"
+                value={newAgent.email}
+                onChange={handleCreateChange}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>Phone number</Label>
+              <Input
+                name="phoneNumber"
+                value={newAgent.phoneNumber}
+                onChange={handleCreateChange}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>Area of operation</Label>
+              <Input
+                name="areaOfOperation"
+                value={newAgent.areaOfOperation}
+                onChange={handleCreateChange}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>Temporary password</Label>
+              <Input
+                type="password"
+                name="password"
+                value={newAgent.password}
+                onChange={handleCreateChange}
+                minLength={6}
+                required
+              />
+            </div>
+            <label className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 text-sm">
+              <Checkbox
+                checked={newAgent.validateImmediately}
+                onCheckedChange={(checked) =>
+                  setNewAgent((previous) => ({
+                    ...previous,
+                    validateImmediately: checked === true,
+                  }))
+                }
+              />
+              Validate this agent immediately
+            </label>
+            <DialogFooter>
+              <Button type="submit" disabled={creating}>
+                {creating ? 'Creating...' : 'Create Agent'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={modalOpen}
