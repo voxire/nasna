@@ -14,7 +14,6 @@ import {
 } from 'firebase/firestore';
 import type { CenterDocument } from '@/types';
 import { Button } from '@/Components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Checkbox } from '@/Components/ui/checkbox';
 import {
   Dialog,
@@ -25,6 +24,14 @@ import {
 } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/Components/ui/table';
 import { toast } from 'sonner';
 import { QrCode } from 'lucide-react';
 import WhatsAppQRCode from '@/Components/WhatsAppQRCode';
@@ -161,81 +168,120 @@ export default function CenterManagement() {
         className="bg-white"
       />
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {filteredCenters.map((center) => {
-          const available = Math.max(
-            0,
-            Number(center.capacity ?? 0) - Number(center.occupiedCapacity ?? 0),
-          );
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50 hover:bg-gray-50">
+              <TableHead className="font-semibold text-gray-700">
+                {t('admin.centers.name')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('admin.centers.city')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('admin.centers.address')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('admin.centers.capacity')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('admin.centers.contactName')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('admin.centers.status')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('admin.centers.actions')}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredCenters.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="py-12 text-center text-gray-500">
+                  {t('admin.centers.empty')}
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredCenters.map((center) => {
+                const available = Math.max(
+                  0,
+                  Number(center.capacity ?? 0) - Number(center.occupiedCapacity ?? 0),
+                );
 
-          return (
-            <Card key={center.id}>
-              <CardHeader className="space-y-2">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <CardTitle className="text-lg">{center.name}</CardTitle>
-                    <p className="text-sm text-gray-500">
-                      {center.city}, {center.governorate}
-                    </p>
-                  </div>
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                      center.active
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {center.active ? t('admin.centers.active') : t('admin.centers.inactive')}
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1 text-sm text-gray-600">
-                  <p>{center.address}</p>
-                  <p>
-                    {`${t('admin.centers.capacity')} ${center.occupiedCapacity}/${center.capacity} · ${available} ${t('admin.centers.available')}`}
-                  </p>
-                  <p>
-                    {center.contactName || t('admin.centers.noContactName')} ·{' '}
-                    {center.contactPhone || t('admin.centers.noPhone')}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setQrCenter(center)}
-                    title={t('admin.centers.qrCode')}
-                  >
-                    <QrCode className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setEditingCenter(center);
-                      setFormState({
-                        name: center.name,
-                        governorate: center.governorate,
-                        city: center.city,
-                        address: center.address,
-                        capacity: Number(center.capacity ?? 0),
-                        occupiedCapacity: Number(center.occupiedCapacity ?? 0),
-                        contactName: center.contactName ?? '',
-                        contactPhone: center.contactPhone ?? '',
-                        active: Boolean(center.active),
-                      });
-                    }}
-                  >
-                    {t('admin.centers.edit')}
-                  </Button>
-                  <Button variant="destructive" onClick={() => void handleDelete(center.id)}>
-                    {t('admin.centers.delete')}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                return (
+                  <TableRow key={center.id} className="hover:bg-gray-50">
+                    <TableCell className="font-medium">
+                      <div>
+                        <p>{center.name}</p>
+                        <p className="text-xs text-gray-500">{center.governorate}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>{center.city}</TableCell>
+                    <TableCell className="max-w-[260px] truncate">{center.address}</TableCell>
+                    <TableCell>
+                      {center.occupiedCapacity}/{center.capacity}
+                      <span className="ml-1 text-xs text-gray-500">
+                        · {available} {t('admin.centers.available')}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <p>{center.contactName || t('admin.centers.noContactName')}</p>
+                        <p className="text-xs text-gray-500">
+                          {center.contactPhone || t('admin.centers.noPhone')}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                          center.active
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {center.active ? t('admin.centers.active') : t('admin.centers.inactive')}
+                      </span>
+                    </TableCell>
+                    <TableCell className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setQrCenter(center)}
+                        title={t('admin.centers.qrCode')}
+                      >
+                        <QrCode className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setEditingCenter(center);
+                          setFormState({
+                            name: center.name,
+                            governorate: center.governorate,
+                            city: center.city,
+                            address: center.address,
+                            capacity: Number(center.capacity ?? 0),
+                            occupiedCapacity: Number(center.occupiedCapacity ?? 0),
+                            contactName: center.contactName ?? '',
+                            contactPhone: center.contactPhone ?? '',
+                            active: Boolean(center.active),
+                          });
+                        }}
+                      >
+                        {t('admin.centers.edit')}
+                      </Button>
+                      <Button variant="destructive" onClick={() => void handleDelete(center.id)}>
+                        {t('admin.centers.delete')}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       <Dialog

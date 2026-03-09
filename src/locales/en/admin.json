@@ -216,6 +216,7 @@
     "inactive": "Inactive",
     "capacity": "Capacity",
     "available": "available",
+    "empty": "No centers matched the current search.",
     "noContactName": "No contact name",
     "noPhone": "No phone",
     "edit": "Edit",
