@@ -91,6 +91,9 @@ export default function MyCases() {
                 <p className="text-sm text-gray-600">
                   {memberCase.comments || t('cases.mine.noNotes')}
                 </p>
+                {memberCase.status === 'cancelled' ? (
+                  <p className="text-sm font-medium text-rose-700">{t('cases.mine.cancelledNote')}</p>
+                ) : null}
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outline" asChild>
                     <Link to={`/ngo/cases/${memberCase.id}`}>{t('cases.mine.openCase')}</Link>
@@ -98,18 +101,21 @@ export default function MyCases() {
                   <Button
                     variant="outline"
                     onClick={() => void handleStatusChange(memberCase.id, 'in_progress')}
+                    disabled={memberCase.status === 'completed' || memberCase.status === 'cancelled'}
                   >
                     {t('cases.mine.startWork')}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => void handleStatusChange(memberCase.id, 'completed')}
+                    disabled={memberCase.status === 'completed' || memberCase.status === 'cancelled'}
                   >
                     {t('cases.mine.complete')}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => void handleStatusChange(memberCase.id, 'cancelled')}
+                    disabled={memberCase.status === 'completed' || memberCase.status === 'cancelled'}
                   >
                     {t('cases.mine.cancel')}
                   </Button>

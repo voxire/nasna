@@ -65,6 +65,8 @@ export default function CaseDetail() {
     );
   }
 
+  const isTerminal = memberCase.status === 'completed' || memberCase.status === 'cancelled';
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -133,16 +135,25 @@ export default function CaseDetail() {
           <AidDeliveryForm onSubmit={handleRecordAid} />
 
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={() => void handleStatusChange('in_progress')}>
+            <Button
+              variant="outline"
+              onClick={() => void handleStatusChange('in_progress')}
+              disabled={isTerminal}
+            >
               {t('cases.detail.markInProgress')}
             </Button>
             <Button
               className="bg-[#12a89d] text-white hover:bg-[#0e9088]"
               onClick={() => void handleStatusChange('completed')}
+              disabled={isTerminal}
             >
               {t('cases.detail.markCompleted')}
             </Button>
-            <Button variant="outline" onClick={() => void handleStatusChange('cancelled')}>
+            <Button
+              variant="outline"
+              onClick={() => void handleStatusChange('cancelled')}
+              disabled={isTerminal}
+            >
               {t('cases.detail.cancelCase')}
             </Button>
           </div>
