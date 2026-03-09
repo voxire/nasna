@@ -20,6 +20,7 @@
   "medium": "Medium",
   "low": "Low",
   "comments": "Comments",
+  "commentsCharCounter": "{{remaining}} / {{max}} characters remaining",
   "mySubmissions": "My Submissions",
   "personalInformation": "Personal Information",
   "locationDetails": "Location Details",

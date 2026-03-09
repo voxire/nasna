@@ -63,7 +63,7 @@ const baseSubmissionSchema = z.object({
   needs: z.array(z.string()),
   aidUrgency: z.enum(['High', 'Medium', 'Low']),
   consentGiven: z.literal(true, { error: 'Consent is required' }),
-  comments: z.string(),
+  comments: z.string().max(500),
   numberOfPeopleInHousehold: z.number().min(0),
 });
 
@@ -643,8 +643,18 @@ function CreateSubmission() {
               value={formData.comments}
               onChange={(e) => handleChange('comments', e.target.value)}
               rows={4}
+              maxLength={500}
               className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d] resize-none"
             />
+            <p
+              className={`text-xs text-end ${500 - formData.comments.length < 50 ? 'text-red-500' : 'text-gray-400'}`}
+              aria-label={t('submission.commentsCharCounter', {
+                remaining: 500 - formData.comments.length,
+                max: 500,
+              })}
+            >
+              {500 - formData.comments.length} / 500
+            </p>
           </div>
 
           <div className="flex items-start gap-2 bg-gray-50 rounded-lg p-3">
