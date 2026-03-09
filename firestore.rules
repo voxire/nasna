@@ -9,16 +9,33 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function authProfile() {
+      return get(/databases/$(database)/documents/members/$(request.auth.uid)).data;
+    }
+
     function isAdmin() {
-      return isSignedIn() && request.auth.token.role == 'admin';
+      return isSignedIn()
+        && (
+          request.auth.token.role == 'admin'
+          || authProfile().isAdmin == true
+          || authProfile().role == 'admin'
+        );
     }
 
     function isAgent() {
-      return isSignedIn() && request.auth.token.role == 'agent';
+      return isSignedIn()
+        && (
+          request.auth.token.role == 'agent'
+          || authProfile().role == 'agent'
+        );
     }
 
     function isMember() {
-      return isSignedIn() && request.auth.token.role == 'member';
+      return isSignedIn()
+        && (
+          request.auth.token.role == 'member'
+          || authProfile().role == 'member'
+        );
     }
 
     function isValidatedMember() {
