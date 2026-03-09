@@ -3,5 +3,8 @@
   "goBack": "Go Back",
   "offlineBanner": "You are offline. Changes will sync automatically when you reconnect.",
   "syncingBanner": "Syncing... Do not close this tab.",
-  "loading": "Loading"
+  "loading": "Loading",
+  "errorTitle": "Something went wrong",
+  "errorDescription": "Please refresh the page and try again.",
+  "errorRefresh": "Refresh"
 }

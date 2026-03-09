@@ -3,5 +3,8 @@
   "goBack": "Retour",
   "offlineBanner": "Vous êtes hors ligne. Les modifications seront synchronisées à la reconnexion.",
   "syncingBanner": "Synchronisation... Ne fermez pas cet onglet.",
-  "loading": "Chargement"
+  "loading": "Chargement",
+  "errorTitle": "Une erreur s'est produite",
+  "errorDescription": "Veuillez actualiser la page et réessayer.",
+  "errorRefresh": "Actualiser"
 }
