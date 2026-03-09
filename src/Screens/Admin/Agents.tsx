@@ -41,6 +41,7 @@ import {
 } from '@/Components/ui/dialog';
 import { usePaginatedQuery } from '@/hooks/usePaginatedQuery';
 import { createManagedUser as createManagedUserAccount } from '@/services/adminUsers';
+import ConfirmDialog from '@/Components/ConfirmDialog';
 
 const PAGE_SIZE = 10;
 
@@ -56,6 +57,7 @@ function Agents() {
   const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [deletingAgentId, setDeletingAgentId] = useState<string | null>(null);
   const [newAgent, setNewAgent] = useState({
     name: '',
     email: '',
@@ -114,11 +116,12 @@ function Agents() {
     setValidatedFilter(value);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm(t('admin.agents.deleteConfirm'))) return;
+  const handleDelete = async () => {
+    if (!deletingAgentId) return;
     try {
-      await deleteDoc(doc(db, 'members', id));
+      await deleteDoc(doc(db, 'members', deletingAgentId));
       toast.success(t('admin.agents.deleteSuccess'));
+      setDeletingAgentId(null);
     } catch (error) {
       console.error('Error deleting agent: ', error);
       toast.error(t('admin.agents.deleteError'));
@@ -313,7 +316,7 @@ function Agents() {
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => handleDelete(agent.id)}
+                          onClick={() => setDeletingAgentId(agent.id)}
                         >
                           {t('admin.agents.delete')}
                         </Button>
@@ -425,6 +428,19 @@ function Agents() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={deletingAgentId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeletingAgentId(null);
+        }}
+        title={t('admin.agents.delete')}
+        description={t('admin.agents.deleteConfirm')}
+        confirmLabel={t('admin.agents.delete')}
+        cancelLabel="Cancel"
+        destructive
+        onConfirm={handleDelete}
+      />
 
       <Dialog
         open={modalOpen}

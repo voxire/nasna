@@ -36,6 +36,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/Components/ui/dialog';
+import ConfirmDialog from '@/Components/ConfirmDialog';
 
 const PAGE_SIZE = 10;
 
@@ -58,6 +59,7 @@ function FeedbackManagement() {
   const [typeFilter, setTypeFilter] = useState('');
   const [readFilter, setReadFilter] = useState('');
   const [viewItem, setViewItem] = useState<FeedbackRow | null>(null);
+  const [deletingFeedbackId, setDeletingFeedbackId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
   const typeLabels: Record<string, string> = {
@@ -128,14 +130,15 @@ function FeedbackManagement() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm(t('admin.feedbackMgmt.deleteConfirm'))) return;
+  const handleDelete = async () => {
+    if (!deletingFeedbackId) return;
     try {
-      await deleteDoc(doc(db, 'feedback', id));
-      const updated = items.filter((f) => f.id !== id);
+      await deleteDoc(doc(db, 'feedback', deletingFeedbackId));
+      const updated = items.filter((f) => f.id !== deletingFeedbackId);
       setItems(updated);
       applyFilters(searchQuery, typeFilter, readFilter, updated);
       toast.success(t('admin.feedbackMgmt.deleteSuccess'));
+      setDeletingFeedbackId(null);
     } catch {
       toast.error(t('admin.feedbackMgmt.deleteError'));
     }
@@ -261,7 +264,11 @@ function FeedbackManagement() {
                         {t('admin.feedbackMgmt.markRead')}
                       </Button>
                     )}
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(item.id)}>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setDeletingFeedbackId(item.id)}
+                    >
                       {t('admin.feedbackMgmt.delete')}
                     </Button>
                   </TableCell>
@@ -324,6 +331,19 @@ function FeedbackManagement() {
           </p>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={deletingFeedbackId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeletingFeedbackId(null);
+        }}
+        title={t('admin.feedbackMgmt.delete')}
+        description={t('admin.feedbackMgmt.deleteConfirm')}
+        confirmLabel={t('admin.feedbackMgmt.delete')}
+        cancelLabel="Cancel"
+        destructive
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

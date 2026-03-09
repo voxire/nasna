@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/Components/ui/table';
+import ConfirmDialog from '@/Components/ConfirmDialog';
 
 const PAGE_SIZE = 10;
 
@@ -46,6 +47,7 @@ function OffersManagement() {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [page, setPage] = useState(1);
+  const [deletingOfferId, setDeletingOfferId] = useState<string | null>(null);
 
   const typeLabels: Record<string, string> = {
     Shelter: t('admin.offers.shelter'),
@@ -99,14 +101,15 @@ function OffersManagement() {
     applyFilters(searchQuery, v, items);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm(t('admin.offers.deleteConfirm'))) return;
+  const handleDelete = async () => {
+    if (!deletingOfferId) return;
     try {
-      await deleteDoc(doc(db, 'offers', id));
-      const updated = items.filter((o) => o.id !== id);
+      await deleteDoc(doc(db, 'offers', deletingOfferId));
+      const updated = items.filter((o) => o.id !== deletingOfferId);
       setItems(updated);
       applyFilters(searchQuery, typeFilter, updated);
       toast.success(t('admin.offers.deleteSuccess'));
+      setDeletingOfferId(null);
     } catch {
       toast.error(t('admin.offers.deleteError'));
     }
@@ -193,7 +196,11 @@ function OffersManagement() {
                     {item.createdAt?.toDate().toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(item.id)}>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setDeletingOfferId(item.id)}
+                    >
                       {t('admin.offers.delete')}
                     </Button>
                   </TableCell>
@@ -232,6 +239,19 @@ function OffersManagement() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={deletingOfferId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeletingOfferId(null);
+        }}
+        title={t('admin.offers.delete')}
+        description={t('admin.offers.deleteConfirm')}
+        confirmLabel={t('admin.offers.delete')}
+        cancelLabel="Cancel"
+        destructive
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }
