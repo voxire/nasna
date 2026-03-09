@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import Admin from '../Layout/Admin/Admin';
+import LazyBoundary from '../Components/LazyBoundary';
 import type { RouteConfig } from '../types';
 
 const Dashboard = lazy(() => import('../Screens/Admin/Dashboard'));
@@ -22,7 +23,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage',
     element: (
       <Admin>
-        <Dashboard />
+        <LazyBoundary>
+          <Dashboard />
+        </LazyBoundary>
       </Admin>
     ),
   },
@@ -30,7 +33,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/dispatch',
     element: (
       <Admin>
-        <DispatchCenter />
+        <LazyBoundary>
+          <DispatchCenter />
+        </LazyBoundary>
       </Admin>
     ),
   },
@@ -38,7 +43,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/centers',
     element: (
       <Admin>
-        <CenterManagement />
+        <LazyBoundary>
+          <CenterManagement />
+        </LazyBoundary>
       </Admin>
     ),
   },
@@ -46,7 +53,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/housing',
     element: (
       <Admin>
-        <HousingReview />
+        <LazyBoundary>
+          <HousingReview />
+        </LazyBoundary>
       </Admin>
     ),
   },
@@ -54,7 +63,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/impact',
     element: (
       <Admin>
-        <ImpactDashboard />
+        <LazyBoundary>
+          <ImpactDashboard />
+        </LazyBoundary>
       </Admin>
     ),
   },
@@ -62,7 +73,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/operations-map',
     element: (
       <Admin>
-        <OperationsMap />
+        <LazyBoundary>
+          <OperationsMap />
+        </LazyBoundary>
       </Admin>
     ),
   },
@@ -70,7 +83,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/submissions',
     element: (
       <Admin>
-        <AdminSubmissions />
+        <LazyBoundary>
+          <AdminSubmissions />
+        </LazyBoundary>
       </Admin>
     ),
   },
@@ -78,7 +93,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/ngo',
     element: (
       <Admin>
-        <Members />
+        <LazyBoundary>
+          <Members />
+        </LazyBoundary>
       </Admin>
     ),
   },
@@ -86,7 +103,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/agents',
     element: (
       <Admin>
-        <Agents />
+        <LazyBoundary>
+          <Agents />
+        </LazyBoundary>
       </Admin>
     ),
   },
@@ -94,7 +113,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/feedback',
     element: (
       <Admin>
-        <FeedbackManagement />
+        <LazyBoundary>
+          <FeedbackManagement />
+        </LazyBoundary>
       </Admin>
     ),
   },
@@ -102,7 +123,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/emergency',
     element: (
       <Admin>
-        <EmergencyContactsManagement />
+        <LazyBoundary>
+          <EmergencyContactsManagement />
+        </LazyBoundary>
       </Admin>
     ),
   },
@@ -110,7 +133,9 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/offers',
     element: (
       <Admin>
-        <OffersManagement />
+        <LazyBoundary>
+          <OffersManagement />
+        </LazyBoundary>
       </Admin>
     ),
   },

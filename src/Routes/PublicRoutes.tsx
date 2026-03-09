@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import Public from '../Layout/Public';
+import LazyBoundary from '../Components/LazyBoundary';
 import type { RouteConfig } from '../types';
 
 const Landing = lazy(() => import('../Screens/Public/Landing'));
@@ -21,7 +22,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/',
     element: (
       <Public>
-        <Landing />
+        <LazyBoundary>
+          <Landing />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -29,7 +32,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/submit',
     element: (
       <Public>
-        <Home />
+        <LazyBoundary>
+          <Home />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -37,7 +42,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/about',
     element: (
       <Public>
-        <About />
+        <LazyBoundary>
+          <About />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -45,7 +52,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/confirmation',
     element: (
       <Public>
-        <Confirmation />
+        <LazyBoundary>
+          <Confirmation />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -53,7 +62,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/donate',
     element: (
       <Public>
-        <Donate />
+        <LazyBoundary>
+          <Donate />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -61,7 +72,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/impact',
     element: (
       <Public>
-        <Impact />
+        <LazyBoundary>
+          <Impact />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -69,7 +82,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/offer-housing',
     element: (
       <Public>
-        <OfferHousing />
+        <LazyBoundary>
+          <OfferHousing />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -77,7 +92,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/housing',
     element: (
       <Public>
-        <Housing />
+        <LazyBoundary>
+          <Housing />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -85,7 +102,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/terms',
     element: (
       <Public>
-        <Terms />
+        <LazyBoundary>
+          <Terms />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -93,7 +112,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/offer-help',
     element: (
       <Public>
-        <OfferHelp />
+        <LazyBoundary>
+          <OfferHelp />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -101,7 +122,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/resources',
     element: (
       <Public>
-        <Resources />
+        <LazyBoundary>
+          <Resources />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -109,7 +132,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/emergency',
     element: (
       <Public>
-        <Emergency />
+        <LazyBoundary>
+          <Emergency />
+        </LazyBoundary>
       </Public>
     ),
   },
@@ -117,7 +142,9 @@ const PublicRoutes: RouteConfig[] = [
     path: '/feedback',
     element: (
       <Public>
-        <Feedback />
+        <LazyBoundary>
+          <Feedback />
+        </LazyBoundary>
       </Public>
     ),
   },

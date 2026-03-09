@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import PrivateRoute from '../Components/PrivateRoute';
 import Private from '../Layout/Private';
+import LazyBoundary from '../Components/LazyBoundary';
 import type { RouteConfig } from '../types';
 
 const Submissions = lazy(() => import('../Screens/Private/Submissions'));
@@ -17,7 +18,9 @@ const NGORoutes: RouteConfig[] = [
     element: (
       <PrivateRoute allowedRoles={['member']} requireValidated>
         <Private>
-          <Submissions />
+          <LazyBoundary>
+            <Submissions />
+          </LazyBoundary>
         </Private>
       </PrivateRoute>
     ),
@@ -27,7 +30,9 @@ const NGORoutes: RouteConfig[] = [
     element: (
       <PrivateRoute allowedRoles={['member']} requireValidated>
         <Private>
-          <MyCases />
+          <LazyBoundary>
+            <MyCases />
+          </LazyBoundary>
         </Private>
       </PrivateRoute>
     ),
@@ -37,7 +42,9 @@ const NGORoutes: RouteConfig[] = [
     element: (
       <PrivateRoute allowedRoles={['member']} requireValidated>
         <Private>
-          <CaseDetail />
+          <LazyBoundary>
+            <CaseDetail />
+          </LazyBoundary>
         </Private>
       </PrivateRoute>
     ),
@@ -47,7 +54,9 @@ const NGORoutes: RouteConfig[] = [
     element: (
       <PrivateRoute allowedRoles={['member']} requireValidated>
         <Private>
-          <ProfileCoverage />
+          <LazyBoundary>
+            <ProfileCoverage />
+          </LazyBoundary>
         </Private>
       </PrivateRoute>
     ),
@@ -57,7 +66,9 @@ const NGORoutes: RouteConfig[] = [
     element: (
       <PrivateRoute allowedRoles={['agent']} requireValidated>
         <Private>
-          <CreateSubmission />
+          <LazyBoundary>
+            <CreateSubmission />
+          </LazyBoundary>
         </Private>
       </PrivateRoute>
     ),
@@ -67,7 +78,9 @@ const NGORoutes: RouteConfig[] = [
     element: (
       <PrivateRoute allowedRoles={['agent']} requireValidated>
         <Private>
-          <AgentSubmissions />
+          <LazyBoundary>
+            <AgentSubmissions />
+          </LazyBoundary>
         </Private>
       </PrivateRoute>
     ),
@@ -77,7 +90,9 @@ const NGORoutes: RouteConfig[] = [
     element: (
       <PrivateRoute allowedRoles={['agent']} requireValidated>
         <Private>
-          <AgentSubmissionDetail />
+          <LazyBoundary>
+            <AgentSubmissionDetail />
+          </LazyBoundary>
         </Private>
       </PrivateRoute>
     ),
