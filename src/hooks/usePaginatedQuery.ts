@@ -3,6 +3,7 @@ import type {
   CollectionReference,
   DocumentData,
   OrderByDirection,
+  FirestoreError,
   QueryConstraint,
   QueryDocumentSnapshot,
 } from 'firebase/firestore';
@@ -90,8 +91,14 @@ export function usePaginatedQuery<T>({
           return hasChanged ? next : previous;
         });
       },
-      () => {
-        setError('Failed to load data.');
+      (firestoreError: FirestoreError) => {
+        console.error('usePaginatedQuery failed', {
+          code: firestoreError.code,
+          message: firestoreError.message,
+          collectionPath: collectionRef.path,
+          orderByField,
+        });
+        setError(firestoreError.message || 'Failed to load data.');
         setItems([]);
         setHasNextPage(false);
         setLoading(false);
