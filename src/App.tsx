@@ -1,12 +1,12 @@
 import { useEffect, useState, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import ScrollToTop from './Components/ScrollToTop';
 import PublicRoutes from './Routes/PublicRoutes';
 import AuthRoutes from './Routes/AuthRoutes';
 import AdminRoutes from './Routes/AdminRoutes';
 import NotFound from './Components/NotFound/NotFound';
 import PrivateRoutes from './Routes/PrivateRoutes';
+import LoadingScreen from './Components/LoadingScreen';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -14,6 +14,8 @@ export default function App() {
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const initializeAuth = useAuthStore((state) => state.initializeAuth);
+  const authLoading = useAuthStore((state) => state.loading);
+  const authInitialized = useAuthStore((state) => state.initialized);
 
   useEffect(() => {
     initializeAuth();
@@ -32,16 +34,14 @@ export default function App() {
     return null;
   }
 
+  if (!authInitialized && authLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <>
       <ScrollToTop />
-      <Suspense
-        fallback={
-          <div className="flex justify-center items-center min-h-[80vh]">
-            <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />
-          </div>
-        }
-      >
+      <Suspense fallback={<LoadingScreen />}>
         <Routes key={location.pathname} location={location}>
           {PublicRoutes.map((route, index) => (
             <Route key={index} path={route.path} element={route.element} />

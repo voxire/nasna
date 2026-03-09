@@ -2,5 +2,6 @@
   "notFound": "The page you are looking for does not exist.",
   "goBack": "Go Back",
   "offlineBanner": "You are offline. Changes will sync automatically when you reconnect.",
-  "syncingBanner": "Syncing... Do not close this tab."
+  "syncingBanner": "Syncing... Do not close this tab.",
+  "loading": "Loading"
 }
