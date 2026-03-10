@@ -14,6 +14,7 @@
     "functions:build": "pnpm --dir functions build",
     "functions:serve": "pnpm --dir functions serve",
     "functions:deploy": "pnpm --dir functions deploy",
+    "set-admin": "pnpm --dir functions set-admin",
     "check": "pnpm tsc && pnpm functions:build",
     "format": "prettier --write \"src/**/*.{ts,tsx,scss,json}\" \"functions/src/**/*.ts\" \".github/workflows/*.yml\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,scss,json}\" \"functions/src/**/*.ts\" \".github/workflows/*.yml\"",
