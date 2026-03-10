@@ -15,6 +15,7 @@ functions/lib
 *.local
 .env
 *firebase-adminsdk*.json
+.secrets/
 
 # Editor directories and files
 .vscode/*
