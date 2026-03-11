@@ -15,9 +15,14 @@ type SubmissionStatus = (typeof ALLOWED_STATUSES)[number];
 interface MemberProfile {
   validated?: boolean;
   role?: string;
+  name?: string;
+  initiativeOrNgo?: string;
   coverageType?: 'governorate' | 'center' | 'hybrid';
   coverageGovernorates?: string[];
   coverageCenterIds?: string[];
+  aidTypes?: string[];
+  maxCaseLoad?: number;
+  deliveryMode?: 'delivery' | 'pickup' | 'both';
   areaOfOperation?: string;
 }
 
@@ -38,10 +43,12 @@ interface SubmissionRecord {
   comments?: string;
   numberOfPeopleInHousehold?: number;
   registrationDate?: Timestamp;
+  updatedAt?: Timestamp;
   status?: SubmissionStatus;
   locationType?: string;
   centerId?: string;
   assignedTo?: string;
+  assignedToOrgName?: string;
   assignedAt?: Timestamp | null;
   aidDelivered?: boolean;
   staleFlagged?: boolean;
@@ -67,6 +74,7 @@ interface UpdateCaseStatusRequest {
 
 interface RecordAidDeliveryRequest {
   submissionId: string;
+  deliveryNotes?: string;
 }
 
 interface UpdateMemberCoverageProfileRequest {
@@ -118,14 +126,25 @@ interface MemberCaseResponse {
   comments: string;
   numberOfPeopleInHousehold: number;
   registrationDate: string | null;
+  updatedAt: string | null;
   status: SubmissionStatus;
   locationType: string;
   centerId: string;
   assignedTo: string;
+  assignedToOrgName: string;
   assignedAt: string | null;
   aidDelivered: boolean;
   staleFlagged: boolean;
   source: string;
+}
+
+interface GetCoverageProfileResponse {
+  coverageType: 'governorate' | 'center' | 'hybrid';
+  coverageGovernorates: string[];
+  coverageCenterIds: string[];
+  aidTypes: string[];
+  maxCaseLoad: number;
+  deliveryMode: 'delivery' | 'pickup' | 'both';
 }
 
 function assertSignedIn(uid?: string): string {
@@ -213,10 +232,12 @@ function sanitizeSubmission(id: string, submission: SubmissionRecord): MemberCas
     comments: submission.comments ?? '',
     numberOfPeopleInHousehold: submission.numberOfPeopleInHousehold ?? 0,
     registrationDate: submission.registrationDate?.toDate().toISOString() ?? null,
+    updatedAt: submission.updatedAt?.toDate().toISOString() ?? null,
     status: submission.status ?? 'pending',
     locationType: submission.locationType ?? 'with_family',
     centerId: submission.centerId ?? '',
     assignedTo: submission.assignedTo ?? '',
+    assignedToOrgName: submission.assignedToOrgName ?? '',
     assignedAt: submission.assignedAt?.toDate().toISOString() ?? null,
     aidDelivered: submission.aidDelivered ?? false,
     staleFlagged: submission.staleFlagged ?? false,
@@ -359,10 +380,13 @@ export const claimMemberCase = onCall<ClaimCaseRequest>(
       throw new HttpsError('failed-precondition', 'Only pending cases can be claimed.');
     }
 
+    const orgName = (memberProfile.name ?? memberProfile.initiativeOrNgo ?? '').trim();
+
     await submissionRef.set(
       {
         status: 'assigned',
         assignedTo: uid,
+        assignedToOrgName: orgName,
         assignedAt: Timestamp.now(),
         lastUpdatedBy: uid,
         updatedAt: new Date(),
@@ -448,10 +472,19 @@ export const recordMemberAidDelivery = onCall<RecordAidDeliveryRequest>(
       throw new HttpsError('permission-denied', 'You can only complete your claimed cases.');
     }
 
+    const notes = (request.data.deliveryNotes ?? '').trim();
+    const existingComments = (submission.comments ?? '').trim();
+    const updatedComments = notes
+      ? existingComments
+        ? `${existingComments}\n\nDelivery note: ${notes}`
+        : `Delivery note: ${notes}`
+      : existingComments;
+
     await submissionRef.set(
       {
         aidDelivered: true,
         status: 'completed',
+        comments: updatedComments,
         lastUpdatedBy: uid,
         updatedAt: new Date(),
       },
@@ -505,6 +538,30 @@ export const updateMemberCoverageProfile = onCall<UpdateMemberCoverageProfileReq
   },
 );
 
+export const getMemberCoverageProfile = onCall<Record<string, never>>(
+  { region: 'europe-west1' },
+  async (request) => {
+    const uid = assertSignedIn(request.auth?.uid);
+    await getValidatedMemberProfile(uid);
+
+    const snapshot = await db.collection('members').doc(uid).get();
+    const data = (snapshot.data() as MemberProfile | undefined) ?? {};
+
+    const profile: GetCoverageProfileResponse = {
+      coverageType: data.coverageType ?? 'governorate',
+      coverageGovernorates: Array.isArray(data.coverageGovernorates)
+        ? data.coverageGovernorates
+        : [],
+      coverageCenterIds: Array.isArray(data.coverageCenterIds) ? data.coverageCenterIds : [],
+      aidTypes: Array.isArray(data.aidTypes) ? data.aidTypes : [],
+      maxCaseLoad: Number.isFinite(data.maxCaseLoad) ? (data.maxCaseLoad as number) : 10,
+      deliveryMode: data.deliveryMode ?? 'both',
+    };
+
+    return { profile };
+  },
+);
+
 export const createMemberCase = onCall<CreateMemberCaseRequest>(
   { region: 'europe-west1' },
   async (request) => {
@@ -531,6 +588,10 @@ export const createMemberCase = onCall<CreateMemberCaseRequest>(
     ) {
       throw new HttpsError('invalid-argument', 'Case data is incomplete.');
     }
+
+    const memberSnapshotForName = await db.collection('members').doc(uid).get();
+    const memberDataForName = memberSnapshotForName.data() as MemberProfile | undefined;
+    const orgName = (memberDataForName?.name ?? memberDataForName?.initiativeOrNgo ?? '').trim();
 
     const submissionRef = db.collection('submissions').doc();
     const statsRef = db.collection('stats').doc('global');
@@ -567,6 +628,7 @@ export const createMemberCase = onCall<CreateMemberCaseRequest>(
         locationType: data.locationType ?? 'with_family',
         centerId: data.centerId ?? '',
         assignedTo: uid,
+        assignedToOrgName: orgName,
         assignedAt: now,
         aidDelivered: false,
         lastUpdatedBy: uid,

@@ -17,7 +17,9 @@
     "noneListed": "Aucun mentionné",
     "viewDetails": "Voir les détails",
     "claiming": "Réclamation en cours...",
-    "claimCase": "Réclamer le cas"
+    "claimCase": "Réclamer le cas",
+    "filterByNeed": "Filtrer par besoin :",
+    "clearFilter": "Effacer le filtre"
   },
   "mine": {
     "title": "Mes cas",
@@ -26,12 +28,25 @@
     "loading": "Chargement des cas réclamés...",
     "empty": "Vous n'avez encore réclamé aucun cas.",
     "noNotes": "Pas encore de notes.",
+    "noFilterResults": "Aucun cas ne correspond à ce filtre.",
     "cancelledNote": "Ce cas est annulé et reste visible dans votre liste pour le suivi.",
     "reopen": "Rouvrir",
     "openCase": "Ouvrir le cas",
     "startWork": "Commencer le travail",
     "complete": "Terminer",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "tabs": {
+      "all": "Tous",
+      "assigned": "Attribué",
+      "inProgress": "En cours",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "stats": {
+      "active": "Actifs",
+      "completed": "Terminés",
+      "cancelled": "Annulés"
+    }
   },
   "create": {
     "title": "Ajouter un cas",
@@ -56,6 +71,7 @@
     "markCompleted": "Marquer terminé",
     "cancelCase": "Annuler le cas",
     "reopenCase": "Rouvrir le cas",
-    "timeline": "Chronologie"
+    "timeline": "Chronologie",
+    "aidDeliveryFailed": "Échec de l'enregistrement de la livraison d'aide. Veuillez réessayer."
   }
 }

@@ -2,7 +2,17 @@ import { useTranslation } from 'react-i18next';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Label } from '@/Components/ui/label';
 
-const AID_TYPES = ['food', 'water', 'shelter', 'hygiene', 'medical', 'clothing'] as const;
+const AID_TYPES = [
+  'food',
+  'water',
+  'shelter',
+  'hygiene',
+  'medical',
+  'clothing',
+  'baby_supplies',
+  'psychosocial',
+  'legal_docs',
+] as const;
 
 type AidType = (typeof AID_TYPES)[number];
 

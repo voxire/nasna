@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { auth, db } from '../../firebase';
+import { auth, db, functions } from '../../firebase';
 import { addDoc, collection, onSnapshot, query, where } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -325,6 +326,24 @@ function CreateSubmission() {
 
     setLoading(true);
     try {
+      if (isOnline) {
+        try {
+          const checkDuplicate = httpsCallable<
+            { phoneNumber: string; emailAddress?: string },
+            { phoneDuplicate: boolean; emailDuplicate: boolean }
+          >(functions, 'checkSubmissionDuplicates');
+          const dupResult = await checkDuplicate({
+            phoneNumber: result.data.phoneNumber,
+            emailAddress: result.data.emailAddress,
+          });
+          if (dupResult.data.phoneDuplicate) {
+            toast.warning(t('submission.duplicatePhoneWarning'));
+          }
+        } catch {
+          // Non-blocking: if the duplicate check fails, proceed with submission
+        }
+      }
+
       const submissionPayload = buildSubmissionPayload(result.data);
 
       if (!isOnline) {

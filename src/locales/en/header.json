@@ -9,5 +9,8 @@
   "caseFeed": "Case Feed",
   "myCases": "My Cases",
   "coverage": "Coverage",
-  "logout": "Logout"
+  "logout": "Logout",
+  "createSubmission": "Create Submission",
+  "mySubmissions": "My Submissions",
+  "bulkUpload": "Bulk Upload"
 }

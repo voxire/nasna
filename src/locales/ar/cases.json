@@ -17,7 +17,9 @@
     "noneListed": "لم يُذكر أي شيء",
     "viewDetails": "عرض التفاصيل",
     "claiming": "جارٍ الطلب...",
-    "claimCase": "طلب الحالة"
+    "claimCase": "طلب الحالة",
+    "filterByNeed": "تصفية حسب الاحتياج:",
+    "clearFilter": "مسح التصفية"
   },
   "mine": {
     "title": "حالاتي",
@@ -26,12 +28,25 @@
     "loading": "جارٍ تحميل الحالات المطلوبة...",
     "empty": "لم تطلب أي حالات بعد.",
     "noNotes": "لا توجد ملاحظات بعد.",
+    "noFilterResults": "لا توجد حالات تطابق هذه التصفية.",
     "cancelledNote": "تم إلغاء هذه الحالة وما زالت ظاهرة في قائمتك لأغراض المتابعة.",
     "reopen": "إعادة فتح",
     "openCase": "فتح الحالة",
     "startWork": "بدء العمل",
     "complete": "إكمال",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "tabs": {
+      "all": "الكل",
+      "assigned": "مُسندة",
+      "inProgress": "قيد التنفيذ",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
+    },
+    "stats": {
+      "active": "نشطة",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
+    }
   },
   "create": {
     "title": "إضافة حالة",
@@ -56,6 +71,7 @@
     "markCompleted": "تحديد كمكتملة",
     "cancelCase": "إلغاء الحالة",
     "reopenCase": "إعادة فتح الحالة",
-    "timeline": "الجدول الزمني"
+    "timeline": "الجدول الزمني",
+    "aidDeliveryFailed": "فشل تسجيل تسليم المساعدات. يرجى المحاولة مرة أخرى."
   }
 }

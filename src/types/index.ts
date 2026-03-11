@@ -73,6 +73,7 @@ export interface SubmissionDocument {
   locationType?: LocationType;
   centerId?: string;
   assignedTo?: string;
+  assignedToOrgName?: string;
   assignedAt?: Timestamp | null;
   aidDelivered?: boolean;
   lastUpdatedBy?: string;

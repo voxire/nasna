@@ -154,7 +154,9 @@ function AdminSubmissions() {
           submission.phoneNumber,
           submission.emailAddress,
           submission.currentGovernorate,
-          submission.assignedTo ? assignedNgoNames[submission.assignedTo] ?? submission.assignedTo : '',
+          submission.assignedTo
+            ? (assignedNgoNames[submission.assignedTo] ?? submission.assignedTo)
+            : '',
         ].some((field) => (field ?? '').toLowerCase().includes(q)),
       );
     }
@@ -384,7 +386,7 @@ function AdminSubmissions() {
                     </TableCell>
                     <TableCell>
                       {member.assignedTo
-                        ? assignedNgoNames[member.assignedTo] ?? member.assignedTo
+                        ? (assignedNgoNames[member.assignedTo] ?? member.assignedTo)
                         : '—'}
                     </TableCell>
                     <TableCell>{member.comments}</TableCell>

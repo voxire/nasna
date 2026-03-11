@@ -19,14 +19,25 @@ export interface MemberCase {
   comments: string;
   numberOfPeopleInHousehold: number;
   registrationDate: string | null;
+  updatedAt: string | null;
   status: string;
   locationType: string;
   centerId: string;
   assignedTo: string;
+  assignedToOrgName: string;
   assignedAt: string | null;
   aidDelivered: boolean;
   staleFlagged: boolean;
   source: string;
+}
+
+export interface CoverageProfile {
+  coverageType: 'governorate' | 'center' | 'hybrid';
+  coverageGovernorates: string[];
+  coverageCenterIds: string[];
+  aidTypes: string[];
+  maxCaseLoad: number;
+  deliveryMode: 'delivery' | 'pickup' | 'both';
 }
 
 interface CaseListResponse {
@@ -35,6 +46,10 @@ interface CaseListResponse {
 
 interface CaseDetailResponse {
   case: MemberCase;
+}
+
+interface CoverageProfileResponse {
+  profile: CoverageProfile;
 }
 
 export async function listMemberPendingCases(limit = 50) {
@@ -113,13 +128,22 @@ export async function updateMemberCaseStatus(submissionId: string, status: strin
   return result.data.case;
 }
 
-export async function recordMemberAidDelivery(submissionId: string) {
-  const callable = httpsCallable<{ submissionId: string }, CaseDetailResponse>(
-    functions,
-    'recordMemberAidDelivery',
-  );
-  const result = await callable({ submissionId });
+export async function recordMemberAidDelivery(submissionId: string, deliveryNotes?: string) {
+  const callable = httpsCallable<
+    { submissionId: string; deliveryNotes?: string },
+    CaseDetailResponse
+  >(functions, 'recordMemberAidDelivery');
+  const result = await callable({ submissionId, deliveryNotes });
   return result.data.case;
+}
+
+export async function getMemberCoverageProfile() {
+  const callable = httpsCallable<Record<string, never>, CoverageProfileResponse>(
+    functions,
+    'getMemberCoverageProfile',
+  );
+  const result = await callable({});
+  return result.data.profile;
 }
 
 interface CoverageProfilePayload {
