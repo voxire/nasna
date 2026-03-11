@@ -13,6 +13,13 @@ export type NotificationChannel = 'email' | 'system';
 export type NotificationStatus = 'pending' | 'sent' | 'failed';
 export type HousingStatus = 'pending_review' | 'approved' | 'rejected' | 'reserved' | 'filled';
 
+export interface AidDeliveryRecord {
+  type: string;
+  date: Timestamp;
+  deliveredBy: string;
+  notes?: string;
+}
+
 export interface AgeRanges {
   '0-3': number;
   '4-12': number;
@@ -73,9 +80,11 @@ export interface SubmissionDocument {
   locationType?: LocationType;
   centerId?: string;
   assignedTo?: string;
+  // PII: admin + member via Cloud Functions only. Never expose to agents.
   assignedToOrgName?: string;
   assignedAt?: Timestamp | null;
   aidDelivered?: boolean;
+  aidDeliveries?: AidDeliveryRecord[];
   lastUpdatedBy?: string;
   staleFlagged?: boolean;
   source?: SubmissionSource;
@@ -118,15 +127,29 @@ export interface HousingDocument {
   updatedAt?: Date;
 }
 
+export type EmergencyContactCategory =
+  | 'government'
+  | 'health'
+  | 'ngo'
+  | 'security'
+  | 'legal'
+  | 'utilities'
+  | 'medical'
+  | 'shelter'
+  | 'food'
+  | 'protection';
+
 export interface EmergencyContactDocument {
   id?: string;
   name: string;
   phoneNumber: string;
-  category: string;
+  phoneAlt?: string;
+  category: EmergencyContactCategory | string;
   coverage: string;
   notes?: string;
   verified: boolean;
   lastVerifiedAt?: Date | null;
+  order?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -88,10 +88,15 @@ export default function Emergency() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('emergency.allCategories')}</SelectItem>
+            <SelectItem value="government">{t('emergency.categories.government')}</SelectItem>
+            <SelectItem value="health">{t('emergency.categories.health')}</SelectItem>
+            <SelectItem value="ngo">{t('emergency.categories.ngo')}</SelectItem>
+            <SelectItem value="security">{t('emergency.categories.security')}</SelectItem>
+            <SelectItem value="legal">{t('emergency.categories.legal')}</SelectItem>
+            <SelectItem value="utilities">{t('emergency.categories.utilities')}</SelectItem>
             <SelectItem value="medical">{t('emergency.categories.medical')}</SelectItem>
             <SelectItem value="shelter">{t('emergency.categories.shelter')}</SelectItem>
             <SelectItem value="food">{t('emergency.categories.food')}</SelectItem>
-            <SelectItem value="legal">{t('emergency.categories.legal')}</SelectItem>
             <SelectItem value="protection">{t('emergency.categories.protection')}</SelectItem>
           </SelectContent>
         </Select>
@@ -137,6 +142,15 @@ export default function Emergency() {
                 <span>{contact.phoneNumber}</span>
                 <PhoneCall className="h-4 w-4 text-[#12a89d]" />
               </a>
+              {contact.phoneAlt ? (
+                <a
+                  href={`tel:${contact.phoneAlt}`}
+                  className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition hover:border-[#12a89d] hover:bg-[#12a89d]/5"
+                >
+                  <span>{contact.phoneAlt}</span>
+                  <PhoneCall className="h-4 w-4 text-gray-400" />
+                </a>
+              ) : null}
             </CardContent>
           </Card>
         ))}

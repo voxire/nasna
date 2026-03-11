@@ -38,6 +38,8 @@ interface SubmissionRecord {
   updatedAt?: Timestamp | Date;
   registrationDate?: Timestamp;
   source?: string;
+  locationType?: 'with_family' | 'center';
+  centerId?: string;
   // PII: admin + assigned agent only. Never expose to members.
   whatsappPhone?: string;
 }
@@ -48,7 +50,10 @@ interface MemberRecord {
   role?: string;
   validated?: boolean;
   currentCaseLoad?: number;
+  maxCaseLoad?: number;
   coverageGovernorates?: string[];
+  coverageCenterIds?: string[];
+  aidTypes?: string[];
   phoneNumber?: string;
 }
 
@@ -292,15 +297,84 @@ export const onNewSubmission = onDocumentCreated(
       submissionId,
     );
 
-    // Email matched NGO members in the submission's governorate
+    // Match NGOs by governorate coverage and (optionally) center coverage
     const governorate = submission.currentGovernorate ?? 'Unknown';
-    const membersSnapshot = await db
+    const centerId = submission.centerId;
+    const submissionNeeds = submission.needs ?? [];
+
+    // Query by governorate coverage
+    const governorateQuery = db
       .collection('members')
       .where('role', '==', 'member')
       .where('validated', '==', true)
       .where('coverageGovernorates', 'array-contains', governorate)
-      .limit(50)
-      .get();
+      .limit(50);
+
+    // Query by center coverage (if applicable)
+    const centerQuery =
+      centerId && submission.locationType === 'center'
+        ? db
+            .collection('members')
+            .where('role', '==', 'member')
+            .where('validated', '==', true)
+            .where('coverageCenterIds', 'array-contains', centerId)
+            .limit(50)
+        : null;
+
+    const [governorateSnapshot, centerSnapshot] = await Promise.all([
+      governorateQuery.get(),
+      centerQuery ? centerQuery.get() : Promise.resolve(null),
+    ]);
+
+    // Merge and deduplicate matched members
+    const memberMap = new Map<
+      string,
+      FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
+    >();
+    for (const doc of governorateSnapshot.docs) {
+      memberMap.set(doc.id, doc);
+    }
+    if (centerSnapshot) {
+      for (const doc of centerSnapshot.docs) {
+        memberMap.set(doc.id, doc);
+      }
+    }
+
+    // Filter: aidTypes must intersect with needs, and caseLoad must be below max
+    const matchedMembers = [...memberMap.entries()].filter(([, doc]) => {
+      const member = doc.data() as MemberRecord;
+
+      // Must have an email to receive notifications
+      if (!member.email) return false;
+
+      // Filter by aidTypes intersection (skip if NGO has no aidTypes configured)
+      const memberAidTypes = member.aidTypes ?? [];
+      if (memberAidTypes.length > 0 && submissionNeeds.length > 0) {
+        const hasOverlap = submissionNeeds.some((need) => memberAidTypes.includes(need));
+        if (!hasOverlap) return false;
+      }
+
+      // Filter by caseLoad capacity (0 = unlimited)
+      const maxLoad = member.maxCaseLoad ?? 0;
+      if (maxLoad > 0) {
+        const currentLoad = member.currentCaseLoad ?? 0;
+        if (currentLoad >= maxLoad) return false;
+      }
+
+      return true;
+    });
+
+    // If zero NGOs matched, create an admin alert
+    if (matchedMembers.length === 0) {
+      await createAdminNotifications(
+        `no-ngo-match:${submissionId}`,
+        'No NGO match for new case',
+        `No validated NGO covers ${governorate} with matching aid types for case ${submissionId}. Manual dispatch required.`,
+        submissionId,
+      );
+      logger.info('No NGO matched for new submission', { submissionId, governorate });
+      return;
+    }
 
     const pendingInAreaSnapshot = await db
       .collection('submissions')
@@ -312,48 +386,46 @@ export const onNewSubmission = onDocumentCreated(
     const caseCount = pendingInAreaSnapshot.size;
 
     await Promise.all(
-      membersSnapshot.docs
-        .filter((doc) => {
-          const member = doc.data() as MemberRecord;
-          return Boolean(member.email);
-        })
-        .map(async (doc) => {
-          const member = doc.data() as MemberRecord;
-          const notificationId = `ngo-new-case:${submissionId}:${doc.id}`;
+      matchedMembers.map(async ([memberId, doc]) => {
+        const member = doc.data() as MemberRecord;
+        const notificationId = `ngo-new-case:${submissionId}:${memberId}`;
 
-          const created = await createNotification({
-            id: notificationId,
-            recipientUid: doc.id,
-            title: 'New case in your area',
-            body: `New case in ${governorate} — needs: ${(submission.needs ?? []).join(', ') || 'unspecified'} — ${submission.aidUrgency ?? 'Unknown'} urgency`,
-            channel: 'email',
-            relatedSubmissionId: submissionId,
+        const created = await createNotification({
+          id: notificationId,
+          recipientUid: memberId,
+          title: 'New case in your area',
+          body: `New case in ${governorate} — needs: ${submissionNeeds.join(', ') || 'unspecified'} — ${submission.aidUrgency ?? 'Unknown'} urgency`,
+          channel: 'email',
+          relatedSubmissionId: submissionId,
+        });
+
+        if (!created) return;
+
+        try {
+          await sendNgoNewCaseAlert({
+            recipientEmail: member.email!,
+            recipientName: member.name ?? 'Team',
+            governorate,
+            needs: submissionNeeds,
+            urgency: submission.aidUrgency ?? 'Unknown',
+            caseCount,
           });
-
-          if (!created) return;
-
-          try {
-            await sendNgoNewCaseAlert({
-              recipientEmail: member.email!,
-              recipientName: member.name ?? 'Team',
-              governorate,
-              needs: submission.needs ?? [],
-              urgency: submission.aidUrgency ?? 'Unknown',
-              caseCount,
-            });
-            await updateNotificationStatus(notificationId, 'sent');
-          } catch (error) {
-            logger.error('Failed to send NGO new case alert email', {
-              recipientUid: doc.id,
-              submissionId,
-              error,
-            });
-            await updateNotificationStatus(notificationId, 'failed');
-          }
-        }),
+          await updateNotificationStatus(notificationId, 'sent');
+        } catch (error) {
+          logger.error('Failed to send NGO new case alert email', {
+            recipientUid: memberId,
+            submissionId,
+            error,
+          });
+          await updateNotificationStatus(notificationId, 'failed');
+        }
+      }),
     );
 
-    logger.info('Processed new submission trigger', { submissionId });
+    logger.info('Processed new submission trigger', {
+      submissionId,
+      matchedNgoCount: matchedMembers.length,
+    });
   },
 );
 
@@ -516,6 +588,8 @@ export const onCaseCompleted = onDocumentUpdated(
   },
 );
 
+const STALE_CHECK_BATCH_SIZE = 200;
+
 export const dailyStaleCaseCheck = onSchedule(
   {
     schedule: '0 2 * * *',
@@ -524,99 +598,121 @@ export const dailyStaleCaseCheck = onSchedule(
   },
   async () => {
     const staleBefore = Date.now() - STALE_CASE_THRESHOLD_HOURS * 60 * 60 * 1000;
-    const snapshot = await db
-      .collection('submissions')
-      .where('status', 'in', ['pending', 'assigned', 'in_progress'])
-      .get();
+    const allStaleCaseIds: string[] = [];
+    const memberCache = new Map<string, MemberRecord>();
 
-    const staleCases = snapshot.docs.filter((document) => {
-      const submission = document.data() as SubmissionRecord;
-      const activityAt = Math.max(
-        getTimestampValue(submission.updatedAt),
-        getTimestampValue(submission.registrationDate),
+    // Process submissions in cursor-paginated batches to bound memory and read cost
+    let lastDoc: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+    let hasMore = true;
+
+    while (hasMore) {
+      let batchQuery = db
+        .collection('submissions')
+        .where('status', 'in', ['pending', 'assigned', 'in_progress'])
+        .where('staleFlagged', '!=', true)
+        .orderBy('staleFlagged')
+        .limit(STALE_CHECK_BATCH_SIZE);
+
+      if (lastDoc) {
+        batchQuery = batchQuery.startAfter(lastDoc);
+      }
+
+      const batchSnapshot = await batchQuery.get();
+      hasMore = batchSnapshot.size === STALE_CHECK_BATCH_SIZE;
+
+      if (batchSnapshot.empty) break;
+      lastDoc = batchSnapshot.docs[batchSnapshot.docs.length - 1];
+
+      const staleDocs = batchSnapshot.docs.filter((document) => {
+        const submission = document.data() as SubmissionRecord;
+        const activityAt = Math.max(
+          getTimestampValue(submission.updatedAt),
+          getTimestampValue(submission.registrationDate),
+        );
+        return activityAt > 0 && activityAt <= staleBefore;
+      });
+
+      if (staleDocs.length === 0) continue;
+
+      // Pre-fetch assigned NGO members for this batch (deduped via cache)
+      const newMemberUids = [
+        ...new Set(
+          staleDocs
+            .map((doc) => {
+              const s = doc.data() as SubmissionRecord;
+              return s.assignedTo && (s.status === 'assigned' || s.status === 'in_progress')
+                ? s.assignedTo
+                : null;
+            })
+            .filter((uid): uid is string => uid !== null && !memberCache.has(uid)),
+        ),
+      ];
+
+      await Promise.all(
+        newMemberUids.map(async (uid) => {
+          const snap = await db.collection('members').doc(uid).get();
+          if (snap.exists) {
+            memberCache.set(uid, snap.data() as MemberRecord);
+          }
+        }),
       );
 
-      return !submission.staleFlagged && activityAt > 0 && activityAt <= staleBefore;
-    });
+      await Promise.all(
+        staleDocs.map(async (document) => {
+          await document.ref.set(
+            {
+              staleFlagged: true,
+              updatedAt: new Date(),
+            },
+            { merge: true },
+          );
 
-    // Pre-fetch assigned NGO members to avoid duplicate Firestore reads
-    const assignedMemberUids = [
-      ...new Set(
-        staleCases
-          .map((doc) => {
-            const s = doc.data() as SubmissionRecord;
-            return s.assignedTo && (s.status === 'assigned' || s.status === 'in_progress')
-              ? s.assignedTo
-              : null;
-          })
-          .filter((uid): uid is string => uid !== null),
-      ),
-    ];
+          allStaleCaseIds.push(document.id);
 
-    const memberMap = new Map<string, MemberRecord>();
-    await Promise.all(
-      assignedMemberUids.map(async (uid) => {
-        const snap = await db.collection('members').doc(uid).get();
-        if (snap.exists) {
-          memberMap.set(uid, snap.data() as MemberRecord);
-        }
-      }),
-    );
+          const submission = document.data() as SubmissionRecord;
+          await createAdminNotifications(
+            `stale-case:${document.id}`,
+            'Case flagged as stale',
+            `${submission.fullName ?? 'A household'} has not been updated in over ${STALE_CASE_THRESHOLD_HOURS} hours.`,
+            document.id,
+          );
 
-    await Promise.all(
-      staleCases.map(async (document) => {
-        await document.ref.set(
-          {
-            staleFlagged: true,
-            updatedAt: new Date(),
-          },
-          { merge: true },
-        );
-
-        const submission = document.data() as SubmissionRecord;
-        await createAdminNotifications(
-          `stale-case:${document.id}`,
-          'Case flagged as stale',
-          `${submission.fullName ?? 'A household'} has not been updated in over ${STALE_CASE_THRESHOLD_HOURS} hours.`,
-          document.id,
-        );
-
-        // WhatsApp reminder to assigned NGO
-        if (
-          submission.assignedTo &&
-          (submission.status === 'assigned' || submission.status === 'in_progress')
-        ) {
-          const member = memberMap.get(submission.assignedTo);
-          if (member?.phoneNumber) {
-            try {
-              await sendWhatsApp(
-                member.phoneNumber,
-                `تذكير: الحالة (#${document.id}) لم تُحدَّث منذ ${STALE_CASE_THRESHOLD_HOURS} ساعة. يرجى تحديث الحالة في نسنا.`,
-              );
-              logger.info('Sent stale case WhatsApp to NGO', {
-                submissionId: document.id,
-              });
-            } catch (error) {
-              logger.error('Failed to send stale case WhatsApp to NGO', {
-                submissionId: document.id,
-                error,
-              });
+          // WhatsApp reminder to assigned NGO
+          if (
+            submission.assignedTo &&
+            (submission.status === 'assigned' || submission.status === 'in_progress')
+          ) {
+            const member = memberCache.get(submission.assignedTo);
+            if (member?.phoneNumber) {
+              try {
+                await sendWhatsApp(
+                  member.phoneNumber,
+                  `تذكير: الحالة (#${document.id}) لم تُحدَّث منذ ${STALE_CASE_THRESHOLD_HOURS} ساعة. يرجى تحديث الحالة في نسنا.`,
+                );
+                logger.info('Sent stale case WhatsApp to NGO', {
+                  submissionId: document.id,
+                });
+              } catch (error) {
+                logger.error('Failed to send stale case WhatsApp to NGO', {
+                  submissionId: document.id,
+                  error,
+                });
+              }
             }
           }
-        }
-      }),
-    );
+        }),
+      );
+    }
 
     // Send admin email alert if there are stale cases
-    if (staleCases.length > 0) {
+    if (allStaleCaseIds.length > 0) {
       const adminEmail = process.env.ADMIN_EMAIL;
       if (adminEmail) {
-        const staleCaseIds = staleCases.map((doc) => doc.id);
         try {
           await sendAdminStaleCasesAlert({
             adminEmail,
-            staleCaseIds,
-            staleCaseCount: staleCases.length,
+            staleCaseIds: allStaleCaseIds,
+            staleCaseCount: allStaleCaseIds.length,
           });
         } catch (error) {
           logger.error('Failed to send admin stale cases alert email', { error });
@@ -625,7 +721,7 @@ export const dailyStaleCaseCheck = onSchedule(
     }
 
     logger.info('Completed stale case check', {
-      staleCaseCount: staleCases.length,
+      staleCaseCount: allStaleCaseIds.length,
     });
   },
 );

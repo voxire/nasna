@@ -8,10 +8,15 @@
   "allCategories": "جميع الفئات",
   "allCoverage": "جميع المناطق",
   "categories": {
+    "government": "حكومي",
+    "health": "صحة",
+    "ngo": "منظمة غير حكومية",
+    "security": "أمن",
+    "legal": "قانوني",
+    "utilities": "خدمات عامة",
     "medical": "طبي",
     "shelter": "إيواء",
     "food": "غذاء",
-    "legal": "قانوني",
     "protection": "حماية"
   },
   "noNotes": "لا توجد ملاحظات إضافية.",
