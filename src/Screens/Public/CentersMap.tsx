@@ -42,6 +42,7 @@ export default function CentersMap() {
   useEffect(() => {
     void (async () => {
       setLoading(true);
+      setError(null);
       try {
         const data = await getPublicCentersMapData();
         setCenters(data.centers);
