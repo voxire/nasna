@@ -5,6 +5,7 @@ import { collection, onSnapshot, query, where, limit } from 'firebase/firestore'
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
 import type { SubmissionDocument } from '../../types';
+import CaseStatusBadge from '@/Components/CaseStatusBadge';
 import { Button } from '@/Components/ui/button';
 import {
   Table,
@@ -111,10 +112,13 @@ function AgentSubmissions() {
                 {t('submission.agent.fullName')}
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
-                {t('submission.agent.email')}
+                {t('submission.agent.phoneNumber')}
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
-                {t('submission.agent.phoneNumber')}
+                {t('submission.agent.status')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('submission.agent.assignedNgo')}
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
                 {t('submission.agent.dateRegistered')}
@@ -125,7 +129,7 @@ function AgentSubmissions() {
           <TableBody>
             {submissions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-12 text-gray-500">
+                <TableCell colSpan={6} className="text-center py-12 text-gray-500">
                   {t('submission.agent.noSubmissions')}
                 </TableCell>
               </TableRow>
@@ -137,8 +141,16 @@ function AgentSubmissions() {
                   onClick={() => navigate(`/agent/submissions/${submission.id}`)}
                 >
                   <TableCell className="font-medium">{submission.fullName}</TableCell>
-                  <TableCell>{submission.emailAddress}</TableCell>
                   <TableCell>{submission.phoneNumber}</TableCell>
+                  <TableCell>
+                    <CaseStatusBadge
+                      status={(submission.status as string) ?? 'pending'}
+                      staleFlagged={submission.staleFlagged ?? false}
+                    />
+                  </TableCell>
+                  <TableCell className="text-sm text-gray-600">
+                    {submission.assignedToOrgName || t('submission.agent.unassigned')}
+                  </TableCell>
                   <TableCell>
                     {submission.registrationDate?.toDate().toLocaleDateString()}
                   </TableCell>

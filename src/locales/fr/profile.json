@@ -16,6 +16,7 @@
   "aidTypes": "Types d'aide",
   "aidTypesPlaceholder": "nourriture, hébergement, médicaments",
   "maxCaseLoad": "Charge de cas maximale",
+  "loading": "Chargement de votre profil de couverture...",
   "saving": "Enregistrement...",
   "save": "Enregistrer le profil de couverture",
   "saveSuccess": "Profil de couverture enregistré avec succès"

@@ -4,18 +4,18 @@ on:
   workflow_dispatch:
     inputs:
       prompt:
-        description: "Feature description for Claude Code to implement"
+        description: 'Feature description for Claude Code to implement'
         required: true
         type: string
       branch_name:
-        description: "Branch name (e.g. feat/my-feature)"
+        description: 'Branch name (e.g. feat/my-feature)'
         required: true
         type: string
 
 jobs:
   implement:
     runs-on: ubuntu-latest
-    permissions
+    permissions:
       contents: write
       pull-requests: write
 

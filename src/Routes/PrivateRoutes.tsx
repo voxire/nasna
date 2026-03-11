@@ -12,6 +12,7 @@ const CreateMemberCase = lazy(() => import('../Screens/Private/CreateMemberCase'
 const CreateSubmission = lazy(() => import('../Screens/Private/CreateSubmission'));
 const AgentSubmissions = lazy(() => import('../Screens/Private/AgentSubmissions'));
 const AgentSubmissionDetail = lazy(() => import('../Screens/Private/AgentSubmissionDetail'));
+const BulkUpload = lazy(() => import('../Screens/Private/BulkUpload'));
 
 const NGORoutes: RouteConfig[] = [
   {
@@ -105,6 +106,18 @@ const NGORoutes: RouteConfig[] = [
         <Private>
           <LazyBoundary>
             <AgentSubmissionDetail />
+          </LazyBoundary>
+        </Private>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/agent/bulk-upload',
+    element: (
+      <PrivateRoute allowedRoles={['agent']} requireValidated>
+        <Private>
+          <LazyBoundary>
+            <BulkUpload />
           </LazyBoundary>
         </Private>
       </PrivateRoute>

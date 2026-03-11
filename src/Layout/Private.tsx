@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2, WifiOff } from 'lucide-react';
-import Header from '../Components/Header';
+import PrivateNavbar from './Private/PrivateNavbar';
 import PageTransition from '../Components/PageTransition';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 
@@ -27,7 +27,7 @@ function Private({ children }: PrivateProps) {
           <span>{t('syncingBanner')}</span>
         </div>
       )}
-      <Header dashboard={true} />
+      <PrivateNavbar />
       <div style={{ padding: 20 }}>
         <PageTransition>{children}</PageTransition>
       </div>

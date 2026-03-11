@@ -81,6 +81,29 @@ function PrivateNavbar() {
           </nav>
         ) : null}
 
+        {role === 'agent' ? (
+          <nav className="mr-4 hidden items-center gap-2 lg:flex">
+            {[
+              { href: '/agent/create', label: t('header.createSubmission') },
+              { href: '/agent/submissions', label: t('header.mySubmissions') },
+              { href: '/agent/bulk-upload', label: t('header.bulkUpload') },
+            ].map((item) => (
+              <Button
+                key={item.href}
+                variant={location.pathname === item.href ? 'default' : 'ghost'}
+                className={
+                  location.pathname === item.href
+                    ? 'bg-[#12a89d] text-white hover:bg-[#0e9088]'
+                    : 'text-[#12a89d]'
+                }
+                asChild
+              >
+                <Link to={item.href}>{item.label}</Link>
+              </Button>
+            ))}
+          </nav>
+        ) : null}
+
         <div className="flex items-center gap-1">
           <Button variant="ghost" onClick={handleLogout} className="text-[#12a89d]">
             <LogOut className="h-4 w-4 mr-1" />

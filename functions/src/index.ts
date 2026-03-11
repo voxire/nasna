@@ -15,6 +15,7 @@ export {
   claimMemberCase,
   createMemberCase,
   getMemberCaseDetail,
+  getMemberCoverageProfile,
   listMemberClaimedCases,
   listMemberPendingCases,
   recordMemberAidDelivery,

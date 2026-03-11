@@ -9,5 +9,8 @@
   "caseFeed": "Flux des cas",
   "myCases": "Mes cas",
   "coverage": "Couverture",
-  "logout": "Se déconnecter"
+  "logout": "Se déconnecter",
+  "createSubmission": "Créer une soumission",
+  "mySubmissions": "Mes soumissions",
+  "bulkUpload": "Téléversement en masse"
 }

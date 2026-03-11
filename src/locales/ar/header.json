@@ -9,5 +9,8 @@
   "caseFeed": "الحالات المتاحة",
   "myCases": "حالاتي",
   "coverage": "التغطية",
-  "logout": "تسجيل الخروج"
+  "logout": "تسجيل الخروج",
+  "createSubmission": "إنشاء طلب",
+  "mySubmissions": "طلباتي",
+  "bulkUpload": "رفع جماعي"
 }

@@ -17,7 +17,9 @@
     "noneListed": "None listed",
     "viewDetails": "View details",
     "claiming": "Claiming...",
-    "claimCase": "Claim case"
+    "claimCase": "Claim case",
+    "filterByNeed": "Filter by need:",
+    "clearFilter": "Clear filter"
   },
   "mine": {
     "title": "My Cases",
@@ -26,12 +28,25 @@
     "loading": "Loading claimed cases...",
     "empty": "You have not claimed any cases yet.",
     "noNotes": "No notes yet.",
+    "noFilterResults": "No cases match this filter.",
     "cancelledNote": "This case is cancelled and remains in your case list for record keeping.",
     "reopen": "Reopen",
     "openCase": "Open case",
     "startWork": "Start work",
     "complete": "Complete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "tabs": {
+      "all": "All",
+      "assigned": "Assigned",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "stats": {
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
   },
   "create": {
     "title": "Add Case",
@@ -56,6 +71,7 @@
     "markCompleted": "Mark Completed",
     "cancelCase": "Cancel Case",
     "reopenCase": "Reopen Case",
-    "timeline": "Timeline"
+    "timeline": "Timeline",
+    "aidDeliveryFailed": "Failed to record aid delivery. Please try again."
   }
 }

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import type { MemberCase } from '@/services/memberCases';
 import { claimMemberCase, listMemberPendingCases } from '@/services/memberCases';
 import { Button } from '@/Components/ui/button';
+import { Checkbox } from '@/Components/ui/checkbox';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import CaseStatusBadge from '@/Components/CaseStatusBadge';
@@ -17,7 +18,16 @@ export default function Submissions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedNeeds, setSelectedNeeds] = useState<string[]>([]);
   const [claimingId, setClaimingId] = useState<string | null>(null);
+
+  const ALL_NEEDS = ['food', 'water', 'shelter', 'hygiene', 'medical', 'clothing'] as const;
+
+  const toggleNeed = (need: string) => {
+    setSelectedNeeds((prev) =>
+      prev.includes(need) ? prev.filter((n) => n !== need) : [...prev, need],
+    );
+  };
   const currentUser = useAuthStore((state) => state.firebaseUser);
   const role = useAuthStore((state) => state.role);
   const loadingAuth = useAuthStore((state) => state.loading);
@@ -61,14 +71,20 @@ export default function Submissions() {
 
   const filteredCases = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
-    return cases.filter((memberCase) =>
-      normalizedQuery.length === 0
-        ? true
-        : [memberCase.fullName, memberCase.currentGovernorate].some((field) =>
-            (field ?? '').toLowerCase().includes(normalizedQuery),
-          ),
-    );
-  }, [cases, searchQuery]);
+    return cases.filter((memberCase) => {
+      const matchesSearch =
+        normalizedQuery.length === 0 ||
+        [memberCase.fullName, memberCase.currentGovernorate].some((field) =>
+          (field ?? '').toLowerCase().includes(normalizedQuery),
+        );
+
+      const matchesNeeds =
+        selectedNeeds.length === 0 ||
+        selectedNeeds.some((need) => memberCase.needs.some((n) => n.toLowerCase().includes(need)));
+
+      return matchesSearch && matchesNeeds;
+    });
+  }, [cases, searchQuery, selectedNeeds]);
 
   const handleClaimCase = async (caseId: string) => {
     setClaimingId(caseId);
@@ -109,6 +125,25 @@ export default function Submissions() {
         onChange={(event) => setSearchQuery(event.target.value)}
         className="bg-white"
       />
+
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-gray-200 bg-white px-4 py-3">
+        <span className="text-sm font-medium text-gray-600">{t('cases.feed.filterByNeed')}</span>
+        {ALL_NEEDS.map((need) => (
+          <label key={need} className="flex cursor-pointer items-center gap-1.5">
+            <Checkbox
+              checked={selectedNeeds.includes(need)}
+              onCheckedChange={() => toggleNeed(need)}
+              className="data-[state=checked]:bg-[#12a89d] data-[state=checked]:border-[#12a89d]"
+            />
+            <span className="text-sm text-gray-700">{t(`submission.needs.${need}`)}</span>
+          </label>
+        ))}
+        {selectedNeeds.length > 0 ? (
+          <Button variant="ghost" size="sm" onClick={() => setSelectedNeeds([])}>
+            {t('cases.feed.clearFilter')}
+          </Button>
+        ) : null}
+      </div>
 
       {loading ? (
         <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">

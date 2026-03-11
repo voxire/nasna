@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import type { MemberCase } from '@/services/memberCases';
 import {
   getMemberCaseDetail,
@@ -36,19 +37,24 @@ export default function CaseDetail() {
     status: 'assigned' | 'in_progress' | 'completed' | 'cancelled',
   ) => {
     if (!caseId) return;
-    const updatedCase = await updateMemberCaseStatus(caseId, status);
-    setMemberCase(updatedCase);
+    try {
+      const updatedCase = await updateMemberCaseStatus(caseId, status);
+      setMemberCase(updatedCase);
+    } catch (error) {
+      console.error(error);
+      toast.error(t('cases.statusUpdateFailed'));
+    }
   };
 
   const handleRecordAid = async (notes: string) => {
     if (!caseId) return;
-    const updatedCase = await recordMemberAidDelivery(caseId);
-    setMemberCase({
-      ...updatedCase,
-      comments: notes
-        ? `${updatedCase.comments ?? ''}\n\nDelivery note: ${notes}`.trim()
-        : updatedCase.comments,
-    });
+    try {
+      const updatedCase = await recordMemberAidDelivery(caseId, notes || undefined);
+      setMemberCase(updatedCase);
+    } catch (error) {
+      console.error(error);
+      toast.error(t('cases.detail.aidDeliveryFailed'));
+    }
   };
 
   if (loading) {
@@ -134,7 +140,7 @@ export default function CaseDetail() {
             </CardContent>
           </Card>
 
-          <AidDeliveryForm onSubmit={handleRecordAid} />
+          {!isTerminal ? <AidDeliveryForm onSubmit={handleRecordAid} /> : null}
 
           <div className="flex flex-wrap gap-2">
             {memberCase.status === 'cancelled' ? (
@@ -174,7 +180,7 @@ export default function CaseDetail() {
             <CaseTimeline
               registrationDate={memberCase.registrationDate}
               assignedAt={memberCase.assignedAt}
-              updatedAt={null}
+              updatedAt={memberCase.updatedAt}
               status={memberCase.status}
               aidDelivered={memberCase.aidDelivered}
               staleFlagged={memberCase.staleFlagged}

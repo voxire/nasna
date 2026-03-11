@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { db } from '@/firebase';
-import { updateMemberCoverageProfile } from '@/services/memberCases';
+import { getMemberCoverageProfile, updateMemberCoverageProfile } from '@/services/memberCases';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/Components/ui/button';
@@ -33,7 +33,28 @@ export default function ProfileCoverage() {
   const [maxCaseLoad, setMaxCaseLoad] = useState(10);
   const [deliveryMode, setDeliveryMode] = useState<'delivery' | 'pickup' | 'both'>('both');
   const [saving, setSaving] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [centers, setCenters] = useState<Array<CenterDocument & { id: string }>>([]);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const profile = await getMemberCoverageProfile();
+        setCoverageType(profile.coverageType);
+        setCoverageGovernorates(profile.coverageGovernorates.join(', '));
+        setCoverageCenterIds(profile.coverageCenterIds.join(', '));
+        setAidTypes(profile.aidTypes.join(', '));
+        setMaxCaseLoad(profile.maxCaseLoad);
+        setDeliveryMode(profile.deliveryMode);
+      } catch {
+        // Profile not yet configured — defaults are fine
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    void loadProfile();
+  }, []);
 
   useEffect(() => {
     const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
@@ -88,6 +109,14 @@ export default function ProfileCoverage() {
       setSaving(false);
     }
   };
+
+  if (profileLoading) {
+    return (
+      <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
+        {t('profile.loading')}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl space-y-6">

@@ -349,9 +349,7 @@ function CreateMemberCase() {
                 type="number"
                 min={0}
                 value={formData.numberOfPeopleInHousehold}
-                onChange={(e) =>
-                  handleChange('numberOfPeopleInHousehold', Number(e.target.value))
-                }
+                onChange={(e) => handleChange('numberOfPeopleInHousehold', Number(e.target.value))}
                 required
                 className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
               />
