@@ -141,7 +141,7 @@ function Home() {
 
         const center = isCenterCase ? selectedCenter : null;
         const resolvedGovernorate = center ? center.governorate : currentGovernorate;
-        const resolvedCity = center ? center.city : city;
+        const resolvedCity = center ? (center.district ?? '') : city;
         const resolvedStreet = center ? center.address : street;
         const resolvedBuilding = center ? center.name : building;
         const resolvedFloor = isCenterCase ? 'Center intake' : floor;
@@ -256,7 +256,7 @@ function Home() {
               <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
                 <p className="font-medium text-gray-800">{selectedCenter.name}</p>
                 <p>
-                  {selectedCenter.city}, {selectedCenter.governorate}
+                  {selectedCenter.district ? `${selectedCenter.district}, ` : ''}{selectedCenter.governorate}
                 </p>
                 <p>{selectedCenter.address}</p>
               </div>

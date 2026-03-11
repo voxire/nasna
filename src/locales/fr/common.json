@@ -6,5 +6,6 @@
   "loading": "Chargement",
   "errorTitle": "Une erreur s'est produite",
   "errorDescription": "Veuillez actualiser la page et réessayer.",
-  "errorRefresh": "Actualiser"
+  "errorRefresh": "Actualiser",
+  "notAuthenticated": "Vous devez être connecté pour effectuer cette action."
 }

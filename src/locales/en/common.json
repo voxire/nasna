@@ -6,5 +6,6 @@
   "loading": "Loading",
   "errorTitle": "Something went wrong",
   "errorDescription": "Please refresh the page and try again.",
-  "errorRefresh": "Refresh"
+  "errorRefresh": "Refresh",
+  "notAuthenticated": "You must be signed in to perform this action."
 }

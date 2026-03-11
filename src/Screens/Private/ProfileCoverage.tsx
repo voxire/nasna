@@ -186,7 +186,8 @@ export default function ProfileCoverage() {
                       <span className="space-y-1 text-sm">
                         <span className="block font-medium text-gray-800">{center.name}</span>
                         <span className="block text-gray-500">
-                          {center.city}, {center.governorate}
+                          {center.district ? `${center.district}, ` : ''}
+                          {center.governorate}
                         </span>
                       </span>
                     </label>

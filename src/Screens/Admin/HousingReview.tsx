@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 import { auth, db } from '@/firebase';
 import {
   collection,
@@ -17,6 +18,10 @@ import type { HousingDocument, HousingStatus } from '@/types';
 import HousingCard from '@/Components/HousingCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { toast } from 'sonner';
+
+const housingStatusUpdateSchema = z.object({
+  status: z.enum(['available', 'reserved', 'filled']),
+});
 
 interface HousingRow extends HousingDocument {
   id: string;
@@ -69,10 +74,15 @@ export default function HousingReview() {
   }, []);
 
   const approveListing = async (id: string) => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) {
+      toast.error(t('common.notAuthenticated'));
+      return;
+    }
     try {
       await updateDoc(doc(db, 'housing', id), {
         status: 'available',
-        approvedBy: auth.currentUser?.uid ?? '',
+        approvedBy: uid,
         updatedAt: serverTimestamp(),
       });
       toast.success(t('housing.admin.approveSuccess'));
@@ -93,8 +103,16 @@ export default function HousingReview() {
   };
 
   const updateStatus = async (id: string, status: HousingStatus) => {
+    const parsed = housingStatusUpdateSchema.safeParse({ status });
+    if (!parsed.success) {
+      toast.error(t('housing.admin.errorUpdate'));
+      return;
+    }
     try {
-      await updateDoc(doc(db, 'housing', id), { status, updatedAt: serverTimestamp() });
+      await updateDoc(doc(db, 'housing', id), {
+        status: parsed.data.status,
+        updatedAt: serverTimestamp(),
+      });
       toast.success(t('housing.admin.statusUpdated'));
     } catch (error) {
       console.error('Failed to update housing status:', error);
