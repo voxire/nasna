@@ -31,6 +31,14 @@ describe('CapacityBar', () => {
     expect(container.querySelector('.bg-emerald-500')).not.toBeInTheDocument();
   });
 
+  it('renders yellow bar when occupancy is exactly 75%', () => {
+    const { container } = render(
+      <CapacityBar totalCapacity={100} currentOccupancy={75} isActive />,
+    );
+    expect(container.querySelector('.bg-amber-500')).toBeInTheDocument();
+    expect(container.querySelector('.bg-emerald-500')).not.toBeInTheDocument();
+  });
+
   it('clamps occupancy to 100% maximum', () => {
     const { container } = render(
       <CapacityBar totalCapacity={10} currentOccupancy={200} isActive />,

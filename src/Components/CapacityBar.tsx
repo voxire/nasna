@@ -16,7 +16,7 @@ export default function CapacityBar({
     ? 'bg-gray-300'
     : percentage > 90
       ? 'bg-rose-500'
-      : percentage > 75
+      : percentage >= 75
         ? 'bg-amber-500'
         : 'bg-emerald-500';
 
