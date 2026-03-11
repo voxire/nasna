@@ -112,26 +112,15 @@ service cloud.firestore {
     // ─── /centers ───────────────────────────────────────────────────────────
 
     match /centers/{centerId} {
-      allow read: if resource.data.isActive == true || isAdmin() || isValidatedMember() || isAgent();
+      allow read: if isSignedIn();
       allow write: if isAdmin();
     }
 
     // ─── /housing ───────────────────────────────────────────────────────────
 
     match /housing/{housingId} {
-      allow create: if onlyFields(['hostName', 'hostPhone', 'area', 'address', 'capacity',
-                                   'availableSpots', 'priceType', 'notes', 'status',
-                                   'createdAt', 'updatedAt'])
-        && request.resource.data.hostName is string
-        && request.resource.data.hostPhone is string
-        && request.resource.data.area is string
-        && request.resource.data.address is string
-        && request.resource.data.capacity is int
-        && request.resource.data.availableSpots is int
-        && request.resource.data.availableSpots <= request.resource.data.capacity
-        && request.resource.data.priceType in ['free', 'subsidized', 'paid']
-        && request.resource.data.status == 'pending_review';
-      allow read: if isAdmin() || resource.data.status == 'approved';
+      allow create: if true; // unauthenticated public submission
+      allow read: if isAdmin() || resource.data.status == 'available';
       allow update, delete: if isAdmin();
     }
 
