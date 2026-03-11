@@ -49,6 +49,8 @@
     "psychosocial": "Soutien psychosocial",
     "legal_docs": "Documents juridiques"
   },
+  "selectCenter": "Sélectionner un centre",
+  "noCentersAvailable": "Aucun centre actif disponible",
   "consentRequired": "Vous devez donner votre consentement avant de soumettre.",
   "centerRequired": "Sélectionnez un centre avant de soumettre ce cas.",
   "offlineBanner": "Vous êtes hors ligne. Les nouvelles soumissions seront enregistrées dans ce navigateur et synchronisées automatiquement lorsque la connexion reviendra.",
