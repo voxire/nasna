@@ -30,7 +30,6 @@
     "address": "العنوان",
     "totalCapacity": "السعة الإجمالية",
     "availableSpots": "الأماكن المتاحة",
-    "priceType": "نوع السعر",
     "free": "مجاني",
     "subsidized": "مدعوم",
     "paid": "مدفوع",

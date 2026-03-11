@@ -30,7 +30,6 @@
     "address": "Address",
     "totalCapacity": "Total Capacity",
     "availableSpots": "Available Spots",
-    "priceType": "Price Type",
     "free": "Free",
     "subsidized": "Subsidized",
     "paid": "Paid",
