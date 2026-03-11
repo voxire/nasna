@@ -9,31 +9,100 @@
   },
   "map": {
     "title": "خريطة العمليات",
-    "description": "الجغرافيا التشغيلية على مستوى المحافظات للحالات وتغطية المنظمات والمراكز والسكن.",
-    "mappedGovernorates": "المحافظات المُعيّنة",
-    "pendingCases": "حالات معلقة",
-    "urgentCases": "حالات عاجلة",
-    "housingSpots": "أماكن سكن",
-    "layers": "الطبقات",
-    "submissionClusters": "تجمعات الطلبات",
-    "ngoCoverage": "تغطية المنظمات",
-    "centers": "المراكز",
-    "housingAreas": "مناطق السكن",
+    "description": "عرض لحظي للحالات وتغطية الجمعيات ومراكز الإيواء والسكن المتاح في لبنان.",
+    "refresh": "تحديث",
+    "limitWarning": "يتم عرض آخر {{count}} حالة فقط. ضيّق المرشحات إذا كنت تحتاج عرضاً أدق.",
     "privacyModel": "نموذج الخصوصية",
-    "privacyDescription": "يتم تجميع حالات الأسر حسب المحافظة. لا تُعرض العناوين الدقيقة للعائلات على هذه الخريطة.",
-    "totalCases": "إجمالي الحالات:",
-    "pending": "معلقة:",
-    "urgent": "عاجلة:",
-    "capacity": "السعة:",
-    "listings": "القوائم:",
-    "availableSpots": "الأماكن المتاحة:",
-    "coverage": "التغطية:",
-    "centerIds": "معرفات المراكز:",
-    "loadError": "فشل تحميل بيانات خريطة العمليات.",
-    "loading": "جارٍ تحميل خريطة العمليات...",
-    "displacementSites": "مواقع التهجير",
-    "contact": "المسؤول:",
-    "phone": "الهاتف:"
+    "privacyDescription": "تعرض النوافذ المنبثقة بيانات تشغيلية فقط ولا تعرض الأسماء أو أرقام الهواتف أو العناوين الدقيقة.",
+    "loadError": "تعذّر تحميل بيانات خريطة العمليات.",
+    "summary": {
+      "submissions": "الحالات:",
+      "ngos": "الجمعيات:",
+      "centers": "المراكز:",
+      "housing": "أماكن السكن:",
+      "centerCapacity": "السعة المتتبعة للمراكز:"
+    },
+    "filters": {
+      "title": "المرشحات",
+      "description": "غيّر الطبقات ومرشحات الحالات مباشرة من الخريطة.",
+      "dateRange": "الفترة الزمنية",
+      "dateOptions": {
+        "24h": "آخر 24 ساعة",
+        "48h": "آخر 48 ساعة",
+        "7d": "آخر 7 أيام",
+        "all": "كل الوقت"
+      },
+      "status": "الحالات",
+      "needs": "الاحتياجات",
+      "staleOnly": "المتأخرة فقط",
+      "staleOnlyHelp": "إظهار الحالات المعلّمة كمتأخرة فقط.",
+      "zoomHint": "مستوى التكبير الحالي: {{zoom}}. تتفكك التجمعات إلى حالات منفردة بعد مستوى 11."
+    },
+    "layers": {
+      "title": "الطبقات",
+      "submissions": "نقاط الحالات",
+      "ngoCoverage": "مناطق تغطية الجمعيات",
+      "centers": "مراكز الإيواء",
+      "housing": "نقاط السكن"
+    },
+    "popup": {
+      "caseId": "معرّف الحالة:",
+      "governorate": "المحافظة:",
+      "status": "الحالة:",
+      "stale": "متأخرة:",
+      "created": "تاريخ الإنشاء:",
+      "needs": "الاحتياجات:",
+      "yes": "نعم",
+      "no": "لا",
+      "none": "لا يوجد",
+      "clusterTitle": "تجمّع حالات",
+      "clusterCount": "عدد الحالات في هذا التجمّع:",
+      "clusterHint": "قرّب الخريطة لرؤية كل حالة على حدة.",
+      "currentLoad": "الحمولة الحالية:",
+      "center": {
+        "type": "النوع:",
+        "occupancy": "الإشغال:"
+      },
+      "housing": {
+        "type": "النوع:",
+        "governorate": "المحافظة:",
+        "capacity": "السعة:",
+        "priceType": "نوع السعر:",
+        "availableFrom": "متاح من:"
+      }
+    },
+    "statusLabels": {
+      "pending": "معلّقة",
+      "assigned": "مُسندة",
+      "in_progress": "قيد التنفيذ",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
+    },
+    "time": {
+      "minutesAgo_one": "منذ دقيقة",
+      "minutesAgo_two": "منذ دقيقتين",
+      "minutesAgo_few": "منذ {{count}} دقائق",
+      "minutesAgo_many": "منذ {{count}} دقيقة",
+      "minutesAgo_other": "منذ {{count}} دقيقة",
+      "hoursAgo_one": "منذ ساعة",
+      "hoursAgo_two": "منذ ساعتين",
+      "hoursAgo_few": "منذ {{count}} ساعات",
+      "hoursAgo_many": "منذ {{count}} ساعة",
+      "hoursAgo_other": "منذ {{count}} ساعة",
+      "daysAgo_one": "منذ يوم",
+      "daysAgo_two": "منذ يومين",
+      "daysAgo_few": "منذ {{count}} أيام",
+      "daysAgo_many": "منذ {{count}} يوماً",
+      "daysAgo_other": "منذ {{count}} يوم"
+    },
+    "facilities": {
+      "generator": "مولد",
+      "water": "مياه",
+      "kitchen": "مطبخ",
+      "medical_room": "غرفة طبية",
+      "bathrooms": "حمّامات",
+      "internet": "إنترنت"
+    }
   },
   "dispatch": {
     "title": "مركز الإرسال",

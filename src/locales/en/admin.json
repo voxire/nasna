@@ -9,31 +9,91 @@
   },
   "map": {
     "title": "Operations Map",
-    "description": "Governorate-level operational geography for cases, NGO coverage, centers, and housing.",
-    "mappedGovernorates": "Mapped governorates",
-    "pendingCases": "Pending cases",
-    "urgentCases": "Urgent cases",
-    "housingSpots": "Housing spots",
-    "layers": "Layers",
-    "submissionClusters": "Submission clusters",
-    "ngoCoverage": "NGO coverage",
-    "centers": "Centers",
-    "housingAreas": "Housing areas",
+    "description": "Snapshot view of cases, NGO coverage, displacement centers, and available housing across Lebanon.",
+    "refresh": "Refresh",
+    "limitWarning": "Showing the latest {{count}} cases. Narrow the filters if you need a tighter view.",
     "privacyModel": "Privacy model",
-    "privacyDescription": "Household cases are aggregated by governorate. Exact family addresses are not shown on this map.",
-    "totalCases": "Total cases:",
-    "pending": "Pending:",
-    "urgent": "Urgent:",
-    "capacity": "Capacity:",
-    "listings": "Listings:",
-    "availableSpots": "Available spots:",
-    "coverage": "Coverage:",
-    "centerIds": "Center IDs:",
+    "privacyDescription": "Case popups intentionally exclude names, phone numbers, and exact family addresses.",
     "loadError": "Failed to load operations map data.",
-    "loading": "Loading operations map...",
-    "displacementSites": "Displacement sites",
-    "contact": "Contact:",
-    "phone": "Phone:"
+    "summary": {
+      "submissions": "Cases:",
+      "ngos": "NGOs:",
+      "centers": "Centers:",
+      "housing": "Housing spots:",
+      "centerCapacity": "Tracked center capacity:"
+    },
+    "filters": {
+      "title": "Filters",
+      "description": "Adjust layers and case filters without leaving the map.",
+      "dateRange": "Date range",
+      "dateOptions": {
+        "24h": "Last 24h",
+        "48h": "Last 48h",
+        "7d": "Last 7 days",
+        "all": "All time"
+      },
+      "status": "Statuses",
+      "needs": "Needs",
+      "staleOnly": "Stale only",
+      "staleOnlyHelp": "Only show cases marked as stale.",
+      "zoomHint": "Current zoom: {{zoom}}. Clusters split into individual case pins after zoom 11."
+    },
+    "layers": {
+      "title": "Layers",
+      "submissions": "Submission pins",
+      "ngoCoverage": "NGO coverage zones",
+      "centers": "Displacement centers",
+      "housing": "Housing pins"
+    },
+    "popup": {
+      "caseId": "Case ID:",
+      "governorate": "Governorate:",
+      "status": "Status:",
+      "stale": "Stale:",
+      "created": "Created:",
+      "needs": "Needs:",
+      "yes": "Yes",
+      "no": "No",
+      "none": "None listed",
+      "clusterTitle": "Submission cluster",
+      "clusterCount": "Cases in this cluster:",
+      "clusterHint": "Zoom in for individual case popups.",
+      "currentLoad": "Current load:",
+      "center": {
+        "type": "Type:",
+        "occupancy": "Occupancy:"
+      },
+      "housing": {
+        "type": "Type:",
+        "governorate": "Governorate:",
+        "capacity": "Capacity:",
+        "priceType": "Price type:",
+        "availableFrom": "Available from:"
+      }
+    },
+    "statusLabels": {
+      "pending": "Pending",
+      "assigned": "Assigned",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "time": {
+      "minutesAgo_one": "{{count}} min ago",
+      "minutesAgo_other": "{{count}} mins ago",
+      "hoursAgo_one": "{{count}} hour ago",
+      "hoursAgo_other": "{{count}} hours ago",
+      "daysAgo_one": "{{count}} day ago",
+      "daysAgo_other": "{{count}} days ago"
+    },
+    "facilities": {
+      "generator": "Generator",
+      "water": "Water",
+      "kitchen": "Kitchen",
+      "medical_room": "Medical room",
+      "bathrooms": "Bathrooms",
+      "internet": "Internet"
+    }
   },
   "dispatch": {
     "title": "Dispatch Center",

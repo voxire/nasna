@@ -9,31 +9,91 @@
   },
   "map": {
     "title": "Carte des opérations",
-    "description": "Géographie opérationnelle au niveau des gouvernorats pour les cas, la couverture des ONG, les centres et l'hébergement.",
-    "mappedGovernorates": "Gouvernorats cartographiés",
-    "pendingCases": "Cas en attente",
-    "urgentCases": "Cas urgents",
-    "housingSpots": "Places d'hébergement",
-    "layers": "Couches",
-    "submissionClusters": "Groupes de soumissions",
-    "ngoCoverage": "Couverture des ONG",
-    "centers": "Centres",
-    "housingAreas": "Zones d'hébergement",
+    "description": "Vue instantanée des cas, de la couverture des ONG, des centres de déplacement et du logement disponible au Liban.",
+    "refresh": "Actualiser",
+    "limitWarning": "Affichage des {{count}} cas les plus récents. Affinez les filtres pour une vue plus précise.",
     "privacyModel": "Modèle de confidentialité",
-    "privacyDescription": "Les cas des ménages sont agrégés par gouvernorat. Les adresses exactes des familles ne sont pas affichées sur cette carte.",
-    "totalCases": "Total des cas :",
-    "pending": "En attente :",
-    "urgent": "Urgents :",
-    "capacity": "Capacité :",
-    "listings": "Annonces :",
-    "availableSpots": "Places disponibles :",
-    "coverage": "Couverture :",
-    "centerIds": "ID des centres :",
+    "privacyDescription": "Les fenêtres d’information excluent volontairement les noms, numéros de téléphone et adresses exactes.",
     "loadError": "Échec du chargement des données de la carte des opérations.",
-    "loading": "Chargement de la carte des opérations...",
-    "displacementSites": "Sites de déplacement",
-    "contact": "Contact :",
-    "phone": "Téléphone :"
+    "summary": {
+      "submissions": "Cas :",
+      "ngos": "ONG :",
+      "centers": "Centres :",
+      "housing": "Places de logement :",
+      "centerCapacity": "Capacité suivie des centres :"
+    },
+    "filters": {
+      "title": "Filtres",
+      "description": "Ajustez les couches et les filtres de cas directement depuis la carte.",
+      "dateRange": "Période",
+      "dateOptions": {
+        "24h": "Dernières 24 h",
+        "48h": "Dernières 48 h",
+        "7d": "7 derniers jours",
+        "all": "Toute la période"
+      },
+      "status": "Statuts",
+      "needs": "Besoins",
+      "staleOnly": "Seulement les cas obsolètes",
+      "staleOnlyHelp": "N’afficher que les cas signalés comme obsolètes.",
+      "zoomHint": "Niveau de zoom actuel : {{zoom}}. Les grappes se séparent en cas individuels après le niveau 11."
+    },
+    "layers": {
+      "title": "Couches",
+      "submissions": "Repères des cas",
+      "ngoCoverage": "Zones de couverture ONG",
+      "centers": "Centres de déplacement",
+      "housing": "Repères logement"
+    },
+    "popup": {
+      "caseId": "ID du cas :",
+      "governorate": "Gouvernorat :",
+      "status": "Statut :",
+      "stale": "Obsolète :",
+      "created": "Créé :",
+      "needs": "Besoins :",
+      "yes": "Oui",
+      "no": "Non",
+      "none": "Aucun",
+      "clusterTitle": "Grappe de cas",
+      "clusterCount": "Cas dans cette grappe :",
+      "clusterHint": "Zoomez pour afficher les cas un par un.",
+      "currentLoad": "Charge actuelle :",
+      "center": {
+        "type": "Type :",
+        "occupancy": "Occupation :"
+      },
+      "housing": {
+        "type": "Type :",
+        "governorate": "Gouvernorat :",
+        "capacity": "Capacité :",
+        "priceType": "Type de prix :",
+        "availableFrom": "Disponible à partir du :"
+      }
+    },
+    "statusLabels": {
+      "pending": "En attente",
+      "assigned": "Attribué",
+      "in_progress": "En cours",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "time": {
+      "minutesAgo_one": "il y a {{count}} min",
+      "minutesAgo_other": "il y a {{count}} min",
+      "hoursAgo_one": "il y a {{count}} heure",
+      "hoursAgo_other": "il y a {{count}} heures",
+      "daysAgo_one": "il y a {{count}} jour",
+      "daysAgo_other": "il y a {{count}} jours"
+    },
+    "facilities": {
+      "generator": "Générateur",
+      "water": "Eau",
+      "kitchen": "Cuisine",
+      "medical_room": "Salle médicale",
+      "bathrooms": "Sanitaires",
+      "internet": "Internet"
+    }
   },
   "dispatch": {
     "title": "Centre de dispatch",

@@ -9,9 +9,10 @@ import { useAuthStore } from '@/stores/authStore';
 
 interface AdminProps {
   children: ReactNode;
+  fullBleed?: boolean;
 }
 
-function Admin({ children }: AdminProps) {
+function Admin({ children, fullBleed = false }: AdminProps) {
   const loading = useAuthStore((state) => state.loading);
   const profileLoading = useAuthStore((state) => state.profileLoading);
   const initialized = useAuthStore((state) => state.initialized);
@@ -42,7 +43,7 @@ function Admin({ children }: AdminProps) {
           <SidebarTrigger className="md:hidden" />
           <AdminBreadcrumb />
         </header>
-        <main className="flex-1 p-6 bg-gray-50">
+        <main className={fullBleed ? 'flex-1 bg-gray-50' : 'flex-1 p-6 bg-gray-50'}>
           <PageTransition>{children}</PageTransition>
         </main>
       </div>

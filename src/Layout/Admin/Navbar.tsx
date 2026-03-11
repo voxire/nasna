@@ -10,10 +10,17 @@ import {
 
 const ROUTE_LABELS: Record<string, string> = {
   '/manage': 'Home',
+  '/manage/dispatch': 'Dispatch Center',
+  '/manage/centers': 'Centers',
+  '/manage/housing': 'Housing Review',
+  '/manage/impact': 'Impact Dashboard',
+  '/manage/operations-map': 'Operations Map',
+  '/admin/map': 'Operations Map',
   '/manage/submissions': 'Submissions',
   '/manage/ngo': 'NGO / Initiative',
   '/manage/agents': 'Agents',
   '/manage/feedback': 'Feedback',
+  '/manage/emergency': 'Emergency',
   '/manage/offers': 'Aid Offers',
 };
 
