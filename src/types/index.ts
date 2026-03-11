@@ -110,10 +110,12 @@ export interface CenterDocument {
   governorate: string;
   district?: string;
   address?: string;
+  // stored as plain object (not Firestore GeoPoint) for Leaflet compatibility
   coordinates?: { lat: number; lng: number };
   totalCapacity: number;
   currentOccupancy: number;
   facilities?: CenterFacility[];
+  // PII: admin only. Never expose to members, agents, or public.
   managerName?: string;
   // PII: admin only. Never expose to members, agents, or public.
   managerPhone?: string;
@@ -152,6 +154,7 @@ export interface HousingDocument {
   description?: string;
   status: HousingStatus;
   approvedBy?: string;
+  updatedAt?: Timestamp;
   createdAt?: Timestamp;
 }
 
