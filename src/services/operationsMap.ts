@@ -1,6 +1,7 @@
 import { httpsCallable } from 'firebase/functions';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db, functions } from '@/firebase';
+import type { CenterDocument, HousingDocument } from '@/types';
 
 const GOVERNORATE_COORDINATES: Record<string, { lat: number; lng: number }> = {
   Beirut: { lat: 33.8938, lng: 35.5018 },
@@ -89,16 +90,16 @@ export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
   ]);
 
   const centers: CenterMarker[] = centersSnap.docs.map((doc) => {
-    const d = doc.data();
+    const d = doc.data() as CenterDocument;
     return {
       id: doc.id,
-      name: (d.name as string) ?? 'Center',
-      governorate: (d.governorate as string) ?? '',
-      city: (d.city as string) ?? '',
-      address: (d.address as string) ?? '',
+      name: d.name ?? 'Center',
+      governorate: d.governorate ?? '',
+      city: d.city ?? '',
+      address: d.address ?? '',
       capacity: Number(d.capacity ?? 0),
       occupiedCapacity: Number(d.occupiedCapacity ?? 0),
-      ...getCoordinates(d.governorate as string | undefined),
+      ...getCoordinates(d.governorate),
     };
   });
 
@@ -107,8 +108,8 @@ export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
     { area: string; listingCount: number; availableSpots: number; lat: number; lng: number }
   >();
   housingSnap.docs.forEach((doc) => {
-    const d = doc.data();
-    const area = (d.area as string) ?? 'Unknown';
+    const d = doc.data() as HousingDocument;
+    const area = d.area ?? 'Unknown';
     const current = housingMap.get(area) ?? {
       area,
       listingCount: 0,
