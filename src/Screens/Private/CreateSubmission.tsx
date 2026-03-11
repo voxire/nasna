@@ -141,7 +141,7 @@ function CreateSubmission() {
   const draftKey = useMemo(() => `submission-draft:${userUid ?? 'anonymous'}`, [userUid]);
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
+    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true));
 
     return onSnapshot(centerQuery, (snapshot) => {
       setCenters(
@@ -303,8 +303,8 @@ function CreateSubmission() {
         ? {
             ...formData,
             currentGovernorate: selectedCenter.governorate,
-            city: selectedCenter.city,
-            street: selectedCenter.address,
+            city: selectedCenter.district ?? selectedCenter.governorate,
+            street: selectedCenter.address ?? '',
             building: selectedCenter.name,
             floor: 'Center intake',
           }
@@ -467,26 +467,35 @@ function CreateSubmission() {
             <Label className="text-sm font-medium text-gray-700">
               {t('submission.locationType')}
             </Label>
-            <Select
-              value={formData.locationType}
-              onValueChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  locationType: value as LocationType,
-                  centerId: '',
-                  numberOfPeopleInHousehold:
-                    value === 'center' ? 0 : prev.numberOfPeopleInHousehold,
-                }))
-              }
-            >
-              <SelectTrigger className="bg-gray-50 border-gray-200">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="with_family">{t('submission.withFamily')}</SelectItem>
-                <SelectItem value="center">{t('submission.inCenter')}</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
+              {(
+                [
+                  { value: 'with_family', label: t('submission.locationTypeFamily') },
+                  { value: 'center', label: t('submission.locationTypeCenter') },
+                ] as const
+              ).map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      locationType: value,
+                      centerId: '',
+                      numberOfPeopleInHousehold:
+                        value === 'center' ? 0 : prev.numberOfPeopleInHousehold,
+                    }))
+                  }
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                    formData.locationType === value
+                      ? 'bg-white text-[#12a89d] shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[{ name: 'previousGovernorate', label: t('submission.previousGovernorate') }].map(
@@ -518,7 +527,8 @@ function CreateSubmission() {
                 <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
                   <p className="font-medium text-gray-800">{selectedCenter.name}</p>
                   <p>
-                    {selectedCenter.city}, {selectedCenter.governorate}
+                    {selectedCenter.district ? `${selectedCenter.district}, ` : ''}
+                    {selectedCenter.governorate}
                   </p>
                   <p>{selectedCenter.address}</p>
                 </div>

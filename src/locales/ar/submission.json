@@ -27,6 +27,8 @@
   "locationType": "وضع السكن الحالي",
   "withFamily": "الإقامة مع العائلة أو مستضيف",
   "inCenter": "الإقامة في مركز",
+  "locationTypeFamily": "مع عائلة في منطقة آمنة",
+  "locationTypeCenter": "في مركز إيواء",
   "center": "المركز",
   "householdAndNeeds": "الأسرة والاحتياجات",
   "consent": "أوافق على تقديم هذا النموذج ومشاركة بياناتي بشكل خاص.",

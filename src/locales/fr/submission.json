@@ -27,6 +27,8 @@
   "locationType": "Situation de logement actuelle",
   "withFamily": "Hébergé par la famille ou un proche",
   "inCenter": "Hébergé dans un centre",
+  "locationTypeFamily": "Avec la famille dans une zone sûre",
+  "locationTypeCenter": "Dans un centre de déplacement",
   "center": "Centre",
   "householdAndNeeds": "Ménage et besoins",
   "consent": "Je donne mon consentement pour cette soumission.",
