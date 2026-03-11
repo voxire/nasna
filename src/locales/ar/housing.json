@@ -61,5 +61,30 @@
     "noResults": "لا توجد عروض سكن تطابق الفلاتر الحالية.",
     "statusUpdated": "تم تحديث حالة قائمة السكن إلى {{status}}.",
     "errorUpdate": "فشل تحديث قائمة السكن."
+  },
+  "card": {
+    "capacity": "حتى {{count}} أشخاص",
+    "free": "مجاني",
+    "subsidized": "مدعوم",
+    "marketRate": "بالسعر التجاري",
+    "availableFrom": "متاح من",
+    "listerContact": "معلومات المعلِن (مشرف فقط)",
+    "type_apartment": "شقة",
+    "type_room": "غرفة",
+    "type_house": "منزل",
+    "type_floor": "طابق",
+    "status_pending_review": "بانتظار المراجعة",
+    "status_available": "متاح",
+    "status_reserved": "محجوز",
+    "status_filled": "ممتلئ",
+    "amenity_generator": "مولد",
+    "amenity_water": "مياه",
+    "amenity_internet": "إنترنت",
+    "amenity_washing_machine": "غسالة",
+    "amenity_furnished": "مفروش",
+    "amenity_private_bathroom": "حمام خاص"
+  },
+  "admin": {
+    "listerContact": "معلومات المعلِن (مشرف فقط)"
   }
 }

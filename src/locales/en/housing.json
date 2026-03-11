@@ -61,5 +61,30 @@
     "noResults": "No housing offers matched the current filters.",
     "statusUpdated": "Housing listing marked {{status}}.",
     "errorUpdate": "Failed to update housing listing."
+  },
+  "card": {
+    "capacity": "Up to {{count}} people",
+    "free": "Free",
+    "subsidized": "Subsidized",
+    "marketRate": "Market Rate",
+    "availableFrom": "Available from",
+    "listerContact": "Lister Contact (Admin Only)",
+    "type_apartment": "Apartment",
+    "type_room": "Room",
+    "type_house": "House",
+    "type_floor": "Floor",
+    "status_pending_review": "Pending Review",
+    "status_available": "Available",
+    "status_reserved": "Reserved",
+    "status_filled": "Filled",
+    "amenity_generator": "Generator",
+    "amenity_water": "Water",
+    "amenity_internet": "Internet",
+    "amenity_washing_machine": "Washing Machine",
+    "amenity_furnished": "Furnished",
+    "amenity_private_bathroom": "Private Bathroom"
+  },
+  "admin": {
+    "listerContact": "Lister Contact (Admin Only)"
   }
 }

@@ -61,5 +61,30 @@
     "noResults": "Aucune offre d'hébergement ne correspond aux filtres actuels.",
     "statusUpdated": "Annonce d'hébergement marquée {{status}}.",
     "errorUpdate": "Échec de la mise à jour de l'annonce d'hébergement."
+  },
+  "card": {
+    "capacity": "Jusqu'à {{count}} personnes",
+    "free": "Gratuit",
+    "subsidized": "Subventionné",
+    "marketRate": "Prix du marché",
+    "availableFrom": "Disponible à partir du",
+    "listerContact": "Contact de l'annonceur (Admin uniquement)",
+    "type_apartment": "Appartement",
+    "type_room": "Chambre",
+    "type_house": "Maison",
+    "type_floor": "Étage",
+    "status_pending_review": "En attente de révision",
+    "status_available": "Disponible",
+    "status_reserved": "Réservé",
+    "status_filled": "Occupé",
+    "amenity_generator": "Groupe électrogène",
+    "amenity_water": "Eau",
+    "amenity_internet": "Internet",
+    "amenity_washing_machine": "Machine à laver",
+    "amenity_furnished": "Meublé",
+    "amenity_private_bathroom": "Salle de bain privée"
+  },
+  "admin": {
+    "listerContact": "Contact de l'annonceur (Admin uniquement)"
   }
 }
