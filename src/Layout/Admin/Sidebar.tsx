@@ -44,7 +44,7 @@ const NAV_ITEMS = [
   { path: '/manage/centers', label: 'Centers', icon: Building2 },
   { path: '/manage/housing', label: 'Housing Review', icon: House },
   { path: '/manage/impact', label: 'Impact Dashboard', icon: ChartColumn },
-  { path: '/manage/operations-map', label: 'Operations Map', icon: Map },
+  { path: '/admin/map', label: 'Operations Map', icon: Map },
   { path: '/manage/submissions', label: 'Submissions', icon: List },
   { path: '/manage/ngo', label: 'NGO / Initiative', icon: Bell },
   { path: '/manage/agents', label: 'Agents', icon: UserPlus },

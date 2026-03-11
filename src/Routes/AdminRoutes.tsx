@@ -72,7 +72,17 @@ const AdminRoutes: RouteConfig[] = [
   {
     path: '/manage/operations-map',
     element: (
-      <Admin>
+      <Admin fullBleed>
+        <LazyBoundary>
+          <OperationsMap />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/admin/map',
+    element: (
+      <Admin fullBleed>
         <LazyBoundary>
           <OperationsMap />
         </LazyBoundary>
