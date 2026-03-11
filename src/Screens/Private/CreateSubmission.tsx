@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { auth, db, functions } from '../../firebase';
-import { addDoc, collection, onSnapshot, query, where } from 'firebase/firestore';
+import { addDoc, collection, limit, onSnapshot, query, where } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -141,18 +141,25 @@ function CreateSubmission() {
   const draftKey = useMemo(() => `submission-draft:${userUid ?? 'anonymous'}`, [userUid]);
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
+    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true), limit(100));
 
-    return onSnapshot(centerQuery, (snapshot) => {
-      setCenters(
-        snapshot.docs
-          .map((document) => ({
-            id: document.id,
-            ...(document.data() as CenterDocument),
-          }))
-          .sort((left, right) => left.name.localeCompare(right.name)),
-      );
-    });
+    return onSnapshot(
+      centerQuery,
+      (snapshot) => {
+        setCenters(
+          snapshot.docs
+            .map((document) => ({
+              id: document.id,
+              ...(document.data() as CenterDocument),
+            }))
+            .sort((left, right) => left.name.localeCompare(right.name)),
+        );
+      },
+      (error) => {
+        console.error('centers listener error:', error);
+        toast.error(t('submission.centersLoadError'));
+      },
+    );
   }, []);
 
   const refreshQueuedItems = useCallback(async () => {
@@ -303,8 +310,8 @@ function CreateSubmission() {
         ? {
             ...formData,
             currentGovernorate: selectedCenter.governorate,
-            city: selectedCenter.city,
-            street: selectedCenter.address,
+            city: selectedCenter.district ?? selectedCenter.governorate,
+            street: selectedCenter.address ?? '',
             building: selectedCenter.name,
             floor: 'Center intake',
           }
@@ -467,26 +474,35 @@ function CreateSubmission() {
             <Label className="text-sm font-medium text-gray-700">
               {t('submission.locationType')}
             </Label>
-            <Select
-              value={formData.locationType}
-              onValueChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  locationType: value as LocationType,
-                  centerId: '',
-                  numberOfPeopleInHousehold:
-                    value === 'center' ? 0 : prev.numberOfPeopleInHousehold,
-                }))
-              }
-            >
-              <SelectTrigger className="bg-gray-50 border-gray-200">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="with_family">{t('submission.withFamily')}</SelectItem>
-                <SelectItem value="center">{t('submission.inCenter')}</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
+              {(
+                [
+                  { value: 'with_family', label: t('submission.locationTypeFamily') },
+                  { value: 'center', label: t('submission.locationTypeCenter') },
+                ] as const
+              ).map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      locationType: value,
+                      centerId: '',
+                      numberOfPeopleInHousehold:
+                        value === 'center' ? 0 : prev.numberOfPeopleInHousehold,
+                    }))
+                  }
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                    formData.locationType === value
+                      ? 'bg-white text-[#12a89d] shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[{ name: 'previousGovernorate', label: t('submission.previousGovernorate') }].map(
@@ -518,9 +534,10 @@ function CreateSubmission() {
                 <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
                   <p className="font-medium text-gray-800">{selectedCenter.name}</p>
                   <p>
-                    {selectedCenter.city}, {selectedCenter.governorate}
+                    {selectedCenter.district ? `${selectedCenter.district}, ` : ''}
+                    {selectedCenter.governorate}
                   </p>
-                  <p>{selectedCenter.address}</p>
+                  {selectedCenter.address && <p>{selectedCenter.address}</p>}
                 </div>
               ) : null}
             </div>

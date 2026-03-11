@@ -170,7 +170,7 @@ function CreateMemberCase() {
         ? {
             ...formData,
             currentGovernorate: selectedCenter.governorate,
-            city: selectedCenter.city,
+            city: selectedCenter.district ?? '',
             street: selectedCenter.address,
             building: selectedCenter.name,
             floor: 'Center intake',
@@ -309,7 +309,8 @@ function CreateMemberCase() {
                 <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
                   <p className="font-medium text-gray-800">{selectedCenter.name}</p>
                   <p>
-                    {selectedCenter.city}, {selectedCenter.governorate}
+                    {selectedCenter.district ? `${selectedCenter.district}, ` : ''}
+                    {selectedCenter.governorate}
                   </p>
                   <p>{selectedCenter.address}</p>
                 </div>

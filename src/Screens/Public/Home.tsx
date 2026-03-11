@@ -3,7 +3,7 @@ import { db, functions } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { addDoc, collection, onSnapshot, query, Timestamp, where } from 'firebase/firestore';
+import { addDoc, collection, limit, onSnapshot, query, Timestamp, where } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { getCookie, setCookie } from '../../utils/cookies';
 import type { AgeRanges, CenterDocument, LocationType } from '../../types';
@@ -66,7 +66,7 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
+    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true), limit(100));
 
     return onSnapshot(centerQuery, (snapshot) => {
       setCenters(
@@ -141,7 +141,7 @@ function Home() {
 
         const center = isCenterCase ? selectedCenter : null;
         const resolvedGovernorate = center ? center.governorate : currentGovernorate;
-        const resolvedCity = center ? center.city : city;
+        const resolvedCity = center ? (center.district ?? '') : city;
         const resolvedStreet = center ? center.address : street;
         const resolvedBuilding = center ? center.name : building;
         const resolvedFloor = isCenterCase ? 'Center intake' : floor;
@@ -256,7 +256,7 @@ function Home() {
               <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
                 <p className="font-medium text-gray-800">{selectedCenter.name}</p>
                 <p>
-                  {selectedCenter.city}, {selectedCenter.governorate}
+                  {selectedCenter.district ? `${selectedCenter.district}, ` : ''}{selectedCenter.governorate}
                 </p>
                 <p>{selectedCenter.address}</p>
               </div>

@@ -27,6 +27,8 @@
   "locationType": "Current living situation",
   "withFamily": "Staying with family or host",
   "inCenter": "Staying in a center",
+  "locationTypeFamily": "With family in a safe area",
+  "locationTypeCenter": "At a displacement center",
   "center": "Center",
   "householdAndNeeds": "Household & Needs",
   "consent": "I give my consent for this submission.",
@@ -49,6 +51,9 @@
     "psychosocial": "Psychosocial Support",
     "legal_docs": "Legal Documents"
   },
+  "selectCenter": "Select a center",
+  "noCentersAvailable": "No active centers available",
+  "centersLoadError": "Failed to load centers",
   "consentRequired": "You must give consent before submitting.",
   "centerRequired": "Select a center before submitting this case.",
   "offlineBanner": "You are offline. New submissions will be queued in this browser and synced automatically when the connection returns.",

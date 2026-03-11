@@ -6,5 +6,6 @@
   "loading": "جارٍ التحميل",
   "errorTitle": "حدث خطأ",
   "errorDescription": "يرجى تحديث الصفحة والمحاولة مرة أخرى.",
-  "errorRefresh": "تحديث"
+  "errorRefresh": "تحديث",
+  "notAuthenticated": "يجب أن تكون مسجّلاً للدخول لتنفيذ هذا الإجراء."
 }

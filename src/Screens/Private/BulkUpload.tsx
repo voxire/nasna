@@ -513,8 +513,8 @@ export default function BulkUpload() {
           if (center) {
             centerId = center.id;
             currentGovernorate = center.governorate;
-            city = center.city;
-            street = center.address;
+            city = center.district ?? '';
+            street = center.address ?? '';
             building = center.name;
             floor = 'Center intake';
           }

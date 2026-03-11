@@ -11,7 +11,7 @@ export type CoverageType = 'governorate' | 'center' | 'hybrid';
 export type DeliveryMode = 'delivery' | 'pickup' | 'both';
 export type NotificationChannel = 'email' | 'system';
 export type NotificationStatus = 'pending' | 'sent' | 'failed';
-export type HousingStatus = 'pending_review' | 'approved' | 'rejected' | 'reserved' | 'filled';
+export type HousingStatus = 'pending_review' | 'available' | 'reserved' | 'filled';
 
 export interface AidDeliveryRecord {
   type: string;
@@ -94,37 +94,68 @@ export interface SubmissionDocument {
   updatedAt?: Date;
 }
 
+export type CenterType = 'school' | 'university' | 'community_hall' | 'sports_facility' | 'other';
+export type CenterFacility =
+  | 'generator'
+  | 'water'
+  | 'kitchen'
+  | 'medical_room'
+  | 'bathrooms'
+  | 'internet';
+
 export interface CenterDocument {
   id?: string;
   name: string;
+  type: CenterType;
   governorate: string;
-  city: string;
-  address: string;
-  capacity: number;
-  occupiedCapacity: number;
-  contactName?: string;
-  contactPhone?: string;
-  active: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  district?: string;
+  address?: string;
+  // stored as plain object (not Firestore GeoPoint) for Leaflet compatibility
+  coordinates?: { lat: number; lng: number };
+  totalCapacity: number;
+  currentOccupancy: number;
+  facilities?: CenterFacility[];
+  // PII: admin only. Never expose to members, agents, or public.
+  managerName?: string;
+  // PII: admin only. Never expose to members, agents, or public.
+  managerPhone?: string;
+  isActive: boolean;
+  createdBy: string;
+  updatedAt?: Timestamp;
+  createdAt?: Timestamp;
 }
+
+export type HousingType = 'apartment' | 'room' | 'house' | 'floor';
+export type HousingPriceType = 'free' | 'subsidized' | 'market_rate';
+export type HousingAmenity =
+  | 'generator'
+  | 'water'
+  | 'internet'
+  | 'washing_machine'
+  | 'furnished'
+  | 'private_bathroom';
 
 export interface HousingDocument {
   id?: string;
-  hostName: string;
-  hostPhone: string;
-  area: string;
-  address: string;
+  listerId: string; // UID or 'anonymous'
+  // PII: admin only. Never expose to members, agents, or public.
+  listerName: string;
+  // PII: admin only. Never expose to members, agents, or public.
+  listerPhone: string;
+  type: HousingType;
+  governorate: string;
+  district?: string;
   capacity: number;
-  availableSpots: number;
-  priceType: 'free' | 'subsidized' | 'paid';
-  availableFrom: Date;
-  notes?: string;
+  priceType: HousingPriceType;
+  pricePerMonth?: number; // USD, 0 for free
+  availableFrom: Timestamp;
+  availableUntil?: Timestamp;
+  amenities?: HousingAmenity[];
+  description?: string;
   status: HousingStatus;
   approvedBy?: string;
-  approvedAt?: Date | null;
-  createdAt?: Date;
-  updatedAt?: Date;
+  updatedAt?: Timestamp;
+  createdAt?: Timestamp;
 }
 
 export type EmergencyContactCategory =

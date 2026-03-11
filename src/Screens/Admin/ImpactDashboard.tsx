@@ -50,9 +50,7 @@ export default function ImpactDashboard() {
         query(collection(db, 'housing'), where('status', '==', 'reserved')),
         (snapshot) => {
           const rows = snapshot.docs.map((document) => document.data() as HousingDocument);
-          setReservedHousing(
-            rows.reduce((total, row) => total + Number(row.availableSpots ?? 0), 0),
-          );
+          setReservedHousing(rows.reduce((total, row) => total + Number(row.capacity ?? 0), 0));
         },
       ),
     ];
