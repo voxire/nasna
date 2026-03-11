@@ -1,0 +1,20 @@
+{
+  "title": "خريطة المراكز",
+  "description": "ابحث عن مراكز الإغاثة ومواقع التهجير والسكن المتاح بالقرب منك.",
+  "totalCenters": "مراكز الإغاثة",
+  "displacementSitesCount": "مواقع التهجير",
+  "housingListings": "أماكن السكن المتاحة",
+  "layers": "طبقات الخريطة",
+  "aidCenters": "مراكز الإغاثة",
+  "displacementSites": "مواقع التهجير",
+  "housingAreas": "مناطق السكن",
+  "legendTitle": "دليل الخريطة",
+  "legendCenters": "الدبابيس الزرقاء — مراكز الإغاثة",
+  "legendDisplacement": "الدوائر البرتقالية — مواقع التهجير",
+  "legendHousing": "الدوائر البنفسجية — مناطق السكن",
+  "capacity": "السعة:",
+  "availableSpots": "الأماكن المتاحة:",
+  "contact": "المسؤول:",
+  "phone": "الهاتف:",
+  "loadError": "فشل تحميل بيانات خريطة المراكز."
+}

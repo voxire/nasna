@@ -16,6 +16,7 @@ const OfferHelp = lazy(() => import('../Screens/Public/OfferHelp'));
 const Resources = lazy(() => import('../Screens/Public/Resources'));
 const Feedback = lazy(() => import('../Screens/Public/Feedback'));
 const Emergency = lazy(() => import('../Screens/Public/Emergency'));
+const CentersMap = lazy(() => import('../Screens/Public/CentersMap'));
 
 const PublicRoutes: RouteConfig[] = [
   {
@@ -144,6 +145,16 @@ const PublicRoutes: RouteConfig[] = [
       <Public>
         <LazyBoundary>
           <Feedback />
+        </LazyBoundary>
+      </Public>
+    ),
+  },
+  {
+    path: '/centers-map',
+    element: (
+      <Public>
+        <LazyBoundary>
+          <CentersMap />
         </LazyBoundary>
       </Public>
     ),
