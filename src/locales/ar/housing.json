@@ -96,6 +96,21 @@
     "amenity_private_bathroom": "حمام خاص"
   },
   "admin": {
-    "listerContact": "معلومات المعلِن (مشرف فقط)"
+    "listerContact": "معلومات المعلِن (مشرف فقط)",
+    "title": "مراجعة السكن",
+    "description": "راجع عروض السكن واعتمد أو ارفض القوائم.",
+    "pendingReview": "بانتظار المراجعة",
+    "approvedListings": "القوائم المعتمدة",
+    "approve": "اعتماد",
+    "reject": "رفض",
+    "markReserved": "تحديد كمحجوز",
+    "markFilled": "تحديد كممتلئ",
+    "delete": "حذف",
+    "approveSuccess": "تم اعتماد القائمة.",
+    "rejectSuccess": "تم رفض القائمة وحذفها.",
+    "statusUpdated": "تم تحديث الحالة.",
+    "errorUpdate": "فشل تحديث القائمة.",
+    "noPending": "لا توجد عروض سكن بانتظار المراجعة.",
+    "noApproved": "لا توجد قوائم معتمدة."
   }
 }

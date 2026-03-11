@@ -96,6 +96,21 @@
     "amenity_private_bathroom": "Salle de bain privée"
   },
   "admin": {
-    "listerContact": "Contact de l'annonceur (Admin uniquement)"
+    "listerContact": "Contact de l'annonceur (Admin uniquement)",
+    "title": "Révision du logement",
+    "description": "Examinez les offres de logement soumises, approuvez les annonces valides et suivez les unités réservées ou pleines.",
+    "pendingReview": "En attente de révision",
+    "approvedListings": "Annonces approuvées",
+    "approve": "Approuver",
+    "reject": "Rejeter",
+    "markReserved": "Marquer comme réservé",
+    "markFilled": "Marquer comme occupé",
+    "delete": "Supprimer",
+    "approveSuccess": "Annonce approuvée.",
+    "rejectSuccess": "Annonce rejetée et supprimée.",
+    "statusUpdated": "Statut mis à jour.",
+    "errorUpdate": "Échec de la mise à jour de l'annonce.",
+    "noPending": "Aucune offre de logement en attente de révision.",
+    "noApproved": "Aucune annonce approuvée."
   }
 }

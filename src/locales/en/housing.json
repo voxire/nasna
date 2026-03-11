@@ -96,6 +96,21 @@
     "amenity_private_bathroom": "Private Bathroom"
   },
   "admin": {
-    "listerContact": "Lister Contact (Admin Only)"
+    "listerContact": "Lister Contact (Admin Only)",
+    "title": "Housing Review",
+    "description": "Review submitted housing offers, approve valid listings, and track reserved or filled units.",
+    "pendingReview": "Pending Review",
+    "approvedListings": "Approved Listings",
+    "approve": "Approve",
+    "reject": "Reject",
+    "markReserved": "Mark Reserved",
+    "markFilled": "Mark Filled",
+    "delete": "Delete",
+    "approveSuccess": "Listing approved.",
+    "rejectSuccess": "Listing rejected and deleted.",
+    "statusUpdated": "Status updated.",
+    "errorUpdate": "Failed to update listing.",
+    "noPending": "No housing offers pending review.",
+    "noApproved": "No approved listings."
   }
 }
