@@ -270,7 +270,9 @@
     "successUpdated": "تم تحديث المركز.",
     "successAdded": "تم إضافة المركز.",
     "errorCapacityExceeded": "الإشغال الحالي لا يمكن أن يتجاوز السعة الكلية.",
-    "errorSave": "فشل حفظ المركز."
+    "errorSave": "فشل حفظ المركز.",
+    "status": "الحالة",
+    "actions": "الإجراءات"
   },
   "emergencyContacts": {
     "title": "جهات الاتصال الطارئة",

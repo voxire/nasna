@@ -270,7 +270,9 @@
     "successUpdated": "Centre mis à jour.",
     "successAdded": "Centre ajouté.",
     "errorCapacityExceeded": "L'occupation actuelle ne peut pas dépasser la capacité totale.",
-    "errorSave": "Échec de l'enregistrement du centre."
+    "errorSave": "Échec de l'enregistrement du centre.",
+    "status": "Statut",
+    "actions": "Actions"
   },
   "emergencyContacts": {
     "title": "Contacts d'urgence",

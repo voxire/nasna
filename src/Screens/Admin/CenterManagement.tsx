@@ -89,7 +89,7 @@ const DEFAULT_FORM: CenterFormData = {
   governorate: '',
   district: '',
   address: '',
-  totalCapacity: 0,
+  totalCapacity: 1,
   currentOccupancy: 0,
   managerName: '',
   managerPhone: '',
@@ -108,14 +108,21 @@ export default function CenterManagement() {
 
   useEffect(() => {
     const centerQuery = query(collection(db, 'centers'), orderBy('name'), limit(25));
-    return onSnapshot(centerQuery, (snapshot) => {
-      setCenters(
-        snapshot.docs.map((document) => ({
-          id: document.id,
-          ...(document.data() as CenterDocument),
-        })),
-      );
-    });
+    return onSnapshot(
+      centerQuery,
+      (snapshot) => {
+        setCenters(
+          snapshot.docs.map((document) => ({
+            id: document.id,
+            ...(document.data() as CenterDocument),
+          })),
+        );
+      },
+      (error) => {
+        console.error('centers listener error:', error);
+        toast.error(t('admin.centers.errorSave'));
+      },
+    );
   }, []);
 
   const filteredCenters = useMemo(() => {

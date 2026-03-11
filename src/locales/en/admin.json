@@ -270,7 +270,9 @@
     "successUpdated": "Center updated.",
     "successAdded": "Center added.",
     "errorCapacityExceeded": "Current occupancy cannot exceed total capacity.",
-    "errorSave": "Failed to save center."
+    "errorSave": "Failed to save center.",
+    "status": "Status",
+    "actions": "Actions"
   },
   "emergencyContacts": {
     "title": "Emergency Contacts",

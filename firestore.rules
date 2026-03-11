@@ -112,7 +112,7 @@ service cloud.firestore {
     // ─── /centers ───────────────────────────────────────────────────────────
 
     match /centers/{centerId} {
-      allow read: if resource.data.active == true || isAdmin() || isValidatedMember() || isAgent();
+      allow read: if resource.data.isActive == true || isAdmin() || isValidatedMember() || isAgent();
       allow write: if isAdmin();
     }
 
