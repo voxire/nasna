@@ -51,6 +51,7 @@
   },
   "selectCenter": "Select a center",
   "noCentersAvailable": "No active centers available",
+  "centersLoadError": "Failed to load centers",
   "consentRequired": "You must give consent before submitting.",
   "centerRequired": "Select a center before submitting this case.",
   "offlineBanner": "You are offline. New submissions will be queued in this browser and synced automatically when the connection returns.",

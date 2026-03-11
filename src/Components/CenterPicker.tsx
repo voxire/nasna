@@ -33,24 +33,33 @@ export default function CenterPicker({
   const { t } = useTranslation();
   const [centers, setCenters] = useState<CenterRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     // limit(100) bounds the query — realistically centers won't exceed this
     const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true), limit(100));
 
-    return onSnapshot(centerQuery, (snapshot) => {
-      setCenters(
-        snapshot.docs
-          .map((document) => ({
-            id: document.id,
-            ...(document.data() as CenterDocument),
-          }))
-          .sort(
-            (a, b) => a.governorate.localeCompare(b.governorate) || a.name.localeCompare(b.name),
-          ),
-      );
-      setLoading(false);
-    });
+    return onSnapshot(
+      centerQuery,
+      (snapshot) => {
+        setCenters(
+          snapshot.docs
+            .map((document) => ({
+              id: document.id,
+              ...(document.data() as CenterDocument),
+            }))
+            .sort(
+              (a, b) => a.governorate.localeCompare(b.governorate) || a.name.localeCompare(b.name),
+            ),
+        );
+        setLoading(false);
+      },
+      (err) => {
+        console.error('CenterPicker: failed to load centers:', err);
+        setLoading(false);
+        setError(err);
+      },
+    );
   }, []);
 
   const byGovernorate = useMemo(() => {
@@ -61,7 +70,7 @@ export default function CenterPicker({
     return grouped;
   }, [centers]);
 
-  const hasSelectedCenter = centers.some((c) => c.id === value);
+  const hasSelectedCenter = useMemo(() => centers.some((c) => c.id === value), [centers, value]);
 
   const occupancyLabel = (center: CenterRow) => {
     const pct = Math.round((center.currentOccupancy / Math.max(1, center.totalCapacity)) * 100);
@@ -79,9 +88,11 @@ export default function CenterPicker({
           placeholder={
             loading
               ? t('common.loading')
-              : centers.length === 0
-                ? t('submission.noCentersAvailable')
-                : (placeholder ?? t('submission.selectCenter'))
+              : error
+                ? t('submission.centersLoadError')
+                : centers.length === 0
+                  ? t('submission.noCentersAvailable')
+                  : (placeholder ?? t('submission.selectCenter'))
           }
         />
       </SelectTrigger>
