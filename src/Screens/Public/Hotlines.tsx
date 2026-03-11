@@ -1,4 +1,3 @@
-import 'leaflet/dist/leaflet.css';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
