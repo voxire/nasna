@@ -1,18 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { db } from '@/firebase';
+import { auth, db } from '@/firebase';
 import {
   addDoc,
   collection,
-  deleteDoc,
   doc,
   limit,
   onSnapshot,
   orderBy,
   query,
+  serverTimestamp,
   updateDoc,
 } from 'firebase/firestore';
-import type { CenterDocument } from '@/types';
+import { z } from 'zod';
+import type { CenterDocument, CenterFacility, CenterType } from '@/types';
+import CapacityBar from '@/Components/CapacityBar';
 import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
 import {
@@ -25,6 +27,13 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/Components/ui/select';
+import {
   Table,
   TableBody,
   TableCell,
@@ -33,23 +42,59 @@ import {
   TableRow,
 } from '@/Components/ui/table';
 import { toast } from 'sonner';
-import { QrCode } from 'lucide-react';
-import WhatsAppQRCode from '@/Components/WhatsAppQRCode';
 
 interface CenterRow extends CenterDocument {
   id: string;
 }
 
-const DEFAULT_FORM = {
+const CENTER_TYPES: CenterType[] = [
+  'school',
+  'university',
+  'community_hall',
+  'sports_facility',
+  'other',
+];
+
+const FACILITIES: CenterFacility[] = [
+  'generator',
+  'water',
+  'kitchen',
+  'medical_room',
+  'bathrooms',
+  'internet',
+];
+
+const centerSchema = z.object({
+  name: z.string().trim().min(2),
+  type: z.enum(['school', 'university', 'community_hall', 'sports_facility', 'other']),
+  governorate: z.string().trim().min(2),
+  district: z.string().trim().optional(),
+  address: z.string().trim().optional(),
+  totalCapacity: z.number().int().min(1),
+  currentOccupancy: z.number().int().min(0),
+  managerName: z.string().trim().optional(),
+  // PII: admin only — validated here but never exposed outside admin dialog.
+  managerPhone: z.string().trim().optional(),
+  facilities: z
+    .array(z.enum(['generator', 'water', 'kitchen', 'medical_room', 'bathrooms', 'internet']))
+    .optional(),
+  isActive: z.boolean(),
+});
+
+type CenterFormData = z.infer<typeof centerSchema>;
+
+const DEFAULT_FORM: CenterFormData = {
   name: '',
+  type: 'school',
   governorate: '',
-  city: '',
+  district: '',
   address: '',
-  capacity: 0,
-  occupiedCapacity: 0,
-  contactName: '',
-  contactPhone: '',
-  active: true,
+  totalCapacity: 0,
+  currentOccupancy: 0,
+  managerName: '',
+  managerPhone: '',
+  facilities: [],
+  isActive: true,
 };
 
 export default function CenterManagement() {
@@ -57,13 +102,12 @@ export default function CenterManagement() {
   const [centers, setCenters] = useState<CenterRow[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingCenter, setEditingCenter] = useState<CenterRow | null>(null);
-  const [formState, setFormState] = useState(DEFAULT_FORM);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [formState, setFormState] = useState<CenterFormData>(DEFAULT_FORM);
   const [saving, setSaving] = useState(false);
-  const [qrCenter, setQrCenter] = useState<CenterRow | null>(null);
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), orderBy('name'), limit(100));
-
+    const centerQuery = query(collection(db, 'centers'), orderBy('name'), limit(25));
     return onSnapshot(centerQuery, (snapshot) => {
       setCenters(
         snapshot.docs.map((document) => ({
@@ -75,34 +119,59 @@ export default function CenterManagement() {
   }, []);
 
   const filteredCenters = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-
-    return centers.filter((center) =>
-      normalizedQuery.length === 0
-        ? true
-        : [center.name, center.city, center.governorate, center.address].some((field) =>
-            (field ?? '').toLowerCase().includes(normalizedQuery),
-          ),
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return centers;
+    return centers.filter((c) =>
+      [c.name, c.governorate, c.district, c.address].some((f) =>
+        (f ?? '').toLowerCase().includes(q),
+      ),
     );
   }, [centers, searchQuery]);
 
-  const resetForm = () => {
-    setFormState(DEFAULT_FORM);
+  const openCreate = () => {
     setEditingCenter(null);
+    setFormState(DEFAULT_FORM);
+    setIsDialogOpen(true);
+  };
+
+  const openEdit = (center: CenterRow) => {
+    setEditingCenter(center);
+    setFormState({
+      name: center.name,
+      type: center.type,
+      governorate: center.governorate,
+      district: center.district ?? '',
+      address: center.address ?? '',
+      totalCapacity: center.totalCapacity,
+      currentOccupancy: center.currentOccupancy,
+      managerName: center.managerName ?? '',
+      // PII: admin only — shown in dialog
+      managerPhone: center.managerPhone ?? '',
+      facilities: center.facilities ?? [],
+      isActive: center.isActive,
+    });
+    setIsDialogOpen(true);
+  };
+
+  const toggleFacility = (facility: CenterFacility) => {
+    setFormState((prev) => {
+      const current = prev.facilities ?? [];
+      return {
+        ...prev,
+        facilities: current.includes(facility)
+          ? current.filter((f) => f !== facility)
+          : [...current, facility],
+      };
+    });
   };
 
   const handleSave = async () => {
-    if (!formState.name.trim() || !formState.governorate.trim() || !formState.city.trim()) {
+    const result = centerSchema.safeParse(formState);
+    if (!result.success) {
       toast.error(t('admin.centers.errorRequired'));
       return;
     }
-
-    if (formState.capacity < 0 || formState.occupiedCapacity < 0) {
-      toast.error(t('admin.centers.errorNegativeCapacity'));
-      return;
-    }
-
-    if (formState.occupiedCapacity > formState.capacity) {
+    if (result.data.currentOccupancy > result.data.totalCapacity) {
       toast.error(t('admin.centers.errorCapacityExceeded'));
       return;
     }
@@ -111,35 +180,25 @@ export default function CenterManagement() {
     try {
       if (editingCenter?.id) {
         await updateDoc(doc(db, 'centers', editingCenter.id), {
-          ...formState,
-          updatedAt: new Date(),
+          ...result.data,
+          updatedAt: serverTimestamp(),
         });
         toast.success(t('admin.centers.successUpdated'));
       } else {
         await addDoc(collection(db, 'centers'), {
-          ...formState,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          ...result.data,
+          createdBy: auth.currentUser?.uid ?? '',
+          updatedAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
         });
         toast.success(t('admin.centers.successAdded'));
       }
-
-      resetForm();
+      setIsDialogOpen(false);
     } catch (error) {
       console.error('Failed to save center:', error);
       toast.error(t('admin.centers.errorSave'));
     } finally {
       setSaving(false);
-    }
-  };
-
-  const handleDelete = async (centerId: string) => {
-    try {
-      await deleteDoc(doc(db, 'centers', centerId));
-      toast.success(t('admin.centers.successDeleted'));
-    } catch (error) {
-      console.error('Failed to delete center:', error);
-      toast.error(t('admin.centers.errorDelete'));
     }
   };
 
@@ -150,13 +209,7 @@ export default function CenterManagement() {
           <h1 className="text-2xl font-bold text-gray-800">{t('admin.centers.title')}</h1>
           <p className="text-sm text-gray-500">{t('admin.centers.description')}</p>
         </div>
-        <Button
-          className="bg-[#12a89d] text-white hover:bg-[#0e9088]"
-          onClick={() => {
-            resetForm();
-            setEditingCenter({ id: '', ...DEFAULT_FORM });
-          }}
-        >
+        <Button className="bg-[#12a89d] text-white hover:bg-[#0e9088]" onClick={openCreate}>
           {t('admin.centers.addCenter')}
         </Button>
       </div>
@@ -164,7 +217,7 @@ export default function CenterManagement() {
       <Input
         placeholder={t('admin.centers.searchPlaceholder')}
         value={searchQuery}
-        onChange={(event) => setSearchQuery(event.target.value)}
+        onChange={(e) => setSearchQuery(e.target.value)}
         className="bg-white"
       />
 
@@ -176,16 +229,13 @@ export default function CenterManagement() {
                 {t('admin.centers.name')}
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
-                {t('admin.centers.city')}
+                {t('admin.centers.type')}
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
-                {t('admin.centers.address')}
+                {t('admin.centers.governorate')}
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
-                {t('admin.centers.capacity')}
-              </TableHead>
-              <TableHead className="font-semibold text-gray-700">
-                {t('admin.centers.contactName')}
+                {t('admin.centers.occupancy')}
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
                 {t('admin.centers.status')}
@@ -198,102 +248,56 @@ export default function CenterManagement() {
           <TableBody>
             {filteredCenters.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="py-12 text-center text-gray-500">
+                <TableCell colSpan={6} className="py-12 text-center text-gray-500">
                   {t('admin.centers.empty')}
                 </TableCell>
               </TableRow>
             ) : (
-              filteredCenters.map((center) => {
-                const available = Math.max(
-                  0,
-                  Number(center.capacity ?? 0) - Number(center.occupiedCapacity ?? 0),
-                );
-
-                return (
-                  <TableRow key={center.id} className="hover:bg-gray-50">
-                    <TableCell className="font-medium">
-                      <div>
-                        <p>{center.name}</p>
-                        <p className="text-xs text-gray-500">{center.governorate}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>{center.city}</TableCell>
-                    <TableCell className="max-w-[260px] truncate">{center.address}</TableCell>
-                    <TableCell>
-                      {center.occupiedCapacity}/{center.capacity}
-                      <span className="ml-1 text-xs text-gray-500">
-                        · {available} {t('admin.centers.available')}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p>{center.contactName || t('admin.centers.noContactName')}</p>
-                        <p className="text-xs text-gray-500">
-                          {center.contactPhone || t('admin.centers.noPhone')}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                          center.active
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-gray-100 text-gray-700'
-                        }`}
-                      >
-                        {center.active ? t('admin.centers.active') : t('admin.centers.inactive')}
-                      </span>
-                    </TableCell>
-                    <TableCell className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setQrCenter(center)}
-                        title={t('admin.centers.qrCode')}
-                      >
-                        <QrCode className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setEditingCenter(center);
-                          setFormState({
-                            name: center.name,
-                            governorate: center.governorate,
-                            city: center.city,
-                            address: center.address,
-                            capacity: Number(center.capacity ?? 0),
-                            occupiedCapacity: Number(center.occupiedCapacity ?? 0),
-                            contactName: center.contactName ?? '',
-                            contactPhone: center.contactPhone ?? '',
-                            active: Boolean(center.active),
-                          });
-                        }}
-                      >
-                        {t('admin.centers.edit')}
-                      </Button>
-                      <Button variant="destructive" onClick={() => void handleDelete(center.id)}>
-                        {t('admin.centers.delete')}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
+              filteredCenters.map((center) => (
+                <TableRow key={center.id} className="hover:bg-gray-50">
+                  <TableCell className="font-medium">
+                    <p>{center.name}</p>
+                    {center.district && <p className="text-xs text-gray-500">{center.district}</p>}
+                  </TableCell>
+                  <TableCell className="capitalize">
+                    {t(`admin.centers.type_${center.type}`)}
+                  </TableCell>
+                  <TableCell>{center.governorate}</TableCell>
+                  <TableCell className="w-48">
+                    <CapacityBar
+                      totalCapacity={center.totalCapacity}
+                      currentOccupancy={center.currentOccupancy}
+                      isActive={center.isActive}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                        center.isActive
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      {center.isActive ? t('admin.centers.active') : t('admin.centers.inactive')}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm" onClick={() => openEdit(center)}>
+                      {t('admin.centers.edit')}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
             )}
           </TableBody>
         </Table>
       </div>
 
-      <Dialog
-        open={editingCenter !== null}
-        onOpenChange={(open) => {
-          if (!open) resetForm();
-        }}
-      >
-        <DialogContent>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingCenter?.id ? t('admin.centers.editTitle') : t('admin.centers.addTitle')}
+              {editingCenter ? t('admin.centers.editTitle') : t('admin.centers.addTitle')}
             </DialogTitle>
             <DialogDescription>{t('admin.centers.dialogDescription')}</DialogDescription>
           </DialogHeader>
@@ -303,102 +307,126 @@ export default function CenterManagement() {
               <Label>{t('admin.centers.name')}</Label>
               <Input
                 value={formState.name}
-                onChange={(event) =>
-                  setFormState((current) => ({ ...current, name: event.target.value }))
-                }
+                onChange={(e) => setFormState((p) => ({ ...p, name: e.target.value }))}
               />
             </div>
+
             <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>{t('admin.centers.type')}</Label>
+                <Select
+                  value={formState.type}
+                  onValueChange={(v) => setFormState((p) => ({ ...p, type: v as CenterType }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CENTER_TYPES.map((ct) => (
+                      <SelectItem key={ct} value={ct}>
+                        {t(`admin.centers.type_${ct}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2">
                 <Label>{t('admin.centers.governorate')}</Label>
                 <Input
                   value={formState.governorate}
-                  onChange={(event) =>
-                    setFormState((current) => ({ ...current, governorate: event.target.value }))
-                  }
+                  onChange={(e) => setFormState((p) => ({ ...p, governorate: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>{t('admin.centers.district')}</Label>
+                <Input
+                  value={formState.district}
+                  onChange={(e) => setFormState((p) => ({ ...p, district: e.target.value }))}
                 />
               </div>
               <div className="space-y-2">
-                <Label>{t('admin.centers.city')}</Label>
+                <Label>{t('admin.centers.address')}</Label>
                 <Input
-                  value={formState.city}
-                  onChange={(event) =>
-                    setFormState((current) => ({ ...current, city: event.target.value }))
-                  }
+                  value={formState.address}
+                  onChange={(e) => setFormState((p) => ({ ...p, address: e.target.value }))}
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>{t('admin.centers.address')}</Label>
-              <Input
-                value={formState.address}
-                onChange={(event) =>
-                  setFormState((current) => ({ ...current, address: event.target.value }))
-                }
-              />
-            </div>
+
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>{t('admin.centers.totalCapacity')}</Label>
                 <Input
                   type="number"
-                  min={0}
-                  value={formState.capacity}
-                  onChange={(event) =>
-                    setFormState((current) => ({
-                      ...current,
-                      capacity: Number(event.target.value),
-                    }))
+                  min={1}
+                  value={formState.totalCapacity}
+                  onChange={(e) =>
+                    setFormState((p) => ({ ...p, totalCapacity: Number(e.target.value) }))
                   }
                 />
               </div>
               <div className="space-y-2">
-                <Label>{t('admin.centers.occupiedCapacity')}</Label>
+                <Label>{t('admin.centers.currentOccupancy')}</Label>
                 <Input
                   type="number"
                   min={0}
-                  value={formState.occupiedCapacity}
-                  onChange={(event) =>
-                    setFormState((current) => ({
-                      ...current,
-                      occupiedCapacity: Number(event.target.value),
-                    }))
+                  value={formState.currentOccupancy}
+                  onChange={(e) =>
+                    setFormState((p) => ({ ...p, currentOccupancy: Number(e.target.value) }))
                   }
                 />
               </div>
             </div>
+
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label>{t('admin.centers.contactName')}</Label>
+                <Label>{t('admin.centers.managerName')}</Label>
                 <Input
-                  value={formState.contactName}
-                  onChange={(event) =>
-                    setFormState((current) => ({ ...current, contactName: event.target.value }))
-                  }
+                  value={formState.managerName}
+                  onChange={(e) => setFormState((p) => ({ ...p, managerName: e.target.value }))}
                 />
               </div>
               <div className="space-y-2">
-                <Label>{t('admin.centers.contactPhone')}</Label>
+                {/* PII: admin only — shown only in this dialog, never in tables or public views */}
+                <Label>{t('admin.centers.managerPhone')}</Label>
                 <Input
-                  value={formState.contactPhone}
-                  onChange={(event) =>
-                    setFormState((current) => ({ ...current, contactPhone: event.target.value }))
-                  }
+                  value={formState.managerPhone}
+                  onChange={(e) => setFormState((p) => ({ ...p, managerPhone: e.target.value }))}
                 />
               </div>
             </div>
+
+            <div className="space-y-2">
+              <Label>{t('admin.centers.facilities')}</Label>
+              <div className="grid grid-cols-2 gap-2 rounded-lg bg-gray-50 p-3">
+                {FACILITIES.map((facility) => (
+                  <label key={facility} className="flex cursor-pointer items-center gap-2 text-sm">
+                    <Checkbox
+                      checked={(formState.facilities ?? []).includes(facility)}
+                      onCheckedChange={() => toggleFacility(facility)}
+                    />
+                    {t(`admin.centers.facility_${facility}`)}
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
               <Checkbox
                 id="center-active"
-                checked={formState.active}
+                checked={formState.isActive}
                 onCheckedChange={(checked) =>
-                  setFormState((current) => ({ ...current, active: Boolean(checked) }))
+                  setFormState((p) => ({ ...p, isActive: Boolean(checked) }))
                 }
               />
               <Label htmlFor="center-active" className="cursor-pointer">
                 {t('admin.centers.activeCheckbox')}
               </Label>
             </div>
+
             <Button
               className="w-full bg-[#12a89d] text-white hover:bg-[#0e9088]"
               onClick={() => void handleSave()}
@@ -406,21 +434,11 @@ export default function CenterManagement() {
             >
               {saving
                 ? t('admin.centers.saving')
-                : editingCenter?.id
+                : editingCenter
                   ? t('admin.centers.saveChanges')
                   : t('admin.centers.createCenter')}
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={qrCenter !== null} onOpenChange={(open) => !open && setQrCenter(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('admin.centers.qrCode')}</DialogTitle>
-            <DialogDescription>{t('admin.centers.qrDescription')}</DialogDescription>
-          </DialogHeader>
-          {qrCenter && <WhatsAppQRCode centerName={qrCenter.name} />}
         </DialogContent>
       </Dialog>
     </div>
