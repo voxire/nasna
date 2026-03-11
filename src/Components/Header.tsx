@@ -20,6 +20,7 @@ const NAV_LINKS = [
   { to: '/centers-map', labelKey: 'header.centersMap' },
   { to: '/housing', labelKey: 'header.housing' },
   { to: '/emergency', labelKey: 'header.emergency' },
+  { to: '/hotlines', labelKey: 'header.hotlines' },
   { to: '/offer-help', labelKey: 'header.offerHelp' },
   { to: '/resources', labelKey: 'header.resources' },
   { to: '/feedback', labelKey: 'header.feedback' },
