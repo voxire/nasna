@@ -200,7 +200,7 @@ service cloud.firestore {
           'consentGiven', 'comments', 'numberOfPeopleInHousehold',
           'registrationDate', 'createdAt', 'updatedAt', 'agent', 'status',
           'locationType', 'centerId', 'assignedTo', 'assignedAt', 'aidDelivered',
-          'lastUpdatedBy', 'staleFlagged', 'source'
+          'aidDeliveries', 'lastUpdatedBy', 'staleFlagged', 'source'
         ])
         && request.resource.data.consentGiven == true  // consent is mandatory
         && request.resource.data.aidUrgency in ['High', 'Medium', 'Low']
@@ -212,6 +212,7 @@ service cloud.firestore {
         && (!hasField('assignedTo') || request.resource.data.assignedTo is string)
         && (!hasField('assignedAt') || request.resource.data.assignedAt == null || request.resource.data.assignedAt is timestamp)
         && (!hasField('aidDelivered') || request.resource.data.aidDelivered is bool)
+        && (!hasField('aidDeliveries') || request.resource.data.aidDeliveries is list)
         && (!hasField('lastUpdatedBy') || request.resource.data.lastUpdatedBy is string)
         && (!hasField('staleFlagged') || request.resource.data.staleFlagged is bool);
 

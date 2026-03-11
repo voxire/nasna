@@ -40,10 +40,12 @@ interface ContactRow extends EmergencyContactDocument {
 const DEFAULT_FORM = {
   name: '',
   phoneNumber: '',
+  phoneAlt: '',
   category: 'medical',
   coverage: '',
   notes: '',
   verified: true,
+  order: 0,
 };
 
 export default function EmergencyContactsManagement() {
@@ -175,6 +177,11 @@ export default function EmergencyContactsManagement() {
             <CardContent className="space-y-4">
               <div>
                 <p className="text-sm font-medium text-gray-900">{contact.phoneNumber}</p>
+                {contact.phoneAlt ? (
+                  <p className="text-sm text-gray-500">
+                    {t('admin.emergencyContacts.altPhone')}: {contact.phoneAlt}
+                  </p>
+                ) : null}
                 <p className="text-sm text-gray-500">
                   {contact.notes || t('admin.emergencyContacts.noNotes')}
                 </p>
@@ -187,10 +194,12 @@ export default function EmergencyContactsManagement() {
                     setFormState({
                       name: contact.name,
                       phoneNumber: contact.phoneNumber,
+                      phoneAlt: contact.phoneAlt ?? '',
                       category: contact.category,
                       coverage: contact.coverage,
                       notes: contact.notes ?? '',
                       verified: contact.verified,
+                      order: contact.order ?? 0,
                     });
                   }}
                 >
@@ -241,6 +250,16 @@ export default function EmergencyContactsManagement() {
               />
             </div>
             <div className="space-y-2">
+              <Label>{t('admin.emergencyContacts.altPhone')}</Label>
+              <Input
+                value={formState.phoneAlt}
+                onChange={(event) =>
+                  setFormState((current) => ({ ...current, phoneAlt: event.target.value }))
+                }
+                placeholder={t('admin.emergencyContacts.altPhonePlaceholder')}
+              />
+            </div>
+            <div className="space-y-2">
               <Label>{t('admin.emergencyContacts.category')}</Label>
               <Select
                 value={formState.category}
@@ -252,10 +271,19 @@ export default function EmergencyContactsManagement() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="government">
+                    {t('admin.emergencyContacts.government')}
+                  </SelectItem>
+                  <SelectItem value="health">{t('admin.emergencyContacts.health')}</SelectItem>
+                  <SelectItem value="ngo">{t('admin.emergencyContacts.ngo')}</SelectItem>
+                  <SelectItem value="security">{t('admin.emergencyContacts.security')}</SelectItem>
+                  <SelectItem value="legal">{t('admin.emergencyContacts.legal')}</SelectItem>
+                  <SelectItem value="utilities">
+                    {t('admin.emergencyContacts.utilities')}
+                  </SelectItem>
                   <SelectItem value="medical">{t('admin.emergencyContacts.medical')}</SelectItem>
                   <SelectItem value="shelter">{t('admin.emergencyContacts.shelter')}</SelectItem>
                   <SelectItem value="food">{t('admin.emergencyContacts.food')}</SelectItem>
-                  <SelectItem value="legal">{t('admin.emergencyContacts.legal')}</SelectItem>
                   <SelectItem value="protection">
                     {t('admin.emergencyContacts.protection')}
                   </SelectItem>
@@ -279,6 +307,20 @@ export default function EmergencyContactsManagement() {
                 onChange={(event) =>
                   setFormState((current) => ({ ...current, notes: event.target.value }))
                 }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>{t('admin.emergencyContacts.order')}</Label>
+              <Input
+                type="number"
+                value={formState.order}
+                onChange={(event) =>
+                  setFormState((current) => ({
+                    ...current,
+                    order: Number(event.target.value) || 0,
+                  }))
+                }
+                min={0}
               />
             </div>
             <div className="space-y-2">

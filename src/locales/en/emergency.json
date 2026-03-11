@@ -8,10 +8,15 @@
   "allCategories": "All categories",
   "allCoverage": "All coverage",
   "categories": {
+    "government": "Government",
+    "health": "Health",
+    "ngo": "NGO",
+    "security": "Security",
+    "legal": "Legal",
+    "utilities": "Utilities",
     "medical": "Medical",
     "shelter": "Shelter",
     "food": "Food",
-    "legal": "Legal",
     "protection": "Protection"
   },
   "noNotes": "No extra notes provided.",
