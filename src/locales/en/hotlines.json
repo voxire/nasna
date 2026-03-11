@@ -1,0 +1,39 @@
+{
+  "badge": "Lebanon Helplines",
+  "title": "Emergency Hotlines",
+  "subtitle": "Tap any number to call immediately. Available 24/7 where indicated. If you are in immediate danger, call 112.",
+  "sosTitle": "Critical numbers — tap to call",
+  "searchPlaceholder": "Search by organization or number…",
+  "all": "All",
+  "callNow": "Call now",
+  "call": "Call",
+  "emptyState": "No hotlines matched your search.",
+  "disclaimer": "Numbers are verified to the best of our knowledge. If a number is unreachable, try an alternative from the same category.",
+  "categories": {
+    "emergency": "Emergency",
+    "mentalHealth": "Mental Health",
+    "protection": "Protection",
+    "humanitarian": "Humanitarian"
+  },
+  "descriptions": {
+    "police": "Lebanese Internal Security Forces — immediate emergency response",
+    "civilDefense": "Fire, rescue and emergency response",
+    "redCross": "Emergency medical services, ambulance and blood bank",
+    "policeAlt": "Alternative police emergency line",
+    "embrace": "Free 24/7 mental health and suicide prevention helpline",
+    "restart": "Psychosocial support and mental health counselling",
+    "kafa": "Domestic violence and exploitation hotline",
+    "abaad": "Gender-based violence support and referral services",
+    "unhcr": "UN Refugee Agency — asylum seekers and refugees",
+    "unicef": "United Nations Children's Fund",
+    "wfp": "World Food Programme — food assistance",
+    "caritas": "Catholic relief, social and development services",
+    "islamicRelief": "Humanitarian aid and development",
+    "worldVision": "Child-focused humanitarian and development organization",
+    "iom": "International Organization for Migration",
+    "msf": "Médecins Sans Frontières — emergency medical care",
+    "foodBank": "Food assistance and distribution",
+    "saveChildren": "Children's rights and humanitarian response",
+    "amel": "Health, education and social development services"
+  }
+}

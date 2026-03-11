@@ -1,0 +1,20 @@
+{
+  "title": "Centers Map",
+  "description": "Find aid centers, displacement sites, and available housing near you.",
+  "totalCenters": "Aid centers",
+  "displacementSitesCount": "Displacement sites",
+  "housingListings": "Available housing spots",
+  "layers": "Map Layers",
+  "aidCenters": "Aid centers",
+  "displacementSites": "Displacement sites",
+  "housingAreas": "Housing areas",
+  "legendTitle": "Legend",
+  "legendCenters": "Blue pins — Aid centers",
+  "legendDisplacement": "Orange circles — Displacement sites",
+  "legendHousing": "Purple circles — Housing areas",
+  "capacity": "Capacity:",
+  "availableSpots": "Available spots:",
+  "contact": "Contact:",
+  "phone": "Phone:",
+  "loadError": "Failed to load centers map data."
+}

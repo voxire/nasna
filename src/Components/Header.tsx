@@ -17,8 +17,10 @@ import { resolvePostLoginPath, useAuthStore } from '@/stores/authStore';
 const NAV_LINKS = [
   { to: '/about', labelKey: 'header.about' },
   { to: '/impact', labelKey: 'header.impact' },
+  { to: '/centers-map', labelKey: 'header.centersMap' },
   { to: '/housing', labelKey: 'header.housing' },
   { to: '/emergency', labelKey: 'header.emergency' },
+  { to: '/hotlines', labelKey: 'header.hotlines' },
   { to: '/offer-help', labelKey: 'header.offerHelp' },
   { to: '/resources', labelKey: 'header.resources' },
   { to: '/feedback', labelKey: 'header.feedback' },

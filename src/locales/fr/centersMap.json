@@ -1,0 +1,20 @@
+{
+  "title": "Carte des centres",
+  "description": "Trouvez les centres d'aide, les sites de déplacement et les logements disponibles près de chez vous.",
+  "totalCenters": "Centres d'aide",
+  "displacementSitesCount": "Sites de déplacement",
+  "housingListings": "Places de logement disponibles",
+  "layers": "Couches de la carte",
+  "aidCenters": "Centres d'aide",
+  "displacementSites": "Sites de déplacement",
+  "housingAreas": "Zones de logement",
+  "legendTitle": "Légende",
+  "legendCenters": "Épingles bleues — Centres d'aide",
+  "legendDisplacement": "Cercles orange — Sites de déplacement",
+  "legendHousing": "Cercles violets — Zones de logement",
+  "capacity": "Capacité :",
+  "availableSpots": "Places disponibles :",
+  "contact": "Contact :",
+  "phone": "Téléphone :",
+  "loadError": "Échec du chargement des données de la carte des centres."
+}
