@@ -32,6 +32,7 @@ export default function Housing() {
   const [typeFilter, setTypeFilter] = useState<'all' | HousingType>('all');
   const [priceFilter, setPriceFilter] = useState<'all' | HousingPriceType>('all');
   const [minCapacity, setMinCapacity] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const housingQuery = query(
@@ -56,10 +57,12 @@ export default function Housing() {
             ...(document.data() as HousingDocument),
           })),
         );
+        setLoading(false);
       },
       (error) => {
         console.error('housing listener error:', error);
         toast.error(t('common.errorTitle'));
+        setLoading(false);
       },
     );
 
@@ -85,7 +88,10 @@ export default function Housing() {
     };
   }, []);
 
-  const normalizedGovernorate = governorateFilter.trim().toLowerCase();
+  const normalizedGovernorate = useMemo(
+    () => governorateFilter.trim().toLowerCase(),
+    [governorateFilter],
+  );
 
   const filteredHousing = useMemo(
     () =>
@@ -116,6 +122,14 @@ export default function Housing() {
       }),
     [centers, normalizedGovernorate, minCapacity],
   );
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <p className="text-sm text-gray-500">{t('common.loading')}…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-10">
