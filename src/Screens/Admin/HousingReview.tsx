@@ -93,6 +93,10 @@ export default function HousingReview() {
   };
 
   const rejectListing = async (id: string) => {
+    if (!auth.currentUser?.uid) {
+      toast.error(t('common.notAuthenticated'));
+      return;
+    }
     try {
       await deleteDoc(doc(db, 'housing', id));
       toast.success(t('housing.admin.rejectSuccess'));

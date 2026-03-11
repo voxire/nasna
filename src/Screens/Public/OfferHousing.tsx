@@ -144,6 +144,7 @@ export default function OfferHousing() {
           : {}),
         status: 'pending_review',
         createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
       });
       toast.success(t('housing.offer.success'));
       setFormState(DEFAULT_FORM);
