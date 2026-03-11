@@ -112,14 +112,28 @@ service cloud.firestore {
     // ─── /centers ───────────────────────────────────────────────────────────
 
     match /centers/{centerId} {
-      allow read: if isSignedIn();
+      // Active centers are readable by anyone (unauthenticated public intake).
+      // Admins can read all centers including inactive ones.
+      allow read: if resource.data.isActive == true || isAdmin();
       allow write: if isAdmin();
     }
 
     // ─── /housing ───────────────────────────────────────────────────────────
 
     match /housing/{housingId} {
-      allow create: if true; // unauthenticated public submission
+      // Public submission: unauthenticated allowed, but must arrive as pending_review
+      // with only the expected fields — prevents bypassing the moderation queue.
+      allow create: if onlyFields([
+                       'listerId', 'listerName', 'listerPhone', 'type', 'governorate',
+                       'district', 'capacity', 'priceType', 'pricePerMonth',
+                       'availableFrom', 'availableUntil', 'amenities', 'description',
+                       'status', 'createdAt', 'updatedAt'])
+        && request.resource.data.status == 'pending_review'
+        && request.resource.data.listerName is string
+        && request.resource.data.listerPhone is string
+        && request.resource.data.capacity is int
+        && request.resource.data.capacity > 0
+        && request.resource.data.priceType in ['free', 'subsidized', 'market_rate'];
       allow read: if isAdmin() || resource.data.status == 'available';
       allow update, delete: if isAdmin();
     }

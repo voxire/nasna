@@ -3,7 +3,7 @@ import { db, functions } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { addDoc, collection, onSnapshot, query, Timestamp, where } from 'firebase/firestore';
+import { addDoc, collection, limit, onSnapshot, query, Timestamp, where } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { getCookie, setCookie } from '../../utils/cookies';
 import type { AgeRanges, CenterDocument, LocationType } from '../../types';
@@ -66,7 +66,7 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
+    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true), limit(100));
 
     return onSnapshot(centerQuery, (snapshot) => {
       setCenters(
