@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { auth, db, functions } from '../../firebase';
-import { addDoc, collection, onSnapshot, query, where } from 'firebase/firestore';
+import { addDoc, collection, limit, onSnapshot, query, where } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -141,18 +141,25 @@ function CreateSubmission() {
   const draftKey = useMemo(() => `submission-draft:${userUid ?? 'anonymous'}`, [userUid]);
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true));
+    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true), limit(100));
 
-    return onSnapshot(centerQuery, (snapshot) => {
-      setCenters(
-        snapshot.docs
-          .map((document) => ({
-            id: document.id,
-            ...(document.data() as CenterDocument),
-          }))
-          .sort((left, right) => left.name.localeCompare(right.name)),
-      );
-    });
+    return onSnapshot(
+      centerQuery,
+      (snapshot) => {
+        setCenters(
+          snapshot.docs
+            .map((document) => ({
+              id: document.id,
+              ...(document.data() as CenterDocument),
+            }))
+            .sort((left, right) => left.name.localeCompare(right.name)),
+        );
+      },
+      (error) => {
+        console.error('centers listener error:', error);
+        toast.error(t('submission.centersLoadError'));
+      },
+    );
   }, []);
 
   const refreshQueuedItems = useCallback(async () => {
@@ -530,7 +537,7 @@ function CreateSubmission() {
                     {selectedCenter.district ? `${selectedCenter.district}, ` : ''}
                     {selectedCenter.governorate}
                   </p>
-                  <p>{selectedCenter.address}</p>
+                  {selectedCenter.address && <p>{selectedCenter.address}</p>}
                 </div>
               ) : null}
             </div>
