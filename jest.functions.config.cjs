@@ -11,6 +11,9 @@ module.exports = {
       },
     ],
   },
+  moduleNameMapper: {
+    '^@nasna/shared$': '<rootDir>/shared/src/index.ts',
+  },
   collectCoverage: false,
   collectCoverageFrom: [
     'functions/src/operationsMapApi.ts',

@@ -28,6 +28,7 @@
     ]
   },
   "functions": {
+    "predeploy": ["pnpm --dir shared build"],
     "source": "functions",
     "runtime": "nodejs20"
   },

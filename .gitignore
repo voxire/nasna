@@ -12,6 +12,7 @@ dist
 dist-ssr
 coverage
 functions/lib
+shared/lib
 *.local
 .env
 *firebase-adminsdk*.json
