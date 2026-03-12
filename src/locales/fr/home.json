@@ -73,5 +73,10 @@
   "locationWithFamily": "Hébergé chez la famille ou un hôte",
   "locationCenter": "Hébergé dans un centre",
   "center": "Centre",
-  "invalidEmail": "Veuillez entrer une adresse e-mail valide."
+  "invalidEmail": "Veuillez entrer une adresse e-mail valide.",
+  "whatsappCta": {
+    "title": "S'inscrire via WhatsApp",
+    "description": "Vous préférez vous inscrire depuis votre téléphone ? Envoyez-nous un message sur WhatsApp et notre bot vous guidera à travers l'inscription en arabe, anglais ou français.",
+    "buttonLabel": "S'inscrire via WhatsApp"
+  }
 }

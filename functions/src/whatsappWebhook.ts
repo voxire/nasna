@@ -1,8 +1,10 @@
+import crypto from 'crypto';
 import { getApps, initializeApp } from 'firebase-admin/app';
-import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { FieldValue, getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { onRequest } from 'firebase-functions/v2/https';
-import { sendWhatsApp } from './utils/twilio';
+import { z } from 'zod';
+import { sendWhatsAppText } from './utils/meta';
 
 if (getApps().length === 0) {
   initializeApp();
@@ -10,118 +12,184 @@ if (getApps().length === 0) {
 
 const db = getFirestore();
 
-/* ------------------------------------------------------------------ */
-/*  Types                                                              */
-/* ------------------------------------------------------------------ */
+// ------------------------------------------------------------------ //
+// Types (Cloud Functions internal only — do NOT add to src/types)    //
+// ------------------------------------------------------------------ //
 
-type BotStep =
-  | 'new'
-  | 'awaiting_name'
-  | 'awaiting_area'
-  | 'awaiting_household'
-  | 'awaiting_need'
-  | 'complete'
-  | 'status_check';
+type WaState =
+  | 'start'
+  | 'collecting_name'
+  | 'collecting_area'
+  | 'collecting_household'
+  | 'collecting_need'
+  | 'done'
+  | 'checking_status';
 
-type BotLanguage = 'ar' | 'en' | 'fr';
-
-interface SessionData {
-  name?: string;
-  area?: string;
-  householdSize?: number;
-  mainNeed?: string;
-}
+type BotLang = 'ar' | 'en' | 'fr';
 
 interface WaSession {
   phone: string;
-  step: BotStep;
-  language: BotLanguage;
-  data: SessionData;
-  submissionId?: string;
-  createdAt: Timestamp;
+  state: WaState;
+  lang: BotLang;
+  data: {
+    name?: string;
+    currentGovernorate?: string;
+    numberOfPeopleInHousehold?: number;
+    needs?: string[];
+  };
   updatedAt: Timestamp;
 }
 
-/* ------------------------------------------------------------------ */
-/*  i18n strings                                                       */
-/* ------------------------------------------------------------------ */
+// ------------------------------------------------------------------ //
+// Submission schema (Zod)                                             //
+// ------------------------------------------------------------------ //
 
-const STRINGS: Record<BotLanguage, Record<string, string>> = {
+const WaSubmissionSchema = z.object({
+  fullName: z.string().min(1),
+  currentGovernorate: z.string().min(1),
+  numberOfPeopleInHousehold: z.number().int().min(1).max(50),
+  needs: z.array(z.string()).min(1),
+  // PII: admin + Cloud Functions only. Never expose to members.
+  whatsappPhone: z.string().min(1),
+  source: z.literal('whatsapp'),
+  status: z.literal('pending'),
+  // consentGiven: true — user initiating contact via WhatsApp constitutes consent per Nasna's
+  // terms of service. This assumption must be reviewed with legal before production launch.
+  consentGiven: z.literal(true),
+  locationType: z.literal('with_family'),
+  aidUrgency: z.literal('Medium'),
+});
+
+// ------------------------------------------------------------------ //
+// Maps                                                                //
+// ------------------------------------------------------------------ //
+
+const GOVERNORATE_MAP: Record<string, string> = {
+  '1': 'Beirut',
+  '2': 'Mount Lebanon',
+  '3': 'North Lebanon',
+  '4': 'Akkar',
+  '5': 'Beqaa',
+  '6': 'Baalbek-Hermel',
+  '7': 'South Lebanon',
+  '8': 'Nabatieh',
+};
+
+const NEED_MAP: Record<string, string> = {
+  '1': 'food',
+  '2': 'water',
+  '3': 'shelter',
+  '4': 'medical',
+  '5': 'clothing',
+  '6': 'baby_supplies',
+  '7': 'psychosocial',
+  '8': 'legal_docs',
+};
+
+// ------------------------------------------------------------------ //
+// i18n strings                                                        //
+// ------------------------------------------------------------------ //
+
+type StringKey =
+  | 'welcome'
+  | 'ask_name'
+  | 'ask_area'
+  | 'ask_household'
+  | 'ask_need'
+  | 'ask_status_id'
+  | 'invalid_area'
+  | 'invalid_household'
+  | 'invalid_need'
+  | 'invalid_menu'
+  | 'text_only'
+  | 'registered'
+  | 'status_not_found'
+  | 'status_pending'
+  | 'status_assigned'
+  | 'status_completed'
+  | 'status_cancelled';
+
+const STRINGS: Record<BotLang, Record<StringKey, string>> = {
   ar: {
-    welcome: 'أهلاً بك في نسنا 🤝\nاضغط 1️⃣ للتسجيل\nاضغط 2️⃣ لمتابعة حالتك',
+    welcome:
+      'أهلاً بك في نسنا. اكتب 1 للتسجيل أو 2 للاستفسار عن حالتك.\n\nType EN for English. Tapez FR pour le français.',
     ask_name: 'ما اسمك الكامل؟',
-    ask_area: 'في أي محافظة أنت حالياً؟',
-    ask_household: 'كم عدد أفراد أسرتك؟',
-    ask_need: 'ما هي حاجتك الأساسية؟\n1. طعام\n2. مأوى\n3. طبي\n4. ملابس\n5. أخرى',
-    invalid_number: 'يرجى إدخال رقم صحيح.',
-    invalid_need: 'يرجى اختيار رقم من 1 إلى 5.',
-    registered: 'تم تسجيلك ✅ رقم حالتك: #{{id}}\nاحتفظ بهذا الرقم لمتابعة حالتك لاحقاً.',
-    no_submission: 'لم نجد تسجيلاً مرتبطاً برقمك. اضغط 1 للتسجيل.',
-    status_pending: 'قيد الانتظار — جاري البحث عن منظمة',
-    status_assigned: 'تم التعيين — {{ngo}} سيتواصل معك',
-    status_in_progress: 'جاري المعالجة — تم الوصول إليك',
-    status_completed: 'مكتملة — تم تقديم المساعدة ✅',
-    status_cancelled: 'ملغاة — يرجى التواصل مع المسؤول',
-    lang_set: 'تم تعيين اللغة إلى العربية. أرسل أي رسالة للمتابعة.',
-    invalid_menu: 'يرجى اختيار 1 أو 2.',
+    ask_area:
+      'في أي محافظة أنتم الآن؟\n1. بيروت\n2. جبل لبنان\n3. الشمال\n4. عكار\n5. البقاع\n6. بعلبك-الهرمل\n7. الجنوب\n8. النبطية',
+    ask_household: 'كم عدد أفراد الأسرة؟ (أرسل رقماً بين 1 و50)',
+    ask_need:
+      'ما هي حاجتك الأكثر إلحاحاً؟\n1. طعام\n2. مياه\n3. مأوى\n4. رعاية طبية\n5. ملابس\n6. مستلزمات أطفال\n7. دعم نفسي\n8. وثائق قانونية',
+    ask_status_id: 'أرسل رقم حالتك للاستفسار عنها.',
+    invalid_area:
+      'يرجى إرسال رقم من 1 إلى 8.\n1. بيروت\n2. جبل لبنان\n3. الشمال\n4. عكار\n5. البقاع\n6. بعلبك-الهرمل\n7. الجنوب\n8. النبطية',
+    invalid_household: 'يرجى إرسال رقم بين 1 و50.',
+    invalid_need:
+      'يرجى إرسال رقم من 1 إلى 8.\n1. طعام\n2. مياه\n3. مأوى\n4. رعاية طبية\n5. ملابس\n6. مستلزمات أطفال\n7. دعم نفسي\n8. وثائق قانونية',
+    invalid_menu: 'يرجى اختيار 1 للتسجيل أو 2 للاستفسار عن حالتك.',
+    text_only: 'يرجى إرسال رسالة نصية فقط.',
+    registered:
+      'تم تسجيلك بنجاح. رقم حالتك هو: {{id}}. احتفظ بهذا الرقم — يمكنك إرساله في أي وقت للاستفسار عن حالتك.',
+    status_not_found: 'لم يتم العثور على حالة بهذا الرقم. تأكد من الرقم وحاول مجدداً.',
+    status_pending: 'قيد الانتظار',
+    status_assigned: 'تم التعيين',
+    status_completed: 'مكتمل',
+    status_cancelled: 'ملغى',
   },
   en: {
-    welcome: 'Welcome to Nasna 🤝\nPress 1️⃣ to register\nPress 2️⃣ to check your case status',
+    welcome:
+      'Welcome to Nasna. Type 1 to register or 2 to check your case status.\n\nType EN for English. Tapez FR pour le français.',
     ask_name: 'What is your full name?',
-    ask_area: 'Which governorate are you currently in?',
-    ask_household: 'How many people are in your household?',
-    ask_need: 'What is your main need?\n1. Food\n2. Shelter\n3. Medical\n4. Clothing\n5. Other',
-    invalid_number: 'Please enter a valid number.',
-    invalid_need: 'Please choose a number from 1 to 5.',
+    ask_area:
+      'Which governorate are you currently in?\n1. Beirut\n2. Mount Lebanon\n3. North Lebanon\n4. Akkar\n5. Beqaa\n6. Baalbek-Hermel\n7. South Lebanon\n8. Nabatieh',
+    ask_household: 'How many people are in your household? (Enter a number between 1 and 50)',
+    ask_need:
+      'What is your most urgent need?\n1. Food\n2. Water\n3. Shelter\n4. Medical care\n5. Clothing\n6. Baby supplies\n7. Psychosocial support\n8. Legal documents',
+    ask_status_id: 'Please send your case ID.',
+    invalid_area:
+      'Please send a number between 1 and 8.\n1. Beirut\n2. Mount Lebanon\n3. North Lebanon\n4. Akkar\n5. Beqaa\n6. Baalbek-Hermel\n7. South Lebanon\n8. Nabatieh',
+    invalid_household: 'Please enter a number between 1 and 50.',
+    invalid_need:
+      'Please send a number between 1 and 8.\n1. Food\n2. Water\n3. Shelter\n4. Medical care\n5. Clothing\n6. Baby supplies\n7. Psychosocial support\n8. Legal documents',
+    invalid_menu: 'Please choose 1 to register or 2 to check your case.',
+    text_only: 'Please send a text message only.',
     registered:
-      'You are registered ✅ Your case number: #{{id}}\nKeep this number to check your status later.',
-    no_submission: 'We could not find a registration linked to your number. Press 1 to register.',
-    status_pending: 'Pending — searching for an organization',
-    status_assigned: 'Assigned — {{ngo}} will contact you',
-    status_in_progress: 'In progress — you have been reached',
-    status_completed: 'Completed — aid has been delivered ✅',
-    status_cancelled: 'Cancelled — please contact the administrator',
-    lang_set: 'Language set to English. Send any message to continue.',
-    invalid_menu: 'Please choose 1 or 2.',
+      'You have been registered successfully. Your case ID is: {{id}}. Keep this number — you can send it anytime to check your case status.',
+    status_not_found: 'No case was found with that ID. Please verify the ID and try again.',
+    status_pending: 'Pending',
+    status_assigned: 'Assigned',
+    status_completed: 'Completed',
+    status_cancelled: 'Cancelled',
   },
   fr: {
     welcome:
-      'Bienvenue chez Nasna 🤝\nAppuyez sur 1️⃣ pour vous inscrire\nAppuyez sur 2️⃣ pour vérifier votre dossier',
+      'Bienvenue sur Nasna. Tapez 1 pour vous inscrire ou 2 pour vérifier votre dossier.\n\nType EN for English. Tapez FR pour le français.',
     ask_name: 'Quel est votre nom complet ?',
-    ask_area: 'Dans quel gouvernorat êtes-vous actuellement ?',
-    ask_household: 'Combien de personnes dans votre foyer ?',
+    ask_area:
+      'Dans quel gouvernorat êtes-vous actuellement ?\n1. Beyrouth\n2. Mont Liban\n3. Liban-Nord\n4. Akkar\n5. Békaa\n6. Baalbek-Hermel\n7. Liban-Sud\n8. Nabatieh',
+    ask_household: 'Combien de personnes dans votre foyer ? (Envoyez un nombre entre 1 et 50)',
     ask_need:
-      'Quel est votre besoin principal ?\n1. Nourriture\n2. Abri\n3. Médical\n4. Vêtements\n5. Autre',
-    invalid_number: 'Veuillez entrer un nombre valide.',
-    invalid_need: 'Veuillez choisir un numéro de 1 à 5.',
+      'Quel est votre besoin le plus urgent ?\n1. Nourriture\n2. Eau\n3. Abri\n4. Soins médicaux\n5. Vêtements\n6. Fournitures pour bébé\n7. Soutien psychosocial\n8. Documents légaux',
+    ask_status_id: 'Veuillez envoyer votre numéro de dossier.',
+    invalid_area:
+      'Veuillez envoyer un numéro entre 1 et 8.\n1. Beyrouth\n2. Mont Liban\n3. Liban-Nord\n4. Akkar\n5. Békaa\n6. Baalbek-Hermel\n7. Liban-Sud\n8. Nabatieh',
+    invalid_household: 'Veuillez entrer un nombre entre 1 et 50.',
+    invalid_need:
+      'Veuillez envoyer un numéro entre 1 et 8.\n1. Nourriture\n2. Eau\n3. Abri\n4. Soins médicaux\n5. Vêtements\n6. Fournitures pour bébé\n7. Soutien psychosocial\n8. Documents légaux',
+    invalid_menu: 'Veuillez choisir 1 pour vous inscrire ou 2 pour vérifier votre dossier.',
+    text_only: 'Veuillez envoyer un message texte uniquement.',
     registered:
-      'Vous êtes inscrit ✅ Numéro de dossier : #{{id}}\nGardez ce numéro pour vérifier votre statut.',
-    no_submission:
-      "Nous n'avons pas trouvé d'inscription liée à votre numéro. Appuyez sur 1 pour vous inscrire.",
-    status_pending: "En attente — recherche d'une organisation",
-    status_assigned: 'Attribué — {{ngo}} vous contactera',
-    status_in_progress: 'En cours — vous avez été contacté',
-    status_completed: "Terminé — l'aide a été fournie ✅",
-    status_cancelled: "Annulé — veuillez contacter l'administrateur",
-    lang_set: 'Langue définie sur le français. Envoyez un message pour continuer.',
-    invalid_menu: 'Veuillez choisir 1 ou 2.',
+      "Vous avez été enregistré avec succès. Votre numéro de dossier est : {{id}}. Gardez ce numéro — vous pouvez l'envoyer à tout moment pour vérifier le statut de votre dossier.",
+    status_not_found:
+      "Aucun dossier trouvé avec cet identifiant. Vérifiez l'identifiant et réessayez.",
+    status_pending: 'En attente',
+    status_assigned: 'Assigné',
+    status_completed: 'Complété',
+    status_cancelled: 'Annulé',
   },
 };
 
-const NEEDS_MAP: Record<string, string> = {
-  '1': 'food',
-  '2': 'shelter',
-  '3': 'medical',
-  '4': 'clothing',
-  '5': 'other',
-};
-
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
-/* ------------------------------------------------------------------ */
-
-function t(lang: BotLanguage, key: string, vars?: Record<string, string>): string {
-  let text = STRINGS[lang]?.[key] ?? STRINGS.ar[key] ?? key;
+function t(lang: BotLang, key: StringKey, vars?: Record<string, string>): string {
+  let text = STRINGS[lang][key];
   if (vars) {
     for (const [k, v] of Object.entries(vars)) {
       text = text.replace(`{{${k}}}`, v);
@@ -130,9 +198,52 @@ function t(lang: BotLanguage, key: string, vars?: Record<string, string>): strin
   return text;
 }
 
-function stripWhatsAppPrefix(from: string): string {
-  return from.replace(/^whatsapp:/, '');
+function getStatePrompt(state: WaState, lang: BotLang): string {
+  switch (state) {
+    case 'start':
+      return t(lang, 'welcome');
+    case 'collecting_name':
+      return t(lang, 'ask_name');
+    case 'collecting_area':
+      return t(lang, 'ask_area');
+    case 'collecting_household':
+      return t(lang, 'ask_household');
+    case 'collecting_need':
+      return t(lang, 'ask_need');
+    case 'checking_status':
+      return t(lang, 'ask_status_id');
+    case 'done':
+      return t(lang, 'welcome');
+  }
 }
+
+// ------------------------------------------------------------------ //
+// Signature validation                                                //
+// ------------------------------------------------------------------ //
+
+function isValidHubSignature(
+  rawBody: Buffer,
+  signatureHeader: string | undefined,
+  secret: string,
+): boolean {
+  if (!signatureHeader?.startsWith('sha256=')) {
+    return false;
+  }
+
+  const actualHex = signatureHeader.slice(7);
+  const expectedHex = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+
+  try {
+    // Use timing-safe comparison to prevent timing attacks
+    return crypto.timingSafeEqual(Buffer.from(expectedHex, 'hex'), Buffer.from(actualHex, 'hex'));
+  } catch {
+    return false;
+  }
+}
+
+// ------------------------------------------------------------------ //
+// Session helpers                                                     //
+// ------------------------------------------------------------------ //
 
 async function getOrCreateSession(phone: string): Promise<WaSession> {
   const docRef = db.collection('wa_sessions').doc(phone);
@@ -144,10 +255,9 @@ async function getOrCreateSession(phone: string): Promise<WaSession> {
 
   const newSession: WaSession = {
     phone,
-    step: 'new',
-    language: 'ar',
+    state: 'start',
+    lang: 'ar',
     data: {},
-    createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   };
   await docRef.set(newSession);
@@ -156,7 +266,7 @@ async function getOrCreateSession(phone: string): Promise<WaSession> {
 
 async function updateSession(
   phone: string,
-  updates: Partial<Pick<WaSession, 'step' | 'language' | 'data' | 'submissionId'>>,
+  updates: Partial<Omit<WaSession, 'phone' | 'updatedAt'>>,
 ): Promise<void> {
   await db
     .collection('wa_sessions')
@@ -164,227 +274,322 @@ async function updateSession(
     .update({ ...updates, updatedAt: Timestamp.now() });
 }
 
-/* ------------------------------------------------------------------ */
-/*  State handlers                                                     */
-/* ------------------------------------------------------------------ */
+// ------------------------------------------------------------------ //
+// State handlers                                                      //
+// ------------------------------------------------------------------ //
 
-async function handleNew(session: WaSession, body: string, phone: string): Promise<string> {
-  const choice = body.trim();
+async function handleStart(session: WaSession, text: string, phone: string): Promise<string> {
+  const choice = text.trim();
 
   if (choice === '1') {
-    await updateSession(phone, { step: 'awaiting_name' });
-    return t(session.language, 'ask_name');
+    await updateSession(phone, { state: 'collecting_name' });
+    return t(session.lang, 'ask_name');
   }
 
   if (choice === '2') {
-    await updateSession(phone, { step: 'status_check' });
-    return handleStatusCheck(session, phone);
+    await updateSession(phone, { state: 'checking_status' });
+    return t(session.lang, 'ask_status_id');
   }
 
-  return t(session.language, 'invalid_menu');
+  // Any other input — re-show welcome without advancing state
+  return t(session.lang, 'welcome');
 }
 
-async function handleAwaitingName(
+async function handleCollectingName(
   session: WaSession,
-  body: string,
+  text: string,
   phone: string,
 ): Promise<string> {
-  const name = body.trim();
+  const name = text.trim();
   await updateSession(phone, {
-    step: 'awaiting_area',
+    state: 'collecting_area',
     data: { ...session.data, name },
   });
-  return t(session.language, 'ask_area');
+  return t(session.lang, 'ask_area');
 }
 
-async function handleAwaitingArea(
+async function handleCollectingArea(
   session: WaSession,
-  body: string,
+  text: string,
   phone: string,
 ): Promise<string> {
-  const area = body.trim();
-  await updateSession(phone, {
-    step: 'awaiting_household',
-    data: { ...session.data, area },
-  });
-  return t(session.language, 'ask_household');
-}
+  const governorate = GOVERNORATE_MAP[text.trim()];
 
-async function handleAwaitingHousehold(
-  session: WaSession,
-  body: string,
-  phone: string,
-): Promise<string> {
-  const parsed = parseInt(body.trim(), 10);
-  if (isNaN(parsed) || parsed <= 0) {
-    return t(session.language, 'invalid_number');
+  if (!governorate) {
+    return t(session.lang, 'invalid_area');
   }
 
   await updateSession(phone, {
-    step: 'awaiting_need',
-    data: { ...session.data, householdSize: parsed },
+    state: 'collecting_household',
+    data: { ...session.data, currentGovernorate: governorate },
   });
-  return t(session.language, 'ask_need');
+  return t(session.lang, 'ask_household');
 }
 
-async function handleAwaitingNeed(
+async function handleCollectingHousehold(
   session: WaSession,
-  body: string,
+  text: string,
   phone: string,
 ): Promise<string> {
-  const choice = body.trim();
-  const need = NEEDS_MAP[choice];
+  const parsed = parseInt(text.trim(), 10);
+
+  if (isNaN(parsed) || parsed < 1 || parsed > 50) {
+    return t(session.lang, 'invalid_household');
+  }
+
+  await updateSession(phone, {
+    state: 'collecting_need',
+    data: { ...session.data, numberOfPeopleInHousehold: parsed },
+  });
+  return t(session.lang, 'ask_need');
+}
+
+async function handleCollectingNeed(
+  session: WaSession,
+  text: string,
+  phone: string,
+): Promise<string> {
+  const need = NEED_MAP[text.trim()];
 
   if (!need) {
-    return t(session.language, 'invalid_need');
+    return t(session.lang, 'invalid_need');
   }
+
+  // Build and validate through Zod before writing to Firestore
+  const submissionPayload = {
+    fullName: session.data.name ?? '',
+    currentGovernorate: session.data.currentGovernorate ?? '',
+    numberOfPeopleInHousehold: session.data.numberOfPeopleInHousehold ?? 1,
+    needs: [need],
+    // PII: admin + Cloud Functions only. Never expose to members.
+    whatsappPhone: phone,
+    source: 'whatsapp' as const,
+    status: 'pending' as const,
+    // consentGiven: true — user initiating contact via WhatsApp constitutes consent per Nasna's
+    // terms of service. This assumption must be reviewed with legal before production launch.
+    consentGiven: true as const,
+    locationType: 'with_family' as const,
+    aidUrgency: 'Medium' as const,
+  };
+
+  const validated = WaSubmissionSchema.parse(submissionPayload);
 
   const submissionRef = db.collection('submissions').doc();
-  const now = Timestamp.now();
-
   await submissionRef.set({
-    fullName: session.data.name ?? '',
-    phoneNumber: stripWhatsAppPrefix(phone),
-    // PII: admin + Cloud Functions only. Never expose to members.
-    whatsappPhone: stripWhatsAppPrefix(phone),
-    emailAddress: '',
-    gender: 'Male',
-    currentGovernorate: session.data.area ?? '',
-    previousGovernorate: session.data.area ?? '',
-    street: '',
-    building: '',
-    floor: '',
-    city: '',
-    ageRanges: { '0-3': 0, '4-12': 0, '13-18': 0, '19-60': 0, '60+': 0 },
-    specialNeeds: [],
-    needs: [need],
-    aidUrgency: 'Medium',
-    consentGiven: true,
-    comments: '',
-    numberOfPeopleInHousehold: session.data.householdSize ?? 1,
-    status: 'pending',
-    source: 'whatsapp',
-    registrationDate: now,
-    createdAt: now,
+    ...validated,
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
   });
 
-  await updateSession(phone, {
-    step: 'complete',
-    data: { ...session.data, mainNeed: need },
-    submissionId: submissionRef.id,
-  });
+  const submissionId = submissionRef.id;
 
-  return t(session.language, 'registered', { id: submissionRef.id });
+  // Mark done then clean up the session
+  await updateSession(phone, { state: 'done' });
+  await db.collection('wa_sessions').doc(phone).delete();
+
+  return t(session.lang, 'registered', { id: submissionId });
 }
 
-async function handleStatusCheck(session: WaSession, phone: string): Promise<string> {
-  const phoneNumber = stripWhatsAppPrefix(phone);
+async function handleCheckingStatus(
+  session: WaSession,
+  text: string,
+  phone: string,
+): Promise<string> {
+  const caseId = text.trim();
 
-  const snap = await db
-    .collection('submissions')
-    .where('whatsappPhone', '==', phoneNumber)
-    .orderBy('createdAt', 'desc')
-    .limit(1)
-    .get();
-
-  if (snap.empty) {
-    return t(session.language, 'no_submission');
+  if (!caseId) {
+    return t(session.lang, 'ask_status_id');
   }
 
-  const submission = snap.docs[0].data();
-  const status = (submission.status as string) ?? 'pending';
-  const statusKey = `status_${status}`;
+  const snap = await db.collection('submissions').doc(caseId).get();
 
-  const ngoName = submission.assignedTo ? (submission.assignedTo as string) : '';
-  return t(session.language, statusKey, { ngo: ngoName });
+  if (!snap.exists) {
+    return t(session.lang, 'status_not_found');
+  }
+
+  const submission = snap.data() as { status?: string; whatsappPhone?: string };
+
+  // PII: match whatsappPhone to prevent a user from checking someone else's case by guessing an ID
+  if (submission.whatsappPhone !== phone) {
+    return t(session.lang, 'status_not_found');
+  }
+
+  const statusKeyMap: Partial<Record<string, StringKey>> = {
+    pending: 'status_pending',
+    assigned: 'status_assigned',
+    completed: 'status_completed',
+    cancelled: 'status_cancelled',
+  };
+
+  const statusKey: StringKey = statusKeyMap[submission.status ?? ''] ?? 'status_pending';
+  return t(session.lang, statusKey);
 }
 
-/* ------------------------------------------------------------------ */
-/*  Main webhook handler                                               */
-/* ------------------------------------------------------------------ */
+// ------------------------------------------------------------------ //
+// Cloud Function                                                      //
+// ------------------------------------------------------------------ //
 
-export const whatsappWebhook = onRequest({ region: 'europe-west1' }, async (req, res) => {
-  // Twilio sends POST requests for incoming messages
-  if (req.method !== 'POST') {
-    res.status(405).send('Method Not Allowed');
-    return;
-  }
+// IMPORTANT — Development mode limitation:
+// While the Meta app is in Development mode, webhooks are only delivered for test messages
+// sent from the API Setup dashboard. Switch the app to Live mode before real users can register.
+// Developer checklist after deploying:
+//   1. Paste the Cloud Function URL into WhatsApp > Configuration > Callback URL
+//   2. Enter your META_WA_VERIFY_TOKEN in the "Verify token" field and click "Verify and save"
+//   3. Subscribe to the "messages" webhook field in the Configuration page
+//   4. Submit the 'nasna_case_assigned' template in WhatsApp Manager for approval
+//   5. Toggle App Mode from Development → Live
 
-  const from: string = req.body?.From ?? '';
-  const body: string = req.body?.Body ?? '';
+export const whatsappWebhook = onRequest(
+  {
+    region: 'europe-west1',
+    secrets: [
+      'META_WA_PHONE_NUMBER_ID',
+      'META_WA_ACCESS_TOKEN',
+      'META_WA_APP_SECRET',
+      'META_WA_VERIFY_TOKEN',
+    ],
+  },
+  async (req, res) => {
+    // ---- GET: Webhook verification ----
+    // Meta sends this when you first register the webhook URL in the Meta console.
+    if (req.method === 'GET') {
+      const verifyToken = String(req.query['hub.verify_token'] ?? '');
+      const challenge = String(req.query['hub.challenge'] ?? '');
 
-  if (!from) {
-    res.status(200).send('OK');
-    return;
-  }
-
-  const phone = stripWhatsAppPrefix(from);
-
-  try {
-    // Language switching — available at any state
-    const upperBody = body.trim().toUpperCase();
-    if (['AR', 'EN', 'FR'].includes(upperBody)) {
-      const lang = upperBody.toLowerCase() as BotLanguage;
-      await updateSession(phone, { language: lang });
-      await sendWhatsApp(from, t(lang, 'lang_set'));
-      res.status(200).send('OK');
+      if (
+        req.query['hub.mode'] === 'subscribe' &&
+        verifyToken === process.env.META_WA_VERIFY_TOKEN
+      ) {
+        res.status(200).send(challenge);
+      } else {
+        res.sendStatus(403);
+      }
       return;
     }
 
-    const session = await getOrCreateSession(phone);
-    let reply: string;
-
-    switch (session.step) {
-      case 'new':
-        // First-time user: show the welcome menu
-        if (body.trim() !== '1' && body.trim() !== '2') {
-          reply = t(session.language, 'welcome');
-          // Don't advance state — just show the menu
-        } else {
-          reply = await handleNew(session, body, phone);
-        }
-        break;
-
-      case 'awaiting_name':
-        reply = await handleAwaitingName(session, body, phone);
-        break;
-
-      case 'awaiting_area':
-        reply = await handleAwaitingArea(session, body, phone);
-        break;
-
-      case 'awaiting_household':
-        reply = await handleAwaitingHousehold(session, body, phone);
-        break;
-
-      case 'awaiting_need':
-        reply = await handleAwaitingNeed(session, body, phone);
-        break;
-
-      case 'status_check':
-        reply = await handleStatusCheck(session, phone);
-        break;
-
-      case 'complete':
-        // User completed registration — show welcome menu again for new interaction
-        reply = t(session.language, 'welcome');
-        await updateSession(phone, { step: 'new', data: {} });
-        break;
-
-      default:
-        reply = t(session.language, 'welcome');
-        break;
+    if (req.method !== 'POST') {
+      res.sendStatus(405);
+      return;
     }
 
-    await sendWhatsApp(from, reply);
-    logger.info('Webhook processed', { step: session.step });
-  } catch (error) {
-    logger.error('whatsappWebhook error', {
-      step: 'unknown',
-      errorCode: error instanceof Error ? error.message : 'UNKNOWN',
-    });
-  }
+    // ---- POST: Incoming message ----
 
-  // Always return 200 to prevent Twilio retries
-  res.status(200).send('OK');
-});
+    // STEP 1: Validate X-Hub-Signature-256 BEFORE processing any payload.
+    // rawBody is provided by Firebase Functions v2 runtime before any body parsing.
+    const rawBody = req.rawBody as Buffer | undefined;
+    const appSecret = process.env.META_WA_APP_SECRET;
+
+    if (!rawBody || !appSecret) {
+      logger.error('Missing rawBody or META_WA_APP_SECRET — rejecting request');
+      res.sendStatus(401);
+      return;
+    }
+
+    if (
+      !isValidHubSignature(
+        rawBody,
+        req.headers['x-hub-signature-256'] as string | undefined,
+        appSecret,
+      )
+    ) {
+      logger.warn('Invalid X-Hub-Signature-256 — request rejected');
+      res.sendStatus(401);
+      return;
+    }
+
+    // STEP 2: Parse Meta webhook payload.
+    // Only handle 'messages' field type; silently ignore status update events.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const messages: unknown[] | undefined = (req.body as any)?.entry?.[0]?.changes?.[0]?.value
+      ?.messages;
+
+    // Status update events (no messages array) — acknowledge silently
+    if (!messages || messages.length === 0) {
+      res.sendStatus(200);
+      return;
+    }
+
+    // STEP 3: Respond 200 immediately — Meta does not wait for processing
+    res.sendStatus(200);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const message = messages[0] as any;
+    const from: string = message?.from ?? '';
+    const messageType: string = message?.type ?? '';
+
+    if (!from) {
+      return;
+    }
+
+    // STEP 4: Non-text messages — reply and return
+    if (messageType !== 'text') {
+      await sendWhatsAppText(from, t('ar', 'text_only'));
+      return;
+    }
+
+    const text: string = message?.text?.body ?? '';
+
+    try {
+      // Language switching — works at any state without advancing the flow
+      const upperText = text.trim().toUpperCase();
+      const langSwitch: Record<string, BotLang> = { EN: 'en', FR: 'fr', AR: 'ar' };
+      const switchLang = langSwitch[upperText];
+
+      if (switchLang) {
+        const session = await getOrCreateSession(from);
+        await updateSession(from, { lang: switchLang });
+        // Re-send the current state's prompt in the new language
+        await sendWhatsAppText(from, getStatePrompt(session.state, switchLang));
+        logger.info('Language switched', { lang: switchLang, state: session.state });
+        return;
+      }
+
+      const session = await getOrCreateSession(from);
+      let reply: string;
+
+      switch (session.state) {
+        case 'start':
+          reply = await handleStart(session, text, from);
+          break;
+
+        case 'collecting_name':
+          reply = await handleCollectingName(session, text, from);
+          break;
+
+        case 'collecting_area':
+          reply = await handleCollectingArea(session, text, from);
+          break;
+
+        case 'collecting_household':
+          reply = await handleCollectingHousehold(session, text, from);
+          break;
+
+        case 'collecting_need':
+          reply = await handleCollectingNeed(session, text, from);
+          break;
+
+        case 'checking_status':
+          reply = await handleCheckingStatus(session, text, from);
+          break;
+
+        case 'done':
+          // Session was not cleaned up after registration — reset gracefully
+          await db.collection('wa_sessions').doc(from).delete();
+          reply = t(session.lang, 'welcome');
+          break;
+
+        default:
+          reply = t('ar', 'welcome');
+          break;
+      }
+
+      await sendWhatsAppText(from, reply);
+      logger.info('Webhook processed', { state: session.state });
+    } catch (error) {
+      logger.error('whatsappWebhook error', {
+        // Never log 'from' (PII)
+        errorMessage: error instanceof Error ? error.message : 'UNKNOWN',
+      });
+    }
+  },
+);
