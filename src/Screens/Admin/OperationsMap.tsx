@@ -483,7 +483,7 @@ export default function OperationsMap() {
       where('validated', '==', true),
       limit(200),
     );
-    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true), limit(100));
+    const centerQuery = query(collection(db, 'centers'), where('active', '==', true), limit(200));
     const housingQuery = query(
       collection(db, 'housing'),
       where('status', '==', 'available'),
@@ -742,6 +742,33 @@ export default function OperationsMap() {
                       <span className="font-semibold">{t('admin.map.popup.center.occupancy')}</span>{' '}
                       {center.currentOccupancy}/{center.totalCapacity}
                     </p>
+                    {center.intakeOpen !== undefined ? (
+                      <p>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                            center.intakeOpen
+                              ? 'bg-emerald-100 text-emerald-700'
+                              : 'bg-red-100 text-red-700'
+                          }`}
+                        >
+                          {center.intakeOpen
+                            ? t('admin.map.popup.center.intakeOpen')
+                            : t('admin.map.popup.center.intakeClosed')}
+                        </span>
+                      </p>
+                    ) : null}
+                    {center.phone ? (
+                      <p>
+                        <span className="font-semibold">{t('admin.map.popup.center.phone')}</span>{' '}
+                        {center.phone}
+                      </p>
+                    ) : null}
+                    {center.operatingHours ? (
+                      <p>
+                        <span className="font-semibold">{t('admin.map.popup.center.hours')}</span>{' '}
+                        {center.operatingHours}
+                      </p>
+                    ) : null}
                     <div className="flex flex-wrap gap-1">
                       {(center.facilities ?? []).length > 0 ? (
                         center.facilities?.map((facility) => (
