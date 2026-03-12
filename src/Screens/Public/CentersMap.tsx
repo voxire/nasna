@@ -3,7 +3,18 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CircleMarker, MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
-import { Loader2, MapPin } from 'lucide-react';
+import {
+  Building2,
+  Clock,
+  Home,
+  Loader2,
+  MapPin,
+  Navigation,
+  Phone,
+  User,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import {
   getPublicCentersMapData,
@@ -11,7 +22,7 @@ import {
   type HousingAreaSummary,
 } from '@/services/operationsMap';
 import displacementSitesData from '@/data/displacementSites.json';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Card, CardContent } from '@/Components/ui/card';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Label } from '@/Components/ui/label';
 
@@ -32,6 +43,38 @@ const centerIcon = new L.Icon({
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
+
+// Displacement site: pulsing teardrop pin with a person icon inside
+const displacementIcon = L.divIcon({
+  className: '',
+  html: `
+    <div class="ds-wrap">
+      <span class="ds-pulse"></span>
+      <span class="ds-pulse ds-pulse-2"></span>
+      <div class="ds-pin">
+        <svg class="ds-icon" width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+        </svg>
+      </div>
+    </div>
+  `,
+  iconSize: [30, 42],
+  iconAnchor: [15, 42],
+  popupAnchor: [0, -44],
+});
+
+interface StatCard {
+  label: string;
+  value: number;
+  color: string;
+  borderColor: string;
+  bgColor: string;
+  Icon: LucideIcon;
+  iconColor: string;
+  dot: string;
+}
 
 export default function CentersMap() {
   const { t } = useTranslation();
@@ -108,103 +151,110 @@ export default function CentersMap() {
     },
   ];
 
+  const statCards: StatCard[] = [
+    {
+      label: t('centersMap.totalCenters'),
+      value: centers.length,
+      color: 'text-[#12a89d]',
+      borderColor: 'border-l-[#12a89d]',
+      bgColor: 'bg-teal-50',
+      Icon: Building2,
+      iconColor: 'text-[#12a89d]',
+      dot: 'bg-[#12a89d]',
+    },
+    {
+      label: t('centersMap.displacementSitesCount'),
+      value: displacementSites.length,
+      color: 'text-orange-500',
+      borderColor: 'border-l-orange-500',
+      bgColor: 'bg-orange-50',
+      Icon: Users,
+      iconColor: 'text-orange-500',
+      dot: 'bg-orange-400',
+    },
+    {
+      label: t('centersMap.housingListings'),
+      value: totalHousingSpots,
+      color: 'text-purple-600',
+      borderColor: 'border-l-purple-500',
+      bgColor: 'bg-purple-50',
+      Icon: Home,
+      iconColor: 'text-purple-600',
+      dot: 'bg-purple-400',
+    },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 space-y-4 lg:py-10 lg:space-y-6">
-      <div className="flex items-start gap-3">
-        <MapPin className="h-7 w-7 text-[#12a89d] mt-0.5 shrink-0" />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('centersMap.title')}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t('centersMap.description')}</p>
-        </div>
-      </div>
+    <>
+      {/* Popup style — removes default Leaflet padding so colored headers bleed edge-to-edge */}
+      <style>{`
+        .nasna-popup .leaflet-popup-content{margin:0 !important}
+        .nasna-popup .leaflet-popup-content-wrapper{overflow:hidden !important}
+        .ds-wrap{position:relative;width:30px;height:42px}
+        .ds-pulse{position:absolute;bottom:-4px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:rgba(251,146,60,0.55);animation:ds-pulse 2.2s ease-out infinite}
+        .ds-pulse-2{animation-delay:1.1s}
+        .ds-pin{position:absolute;top:0;left:50%;margin-left:-13px;width:26px;height:26px;background:linear-gradient(135deg,#fb923c,#ea580c);border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 3px 10px rgba(234,88,12,0.5)}
+        .ds-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(45deg);margin-top:-2px;margin-left:2px}
+        @keyframes ds-pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(5.5);opacity:0}}
+      `}</style>
 
-      {/* Stat cards — compact pill row on mobile (< sm), grid on desktop */}
-      <div className="flex gap-2 overflow-x-auto pb-1 sm:hidden">
-        {[
-          { label: t('centersMap.totalCenters'), value: centers.length, color: 'text-[#12a89d]' },
-          {
-            label: t('centersMap.displacementSitesCount'),
-            value: displacementSites.length,
-            color: 'text-orange-500',
-          },
-          {
-            label: t('centersMap.housingListings'),
-            value: totalHousingSpots,
-            color: 'text-purple-600',
-          },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            className="flex-none rounded-full border border-gray-200 bg-white px-4 py-2 text-sm flex items-center gap-2 shadow-sm"
-          >
-            <span className={`font-bold text-base ${stat.color}`}>{stat.value}</span>
-            <span className="text-gray-600 whitespace-nowrap">{stat.label}</span>
-          </div>
-        ))}
-      </div>
-      <div className="hidden sm:grid gap-4 sm:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">{t('centersMap.totalCenters')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-[#12a89d]">{centers.length}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">{t('centersMap.displacementSitesCount')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-orange-500">{displacementSites.length}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">{t('centersMap.housingListings')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-purple-600">{totalHousingSpots}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Map + layer controls */}
-      <div className="lg:grid lg:gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        {/* Desktop sidebar — hidden on mobile */}
-        <Card className="hidden lg:block">
-          <CardHeader>
-            <CardTitle>{t('centersMap.layers')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {layerControls.map((layer) => (
-              <div key={layer.id} className="flex items-center gap-3">
-                <Checkbox
-                  checked={layer.checked}
-                  onCheckedChange={(checked) => layer.set(Boolean(checked))}
-                />
-                <span className={`inline-block h-3 w-3 rounded-full ${layer.dot} shrink-0`} />
-                <Label>{layer.label}</Label>
-              </div>
-            ))}
-
-            <div className="rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 mt-2">
-              <p className="font-medium text-gray-800">{t('centersMap.legendTitle')}</p>
-              <ul className="mt-2 space-y-1 list-disc list-inside">
-                <li>{t('centersMap.legendCenters')}</li>
-                <li>{t('centersMap.legendDisplacement')}</li>
-                <li>{t('centersMap.legendHousing')}</li>
-              </ul>
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-6 lg:py-12 lg:space-y-8">
+        {/* ── Hero header ── */}
+        <div className="rounded-2xl bg-gradient-to-br from-teal-50/80 via-white to-white border border-teal-100/60 px-6 py-8 shadow-sm lg:px-10">
+          <div className="flex items-center gap-5">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#12a89d]/10 border border-[#12a89d]/20">
+              <MapPin className="h-7 w-7 text-[#12a89d]" />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">{t('centersMap.title')}</h1>
+              <p className="mt-1.5 text-base text-muted-foreground max-w-lg">
+                {t('centersMap.description')}
+              </p>
+            </div>
+          </div>
+        </div>
 
-        {/* Map container */}
+        {/* ── Stat cards — pill row on mobile, cards on desktop ── */}
+        <div className="flex gap-2 overflow-x-auto pb-1 sm:hidden">
+          {statCards.map((stat) => (
+            <div
+              key={stat.label}
+              className="flex-none rounded-full border border-gray-200 bg-white px-4 py-2 text-sm flex items-center gap-2 shadow-sm"
+            >
+              <span className={`h-2 w-2 rounded-full shrink-0 ${stat.dot}`} />
+              <span className={`font-bold text-base ${stat.color}`}>{stat.value}</span>
+              <span className="text-gray-600 whitespace-nowrap">{stat.label}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="hidden sm:grid gap-4 sm:grid-cols-3">
+          {statCards.map((stat) => {
+            const StatIcon = stat.Icon;
+            return (
+              <Card key={stat.label} className={`border-l-4 ${stat.borderColor} overflow-hidden`}>
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+                      <p className={`text-3xl font-bold mt-1 ${stat.color}`}>{stat.value}</p>
+                    </div>
+                    <div className={`rounded-xl p-2.5 ${stat.bgColor}`}>
+                      <StatIcon className={`h-5 w-5 ${stat.iconColor}`} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* ── Map + floating layer controls ── */}
         <div className="relative">
           <Card className="overflow-hidden">
             <CardContent className="p-0">
-              {/* Full viewport height on mobile, fixed on desktop */}
-              <div className="h-[calc(100vh-4rem)] lg:h-[580px]">
+              {/* Full viewport height on mobile, taller fixed height on desktop */}
+              <div className="h-[calc(100vh-4rem)] lg:h-[620px]">
                 <MapContainer
                   center={[33.8547, 35.8623]}
                   zoom={8}
@@ -233,80 +283,91 @@ export default function CentersMap() {
                           position={[center.lat, center.lng]}
                           icon={centerIcon}
                         >
-                          <Popup>
-                            <div className="space-y-1.5 text-sm min-w-[180px]">
-                              <p className="font-semibold">{center.name}</p>
-                              <p>
-                                {center.city ? `${center.city}, ` : ''}
-                                {center.governorate}
-                              </p>
-                              {center.address && (
-                                <p className="text-muted-foreground">{center.address}</p>
-                              )}
-                              {/* Occupancy progress bar */}
-                              <div>
-                                <p className="text-xs text-gray-500 mb-1">
-                                  {t('centersMap.capacity')} {center.occupiedCapacity}/
-                                  {center.capacity}
+                          <Popup className="nasna-popup" minWidth={220}>
+                            <div className="text-sm">
+                              {/* Teal header band */}
+                              <div className="bg-[#12a89d] px-4 py-3">
+                                <p className="font-semibold text-white leading-tight">
+                                  {center.name}
                                 </p>
-                                <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
-                                  <div
-                                    className="h-full rounded-full transition-all"
-                                    style={{
-                                      width: `${Math.min(100, pct * 100)}%`,
-                                      backgroundColor: barColor,
-                                    }}
-                                  />
-                                </div>
+                                <p className="text-teal-100 text-xs mt-0.5">
+                                  {center.city ? `${center.city}, ` : ''}
+                                  {center.governorate}
+                                </p>
                               </div>
-                              {/* Intake badge */}
-                              <span
-                                className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                                  intakeOpen
-                                    ? 'bg-emerald-100 text-emerald-700'
-                                    : 'bg-red-100 text-red-700'
-                                }`}
-                              >
-                                {intakeOpen
-                                  ? t('centersMap.intakeOpen')
-                                  : t('centersMap.intakeClosed')}
-                              </span>
-                              {/* Tappable phone */}
-                              {center.phone && (
-                                <p>
-                                  {t('centersMap.phone')}{' '}
-                                  <a
-                                    href={`tel:${center.phone}`}
-                                    className="text-[#12a89d] underline"
-                                  >
-                                    {center.phone}
-                                  </a>
-                                </p>
-                              )}
-                              {/* Aid services badges */}
-                              {(center.aidServices ?? []).length > 0 && (
+                              {/* Body */}
+                              <div className="px-4 py-3 space-y-2">
+                                {center.address && (
+                                  <p className="text-xs text-gray-500">{center.address}</p>
+                                )}
+                                {/* Occupancy */}
                                 <div>
-                                  <p className="text-xs text-gray-500 mb-1">
-                                    {t('centersMap.aidServices')}
-                                  </p>
-                                  <div className="flex flex-wrap gap-1">
-                                    {center.aidServices!.map((service) => (
-                                      <span
-                                        key={service}
-                                        className="rounded-full bg-teal-50 px-2 py-0.5 text-xs text-teal-700"
-                                      >
-                                        {service}
-                                      </span>
-                                    ))}
+                                  <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                                    <span>{t('centersMap.capacity')}</span>
+                                    <span className="font-medium">
+                                      {center.occupiedCapacity}/{center.capacity}
+                                    </span>
+                                  </div>
+                                  <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+                                    <div
+                                      className="h-full rounded-full transition-all"
+                                      style={{
+                                        width: `${Math.min(100, pct * 100)}%`,
+                                        backgroundColor: barColor,
+                                      }}
+                                    />
                                   </div>
                                 </div>
-                              )}
-                              {/* Operating hours */}
-                              {center.operatingHours && (
-                                <p className="text-xs text-gray-600">
-                                  {t('centersMap.operatingHours')} {center.operatingHours}
-                                </p>
-                              )}
+                                {/* Intake badge */}
+                                <span
+                                  className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                                    intakeOpen
+                                      ? 'bg-emerald-100 text-emerald-700'
+                                      : 'bg-red-100 text-red-700'
+                                  }`}
+                                >
+                                  {intakeOpen
+                                    ? t('centersMap.intakeOpen')
+                                    : t('centersMap.intakeClosed')}
+                                </span>
+                                {/* Phone */}
+                                {center.phone && (
+                                  <div className="flex items-center gap-2">
+                                    <Phone className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                                    <a
+                                      href={`tel:${center.phone}`}
+                                      className="text-[#12a89d] underline text-xs"
+                                    >
+                                      {center.phone}
+                                    </a>
+                                  </div>
+                                )}
+                                {/* Operating hours */}
+                                {center.operatingHours && (
+                                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                                    <Clock className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                                    <span>{center.operatingHours}</span>
+                                  </div>
+                                )}
+                                {/* Aid services */}
+                                {(center.aidServices ?? []).length > 0 && (
+                                  <div>
+                                    <p className="text-xs text-gray-500 mb-1">
+                                      {t('centersMap.aidServices')}
+                                    </p>
+                                    <div className="flex flex-wrap gap-1">
+                                      {center.aidServices!.map((service) => (
+                                        <span
+                                          key={service}
+                                          className="rounded-full bg-teal-50 px-2 py-0.5 text-xs text-teal-700"
+                                        >
+                                          {service}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </Popup>
                         </Marker>
@@ -316,43 +377,50 @@ export default function CentersMap() {
                   {/* === DISPLACEMENT SITES === */}
                   {showDisplacementSites &&
                     displacementSites.map((site, index) => (
-                      <CircleMarker
+                      <Marker
                         key={`site-${index}`}
-                        center={[site.latitude, site.longitude]}
-                        radius={7}
-                        pathOptions={{
-                          color: '#ea580c',
-                          fillColor: '#fb923c',
-                          fillOpacity: 0.8,
-                        }}
+                        position={[site.latitude, site.longitude]}
+                        icon={displacementIcon}
                       >
-                        <Popup>
-                          <div className="space-y-1.5 text-sm min-w-[180px]">
-                            <p className="font-semibold">{site.place_name_arabic}</p>
-                            <p className="text-muted-foreground">{site.place_name_english}</p>
-                            <p>
-                              {t('centersMap.contact')} {site.contact_person}
-                            </p>
-                            <p>
-                              {t('centersMap.phone')}{' '}
+                        <Popup className="nasna-popup" minWidth={220}>
+                          <div className="text-sm">
+                            {/* Orange header band */}
+                            <div className="bg-orange-500 px-4 py-3">
+                              <p className="font-semibold text-white leading-tight">
+                                {site.place_name_arabic}
+                              </p>
+                              <p className="text-orange-100 text-xs mt-0.5">
+                                {site.place_name_english}
+                              </p>
+                            </div>
+                            {/* Body */}
+                            <div className="px-4 py-3 space-y-2">
+                              <div className="flex items-center gap-2 text-gray-700">
+                                <User className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                                <span>{site.contact_person}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Phone className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                                <a
+                                  href={`tel:${site.phone_number}`}
+                                  className="text-[#12a89d] underline"
+                                >
+                                  {site.phone_number}
+                                </a>
+                              </div>
                               <a
-                                href={`tel:${site.phone_number}`}
-                                className="text-[#12a89d] underline"
+                                href={`https://maps.google.com/?q=${site.latitude},${site.longitude}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-1 flex items-center justify-center gap-1.5 rounded-md bg-[#12a89d] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#0e9088]"
                               >
-                                {site.phone_number}
+                                <Navigation className="h-3.5 w-3.5" />
+                                {t('centersMap.getDirections')}
                               </a>
-                            </p>
-                            <a
-                              href={`https://maps.google.com/?q=${site.latitude},${site.longitude}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="mt-1 block rounded-md bg-[#12a89d] px-3 py-1.5 text-center text-xs font-medium text-white hover:bg-[#0e9088]"
-                            >
-                              {t('centersMap.getDirections')}
-                            </a>
+                            </div>
                           </div>
                         </Popup>
-                      </CircleMarker>
+                      </Marker>
                     ))}
 
                   {/* === HOUSING AREAS === */}
@@ -368,12 +436,18 @@ export default function CentersMap() {
                           fillOpacity: 0.55,
                         }}
                       >
-                        <Popup>
-                          <div className="space-y-1 text-sm">
-                            <p className="font-semibold">{area.area}</p>
-                            <p>
-                              {t('centersMap.availableSpots')} {area.availableSpots}
-                            </p>
+                        <Popup className="nasna-popup" minWidth={180}>
+                          <div className="text-sm">
+                            {/* Purple header band */}
+                            <div className="bg-purple-600 px-4 py-3">
+                              <p className="font-semibold text-white">{area.area}</p>
+                            </div>
+                            <div className="px-4 py-3">
+                              <p className="text-gray-700">
+                                {t('centersMap.availableSpots')}{' '}
+                                <span className="font-semibold">{area.availableSpots}</span>
+                              </p>
+                            </div>
                           </div>
                         </Popup>
                       </CircleMarker>
@@ -383,13 +457,34 @@ export default function CentersMap() {
             </CardContent>
           </Card>
 
-          {/* Mobile bottom sheet — layer controls (hidden on lg+) */}
+          {/* ── Floating layer panel — desktop only, overlaid top-left ── */}
+          <div className="hidden lg:block absolute top-4 left-4 z-[500]">
+            <div className="w-52 rounded-2xl border border-white/60 bg-white/90 shadow-xl backdrop-blur-sm p-4 space-y-3">
+              <p className="text-sm font-semibold text-gray-900">{t('centersMap.layers')}</p>
+              <div className="space-y-3">
+                {layerControls.map((layer) => (
+                  <div key={layer.id} className="flex items-center gap-3">
+                    <Checkbox
+                      checked={layer.checked}
+                      onCheckedChange={(checked) => layer.set(Boolean(checked))}
+                    />
+                    <span
+                      className={`inline-block h-2.5 w-2.5 rounded-full ${layer.dot} shrink-0`}
+                    />
+                    <Label className="text-sm cursor-pointer">{layer.label}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ── Mobile bottom sheet — layer controls (hidden on lg+) ── */}
           <div className="lg:hidden">
             {/* Toggle button fixed at bottom of viewport */}
             <button
               type="button"
               onClick={() => setBottomSheetOpen((prev) => !prev)}
-              className="fixed bottom-6 left-1/2 z-[1000] -translate-x-1/2 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-lg"
+              className="fixed bottom-6 left-1/2 z-[1000] -translate-x-1/2 rounded-full bg-[#12a89d] px-5 py-2.5 text-sm font-medium text-white shadow-lg"
             >
               {t('centersMap.layers')} {bottomSheetOpen ? '▼' : '▲'}
             </button>
@@ -411,7 +506,7 @@ export default function CentersMap() {
                       onCheckedChange={(checked) => layer.set(Boolean(checked))}
                     />
                     <span
-                      className={`inline-block h-3 w-3 rounded-full ${layer.dot} shrink-0`}
+                      className={`inline-block h-2.5 w-2.5 rounded-full ${layer.dot} shrink-0`}
                     />
                     <Label>{layer.label}</Label>
                   </div>
@@ -421,6 +516,6 @@ export default function CentersMap() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

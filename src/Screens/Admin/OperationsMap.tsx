@@ -23,7 +23,15 @@ import {
   type QueryConstraint,
   type Timestamp,
 } from 'firebase/firestore';
-import { ChevronLeft, ChevronRight, MapPinned, RefreshCw, TriangleAlert } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  MapPinned,
+  Phone,
+  RefreshCw,
+  TriangleAlert,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { db } from '@/firebase';
 import type {
@@ -600,6 +608,8 @@ export default function OperationsMap() {
 
   return (
     <div className="relative h-[calc(100vh-56px)] w-full overflow-hidden bg-slate-100">
+      {/* Popup style — removes default Leaflet padding so colored headers bleed edge-to-edge */}
+      <style>{`.nasna-popup .leaflet-popup-content{margin:0 !important}.nasna-popup .leaflet-popup-content-wrapper{overflow:hidden !important}`}</style>
       <MapContainer
         center={LEBANON_CENTER}
         zoom={LEBANON_ZOOM}
@@ -655,43 +665,56 @@ export default function OperationsMap() {
                   weight: 2,
                 }}
               >
-                <Popup>
-                  <div className="space-y-2 text-sm">
-                    <p>
-                      <span className="font-semibold">{t('admin.map.popup.caseId')}</span>{' '}
-                      {cluster.markers[0].id}
-                    </p>
-                    <p>
-                      <span className="font-semibold">{t('admin.map.popup.governorate')}</span>{' '}
-                      {cluster.markers[0].governorate || '—'}
-                    </p>
-                    <p>
-                      <span className="font-semibold">{t('admin.map.popup.status')}</span>{' '}
-                      {cluster.markers[0].status}
-                    </p>
-                    <p>
-                      <span className="font-semibold">{t('admin.map.popup.stale')}</span>{' '}
-                      {cluster.markers[0].staleFlagged
-                        ? t('admin.map.popup.yes')
-                        : t('admin.map.popup.no')}
-                    </p>
-                    <p>
-                      <span className="font-semibold">{t('admin.map.popup.created')}</span>{' '}
-                      {formatRelativeTime(cluster.markers[0].createdAtMs, t)}
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {cluster.markers[0].needs.length > 0 ? (
-                        cluster.markers[0].needs.map((need) => (
-                          <span
-                            key={`${cluster.markers[0].id}-${need}`}
-                            className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700"
-                          >
-                            {t(`submission.needs.${need}`)}
+                <Popup className="nasna-popup" minWidth={220}>
+                  <div className="text-sm">
+                    {/* Severity-coloured header band */}
+                    <div
+                      className="px-4 py-2.5"
+                      style={{
+                        backgroundColor: submissionColorMap[cluster.markers[0].severity].stroke,
+                      }}
+                    >
+                      <p className="font-semibold text-white">
+                        {t(`admin.map.statusLabels.${cluster.markers[0].status}`)}
+                      </p>
+                      <p className="text-white/75 text-xs mt-0.5">
+                        {cluster.markers[0].governorate || '—'}
+                      </p>
+                    </div>
+                    <div className="px-4 py-3 space-y-1.5">
+                      <p className="text-xs text-gray-500">
+                        <span className="font-medium text-gray-700">
+                          {t('admin.map.popup.caseId')}
+                        </span>{' '}
+                        {cluster.markers[0].id}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        <span className="font-medium text-gray-700">
+                          {t('admin.map.popup.stale')}
+                        </span>{' '}
+                        {cluster.markers[0].staleFlagged
+                          ? t('admin.map.popup.yes')
+                          : t('admin.map.popup.no')}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {formatRelativeTime(cluster.markers[0].createdAtMs, t)}
+                      </p>
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {cluster.markers[0].needs.length > 0 ? (
+                          cluster.markers[0].needs.map((need) => (
+                            <span
+                              key={`${cluster.markers[0].id}-${need}`}
+                              className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700"
+                            >
+                              {t(`submission.needs.${need}`)}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-slate-500">
+                            {t('admin.map.popup.none')}
                           </span>
-                        ))
-                      ) : (
-                        <span className="text-xs text-slate-500">{t('admin.map.popup.none')}</span>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Popup>
@@ -702,13 +725,22 @@ export default function OperationsMap() {
                 position={[cluster.lat, cluster.lng]}
                 icon={buildClusterIcon(cluster.count, cluster.severity)}
               >
-                <Popup>
-                  <div className="space-y-1 text-sm">
-                    <p className="font-semibold">{t('admin.map.popup.clusterTitle')}</p>
-                    <p>
-                      {t('admin.map.popup.clusterCount')} {cluster.count}
-                    </p>
-                    <p>{t('admin.map.popup.clusterHint')}</p>
+                <Popup className="nasna-popup" minWidth={200}>
+                  <div className="text-sm">
+                    <div
+                      className="px-4 py-2.5"
+                      style={{ backgroundColor: submissionColorMap[cluster.severity].stroke }}
+                    >
+                      <p className="font-semibold text-white">
+                        {t('admin.map.popup.clusterTitle')}
+                      </p>
+                      <p className="text-white/75 text-xs mt-0.5">
+                        {t('admin.map.popup.clusterCount')} {cluster.count}
+                      </p>
+                    </div>
+                    <div className="px-4 py-3">
+                      <p className="text-xs text-gray-500">{t('admin.map.popup.clusterHint')}</p>
+                    </div>
                   </div>
                 </Popup>
               </Marker>
@@ -731,21 +763,26 @@ export default function OperationsMap() {
                 position={coordinates as [number, number]}
                 icon={buildCenterIcon(occupancyRatio)}
               >
-                <Popup>
-                  <div className="space-y-2 text-sm">
-                    <p className="font-semibold">{center.name}</p>
-                    <p>
-                      <span className="font-semibold">{t('admin.map.popup.center.type')}</span>{' '}
-                      {center.type}
-                    </p>
-                    <p>
-                      <span className="font-semibold">{t('admin.map.popup.center.occupancy')}</span>{' '}
-                      {center.currentOccupancy}/{center.totalCapacity}
-                    </p>
-                    {center.intakeOpen !== undefined ? (
-                      <p>
+                <Popup className="nasna-popup" minWidth={220}>
+                  <div className="text-sm">
+                    {/* Teal header band */}
+                    <div className="bg-[#12a89d] px-4 py-2.5">
+                      <p className="font-semibold text-white leading-tight">{center.name}</p>
+                      <p className="text-teal-100 text-xs mt-0.5">
+                        {center.governorate}
+                        {center.type ? ` · ${center.type}` : ''}
+                      </p>
+                    </div>
+                    <div className="px-4 py-3 space-y-2">
+                      <p className="text-xs text-gray-600">
+                        <span className="font-medium text-gray-700">
+                          {t('admin.map.popup.center.occupancy')}
+                        </span>{' '}
+                        {center.currentOccupancy}/{center.totalCapacity}
+                      </p>
+                      {center.intakeOpen !== undefined ? (
                         <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                          className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
                             center.intakeOpen
                               ? 'bg-emerald-100 text-emerald-700'
                               : 'bg-red-100 text-red-700'
@@ -755,33 +792,35 @@ export default function OperationsMap() {
                             ? t('admin.map.popup.center.intakeOpen')
                             : t('admin.map.popup.center.intakeClosed')}
                         </span>
-                      </p>
-                    ) : null}
-                    {center.phone ? (
-                      <p>
-                        <span className="font-semibold">{t('admin.map.popup.center.phone')}</span>{' '}
-                        {center.phone}
-                      </p>
-                    ) : null}
-                    {center.operatingHours ? (
-                      <p>
-                        <span className="font-semibold">{t('admin.map.popup.center.hours')}</span>{' '}
-                        {center.operatingHours}
-                      </p>
-                    ) : null}
-                    <div className="flex flex-wrap gap-1">
-                      {(center.facilities ?? []).length > 0 ? (
-                        center.facilities?.map((facility) => (
-                          <span
-                            key={`${center.id}-${facility}`}
-                            className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700"
-                          >
-                            {t(`admin.map.facilities.${facility}`)}
+                      ) : null}
+                      {center.phone ? (
+                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                          <Phone className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                          <span>{center.phone}</span>
+                        </div>
+                      ) : null}
+                      {center.operatingHours ? (
+                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                          <Clock className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                          <span>{center.operatingHours}</span>
+                        </div>
+                      ) : null}
+                      <div className="flex flex-wrap gap-1 pt-0.5">
+                        {(center.facilities ?? []).length > 0 ? (
+                          center.facilities?.map((facility) => (
+                            <span
+                              key={`${center.id}-${facility}`}
+                              className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700"
+                            >
+                              {t(`admin.map.facilities.${facility}`)}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-slate-500">
+                            {t('admin.map.popup.none')}
                           </span>
-                        ))
-                      ) : (
-                        <span className="text-xs text-slate-500">{t('admin.map.popup.none')}</span>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Popup>
@@ -797,36 +836,37 @@ export default function OperationsMap() {
 
             return (
               <Marker key={listing.id} position={[lat, lng]} icon={housingIcon}>
-                <Popup>
-                  <div className="space-y-2 text-sm">
-                    <p>
-                      <span className="font-semibold">{t('admin.map.popup.housing.type')}</span>{' '}
-                      {t(`housing.card.type_${listing.type}`)}
-                    </p>
-                    <p>
-                      <span className="font-semibold">
-                        {t('admin.map.popup.housing.governorate')}
-                      </span>{' '}
-                      {listing.governorate}
-                    </p>
-                    <p>
-                      <span className="font-semibold">{t('admin.map.popup.housing.capacity')}</span>{' '}
-                      {listing.capacity}
-                    </p>
-                    <p>
-                      <span className="font-semibold">
-                        {t('admin.map.popup.housing.priceType')}
-                      </span>{' '}
-                      {t(
-                        `housing.card.${listing.priceType === 'market_rate' ? 'marketRate' : listing.priceType}`,
-                      )}
-                    </p>
-                    <p>
-                      <span className="font-semibold">
-                        {t('admin.map.popup.housing.availableFrom')}
-                      </span>{' '}
-                      {listing.availableFrom?.toDate().toLocaleDateString(i18n.language)}
-                    </p>
+                <Popup className="nasna-popup" minWidth={200}>
+                  <div className="text-sm">
+                    {/* Purple header band */}
+                    <div className="bg-purple-600 px-4 py-2.5">
+                      <p className="font-semibold text-white">{listing.governorate}</p>
+                      <p className="text-purple-200 text-xs mt-0.5">
+                        {t(`housing.card.type_${listing.type}`)}
+                      </p>
+                    </div>
+                    <div className="px-4 py-3 space-y-1.5">
+                      <p className="text-xs text-gray-600">
+                        <span className="font-medium text-gray-700">
+                          {t('admin.map.popup.housing.capacity')}
+                        </span>{' '}
+                        {listing.capacity}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        <span className="font-medium text-gray-700">
+                          {t('admin.map.popup.housing.priceType')}
+                        </span>{' '}
+                        {t(
+                          `housing.card.${listing.priceType === 'market_rate' ? 'marketRate' : listing.priceType}`,
+                        )}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        <span className="font-medium text-gray-700">
+                          {t('admin.map.popup.housing.availableFrom')}
+                        </span>{' '}
+                        {listing.availableFrom?.toDate().toLocaleDateString(i18n.language)}
+                      </p>
+                    </div>
                   </div>
                 </Popup>
               </Marker>
@@ -844,17 +884,18 @@ export default function OperationsMap() {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-              {t('admin.map.summary.submissions')} {filteredSubmissionMarkers.length}
+            <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 font-medium text-blue-700">
+              {t('admin.map.summary.submissions')}{' '}
+              <strong>{filteredSubmissionMarkers.length}</strong>
             </span>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-              {t('admin.map.summary.ngos')} {ngoCoverage.length}
+            <span className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 font-medium text-sky-700">
+              {t('admin.map.summary.ngos')} <strong>{ngoCoverage.length}</strong>
             </span>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-              {t('admin.map.summary.centers')} {centers.length}
+            <span className="rounded-full border border-[#12a89d]/30 bg-teal-50 px-3 py-1 font-medium text-[#12a89d]">
+              {t('admin.map.summary.centers')} <strong>{centers.length}</strong>
             </span>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-              {t('admin.map.summary.housing')} {totalHousingCapacity}
+            <span className="rounded-full border border-purple-200 bg-purple-50 px-3 py-1 font-medium text-purple-700">
+              {t('admin.map.summary.housing')} <strong>{totalHousingCapacity}</strong>
             </span>
             <Button
               size="sm"
