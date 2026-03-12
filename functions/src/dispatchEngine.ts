@@ -14,7 +14,7 @@ import {
 } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { sendAdminStaleCasesAlert, sendNgoNewCaseAlert } from './email';
-import { sendWhatsApp } from './utils/twilio';
+import { sendWhatsAppTemplate, sendWhatsAppText } from './utils/meta';
 
 if (getApps().length === 0) {
   initializeApp();
@@ -433,6 +433,7 @@ export const onCaseAssigned = onDocumentUpdated(
   {
     document: 'submissions/{submissionId}',
     region: 'europe-west1',
+    secrets: ['META_WA_PHONE_NUMBER_ID', 'META_WA_ACCESS_TOKEN'],
   },
   async (event) => {
     if (!event.data) {
@@ -478,12 +479,33 @@ export const onCaseAssigned = onDocumentUpdated(
 
     if (after.source === 'whatsapp' && after.whatsappPhone) {
       try {
-        const ngoName = memberData?.name ?? 'فريق المساعدة';
-        await sendWhatsApp(
+        // Try to retrieve user's preferred language from wa_session.
+        // Session may no longer exist if it was cleaned up after registration; default to Arabic.
+        let botLang: 'ar' | 'en' | 'fr' = 'ar';
+        // PII: after.whatsappPhone is used as session key — never log this value
+        const sessionSnap = await db.collection('wa_sessions').doc(after.whatsappPhone).get();
+        if (sessionSnap.exists) {
+          const sessionData = sessionSnap.data() as { lang?: string };
+          if (sessionData.lang === 'en' || sessionData.lang === 'fr') {
+            botLang = sessionData.lang;
+          }
+        }
+
+        const templateLangCode = botLang === 'fr' ? 'fr' : botLang === 'en' ? 'en' : 'ar';
+        const ngoName = memberData?.name ?? '';
+
+        await sendWhatsAppTemplate(
+          // PII: after.whatsappPhone is the recipient — never log this value
           after.whatsappPhone,
-          `تم تعيين حالتك (#${submissionId}) 🤝\n${ngoName} سيتواصل معك قريباً.`,
+          // PLACEHOLDER: replace 'nasna_case_assigned' with your approved Meta template name
+          // once approved in Meta Business Manager (WhatsApp Manager > Message Templates).
+          // Template body (Arabic): "تم تعيين حالتك ({{1}}) إلى {{2}}. سيتواصلون معك قريباً."
+          // Template body (English): "Your case ({{1}}) has been assigned to {{2}}. They will contact you soon."
+          'nasna_case_assigned',
+          templateLangCode,
+          [submissionId, ngoName], // {{1}} = case ID, {{2}} = org name
         );
-        logger.info('Sent WhatsApp assignment notification', { submissionId, status: 'assigned' });
+        logger.info('Sent WhatsApp assignment notification', { submissionId });
       } catch (error) {
         logger.error('Failed to send WhatsApp assignment notification', {
           submissionId,
@@ -506,6 +528,7 @@ export const onCaseCompleted = onDocumentUpdated(
   {
     document: 'submissions/{submissionId}',
     region: 'europe-west1',
+    secrets: ['META_WA_PHONE_NUMBER_ID', 'META_WA_ACCESS_TOKEN'],
   },
   async (event) => {
     if (!event.data) {
@@ -565,11 +588,15 @@ export const onCaseCompleted = onDocumentUpdated(
 
     if (nextStatus === 'completed' && after.source === 'whatsapp' && after.whatsappPhone) {
       try {
-        await sendWhatsApp(
+        // NOTE: This free-form message requires the user to have messaged within the last 24h.
+        // If cases routinely complete days after registration, create a completion template in
+        // Meta Business Manager and switch this to sendWhatsAppTemplate.
+        await sendWhatsAppText(
+          // PII: after.whatsappPhone is the recipient — never log this value
           after.whatsappPhone,
           `تم إغلاق حالتك (#${submissionId}) ✅\nنشكرك على ثقتك بنسنا.`,
         );
-        logger.info('Sent WhatsApp completion notification', { submissionId, status: 'completed' });
+        logger.info('Sent WhatsApp completion notification', { submissionId });
       } catch (error) {
         logger.error('Failed to send WhatsApp completion notification', {
           submissionId,
@@ -595,6 +622,7 @@ export const dailyStaleCaseCheck = onSchedule(
     schedule: '0 2 * * *',
     timeZone: 'Asia/Beirut',
     region: 'europe-west1',
+    secrets: ['META_WA_PHONE_NUMBER_ID', 'META_WA_ACCESS_TOKEN'],
   },
   async () => {
     const staleBefore = Date.now() - STALE_CASE_THRESHOLD_HOURS * 60 * 60 * 1000;
@@ -685,8 +713,12 @@ export const dailyStaleCaseCheck = onSchedule(
             const member = memberCache.get(submission.assignedTo);
             if (member?.phoneNumber) {
               try {
-                await sendWhatsApp(
-                  member.phoneNumber,
+                // Normalize to E.164 without '+' (Meta Cloud API format)
+                const normalizedPhone = member.phoneNumber
+                  .replace(/^whatsapp:/, '')
+                  .replace(/^\+/, '');
+                await sendWhatsAppText(
+                  normalizedPhone,
                   `تذكير: الحالة (#${document.id}) لم تُحدَّث منذ ${STALE_CASE_THRESHOLD_HOURS} ساعة. يرجى تحديث الحالة في نسنا.`,
                 );
                 logger.info('Sent stale case WhatsApp to NGO', {

@@ -73,5 +73,10 @@
   "locationWithFamily": "Staying with family or host",
   "locationCenter": "Staying in a center",
   "center": "Center",
-  "invalidEmail": "Please enter a valid email address."
+  "invalidEmail": "Please enter a valid email address.",
+  "whatsappCta": {
+    "title": "Register via WhatsApp",
+    "description": "Prefer to register from your phone? Send us a message on WhatsApp and our bot will guide you through registration in Arabic, English, or French.",
+    "buttonLabel": "Register via WhatsApp"
+  }
 }
