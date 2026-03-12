@@ -1,5 +1,6 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
 import {
+  FieldPath,
   FieldValue,
   getFirestore,
   Timestamp,
@@ -58,20 +59,23 @@ interface MemberRecord {
 }
 
 interface HousingRecord {
-  availableSpots?: number;
-  status?: 'pending_review' | 'approved' | 'rejected' | 'reserved' | 'filled';
+  capacity?: number; // was: availableSpots (migrated by backfillV2Data.ts)
+  status?: 'pending_review' | 'available' | 'reserved' | 'filled'; // was: 'approved'
 }
 
 async function ensureGlobalStatsDocument() {
   await GLOBAL_STATS_DOC.set(
     {
-      submissionsRegistered: 0,
-      submissionsAssigned: 0,
-      submissionsCompleted: 0,
-      peopleHelped: 0,
-      activeNgoCount: 0,
+      totalRegistered: 0,
+      totalAssigned: 0,
+      totalCompleted: 0,
+      totalPeopleHelped: 0,
+      totalPending: 0,
+      activeNGOs: 0,
       housingAvailable: 0,
-      updatedAt: new Date(),
+      byGovernorate: {},
+      byNeed: {},
+      lastUpdatedAt: new Date(),
     },
     { merge: true },
   );
@@ -172,72 +176,124 @@ async function refreshActiveNgoCount() {
     .where('validated', '==', true)
     .get();
 
-  const activeNgoCount = memberSnapshot.docs.filter(
+  const activeNGOs = memberSnapshot.docs.filter(
     (document) => Number(document.data().currentCaseLoad ?? 0) > 0,
   ).length;
 
   await GLOBAL_STATS_DOC.set(
     {
-      activeNgoCount,
-      updatedAt: new Date(),
+      activeNGOs,
+      lastUpdatedAt: new Date(),
     },
     { merge: true },
   );
 }
 
 async function refreshHousingAvailability() {
-  const housingSnapshot = await db.collection('housing').where('status', '==', 'approved').get();
+  // status 'available' — 'approved' was migrated to 'available' by backfillV2Data.ts
+  const housingSnapshot = await db.collection('housing').where('status', '==', 'available').get();
   const housingAvailable = housingSnapshot.docs.reduce(
-    (total, document) => total + Number((document.data() as HousingRecord).availableSpots ?? 0),
+    (total, document) => total + Number((document.data() as HousingRecord).capacity ?? 0),
     0,
   );
 
   await GLOBAL_STATS_DOC.set(
     {
       housingAvailable,
-      updatedAt: new Date(),
+      lastUpdatedAt: new Date(),
     },
     { merge: true },
   );
 }
 
-async function rebuildGlobalStats() {
-  const [submissionSnapshot, housingSnapshot, memberSnapshot] = await Promise.all([
-    db.collection('submissions').get(),
-    db.collection('housing').where('status', '==', 'approved').get(),
-    db.collection('members').where('role', '==', 'member').where('validated', '==', true).get(),
-  ]);
+const REBUILD_BATCH_SIZE = 200;
 
-  const submissionsRegistered = submissionSnapshot.size;
-  const submissionsAssigned = submissionSnapshot.docs.filter((document) =>
-    Boolean((document.data() as SubmissionRecord).assignedTo),
+async function rebuildGlobalStats() {
+  // ADMIN REBUILD TOOL: full collection scan is intentional here.
+  // This function is scheduled nightly and invoked manually by admins only.
+  // Client-facing queries must never do unbounded scans.
+
+  // Accumulator
+  let totalRegistered = 0;
+  let totalPending = 0;
+  let totalAssigned = 0;
+  let totalCompleted = 0;
+  let totalPeopleHelped = 0;
+  const byGovernorate: Record<string, number> = {};
+  const byNeed: Record<string, number> = {};
+
+  // Paginated scan of submissions
+  let lastDoc: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+  let hasMore = true;
+
+  while (hasMore) {
+    // Use documentId() not a data field — Firestore silently drops documents
+    // that are missing the ordered field, which would corrupt the rebuild totals.
+    let batchQuery = db
+      .collection('submissions')
+      .orderBy(FieldPath.documentId())
+      .limit(REBUILD_BATCH_SIZE);
+
+    if (lastDoc) {
+      batchQuery = batchQuery.startAfter(lastDoc);
+    }
+
+    const batchSnapshot = await batchQuery.get();
+    hasMore = batchSnapshot.size === REBUILD_BATCH_SIZE;
+
+    if (batchSnapshot.empty) break;
+    lastDoc = batchSnapshot.docs[batchSnapshot.docs.length - 1];
+
+    for (const doc of batchSnapshot.docs) {
+      const submission = doc.data() as SubmissionRecord;
+      totalRegistered++;
+
+      const status = submission.status ?? 'pending';
+      if (status === 'pending') totalPending++;
+      else if (status === 'assigned' || status === 'in_progress') totalAssigned++;
+      else if (status === 'completed') {
+        totalCompleted++;
+        totalPeopleHelped += Number(submission.numberOfPeopleInHousehold ?? 0);
+      }
+
+      const gov = submission.currentGovernorate;
+      if (gov) byGovernorate[gov] = (byGovernorate[gov] ?? 0) + 1;
+
+      for (const need of submission.needs ?? []) {
+        byNeed[need] = (byNeed[need] ?? 0) + 1;
+      }
+    }
+  }
+
+  // Members: activeNGOs
+  const memberSnapshot = await db
+    .collection('members')
+    .where('role', '==', 'member')
+    .where('validated', '==', true)
+    .get();
+  const activeNGOs = memberSnapshot.docs.filter(
+    (doc) => Number((doc.data() as MemberRecord).currentCaseLoad ?? 0) > 0,
   ).length;
-  const completedSubmissions = submissionSnapshot.docs.filter(
-    (document) => (document.data() as SubmissionRecord).status === 'completed',
-  );
-  const submissionsCompleted = completedSubmissions.length;
-  const peopleHelped = completedSubmissions.reduce(
-    (total, document) =>
-      total + Number((document.data() as SubmissionRecord).numberOfPeopleInHousehold ?? 0),
-    0,
-  );
-  const activeNgoCount = memberSnapshot.docs.filter(
-    (document) => Number((document.data() as MemberRecord).currentCaseLoad ?? 0) > 0,
-  ).length;
+
+  // Housing: status 'available' — 'approved' was migrated by backfillV2Data.ts
+  const housingSnapshot = await db.collection('housing').where('status', '==', 'available').get();
   const housingAvailable = housingSnapshot.docs.reduce(
-    (total, document) => total + Number((document.data() as HousingRecord).availableSpots ?? 0),
+    (total, doc) => total + Number((doc.data() as HousingRecord).capacity ?? 0),
     0,
   );
 
   await GLOBAL_STATS_DOC.set(
     {
-      submissionsRegistered,
-      submissionsAssigned,
-      submissionsCompleted,
-      peopleHelped,
-      activeNgoCount,
+      totalRegistered,
+      totalPending,
+      totalAssigned,
+      totalCompleted,
+      totalPeopleHelped,
+      activeNGOs,
       housingAvailable,
-      updatedAt: new Date(),
+      byGovernorate,
+      byNeed,
+      lastUpdatedAt: new Date(),
     },
     { merge: true },
   );
