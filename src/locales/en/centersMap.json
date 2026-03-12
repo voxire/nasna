@@ -16,5 +16,10 @@
   "availableSpots": "Available spots:",
   "contact": "Contact:",
   "phone": "Phone:",
-  "loadError": "Failed to load centers map data."
+  "loadError": "Failed to load centers map data.",
+  "getDirections": "Get Directions",
+  "intakeOpen": "Open — accepting arrivals",
+  "intakeClosed": "Full / Closed",
+  "aidServices": "Aid services:",
+  "operatingHours": "Hours:"
 }

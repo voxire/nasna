@@ -61,7 +61,11 @@
       "currentLoad": "Charge actuelle :",
       "center": {
         "type": "Type :",
-        "occupancy": "Occupation :"
+        "occupancy": "Occupation :",
+        "intakeOpen": "Ouvert",
+        "intakeClosed": "Complet / Fermé",
+        "phone": "Téléphone :",
+        "hours": "Horaires :"
       },
       "housing": {
         "type": "Type :",
@@ -293,6 +297,20 @@
     "contactName": "Nom du contact",
     "contactPhone": "Téléphone du contact",
     "activeCheckbox": "Le centre est actif et disponible pour l'accueil",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "coordinatesHint": "Trouvez les coordonnées sur maps.google.com",
+    "publicPhone": "Numéro de téléphone public",
+    "operatingHours": "Heures d'ouverture",
+    "aidServices": "Services d'aide",
+    "intakeOpen": "Accepte actuellement des arrivées",
+    "aidService_food": "Alimentation",
+    "aidService_water": "Eau",
+    "aidService_medical": "Médical",
+    "aidService_clothing": "Vêtements",
+    "aidService_shelter": "Hébergement",
+    "aidService_legal": "Soutien juridique",
+    "aidService_psychosocial": "Soutien psychosocial",
     "saving": "Enregistrement...",
     "saveChanges": "Enregistrer les modifications",
     "createCenter": "Créer un centre",

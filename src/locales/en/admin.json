@@ -61,7 +61,11 @@
       "currentLoad": "Current load:",
       "center": {
         "type": "Type:",
-        "occupancy": "Occupancy:"
+        "occupancy": "Occupancy:",
+        "intakeOpen": "Open",
+        "intakeClosed": "Full / Closed",
+        "phone": "Phone:",
+        "hours": "Hours:"
       },
       "housing": {
         "type": "Type:",
@@ -293,6 +297,20 @@
     "contactName": "Contact Name",
     "contactPhone": "Contact Phone",
     "activeCheckbox": "Center is active and available for intake",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "coordinatesHint": "Find coordinates at maps.google.com",
+    "publicPhone": "Public phone number",
+    "operatingHours": "Operating hours",
+    "aidServices": "Aid services",
+    "intakeOpen": "Currently accepting arrivals",
+    "aidService_food": "Food",
+    "aidService_water": "Water",
+    "aidService_medical": "Medical",
+    "aidService_clothing": "Clothing",
+    "aidService_shelter": "Shelter",
+    "aidService_legal": "Legal support",
+    "aidService_psychosocial": "Psychosocial support",
     "saving": "Saving...",
     "saveChanges": "Save Changes",
     "createCenter": "Create Center",

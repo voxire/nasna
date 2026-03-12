@@ -16,5 +16,10 @@
   "availableSpots": "الأماكن المتاحة:",
   "contact": "المسؤول:",
   "phone": "الهاتف:",
-  "loadError": "فشل تحميل بيانات خريطة المراكز."
+  "loadError": "فشل تحميل بيانات خريطة المراكز.",
+  "getDirections": "احصل على الاتجاهات",
+  "intakeOpen": "يستقبل الوافدين",
+  "intakeClosed": "ممتلئ / مغلق",
+  "aidServices": "الخدمات المقدّمة:",
+  "operatingHours": "ساعات العمل:"
 }
