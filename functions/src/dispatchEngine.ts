@@ -170,6 +170,8 @@ async function incrementMemberCaseLoad(memberUid: string, delta: number) {
 }
 
 async function refreshActiveNgoCount() {
+  // Server-side admin SDK call — members is a bounded collection (NGOs, not displaced persons).
+  // Unbounded scan is acceptable here; ~50-100 NGOs maximum in current scope.
   const memberSnapshot = await db
     .collection('members')
     .where('role', '==', 'member')
@@ -191,6 +193,8 @@ async function refreshActiveNgoCount() {
 
 async function refreshHousingAvailability() {
   // status 'available' — 'approved' was migrated to 'available' by backfillV2Data.ts
+  // Server-side admin SDK call — housing listings are bounded by real available properties.
+  // Unbounded scan is acceptable here.
   const housingSnapshot = await db.collection('housing').where('status', '==', 'available').get();
   const housingAvailable = housingSnapshot.docs.reduce(
     (total, document) => total + Number((document.data() as HousingRecord).capacity ?? 0),
@@ -624,6 +628,11 @@ export const onCaseCompleted = onDocumentUpdated(
       await incrementMemberCaseLoad(after.assignedTo, -1);
     }
 
+    // Known limitation: if a single Firestore write simultaneously sets assignedTo and
+    // status=completed (rare admin action), both onCaseAssigned and onCaseCompleted fire.
+    // onCaseAssigned decrements totalPending; this function may also decrement it if
+    // wasPending is true, causing a brief -2 instead of -1. The nightly rebuildGlobalStats
+    // corrects this drift. Fixing this requires consolidating both triggers into one handler.
     const wasPending = previousStatus === 'pending';
     const wasAssigned = previousStatus === 'assigned' || previousStatus === 'in_progress';
 
@@ -639,8 +648,15 @@ export const onCaseCompleted = onDocumentUpdated(
         { merge: true },
       );
     } else {
-      // cancelled — only update timestamp
-      await GLOBAL_STATS_DOC.set({ lastUpdatedAt: new Date() }, { merge: true });
+      // cancelled — decrement the bucket the case was in
+      await GLOBAL_STATS_DOC.set(
+        {
+          ...(wasAssigned ? { totalAssigned: FieldValue.increment(-1) } : {}),
+          ...(wasPending ? { totalPending: FieldValue.increment(-1) } : {}),
+          lastUpdatedAt: new Date(),
+        },
+        { merge: true },
+      );
     }
 
     if (after.assignedTo) {
