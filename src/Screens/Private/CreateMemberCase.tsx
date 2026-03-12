@@ -23,6 +23,7 @@ import {
 import AidTypeCheckboxGrid from '@/Components/AidTypeCheckboxGrid';
 import CenterPicker from '@/Components/CenterPicker';
 import { createMemberCase } from '@/services/memberCases';
+import { LEBANON_GOVERNORATES, LEBANON_GOVERNORATE_TRANSLATION_KEYS } from '@/lib/governorates';
 
 const baseSubmissionSchema = z.object({
   fullName: z.string().min(1),
@@ -65,6 +66,21 @@ const submissionSchema = baseSubmissionSchema.superRefine((value, context) => {
       path: ['centerId'],
       message: 'Center selection is required',
     });
+  }
+
+  if (value.locationType !== 'center') {
+    const totalFamilyBreakdown = Object.values(value.ageRanges).reduce(
+      (sum, memberCount) => sum + memberCount,
+      0,
+    );
+
+    if (totalFamilyBreakdown > value.numberOfPeopleInHousehold) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['numberOfPeopleInHousehold'],
+        message: 'Family member breakdown cannot exceed household size',
+      });
+    }
   }
 });
 
@@ -121,7 +137,7 @@ function CreateMemberCase() {
   const [centers, setCenters] = useState<Array<CenterDocument & { id: string }>>([]);
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
+    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true));
 
     return onSnapshot(centerQuery, (snapshot) => {
       setCenters(
@@ -181,10 +197,15 @@ function CreateMemberCase() {
     if (!result.success) {
       const consentError = result.error.issues.find((i) => i.path.includes('consentGiven'));
       const centerError = result.error.issues.find((i) => i.path.includes('centerId'));
+      const householdMismatchError = result.error.issues.find((i) =>
+        i.path.includes('numberOfPeopleInHousehold'),
+      );
       if (consentError) {
         toast.error(t('submission.consentRequired'));
       } else if (centerError) {
         toast.error(t('submission.centerRequired'));
+      } else if (householdMismatchError) {
+        toast.error(t('submission.householdCountMismatch'));
       } else {
         toast.error(t('submission.validationError'));
       }
@@ -288,12 +309,21 @@ function CreateMemberCase() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               {renderLabel(t('submission.previousGovernorate'), true)}
-              <Input
+              <Select
                 value={formData.previousGovernorate}
-                onChange={(e) => handleChange('previousGovernorate', e.target.value)}
-                required
-                className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
-              />
+                onValueChange={(value) => handleChange('previousGovernorate', value)}
+              >
+                <SelectTrigger className="bg-gray-50 border-gray-200">
+                  <SelectValue placeholder={t('submission.previousGovernorate')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {LEBANON_GOVERNORATES.map((governorate) => (
+                    <SelectItem key={governorate} value={governorate}>
+                      {t(LEBANON_GOVERNORATE_TRANSLATION_KEYS[governorate])}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           {isCenterCase ? (

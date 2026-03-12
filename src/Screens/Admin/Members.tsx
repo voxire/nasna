@@ -3,11 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { db } from '../../firebase';
 import {
   collection,
-  doc,
   type DocumentData,
-  deleteDoc,
   type QueryDocumentSnapshot,
-  updateDoc,
   where,
 } from 'firebase/firestore';
 import { toast } from 'sonner';
@@ -40,7 +37,12 @@ import {
   DialogFooter,
 } from '@/Components/ui/dialog';
 import { usePaginatedQuery } from '@/hooks/usePaginatedQuery';
-import { createManagedUser as createManagedUserAccount } from '@/services/adminUsers';
+import {
+  createManagedUser as createManagedUserAccount,
+  deleteManagedUser as deleteManagedUserAccount,
+  updateManagedUser as updateManagedUserAccount,
+  validateManagedUser as validateManagedUserAccount,
+} from '@/services/adminUsers';
 import ConfirmDialog from '@/Components/ConfirmDialog';
 
 const PAGE_SIZE = 10;
@@ -119,22 +121,22 @@ function Members() {
   const handleDelete = async () => {
     if (!deletingMemberId) return;
     try {
-      await deleteDoc(doc(db, 'members', deletingMemberId));
+      await deleteManagedUserAccount(deletingMemberId);
       toast.success(t('admin.members.deleteSuccess'));
       setDeletingMemberId(null);
     } catch (error) {
       console.error('Error deleting member: ', error);
-      toast.error(t('admin.members.deleteError'));
+      toast.error(error instanceof Error ? error.message : t('admin.members.deleteError'));
     }
   };
 
   const handleValidate = async (id: string) => {
     try {
-      await updateDoc(doc(db, 'members', id), { validated: true, updatedAt: new Date() });
+      await validateManagedUserAccount(id);
       toast.success(t('admin.members.validateSuccess'));
     } catch (error) {
       console.error('Error validating member: ', error);
-      toast.error(t('admin.members.validateError'));
+      toast.error(error instanceof Error ? error.message : t('admin.members.validateError'));
     }
   };
 
@@ -147,19 +149,20 @@ function Members() {
     e.preventDefault();
     if (!editMember) return;
     try {
-      await updateDoc(doc(db, 'members', editMember.id), {
+      await updateManagedUserAccount({
+        uid: editMember.id,
+        role: 'member',
         name: editMember.name,
         contactPersonName: editMember.contactPersonName ?? '',
         email: editMember.email,
         phoneNumber: editMember.phoneNumber,
-        updatedAt: new Date(),
       });
       toast.success(t('admin.members.updateSuccess'));
       setModalOpen(false);
       setEditMember(null);
     } catch (error) {
       console.error('Error updating member: ', error);
-      toast.error(t('admin.members.updateError'));
+      toast.error(error instanceof Error ? error.message : t('admin.members.updateError'));
     }
   };
 
@@ -198,7 +201,7 @@ function Members() {
       resetCreateForm();
     } catch (error) {
       console.error('Error creating NGO: ', error);
-      toast.error('Failed to create NGO account.');
+      toast.error(error instanceof Error ? error.message : 'Failed to create NGO account.');
     } finally {
       setCreating(false);
     }
@@ -300,28 +303,24 @@ function Members() {
                         {t('admin.members.validate')}
                       </Button>
                     )}
-                    {member.validated && (
-                      <>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-gray-300"
-                          onClick={() => {
-                            setEditMember(member);
-                            setModalOpen(true);
-                          }}
-                        >
-                          {t('admin.members.edit')}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => setDeletingMemberId(member.id)}
-                        >
-                          {t('admin.members.delete')}
-                        </Button>
-                      </>
-                    )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-gray-300"
+                      onClick={() => {
+                        setEditMember(member);
+                        setModalOpen(true);
+                      }}
+                    >
+                      {t('admin.members.edit')}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setDeletingMemberId(member.id)}
+                    >
+                      {t('admin.members.delete')}
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

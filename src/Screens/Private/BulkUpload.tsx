@@ -361,7 +361,7 @@ export default function BulkUpload() {
 
   // Load centers for name→ID lookup
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
+    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true));
     return onSnapshot(centerQuery, (snapshot) => {
       setCenters(snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as CenterDocument) })));
     });

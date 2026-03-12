@@ -36,14 +36,21 @@ export default function MyCases() {
     caseId: string,
     status: 'assigned' | 'in_progress' | 'completed' | 'cancelled',
   ) => {
+    const existingCase = cases.find((memberCase) => memberCase.id === caseId);
+    if (existingCase?.status === status) {
+      toast.info(t('cases.statusAlreadyUpdated'));
+      return;
+    }
+
     try {
       const updatedCase = await updateMemberCaseStatus(caseId, status);
       setCases((current) =>
         current.map((memberCase) => (memberCase.id === caseId ? updatedCase : memberCase)),
       );
+      toast.success(t('cases.statusUpdatedSuccess'));
     } catch (error) {
       console.error(error);
-      toast.error(t('cases.statusUpdateFailed'));
+      toast.error(error instanceof Error ? error.message : t('cases.statusUpdateFailed'));
     }
   };
 

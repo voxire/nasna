@@ -51,6 +51,12 @@ interface SubmissionRecord {
   assignedToOrgName?: string;
   assignedAt?: Timestamp | null;
   aidDelivered?: boolean;
+  aidDeliveries?: Array<{
+    type?: string;
+    date?: Timestamp;
+    deliveredBy?: string;
+    notes?: string;
+  }>;
   staleFlagged?: boolean;
   source?: string;
 }
@@ -134,6 +140,12 @@ interface MemberCaseResponse {
   assignedToOrgName: string;
   assignedAt: string | null;
   aidDelivered: boolean;
+  aidDeliveries: Array<{
+    type: string;
+    date: string | null;
+    deliveredBy: string;
+    notes: string;
+  }>;
   staleFlagged: boolean;
   source: string;
 }
@@ -240,6 +252,14 @@ function sanitizeSubmission(id: string, submission: SubmissionRecord): MemberCas
     assignedToOrgName: submission.assignedToOrgName ?? '',
     assignedAt: submission.assignedAt?.toDate().toISOString() ?? null,
     aidDelivered: submission.aidDelivered ?? false,
+    aidDeliveries: Array.isArray(submission.aidDeliveries)
+      ? submission.aidDeliveries.map((entry) => ({
+          type: entry.type ?? 'delivery_note',
+          date: entry.date?.toDate().toISOString() ?? null,
+          deliveredBy: entry.deliveredBy ?? '',
+          notes: entry.notes ?? '',
+        }))
+      : [],
     staleFlagged: submission.staleFlagged ?? false,
     source: submission.source ?? 'web',
   };
@@ -279,21 +299,50 @@ export const listMemberPendingCases = onCall<ListCasesRequest>(
     const memberProfile = await getValidatedMemberProfile(uid);
     const pageSize = Math.min(Math.max(request.data?.limit ?? DEFAULT_PAGE_SIZE, 1), 100);
 
-    const snapshot = await db
-      .collection('submissions')
-      .where('status', '==', 'pending')
-      .limit(pageSize)
-      .get();
+    const matchedCases: Array<{ id: string; data: SubmissionRecord }> = [];
+    let lastDoc:
+      | FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
+      | undefined;
+    let pagesScanned = 0;
+
+    while (matchedCases.length < pageSize && pagesScanned < 6) {
+      let queryBuilder = db
+        .collection('submissions')
+        .where('status', '==', 'pending')
+        .orderBy('registrationDate', 'desc')
+        .limit(Math.max(pageSize * 2, 50));
+
+      if (lastDoc) {
+        queryBuilder = queryBuilder.startAfter(lastDoc);
+      }
+
+      const snapshot = await queryBuilder.get();
+      if (snapshot.empty) {
+        break;
+      }
+
+      for (const document of snapshot.docs) {
+        const data = document.data() as SubmissionRecord;
+        if (matchesCoverage(memberProfile, data)) {
+          matchedCases.push({ id: document.id, data });
+          if (matchedCases.length >= pageSize) {
+            break;
+          }
+        }
+      }
+
+      lastDoc = snapshot.docs.at(-1);
+      pagesScanned += 1;
+
+      if (snapshot.size < Math.max(pageSize * 2, 50)) {
+        break;
+      }
+    }
 
     return {
-      cases: sortByRegistrationDateDescending(
-        snapshot.docs.map((document) => ({
-          id: document.id,
-          data: document.data() as SubmissionRecord,
-        })),
-      )
-        .filter(({ data }) => matchesCoverage(memberProfile, data))
-        .map(({ id, data }) => sanitizeSubmission(id, data)),
+      cases: sortByRegistrationDateDescending(matchedCases).map(({ id, data }) =>
+        sanitizeSubmission(id, data),
+      ),
     };
   },
 );
@@ -343,7 +392,11 @@ export const getMemberCaseDetail = onCall<GetCaseDetailRequest>(
 
     const submission = submissionSnapshot.data() as SubmissionRecord;
 
-    if (submission.assignedTo !== uid && !matchesCoverage(memberProfile, submission)) {
+    if (submission.assignedTo && submission.assignedTo !== uid) {
+      throw new HttpsError('permission-denied', 'This case is assigned to another NGO.');
+    }
+
+    if (!submission.assignedTo && !matchesCoverage(memberProfile, submission)) {
       throw new HttpsError('permission-denied', 'This case is outside your coverage.');
     }
 
@@ -429,6 +482,9 @@ export const updateMemberCaseStatus = onCall<UpdateCaseStatusRequest>(
     }
 
     const currentStatus = submission.status ?? 'pending';
+    if (currentStatus === request.data.status) {
+      throw new HttpsError('already-exists', `Case is already marked as ${currentStatus}.`);
+    }
     assertAllowedStatusTransition(currentStatus, request.data.status);
 
     await submissionRef.set(
@@ -473,18 +529,28 @@ export const recordMemberAidDelivery = onCall<RecordAidDeliveryRequest>(
     }
 
     const notes = (request.data.deliveryNotes ?? '').trim();
-    const existingComments = (submission.comments ?? '').trim();
-    const updatedComments = notes
-      ? existingComments
-        ? `${existingComments}\n\nDelivery note: ${notes}`
-        : `Delivery note: ${notes}`
-      : existingComments;
+    if (!notes) {
+      throw new HttpsError('invalid-argument', 'deliveryNotes is required.');
+    }
+
+    const memberSnapshot = await db.collection('members').doc(uid).get();
+    const memberName = (memberSnapshot.data() as MemberProfile | undefined)?.name?.trim() || uid;
+    const existingAidDeliveries = Array.isArray(submission.aidDeliveries)
+      ? submission.aidDeliveries
+      : [];
 
     await submissionRef.set(
       {
         aidDelivered: true,
-        status: 'completed',
-        comments: updatedComments,
+        aidDeliveries: [
+          ...existingAidDeliveries,
+          {
+            type: 'delivery_note',
+            date: Timestamp.now(),
+            deliveredBy: memberName,
+            notes,
+          },
+        ],
         lastUpdatedBy: uid,
         updatedAt: new Date(),
       },
@@ -631,6 +697,7 @@ export const createMemberCase = onCall<CreateMemberCaseRequest>(
         assignedToOrgName: orgName,
         assignedAt: now,
         aidDelivered: false,
+        aidDeliveries: [],
         lastUpdatedBy: uid,
         staleFlagged: false,
         source: 'web',

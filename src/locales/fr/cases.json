@@ -1,4 +1,6 @@
 {
+  "statusUpdatedSuccess": "Le statut du cas a été mis à jour.",
+  "statusAlreadyUpdated": "Le statut est déjà à jour.",
   "statusUpdateFailed": "Échec de la mise à jour du statut du cas. Veuillez réessayer.",
   "claimFailed": "Échec de la réclamation du cas. Veuillez réessayer.",
   "feed": {
@@ -18,6 +20,7 @@
     "viewDetails": "Voir les détails",
     "claiming": "Réclamation en cours...",
     "claimCase": "Réclamer le cas",
+    "claimSuccess": "Cas réclamé avec succès.",
     "filterByNeed": "Filtrer par besoin :",
     "clearFilter": "Effacer le filtre"
   },
@@ -72,6 +75,16 @@
     "cancelCase": "Annuler le cas",
     "reopenCase": "Rouvrir le cas",
     "timeline": "Chronologie",
-    "aidDeliveryFailed": "Échec de l'enregistrement de la livraison d'aide. Veuillez réessayer."
+    "aidDeliveryFailed": "Échec de l'enregistrement de la note. Veuillez réessayer.",
+    "aidDeliverySaved": "Note enregistrée avec succès.",
+    "notesTitle": "Notes de livraison",
+    "notesDescription": "Ajoutez des notes horodatées au fur et à mesure. Cela ne termine pas automatiquement le cas.",
+    "notesPlaceholder": "Kits alimentaires livrés, couvertures, eau ou tout autre suivi...",
+    "notesSaving": "Enregistrement...",
+    "notesSubmit": "Enregistrer la note",
+    "noteHistoryTitle": "Historique des notes",
+    "noDeliveryNotes": "Aucune note de livraison pour le moment.",
+    "noteAuthorFallback": "Équipe ONG",
+    "noteDateUnknown": "Heure inconnue"
   }
 }

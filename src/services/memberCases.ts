@@ -27,6 +27,12 @@ export interface MemberCase {
   assignedToOrgName: string;
   assignedAt: string | null;
   aidDelivered: boolean;
+  aidDeliveries: Array<{
+    type: string;
+    date: string | null;
+    deliveredBy: string;
+    notes: string;
+  }>;
   staleFlagged: boolean;
   source: string;
 }

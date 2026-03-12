@@ -1,4 +1,6 @@
 {
+  "statusUpdatedSuccess": "Case status updated.",
+  "statusAlreadyUpdated": "Status already updated.",
   "statusUpdateFailed": "Failed to update case status. Please try again.",
   "claimFailed": "Failed to claim case. Please try again.",
   "feed": {
@@ -18,6 +20,7 @@
     "viewDetails": "View details",
     "claiming": "Claiming...",
     "claimCase": "Claim case",
+    "claimSuccess": "Case claimed successfully.",
     "filterByNeed": "Filter by need:",
     "clearFilter": "Clear filter"
   },
@@ -72,6 +75,16 @@
     "cancelCase": "Cancel Case",
     "reopenCase": "Reopen Case",
     "timeline": "Timeline",
-    "aidDeliveryFailed": "Failed to record aid delivery. Please try again."
+    "aidDeliveryFailed": "Failed to save the note. Please try again.",
+    "aidDeliverySaved": "Note saved successfully.",
+    "notesTitle": "Delivery Notes",
+    "notesDescription": "Add timestamped notes as work progresses. This does not automatically complete the case.",
+    "notesPlaceholder": "Delivered food kits, blankets, water, or any follow-up context...",
+    "notesSaving": "Saving...",
+    "notesSubmit": "Save note",
+    "noteHistoryTitle": "Note History",
+    "noDeliveryNotes": "No delivery notes yet.",
+    "noteAuthorFallback": "NGO team",
+    "noteDateUnknown": "Unknown time"
   }
 }

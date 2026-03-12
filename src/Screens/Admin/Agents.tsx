@@ -3,11 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { db } from '../../firebase';
 import {
   collection,
-  doc,
   type DocumentData,
-  deleteDoc,
   type QueryDocumentSnapshot,
-  updateDoc,
   where,
 } from 'firebase/firestore';
 import { toast } from 'sonner';
@@ -40,7 +37,12 @@ import {
   DialogFooter,
 } from '@/Components/ui/dialog';
 import { usePaginatedQuery } from '@/hooks/usePaginatedQuery';
-import { createManagedUser as createManagedUserAccount } from '@/services/adminUsers';
+import {
+  createManagedUser as createManagedUserAccount,
+  deleteManagedUser as deleteManagedUserAccount,
+  updateManagedUser as updateManagedUserAccount,
+  validateManagedUser as validateManagedUserAccount,
+} from '@/services/adminUsers';
 import ConfirmDialog from '@/Components/ConfirmDialog';
 
 const PAGE_SIZE = 10;
@@ -119,22 +121,22 @@ function Agents() {
   const handleDelete = async () => {
     if (!deletingAgentId) return;
     try {
-      await deleteDoc(doc(db, 'members', deletingAgentId));
+      await deleteManagedUserAccount(deletingAgentId);
       toast.success(t('admin.agents.deleteSuccess'));
       setDeletingAgentId(null);
     } catch (error) {
       console.error('Error deleting agent: ', error);
-      toast.error(t('admin.agents.deleteError'));
+      toast.error(error instanceof Error ? error.message : t('admin.agents.deleteError'));
     }
   };
 
   const handleValidate = async (id: string) => {
     try {
-      await updateDoc(doc(db, 'members', id), { validated: true, updatedAt: new Date() });
+      await validateManagedUserAccount(id);
       toast.success(t('admin.agents.validateSuccess'));
     } catch (error) {
       console.error('Error validating agent: ', error);
-      toast.error(t('admin.agents.validateError'));
+      toast.error(error instanceof Error ? error.message : t('admin.agents.validateError'));
     }
   };
 
@@ -147,19 +149,20 @@ function Agents() {
     e.preventDefault();
     if (!editAgent) return;
     try {
-      await updateDoc(doc(db, 'members', editAgent.id), {
+      await updateManagedUserAccount({
+        uid: editAgent.id,
+        role: 'agent',
         name: editAgent.name,
-        contactPersonName: editAgent.contactPersonName ?? '',
         email: editAgent.email,
         phoneNumber: editAgent.phoneNumber,
-        updatedAt: new Date(),
+        areaOfOperation: editAgent.areaOfOperation ?? '',
       });
       toast.success(t('admin.agents.updateSuccess'));
       setModalOpen(false);
       setEditAgent(null);
     } catch (error) {
       console.error('Error updating agent: ', error);
-      toast.error(t('admin.agents.updateError'));
+      toast.error(error instanceof Error ? error.message : t('admin.agents.updateError'));
     }
   };
 
@@ -198,7 +201,7 @@ function Agents() {
       resetCreateForm();
     } catch (error) {
       console.error('Error creating agent: ', error);
-      toast.error('Failed to create agent account.');
+      toast.error(error instanceof Error ? error.message : 'Failed to create agent account.');
     } finally {
       setCreating(false);
     }
@@ -207,9 +210,9 @@ function Agents() {
   const editFormFields = useMemo(
     () => [
       { name: 'name', label: t('admin.agents.name') },
-      { name: 'contactPersonName', label: t('admin.agents.contactPerson') },
       { name: 'email', label: t('admin.agents.email') },
       { name: 'phoneNumber', label: t('admin.agents.phoneNumber') },
+      { name: 'areaOfOperation', label: t('admin.agents.areaOfOperation') },
     ],
     [t],
   );
@@ -300,28 +303,24 @@ function Agents() {
                         {t('admin.agents.validate')}
                       </Button>
                     )}
-                    {agent.validated && (
-                      <>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-gray-300"
-                          onClick={() => {
-                            setEditAgent(agent);
-                            setModalOpen(true);
-                          }}
-                        >
-                          {t('admin.agents.edit')}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => setDeletingAgentId(agent.id)}
-                        >
-                          {t('admin.agents.delete')}
-                        </Button>
-                      </>
-                    )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-gray-300"
+                      onClick={() => {
+                        setEditAgent(agent);
+                        setModalOpen(true);
+                      }}
+                    >
+                      {t('admin.agents.edit')}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setDeletingAgentId(agent.id)}
+                    >
+                      {t('admin.agents.delete')}
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

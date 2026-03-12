@@ -37,12 +37,17 @@ export default function CaseDetail() {
     status: 'assigned' | 'in_progress' | 'completed' | 'cancelled',
   ) => {
     if (!caseId) return;
+    if (memberCase?.status === status) {
+      toast.info(t('cases.statusAlreadyUpdated'));
+      return;
+    }
     try {
       const updatedCase = await updateMemberCaseStatus(caseId, status);
       setMemberCase(updatedCase);
+      toast.success(t('cases.statusUpdatedSuccess'));
     } catch (error) {
       console.error(error);
-      toast.error(t('cases.statusUpdateFailed'));
+      toast.error(error instanceof Error ? error.message : t('cases.statusUpdateFailed'));
     }
   };
 
@@ -51,9 +56,10 @@ export default function CaseDetail() {
     try {
       const updatedCase = await recordMemberAidDelivery(caseId, notes || undefined);
       setMemberCase(updatedCase);
+      toast.success(t('cases.detail.aidDeliverySaved'));
     } catch (error) {
       console.error(error);
-      toast.error(t('cases.detail.aidDeliveryFailed'));
+      toast.error(error instanceof Error ? error.message : t('cases.detail.aidDeliveryFailed'));
     }
   };
 
@@ -141,6 +147,39 @@ export default function CaseDetail() {
           </Card>
 
           {!isTerminal ? <AidDeliveryForm onSubmit={handleRecordAid} /> : null}
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">{t('cases.detail.noteHistoryTitle')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {memberCase.aidDeliveries.length === 0 ? (
+                <p className="text-sm text-gray-500">{t('cases.detail.noDeliveryNotes')}</p>
+              ) : (
+                memberCase.aidDeliveries
+                  .slice()
+                  .reverse()
+                  .map((note, index) => (
+                    <div
+                      key={`${note.date ?? 'note'}-${index}`}
+                      className="rounded-lg border border-gray-200 bg-gray-50 p-3"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-sm font-medium text-gray-900">
+                          {note.deliveredBy || t('cases.detail.noteAuthorFallback')}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {note.date
+                            ? new Date(note.date).toLocaleString()
+                            : t('cases.detail.noteDateUnknown')}
+                        </p>
+                      </div>
+                      <p className="mt-2 whitespace-pre-wrap text-sm text-gray-700">{note.notes}</p>
+                    </div>
+                  ))
+              )}
+            </CardContent>
+          </Card>
 
           <div className="flex flex-wrap gap-2">
             {memberCase.status === 'cancelled' ? (
