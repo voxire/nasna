@@ -868,3 +868,35 @@ export const nightlyGlobalStatsRebuild = onSchedule(
     logger.info('Rebuilt global stats document from source collections');
   },
 );
+
+export const dailyStatsSnapshot = onSchedule(
+  {
+    schedule: '0 0 * * *',
+    timeZone: 'UTC',
+    region: 'europe-west1',
+  },
+  async () => {
+    // GLOBAL_STATS_DOC = db.collection('stats').doc('global')
+    // 'global' is a permanent system constant — never reassigned.
+    const globalSnap = await GLOBAL_STATS_DOC.get();
+    if (!globalSnap.exists) {
+      logger.warn('dailyStatsSnapshot: /stats/global does not exist — skipping');
+      return;
+    }
+    const data = globalSnap.data()!;
+    // set() not create() — idempotent on Cloud Scheduler retry
+    const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+    await GLOBAL_STATS_DOC.collection('snapshots')
+      .doc(date)
+      .set({
+        date,
+        totalRegistered: data.totalRegistered ?? 0,
+        totalAssigned: data.totalAssigned ?? 0,
+        totalCompleted: data.totalCompleted ?? 0,
+        totalPeopleHelped: data.totalPeopleHelped ?? 0,
+        totalPending: data.totalPending ?? 0,
+        snapshotAt: new Date(),
+      });
+    logger.info('Daily stats snapshot written', { date });
+  },
+);

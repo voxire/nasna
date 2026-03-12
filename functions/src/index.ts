@@ -4,6 +4,7 @@ export { getOperationsMapData } from './operationsMapApi';
 export { createDonationCheckoutSession } from './payments';
 export {
   dailyStaleCaseCheck,
+  dailyStatsSnapshot,
   nightlyGlobalStatsRebuild,
   onCaseAssigned,
   onCaseCompleted,
