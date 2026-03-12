@@ -1,18 +1,48 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  limit,
+  where,
+} from 'firebase/firestore';
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import { toast } from 'sonner';
 import { db } from '@/firebase';
-import type { GlobalStatsDocument, HousingDocument, SubmissionDocument } from '@/types';
+import type {
+  GlobalStatsDocument,
+  HousingDocument,
+  MemberDocument,
+  StatsSnapshotDocument,
+  SubmissionDocument,
+} from '@/types';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Skeleton } from '@/Components/ui/skeleton';
 
 const DEFAULT_STATS: GlobalStatsDocument = {
-  submissionsRegistered: 0,
-  submissionsAssigned: 0,
-  submissionsCompleted: 0,
-  peopleHelped: 0,
-  activeNgoCount: 0,
+  totalRegistered: 0,
+  totalAssigned: 0,
+  totalCompleted: 0,
+  totalPeopleHelped: 0,
+  totalPending: 0,
+  activeNGOs: 0,
   housingAvailable: 0,
+  byGovernorate: {},
+  byNeed: {},
 };
 
 export default function ImpactDashboard() {
@@ -22,6 +52,9 @@ export default function ImpactDashboard() {
   const [staleCases, setStaleCases] = useState(0);
   const [housingPendingReview, setHousingPendingReview] = useState(0);
   const [reservedHousing, setReservedHousing] = useState(0);
+  const [snapshots, setSnapshots] = useState<StatsSnapshotDocument[]>([]);
+  const [ngos, setNgos] = useState<(MemberDocument & { id: string })[]>([]);
+  const [ngosLoading, setNgosLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribers = [
@@ -32,22 +65,27 @@ export default function ImpactDashboard() {
             : DEFAULT_STATS,
         );
       }),
+      // ⚠️ CRISIS WORKAROUND: unbounded submissions scan replaced with limit(500).
+      // Replace with derived fields in /stats/global when time permits.
+      // See: docs/superpowers/specs/2026-03-12-phase-4-impact-dashboard-design.md
       onSnapshot(
-        query(collection(db, 'submissions'), where('status', '==', 'pending')),
+        query(collection(db, 'submissions'), where('status', '==', 'pending'), limit(500)),
         (snapshot) => {
           const rows = snapshot.docs.map((document) => document.data() as SubmissionDocument);
           setPendingUrgentCases(rows.filter((row) => row.aidUrgency === 'High').length);
           setStaleCases(rows.filter((row) => row.staleFlagged).length);
         },
       ),
+      // ⚠️ CRISIS WORKAROUND: replace with derived counter in /stats/global when time permits.
       onSnapshot(
-        query(collection(db, 'housing'), where('status', '==', 'pending_review')),
+        query(collection(db, 'housing'), where('status', '==', 'pending_review'), limit(500)),
         (snapshot) => {
           setHousingPendingReview(snapshot.size);
         },
       ),
+      // ⚠️ CRISIS WORKAROUND: replace with derived counter in /stats/global when time permits.
       onSnapshot(
-        query(collection(db, 'housing'), where('status', '==', 'reserved')),
+        query(collection(db, 'housing'), where('status', '==', 'reserved'), limit(500)),
         (snapshot) => {
           const rows = snapshot.docs.map((document) => document.data() as HousingDocument);
           setReservedHousing(rows.reduce((total, row) => total + Number(row.capacity ?? 0), 0));
@@ -55,44 +93,101 @@ export default function ImpactDashboard() {
       ),
     ];
 
+    // Time-series snapshots (one-time fetch, 90-day window)
+    getDocs(query(collection(db, 'stats', 'global', 'snapshots'), orderBy('date'), limit(90)))
+      .then((snap) => {
+        setSnapshots(snap.docs.map((d) => d.data() as StatsSnapshotDocument));
+      })
+      .catch(() => {
+        toast.error(t('common.error'));
+      });
+
+    // NGO breakdown (one-time fetch)
+    getDocs(
+      query(
+        collection(db, 'members'),
+        where('role', '==', 'member'),
+        where('validated', '==', true),
+        orderBy('name'),
+        limit(50),
+      ),
+    )
+      .then((snap) => {
+        setNgos(snap.docs.map((d) => ({ id: d.id, ...(d.data() as MemberDocument) })));
+      })
+      .catch(() => {
+        toast.error(t('common.error'));
+      })
+      .finally(() => {
+        setNgosLoading(false);
+      });
+
     return () => {
       unsubscribers.forEach((unsubscribe) => unsubscribe());
     };
-  }, []);
+  }, [t]);
 
   const assignmentRate = useMemo(() => {
-    if (stats.submissionsRegistered === 0) return 0;
-    return Math.round((stats.submissionsAssigned / stats.submissionsRegistered) * 100);
-  }, [stats.submissionsAssigned, stats.submissionsRegistered]);
+    if (stats.totalRegistered === 0) return 0;
+    return Math.round((stats.totalAssigned / stats.totalRegistered) * 100);
+  }, [stats.totalAssigned, stats.totalRegistered]);
 
   const completionRate = useMemo(() => {
-    if (stats.submissionsRegistered === 0) return 0;
-    return Math.round((stats.submissionsCompleted / stats.submissionsRegistered) * 100);
-  }, [stats.submissionsCompleted, stats.submissionsRegistered]);
+    if (stats.totalRegistered === 0) return 0;
+    return Math.round((stats.totalCompleted / stats.totalRegistered) * 100);
+  }, [stats.totalCompleted, stats.totalRegistered]);
 
   const exportCsv = () => {
-    const rows = [
-      ['metric', 'value'],
-      ['submissionsRegistered', stats.submissionsRegistered],
-      ['submissionsAssigned', stats.submissionsAssigned],
-      ['submissionsCompleted', stats.submissionsCompleted],
-      ['peopleHelped', stats.peopleHelped],
-      ['activeNgoCount', stats.activeNgoCount],
-      ['housingAvailable', stats.housingAvailable],
-      ['pendingUrgentCases', pendingUrgentCases],
-      ['staleCases', staleCases],
-      ['housingPendingReview', housingPendingReview],
-      ['reservedHousingSpots', reservedHousing],
-      ['assignmentRatePercent', assignmentRate],
-      ['completionRatePercent', completionRate],
-    ];
+    const today = new Date().toISOString().slice(0, 10);
+    let rows: (string | number)[][];
+
+    if (snapshots.length > 0) {
+      rows = [
+        [
+          'date',
+          'totalRegistered',
+          'totalCompleted',
+          'totalPeopleHelped',
+          'totalPending',
+          'totalAssigned',
+        ],
+        ...snapshots.map((s) => [
+          s.date,
+          s.totalRegistered,
+          s.totalCompleted,
+          s.totalPeopleHelped,
+          s.totalPending,
+          s.totalAssigned,
+        ]),
+      ];
+    } else {
+      // Fallback: single-row current stats
+      rows = [
+        [
+          'date',
+          'totalRegistered',
+          'totalCompleted',
+          'totalPeopleHelped',
+          'totalPending',
+          'totalAssigned',
+        ],
+        [
+          today,
+          stats.totalRegistered,
+          stats.totalCompleted,
+          stats.totalPeopleHelped,
+          stats.totalPending,
+          stats.totalAssigned,
+        ],
+      ];
+    }
 
     const csv = rows.map((row) => row.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'nasna-impact-dashboard.csv';
+    link.download = `nasna_impact_export_${today}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -101,25 +196,25 @@ export default function ImpactDashboard() {
     {
       id: 'registered',
       label: t('impact.admin.registeredCases'),
-      value: stats.submissionsRegistered,
+      value: stats.totalRegistered,
       tone: 'bg-slate-100 text-slate-900',
     },
     {
       id: 'assigned',
       label: t('impact.admin.assignedCases'),
-      value: stats.submissionsAssigned,
+      value: stats.totalAssigned,
       tone: 'bg-sky-100 text-sky-900',
     },
     {
       id: 'completed',
       label: t('impact.admin.completedCases'),
-      value: stats.submissionsCompleted,
+      value: stats.totalCompleted,
       tone: 'bg-emerald-100 text-emerald-900',
     },
     {
       id: 'helped',
       label: t('impact.admin.peopleHelped'),
-      value: stats.peopleHelped,
+      value: stats.totalPeopleHelped,
       tone: 'bg-amber-100 text-amber-900',
     },
   ];
@@ -196,7 +291,7 @@ export default function ImpactDashboard() {
               <div className="rounded-2xl bg-gray-50 p-5">
                 <p className="text-sm text-gray-500">{t('impact.admin.activeNgos')}</p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">
-                  {stats.activeNgoCount.toLocaleString()}
+                  {stats.activeNGOs.toLocaleString()}
                 </p>
               </div>
               <div className="rounded-2xl bg-gray-50 p-5">
@@ -225,6 +320,94 @@ export default function ImpactDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('impact.admin.timeSeries')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {snapshots.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t('impact.admin.noSnapshotData')}</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart
+                data={snapshots.map((s) => ({
+                  date: s.date.slice(5), // MM-DD
+                  totalRegistered: s.totalRegistered,
+                  totalCompleted: s.totalCompleted,
+                }))}
+                margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="totalRegistered"
+                  stroke="#64748b"
+                  dot={false}
+                  name={t('impact.admin.registeredCases')}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="totalCompleted"
+                  stroke="#10b981"
+                  dot={false}
+                  name={t('impact.admin.completedCases')}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('impact.admin.ngoBreakdown')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {ngosLoading ? (
+            <div className="space-y-2">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-8 w-full rounded-lg" />
+              ))}
+            </div>
+          ) : ngos.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t('impact.public.noData')}</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-muted-foreground">
+                    <th className="pb-2 pe-4 font-medium">{t('impact.admin.ngoName')}</th>
+                    <th className="pb-2 pe-4 font-medium">
+                      {t('impact.admin.governoratesCovered')}
+                    </th>
+                    <th className="pb-2 pe-4 font-medium">{t('impact.admin.currentCaseLoad')}</th>
+                    <th className="pb-2 font-medium">{t('impact.admin.aidTypes')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ngos.map((ngo) => (
+                    <tr key={ngo.id} className="border-b last:border-0">
+                      <td className="py-2 pe-4 font-medium">{ngo.name}</td>
+                      <td className="py-2 pe-4 text-muted-foreground">
+                        {(ngo.coverageGovernorates ?? []).join(', ') || '—'}
+                      </td>
+                      <td className="py-2 pe-4">{ngo.currentCaseLoad ?? 0}</td>
+                      <td className="py-2 text-muted-foreground">
+                        {(ngo.aidTypes ?? []).join(', ') || '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -7,5 +7,6 @@
   "errorTitle": "Something went wrong",
   "errorDescription": "Please refresh the page and try again.",
   "errorRefresh": "Refresh",
-  "notAuthenticated": "You must be signed in to perform this action."
+  "notAuthenticated": "You must be signed in to perform this action.",
+  "error": "An error occurred. Please try again."
 }

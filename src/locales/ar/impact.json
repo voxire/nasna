@@ -20,7 +20,12 @@
     "snapshotDescription": "مؤشرات سعة عالية المستوى عبر المنظمات وموارد السكن.",
     "avgPeopleHelped": "متوسط عدد الأشخاص الذين تمت مساعدتهم لكل حالة مكتملة",
     "availableHousing": "سعة السكن المتاحة",
-    "activeNgosLive": "المنظمات النشطة ذات الحالات الحية"
+    "activeNgosLive": "المنظمات النشطة ذات الحالات الحية",
+    "pending": "معلقة",
+    "needsBreakdown": "توزيع الاحتياجات",
+    "coverageByArea": "التغطية حسب المنطقة",
+    "statusSplit": "توزيع الحالات حسب الحالة",
+    "noData": "لا توجد بيانات كافية لعرض هذا المخطط بعد."
   },
   "admin": {
     "title": "لوحة الأثر",
@@ -39,6 +44,13 @@
     "pendingUrgent": "حالات عاجلة معلقة",
     "stalePending": "حالات معلقة متأخرة",
     "housingPendingReview": "سكن بانتظار المراجعة",
-    "reservedHousing": "أماكن سكن محجوزة"
+    "reservedHousing": "أماكن سكن محجوزة",
+    "timeSeries": "التطور عبر الزمن",
+    "noSnapshotData": "لا توجد بيانات تاريخية بعد — تظهر أول لقطة بعد منتصف الليل بالتوقيت العالمي",
+    "ngoBreakdown": "تفاصيل المنظمات",
+    "ngoName": "اسم المنظمة",
+    "governoratesCovered": "المحافظات المغطاة",
+    "currentCaseLoad": "الحالات الحالية",
+    "aidTypes": "أنواع المساعدات"
   }
 }

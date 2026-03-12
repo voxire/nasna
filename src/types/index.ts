@@ -198,13 +198,26 @@ export interface NotificationDocument {
 }
 
 export interface GlobalStatsDocument {
-  submissionsRegistered: number;
-  submissionsAssigned: number;
-  submissionsCompleted: number;
-  peopleHelped: number;
-  activeNgoCount: number;
+  totalRegistered: number;
+  totalAssigned: number;
+  totalCompleted: number;
+  totalPeopleHelped: number;
+  totalPending: number;
+  activeNGOs: number;
   housingAvailable: number;
-  updatedAt?: Date;
+  byGovernorate: Record<string, number>;
+  byNeed: Record<string, number>;
+  lastUpdatedAt?: Timestamp | Date;
+}
+
+export interface StatsSnapshotDocument {
+  date: string; // YYYY-MM-DD
+  totalRegistered: number;
+  totalAssigned: number;
+  totalCompleted: number;
+  totalPeopleHelped: number;
+  totalPending: number;
+  snapshotAt: Timestamp | Date;
 }
 
 export interface DonationDocument {
