@@ -338,10 +338,25 @@ export const onNewSubmission = onDocumentCreated(
     const submission = event.data.data() as SubmissionRecord;
 
     await ensureGlobalStatsDocument();
+
+    // Match NGOs by governorate coverage and (optionally) center coverage
+    const governorate = submission.currentGovernorate ?? 'Unknown';
+    const centerId = submission.centerId;
+    const submissionNeeds = submission.needs ?? [];
+
     await GLOBAL_STATS_DOC.set(
       {
-        submissionsRegistered: FieldValue.increment(1),
-        updatedAt: new Date(),
+        totalRegistered: FieldValue.increment(1),
+        totalPending: FieldValue.increment(1),
+        [`byGovernorate.${governorate}`]: FieldValue.increment(1),
+        ...submissionNeeds.reduce<Record<string, FieldValue>>(
+          (acc, need) => ({
+            ...acc,
+            [`byNeed.${need}`]: FieldValue.increment(1),
+          }),
+          {},
+        ),
+        lastUpdatedAt: new Date(),
       },
       { merge: true },
     );
@@ -352,11 +367,6 @@ export const onNewSubmission = onDocumentCreated(
       `${submission.fullName ?? 'A household'} in ${submission.currentGovernorate ?? 'an unknown area'} needs review.`,
       submissionId,
     );
-
-    // Match NGOs by governorate coverage and (optionally) center coverage
-    const governorate = submission.currentGovernorate ?? 'Unknown';
-    const centerId = submission.centerId;
-    const submissionNeeds = submission.needs ?? [];
 
     // Query by governorate coverage
     const governorateQuery = db
@@ -513,10 +523,17 @@ export const onCaseAssigned = onDocumentUpdated(
     }
 
     await incrementMemberCaseLoad(nextAssignedTo, 1);
+
+    const beforeStatus = before.status ?? 'pending';
+    const isEverFirstAssignment = !previousAssignedTo; // only increment on first assignment
+
     await GLOBAL_STATS_DOC.set(
       {
-        submissionsAssigned: FieldValue.increment(previousAssignedTo ? 0 : 1),
-        updatedAt: new Date(),
+        ...(isEverFirstAssignment ? { totalAssigned: FieldValue.increment(1) } : {}),
+        ...(isEverFirstAssignment && beforeStatus === 'pending'
+          ? { totalPending: FieldValue.increment(-1) }
+          : {}),
+        lastUpdatedAt: new Date(),
       },
       { merge: true },
     );
@@ -607,22 +624,23 @@ export const onCaseCompleted = onDocumentUpdated(
       await incrementMemberCaseLoad(after.assignedTo, -1);
     }
 
+    const wasPending = previousStatus === 'pending';
+    const wasAssigned = previousStatus === 'assigned' || previousStatus === 'in_progress';
+
     if (nextStatus === 'completed') {
       await GLOBAL_STATS_DOC.set(
         {
-          submissionsCompleted: FieldValue.increment(1),
-          peopleHelped: FieldValue.increment(Number(after.numberOfPeopleInHousehold ?? 0)),
-          updatedAt: new Date(),
+          totalCompleted: FieldValue.increment(1),
+          totalPeopleHelped: FieldValue.increment(Number(after.numberOfPeopleInHousehold ?? 0)),
+          ...(wasAssigned ? { totalAssigned: FieldValue.increment(-1) } : {}),
+          ...(wasPending ? { totalPending: FieldValue.increment(-1) } : {}),
+          lastUpdatedAt: new Date(),
         },
         { merge: true },
       );
     } else {
-      await GLOBAL_STATS_DOC.set(
-        {
-          updatedAt: new Date(),
-        },
-        { merge: true },
-      );
+      // cancelled — only update timestamp
+      await GLOBAL_STATS_DOC.set({ lastUpdatedAt: new Date() }, { merge: true });
     }
 
     if (after.assignedTo) {
