@@ -160,6 +160,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ─── /stats/global/snapshots ────────────────────────────────────────────────
+    // Public read — all users including unauthenticated may read snapshot history.
+    // Writes are Cloud Functions only via Admin SDK (bypasses these rules).
+
+    match /stats/global/snapshots/{date} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // ─── /businesses ─────────────────────────────────────────────────────────
 
     match /businesses/{docId} {
