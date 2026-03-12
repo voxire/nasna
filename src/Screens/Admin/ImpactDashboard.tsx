@@ -7,12 +7,15 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 
 const DEFAULT_STATS: GlobalStatsDocument = {
-  submissionsRegistered: 0,
-  submissionsAssigned: 0,
-  submissionsCompleted: 0,
-  peopleHelped: 0,
-  activeNgoCount: 0,
+  totalRegistered: 0,
+  totalAssigned: 0,
+  totalCompleted: 0,
+  totalPeopleHelped: 0,
+  totalPending: 0,
+  activeNGOs: 0,
   housingAvailable: 0,
+  byGovernorate: {},
+  byNeed: {},
 };
 
 export default function ImpactDashboard() {
@@ -61,23 +64,23 @@ export default function ImpactDashboard() {
   }, []);
 
   const assignmentRate = useMemo(() => {
-    if (stats.submissionsRegistered === 0) return 0;
-    return Math.round((stats.submissionsAssigned / stats.submissionsRegistered) * 100);
-  }, [stats.submissionsAssigned, stats.submissionsRegistered]);
+    if (stats.totalRegistered === 0) return 0;
+    return Math.round((stats.totalAssigned / stats.totalRegistered) * 100);
+  }, [stats.totalAssigned, stats.totalRegistered]);
 
   const completionRate = useMemo(() => {
-    if (stats.submissionsRegistered === 0) return 0;
-    return Math.round((stats.submissionsCompleted / stats.submissionsRegistered) * 100);
-  }, [stats.submissionsCompleted, stats.submissionsRegistered]);
+    if (stats.totalRegistered === 0) return 0;
+    return Math.round((stats.totalCompleted / stats.totalRegistered) * 100);
+  }, [stats.totalCompleted, stats.totalRegistered]);
 
   const exportCsv = () => {
     const rows = [
       ['metric', 'value'],
-      ['submissionsRegistered', stats.submissionsRegistered],
-      ['submissionsAssigned', stats.submissionsAssigned],
-      ['submissionsCompleted', stats.submissionsCompleted],
-      ['peopleHelped', stats.peopleHelped],
-      ['activeNgoCount', stats.activeNgoCount],
+      ['totalRegistered', stats.totalRegistered],
+      ['totalAssigned', stats.totalAssigned],
+      ['totalCompleted', stats.totalCompleted],
+      ['totalPeopleHelped', stats.totalPeopleHelped],
+      ['activeNGOs', stats.activeNGOs],
       ['housingAvailable', stats.housingAvailable],
       ['pendingUrgentCases', pendingUrgentCases],
       ['staleCases', staleCases],
@@ -101,25 +104,25 @@ export default function ImpactDashboard() {
     {
       id: 'registered',
       label: t('impact.admin.registeredCases'),
-      value: stats.submissionsRegistered,
+      value: stats.totalRegistered,
       tone: 'bg-slate-100 text-slate-900',
     },
     {
       id: 'assigned',
       label: t('impact.admin.assignedCases'),
-      value: stats.submissionsAssigned,
+      value: stats.totalAssigned,
       tone: 'bg-sky-100 text-sky-900',
     },
     {
       id: 'completed',
       label: t('impact.admin.completedCases'),
-      value: stats.submissionsCompleted,
+      value: stats.totalCompleted,
       tone: 'bg-emerald-100 text-emerald-900',
     },
     {
       id: 'helped',
       label: t('impact.admin.peopleHelped'),
-      value: stats.peopleHelped,
+      value: stats.totalPeopleHelped,
       tone: 'bg-amber-100 text-amber-900',
     },
   ];
@@ -196,7 +199,7 @@ export default function ImpactDashboard() {
               <div className="rounded-2xl bg-gray-50 p-5">
                 <p className="text-sm text-gray-500">{t('impact.admin.activeNgos')}</p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">
-                  {stats.activeNgoCount.toLocaleString()}
+                  {stats.activeNGOs.toLocaleString()}
                 </p>
               </div>
               <div className="rounded-2xl bg-gray-50 p-5">

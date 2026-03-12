@@ -5,12 +5,15 @@ import { db } from '@/firebase';
 import type { GlobalStatsDocument } from '@/types';
 
 const DEFAULT_STATS: GlobalStatsDocument = {
-  submissionsRegistered: 0,
-  submissionsAssigned: 0,
-  submissionsCompleted: 0,
-  peopleHelped: 0,
-  activeNgoCount: 0,
+  totalRegistered: 0,
+  totalAssigned: 0,
+  totalCompleted: 0,
+  totalPeopleHelped: 0,
+  totalPending: 0,
+  activeNGOs: 0,
   housingAvailable: 0,
+  byGovernorate: {},
+  byNeed: {},
 };
 
 export default function Impact() {
@@ -32,21 +35,21 @@ export default function Impact() {
   }, []);
 
   const completionRate = useMemo(() => {
-    if (stats.submissionsRegistered === 0) return 0;
-    return Math.round((stats.submissionsCompleted / stats.submissionsRegistered) * 100);
-  }, [stats.submissionsCompleted, stats.submissionsRegistered]);
+    if (stats.totalRegistered === 0) return 0;
+    return Math.round((stats.totalCompleted / stats.totalRegistered) * 100);
+  }, [stats.totalCompleted, stats.totalRegistered]);
 
   const assignmentRate = useMemo(() => {
-    if (stats.submissionsRegistered === 0) return 0;
-    return Math.round((stats.submissionsAssigned / stats.submissionsRegistered) * 100);
-  }, [stats.submissionsAssigned, stats.submissionsRegistered]);
+    if (stats.totalRegistered === 0) return 0;
+    return Math.round((stats.totalAssigned / stats.totalRegistered) * 100);
+  }, [stats.totalAssigned, stats.totalRegistered]);
 
   const impactCards = [
-    { id: 'registered', label: t('impact.public.casesRegistered'), value: stats.submissionsRegistered, tone: 'bg-slate-100 text-slate-900' },
-    { id: 'assigned', label: t('impact.public.casesAssigned'), value: stats.submissionsAssigned, tone: 'bg-sky-100 text-sky-900' },
-    { id: 'completed', label: t('impact.public.casesCompleted'), value: stats.submissionsCompleted, tone: 'bg-emerald-100 text-emerald-900' },
-    { id: 'people', label: t('impact.public.peopleHelped'), value: stats.peopleHelped, tone: 'bg-amber-100 text-amber-900' },
-    { id: 'ngos', label: t('impact.public.activeNgos'), value: stats.activeNgoCount, tone: 'bg-violet-100 text-violet-900' },
+    { id: 'registered', label: t('impact.public.casesRegistered'), value: stats.totalRegistered, tone: 'bg-slate-100 text-slate-900' },
+    { id: 'assigned', label: t('impact.public.casesAssigned'), value: stats.totalAssigned, tone: 'bg-sky-100 text-sky-900' },
+    { id: 'completed', label: t('impact.public.casesCompleted'), value: stats.totalCompleted, tone: 'bg-emerald-100 text-emerald-900' },
+    { id: 'people', label: t('impact.public.peopleHelped'), value: stats.totalPeopleHelped, tone: 'bg-amber-100 text-amber-900' },
+    { id: 'ngos', label: t('impact.public.activeNgos'), value: stats.activeNGOs, tone: 'bg-violet-100 text-violet-900' },
     { id: 'housing', label: t('impact.public.housingSpots'), value: stats.housingAvailable, tone: 'bg-rose-100 text-rose-900' },
   ];
 
@@ -100,14 +103,14 @@ export default function Impact() {
 
           <div className="space-y-4">
             {[
-              { id: 'reg', label: t('impact.public.registered'), value: stats.submissionsRegistered, color: 'bg-slate-500' },
-              { id: 'asgn', label: t('impact.public.assigned'), value: stats.submissionsAssigned, color: 'bg-sky-500' },
-              { id: 'done', label: t('impact.public.completed'), value: stats.submissionsCompleted, color: 'bg-emerald-500' },
+              { id: 'reg', label: t('impact.public.registered'), value: stats.totalRegistered, color: 'bg-slate-500' },
+              { id: 'asgn', label: t('impact.public.assigned'), value: stats.totalAssigned, color: 'bg-sky-500' },
+              { id: 'done', label: t('impact.public.completed'), value: stats.totalCompleted, color: 'bg-emerald-500' },
             ].map((item) => {
               const percentage =
-                stats.submissionsRegistered === 0
+                stats.totalRegistered === 0
                   ? 0
-                  : Math.min(100, Math.round((item.value / stats.submissionsRegistered) * 100));
+                  : Math.min(100, Math.round((item.value / stats.totalRegistered) * 100));
 
               return (
                 <div key={item.id} className="space-y-2">
@@ -138,9 +141,9 @@ export default function Impact() {
             <div className="rounded-2xl bg-gray-50 p-5">
               <p className="text-sm text-gray-500">{t('impact.public.avgPeopleHelped')}</p>
               <p className="mt-2 text-3xl font-bold text-gray-900">
-                {stats.submissionsCompleted === 0
+                {stats.totalCompleted === 0
                   ? '0'
-                  : (stats.peopleHelped / stats.submissionsCompleted).toFixed(1)}
+                  : (stats.totalPeopleHelped / stats.totalCompleted).toFixed(1)}
               </p>
             </div>
             <div className="rounded-2xl bg-gray-50 p-5">
@@ -152,7 +155,7 @@ export default function Impact() {
             <div className="rounded-2xl bg-gray-50 p-5">
               <p className="text-sm text-gray-500">{t('impact.public.activeNgosLive')}</p>
               <p className="mt-2 text-3xl font-bold text-gray-900">
-                {stats.activeNgoCount.toLocaleString()}
+                {stats.activeNGOs.toLocaleString()}
               </p>
             </div>
           </div>
