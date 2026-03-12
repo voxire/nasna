@@ -7,5 +7,6 @@
   "errorTitle": "Une erreur s'est produite",
   "errorDescription": "Veuillez actualiser la page et réessayer.",
   "errorRefresh": "Actualiser",
-  "notAuthenticated": "Vous devez être connecté pour effectuer cette action."
+  "notAuthenticated": "Vous devez être connecté pour effectuer cette action.",
+  "error": "Une erreur s'est produite. Veuillez réessayer."
 }

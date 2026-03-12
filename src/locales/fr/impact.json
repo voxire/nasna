@@ -20,7 +20,12 @@
     "snapshotDescription": "Indicateurs de capacité de haut niveau pour les ONG et les ressources d'hébergement.",
     "avgPeopleHelped": "Nombre moyen de personnes aidées par cas terminé",
     "availableHousing": "Capacité d'hébergement disponible",
-    "activeNgosLive": "ONG actives avec des cas en cours"
+    "activeNgosLive": "ONG actives avec des cas en cours",
+    "pending": "En attente",
+    "needsBreakdown": "Répartition des besoins",
+    "coverageByArea": "Couverture par zone",
+    "statusSplit": "Répartition par statut",
+    "noData": "Pas assez de données pour afficher ce graphique pour l'instant."
   },
   "admin": {
     "title": "Tableau de bord d'impact",
