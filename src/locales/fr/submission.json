@@ -56,6 +56,7 @@
   "centersLoadError": "Impossible de charger les centres",
   "consentRequired": "Vous devez donner votre consentement avant de soumettre.",
   "centerRequired": "Sélectionnez un centre avant de soumettre ce cas.",
+  "householdCountMismatch": "Le détail des membres de la famille ne peut pas dépasser la taille totale du ménage.",
   "offlineBanner": "Vous êtes hors ligne. Les nouvelles soumissions seront enregistrées dans ce navigateur et synchronisées automatiquement lorsque la connexion reviendra.",
   "offlineQueued": "Soumission enregistrée hors ligne. Elle sera synchronisée dès la reconnexion.",
   "offlineRecovered": "Réseau indisponible. La soumission a été enregistrée hors ligne pour une nouvelle tentative.",

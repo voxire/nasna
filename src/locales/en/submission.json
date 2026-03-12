@@ -56,6 +56,7 @@
   "centersLoadError": "Failed to load centers",
   "consentRequired": "You must give consent before submitting.",
   "centerRequired": "Select a center before submitting this case.",
+  "householdCountMismatch": "The family member breakdown cannot exceed the household size.",
   "offlineBanner": "You are offline. New submissions will be queued in this browser and synced automatically when the connection returns.",
   "offlineQueued": "Submission saved offline. It will sync when you reconnect.",
   "offlineRecovered": "Network unavailable. Submission saved offline for retry.",

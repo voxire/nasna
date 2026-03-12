@@ -11,6 +11,14 @@ import { Checkbox } from '@/Components/ui/checkbox';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -18,6 +26,7 @@ import {
   SelectValue,
 } from '@/Components/ui/select';
 import type { CenterDocument } from '@/types';
+import { LEBANON_GOVERNORATES, LEBANON_GOVERNORATE_TRANSLATION_KEYS } from '@/lib/governorates';
 
 export default function ProfileCoverage() {
   const { t } = useTranslation();
@@ -27,22 +36,24 @@ export default function ProfileCoverage() {
   const [coverageType, setCoverageType] = useState<'governorate' | 'center' | 'hybrid'>(
     'governorate',
   );
-  const [coverageGovernorates, setCoverageGovernorates] = useState('');
-  const [coverageCenterIds, setCoverageCenterIds] = useState('');
+  const [coverageGovernorates, setCoverageGovernorates] = useState<string[]>([]);
+  const [coverageCenterIds, setCoverageCenterIds] = useState<string[]>([]);
   const [aidTypes, setAidTypes] = useState('');
   const [maxCaseLoad, setMaxCaseLoad] = useState(10);
   const [deliveryMode, setDeliveryMode] = useState<'delivery' | 'pickup' | 'both'>('both');
   const [saving, setSaving] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   const [centers, setCenters] = useState<Array<CenterDocument & { id: string }>>([]);
+  const [centerGovernorateFilter, setCenterGovernorateFilter] = useState('all');
+  const [centerCapacityFilter, setCenterCapacityFilter] = useState('all');
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
         const profile = await getMemberCoverageProfile();
         setCoverageType(profile.coverageType);
-        setCoverageGovernorates(profile.coverageGovernorates.join(', '));
-        setCoverageCenterIds(profile.coverageCenterIds.join(', '));
+        setCoverageGovernorates(profile.coverageGovernorates);
+        setCoverageCenterIds(profile.coverageCenterIds);
         setAidTypes(profile.aidTypes.join(', '));
         setMaxCaseLoad(profile.maxCaseLoad);
         setDeliveryMode(profile.deliveryMode);
@@ -57,7 +68,7 @@ export default function ProfileCoverage() {
   }, []);
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
+    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true));
 
     return onSnapshot(centerQuery, (snapshot) => {
       setCenters(
@@ -77,14 +88,49 @@ export default function ProfileCoverage() {
       .map((item) => item.trim())
       .filter(Boolean);
 
-  const selectedCenterIds = useMemo(() => parseCsv(coverageCenterIds), [coverageCenterIds]);
-
   const toggleCenter = (centerId: string, checked: boolean) => {
-    const nextIds = checked
-      ? Array.from(new Set([...selectedCenterIds, centerId]))
-      : selectedCenterIds.filter((item) => item !== centerId);
+    setCoverageCenterIds((current) =>
+      checked
+        ? Array.from(new Set([...current, centerId]))
+        : current.filter((item) => item !== centerId),
+    );
+  };
 
-    setCoverageCenterIds(nextIds.join(', '));
+  const toggleGovernorate = (governorate: string, checked: boolean) => {
+    setCoverageGovernorates((current) =>
+      checked
+        ? Array.from(new Set([...current, governorate]))
+        : current.filter((item) => item !== governorate),
+    );
+  };
+
+  const filteredCenters = useMemo(() => {
+    return centers.filter((center) => {
+      const matchesGovernorate =
+        centerGovernorateFilter === 'all' || center.governorate === centerGovernorateFilter;
+
+      const totalCapacity = Number(center.totalCapacity ?? center.capacity ?? 0);
+      const matchesCapacity =
+        centerCapacityFilter === 'all' ||
+        (centerCapacityFilter === 'small' && totalCapacity <= 100) ||
+        (centerCapacityFilter === 'medium' && totalCapacity > 100 && totalCapacity <= 300) ||
+        (centerCapacityFilter === 'large' && totalCapacity > 300);
+
+      return matchesGovernorate && matchesCapacity;
+    });
+  }, [centerCapacityFilter, centerGovernorateFilter, centers]);
+
+  const selectAllVisibleCenters = () => {
+    setCoverageCenterIds((current) =>
+      Array.from(new Set([...current, ...filteredCenters.map((center) => center.id)])),
+    );
+  };
+
+  const clearVisibleCenters = () => {
+    const visibleCenterIds = new Set(filteredCenters.map((center) => center.id));
+    setCoverageCenterIds((current) =>
+      current.filter((centerId) => !visibleCenterIds.has(centerId)),
+    );
   };
 
   const handleSave = async () => {
@@ -92,8 +138,8 @@ export default function ProfileCoverage() {
     try {
       await updateMemberCoverageProfile({
         coverageType,
-        coverageGovernorates: parseCsv(coverageGovernorates),
-        coverageCenterIds: parseCsv(coverageCenterIds),
+        coverageGovernorates,
+        coverageCenterIds,
         aidTypes: parseCsv(aidTypes),
         maxCaseLoad,
         deliveryMode,
@@ -109,6 +155,19 @@ export default function ProfileCoverage() {
       setSaving(false);
     }
   };
+
+  const selectedGovernoratesLabel =
+    coverageGovernorates.length === 0
+      ? t('profile.chooseGovernorates')
+      : coverageGovernorates
+          .map((governorate) =>
+            t(
+              LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                governorate as keyof typeof LEBANON_GOVERNORATE_TRANSLATION_KEYS
+              ] ?? governorate,
+            ),
+          )
+          .join(', ');
 
   if (profileLoading) {
     return (
@@ -161,26 +220,80 @@ export default function ProfileCoverage() {
           </div>
           <div className="space-y-2 md:col-span-2">
             <Label>{t('profile.coverageGovernorates')}</Label>
-            <Input
-              value={coverageGovernorates}
-              onChange={(event) => setCoverageGovernorates(event.target.value)}
-              placeholder={t('profile.governoratesPlaceholder')}
-            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-between border-gray-200 bg-white text-left font-normal"
+                >
+                  <span className="truncate">{selectedGovernoratesLabel}</span>
+                  <span className="text-xs text-gray-400">{coverageGovernorates.length}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[320px]">
+                <DropdownMenuLabel>{t('profile.coverageGovernorates')}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {LEBANON_GOVERNORATES.map((governorate) => (
+                  <DropdownMenuCheckboxItem
+                    key={governorate}
+                    checked={coverageGovernorates.includes(governorate)}
+                    onSelect={(event) => event.preventDefault()}
+                    onCheckedChange={(checked) => toggleGovernorate(governorate, Boolean(checked))}
+                  >
+                    {t(LEBANON_GOVERNORATE_TRANSLATION_KEYS[governorate])}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div className="space-y-2 md:col-span-2">
             <Label>{t('profile.coverageCenterIds')}</Label>
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <div className="mb-4 grid gap-3 md:grid-cols-[1fr_1fr_auto_auto]">
+                <Select value={centerGovernorateFilter} onValueChange={setCenterGovernorateFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('profile.filterGovernorate')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('profile.allGovernorates')}</SelectItem>
+                    {LEBANON_GOVERNORATES.map((governorate) => (
+                      <SelectItem key={governorate} value={governorate}>
+                        {t(LEBANON_GOVERNORATE_TRANSLATION_KEYS[governorate])}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={centerCapacityFilter} onValueChange={setCenterCapacityFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('profile.filterCapacity')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('profile.allCapacities')}</SelectItem>
+                    <SelectItem value="small">{t('profile.capacitySmall')}</SelectItem>
+                    <SelectItem value="medium">{t('profile.capacityMedium')}</SelectItem>
+                    <SelectItem value="large">{t('profile.capacityLarge')}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button type="button" variant="outline" onClick={selectAllVisibleCenters}>
+                  {t('profile.selectAllVisible')}
+                </Button>
+                <Button type="button" variant="outline" onClick={clearVisibleCenters}>
+                  {t('profile.clearVisible')}
+                </Button>
+              </div>
               {centers.length === 0 ? (
                 <p className="text-sm text-gray-500">{t('profile.noCenters')}</p>
+              ) : filteredCenters.length === 0 ? (
+                <p className="text-sm text-gray-500">{t('profile.noCentersForFilters')}</p>
               ) : (
                 <div className="grid gap-3 md:grid-cols-2">
-                  {centers.map((center) => (
+                  {filteredCenters.map((center) => (
                     <label
                       key={center.id}
                       className="flex items-start gap-3 rounded-lg bg-white p-3"
                     >
                       <Checkbox
-                        checked={selectedCenterIds.includes(center.id)}
+                        checked={coverageCenterIds.includes(center.id)}
                         onCheckedChange={(checked) => toggleCenter(center.id, Boolean(checked))}
                       />
                       <span className="space-y-1 text-sm">
@@ -188,6 +301,11 @@ export default function ProfileCoverage() {
                         <span className="block text-gray-500">
                           {center.district ? `${center.district}, ` : ''}
                           {center.governorate}
+                        </span>
+                        <span className="block text-xs text-gray-400">
+                          {t('profile.totalCapacityLabel', {
+                            count: Number(center.totalCapacity ?? center.capacity ?? 0),
+                          })}
                         </span>
                       </span>
                     </label>

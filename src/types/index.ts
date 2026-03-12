@@ -128,6 +128,9 @@ export interface CenterDocument {
   // PII: admin only. Never expose to members, agents, or public.
   managerPhone?: string;
   active: boolean;
+  isActive?: boolean;
+  capacity?: number;
+  occupiedCapacity?: number;
   createdBy: string;
   updatedAt?: Timestamp;
   createdAt?: Timestamp;

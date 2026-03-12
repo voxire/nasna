@@ -91,9 +91,10 @@ export default function Submissions() {
     try {
       await claimMemberCase(caseId);
       setCases((current) => current.filter((memberCase) => memberCase.id !== caseId));
+      toast.success(t('cases.feed.claimSuccess'));
     } catch (claimError) {
       console.error(claimError);
-      toast.error(t('cases.claimFailed'));
+      toast.error(claimError instanceof Error ? claimError.message : t('cases.claimFailed'));
     } finally {
       setClaimingId(null);
     }

@@ -1,4 +1,6 @@
 {
+  "statusUpdatedSuccess": "تم تحديث حالة الحالة.",
+  "statusAlreadyUpdated": "تم تحديث الحالة بالفعل.",
   "statusUpdateFailed": "فشل تحديث حالة الطلب. يرجى المحاولة مرة أخرى.",
   "claimFailed": "فشل طلب الحالة. يرجى المحاولة مرة أخرى.",
   "feed": {
@@ -18,6 +20,7 @@
     "viewDetails": "عرض التفاصيل",
     "claiming": "جارٍ الطلب...",
     "claimCase": "طلب الحالة",
+    "claimSuccess": "تم طلب الحالة بنجاح.",
     "filterByNeed": "تصفية حسب الاحتياج:",
     "clearFilter": "مسح التصفية"
   },
@@ -72,6 +75,16 @@
     "cancelCase": "إلغاء الحالة",
     "reopenCase": "إعادة فتح الحالة",
     "timeline": "الجدول الزمني",
-    "aidDeliveryFailed": "فشل تسجيل تسليم المساعدات. يرجى المحاولة مرة أخرى."
+    "aidDeliveryFailed": "فشل حفظ الملاحظة. يرجى المحاولة مرة أخرى.",
+    "aidDeliverySaved": "تم حفظ الملاحظة بنجاح.",
+    "notesTitle": "ملاحظات التسليم",
+    "notesDescription": "أضف ملاحظات مؤرخة أثناء تقدم العمل. لن يؤدي ذلك إلى إكمال الحالة تلقائياً.",
+    "notesPlaceholder": "تم تسليم طرود غذائية أو بطانيات أو مياه أو أي ملاحظات متابعة...",
+    "notesSaving": "جارٍ الحفظ...",
+    "notesSubmit": "حفظ الملاحظة",
+    "noteHistoryTitle": "سجل الملاحظات",
+    "noDeliveryNotes": "لا توجد ملاحظات تسليم بعد.",
+    "noteAuthorFallback": "فريق المنظمة",
+    "noteDateUnknown": "وقت غير معروف"
   }
 }
