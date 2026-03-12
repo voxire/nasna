@@ -115,11 +115,19 @@ export interface CenterDocument {
   totalCapacity: number;
   currentOccupancy: number;
   facilities?: CenterFacility[];
+  // public contact number — NOT PII, safe to show to all users
+  phone?: string;
+  // e.g. ['food', 'medical', 'clothing']
+  aidServices?: string[];
+  // e.g. "Mon–Fri 8:00–17:00"
+  operatingHours?: string;
+  // true = accepting new arrivals; false = full/closed
+  intakeOpen?: boolean;
   // PII: admin only. Never expose to members, agents, or public.
   managerName?: string;
   // PII: admin only. Never expose to members, agents, or public.
   managerPhone?: string;
-  isActive: boolean;
+  active: boolean;
   createdBy: string;
   updatedAt?: Timestamp;
   createdAt?: Timestamp;
