@@ -44,6 +44,13 @@
     "pendingUrgent": "Pending urgent cases",
     "stalePending": "Stale pending cases",
     "housingPendingReview": "Housing pending review",
-    "reservedHousing": "Reserved housing spots"
+    "reservedHousing": "Reserved housing spots",
+    "timeSeries": "Trends over time",
+    "noSnapshotData": "No historical data yet — first snapshot appears after midnight UTC",
+    "ngoBreakdown": "NGO breakdown",
+    "ngoName": "NGO name",
+    "governoratesCovered": "Governorates covered",
+    "currentCaseLoad": "Current caseload",
+    "aidTypes": "Aid types"
   }
 }

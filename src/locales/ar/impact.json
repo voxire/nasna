@@ -44,6 +44,13 @@
     "pendingUrgent": "حالات عاجلة معلقة",
     "stalePending": "حالات معلقة متأخرة",
     "housingPendingReview": "سكن بانتظار المراجعة",
-    "reservedHousing": "أماكن سكن محجوزة"
+    "reservedHousing": "أماكن سكن محجوزة",
+    "timeSeries": "التطور عبر الزمن",
+    "noSnapshotData": "لا توجد بيانات تاريخية بعد — تظهر أول لقطة بعد منتصف الليل بالتوقيت العالمي",
+    "ngoBreakdown": "تفاصيل المنظمات",
+    "ngoName": "اسم المنظمة",
+    "governoratesCovered": "المحافظات المغطاة",
+    "currentCaseLoad": "الحالات الحالية",
+    "aidTypes": "أنواع المساعدات"
   }
 }

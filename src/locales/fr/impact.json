@@ -44,6 +44,13 @@
     "pendingUrgent": "Cas urgents en attente",
     "stalePending": "Cas en attente obsolètes",
     "housingPendingReview": "Hébergement en attente d'examen",
-    "reservedHousing": "Places d'hébergement réservées"
+    "reservedHousing": "Places d'hébergement réservées",
+    "timeSeries": "Évolution dans le temps",
+    "noSnapshotData": "Aucune donnée historique — le premier instantané apparaît après minuit UTC",
+    "ngoBreakdown": "Détail des ONG",
+    "ngoName": "Nom de l'ONG",
+    "governoratesCovered": "Gouvernorats couverts",
+    "currentCaseLoad": "Charge de cas actuelle",
+    "aidTypes": "Types d'aide"
   }
 }
