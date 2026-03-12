@@ -16,5 +16,10 @@
   "availableSpots": "Places disponibles :",
   "contact": "Contact :",
   "phone": "Téléphone :",
-  "loadError": "Échec du chargement des données de la carte des centres."
+  "loadError": "Échec du chargement des données de la carte des centres.",
+  "getDirections": "Obtenir l'itinéraire",
+  "intakeOpen": "Ouvert — accueille des arrivées",
+  "intakeClosed": "Complet / Fermé",
+  "aidServices": "Services d'aide :",
+  "operatingHours": "Horaires :"
 }

@@ -61,7 +61,11 @@
       "currentLoad": "الحمولة الحالية:",
       "center": {
         "type": "النوع:",
-        "occupancy": "الإشغال:"
+        "occupancy": "الإشغال:",
+        "intakeOpen": "مفتوح",
+        "intakeClosed": "ممتلئ / مغلق",
+        "phone": "الهاتف:",
+        "hours": "ساعات العمل:"
       },
       "housing": {
         "type": "النوع:",
@@ -302,6 +306,20 @@
     "contactName": "اسم جهة الاتصال",
     "contactPhone": "هاتف جهة الاتصال",
     "activeCheckbox": "المركز نشط ومتاح للاستقبال",
+    "latitude": "خط العرض",
+    "longitude": "خط الطول",
+    "coordinatesHint": "ابحث عن الإحداثيات على maps.google.com",
+    "publicPhone": "رقم الهاتف العام",
+    "operatingHours": "ساعات العمل",
+    "aidServices": "الخدمات المقدّمة",
+    "intakeOpen": "يستقبل الوافدين حالياً",
+    "aidService_food": "غذاء",
+    "aidService_water": "مياه",
+    "aidService_medical": "رعاية طبية",
+    "aidService_clothing": "ملابس",
+    "aidService_shelter": "مأوى",
+    "aidService_legal": "دعم قانوني",
+    "aidService_psychosocial": "دعم نفسي-اجتماعي",
     "saving": "جارٍ الحفظ...",
     "saveChanges": "حفظ التعديلات",
     "createCenter": "إنشاء مركز",

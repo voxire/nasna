@@ -64,6 +64,18 @@ const FACILITIES: CenterFacility[] = [
   'internet',
 ];
 
+const AID_SERVICES = [
+  'food',
+  'water',
+  'medical',
+  'clothing',
+  'shelter',
+  'legal',
+  'psychosocial',
+] as const;
+
+type AidService = (typeof AID_SERVICES)[number];
+
 const centerSchema = z.object({
   name: z.string().trim().min(2),
   type: z.enum(['school', 'university', 'community_hall', 'sports_facility', 'other']),
@@ -78,7 +90,16 @@ const centerSchema = z.object({
   facilities: z
     .array(z.enum(['generator', 'water', 'kitchen', 'medical_room', 'bathrooms', 'internet']))
     .optional(),
-  isActive: z.boolean(),
+  active: z.boolean(),
+  // coordinate inputs — stored as coordinates: { lat, lng } in Firestore
+  lat: z.number().optional(),
+  lng: z.number().optional(),
+  phone: z.string().trim().optional(),
+  aidServices: z
+    .array(z.enum(['food', 'water', 'medical', 'clothing', 'shelter', 'legal', 'psychosocial']))
+    .optional(),
+  operatingHours: z.string().trim().optional(),
+  intakeOpen: z.boolean().optional(),
 });
 
 type CenterFormData = z.infer<typeof centerSchema>;
@@ -94,7 +115,13 @@ const DEFAULT_FORM: CenterFormData = {
   managerName: '',
   managerPhone: '',
   facilities: [],
-  isActive: true,
+  active: true,
+  lat: undefined,
+  lng: undefined,
+  phone: '',
+  aidServices: [],
+  operatingHours: '',
+  intakeOpen: true,
 };
 
 export default function CenterManagement() {
@@ -155,7 +182,13 @@ export default function CenterManagement() {
       // PII: admin only — shown in dialog
       managerPhone: center.managerPhone ?? '',
       facilities: center.facilities ?? [],
-      isActive: center.isActive,
+      active: center.active,
+      lat: center.coordinates?.lat,
+      lng: center.coordinates?.lng,
+      phone: center.phone ?? '',
+      aidServices: (center.aidServices ?? []) as AidService[],
+      operatingHours: center.operatingHours ?? '',
+      intakeOpen: center.intakeOpen ?? true,
     });
     setIsDialogOpen(true);
   };
@@ -168,6 +201,18 @@ export default function CenterManagement() {
         facilities: current.includes(facility)
           ? current.filter((f) => f !== facility)
           : [...current, facility],
+      };
+    });
+  };
+
+  const toggleAidService = (service: AidService) => {
+    setFormState((prev) => {
+      const current = prev.aidServices ?? [];
+      return {
+        ...prev,
+        aidServices: current.includes(service)
+          ? current.filter((s) => s !== service)
+          : [...current, service],
       };
     });
   };
@@ -185,15 +230,21 @@ export default function CenterManagement() {
 
     setSaving(true);
     try {
+      const { lat, lng, ...coreData } = result.data;
+      const coordinatesField =
+        lat !== undefined && lng !== undefined ? { coordinates: { lat, lng } } : {};
+
       if (editingCenter?.id) {
         await updateDoc(doc(db, 'centers', editingCenter.id), {
-          ...result.data,
+          ...coreData,
+          ...coordinatesField,
           updatedAt: serverTimestamp(),
         });
         toast.success(t('admin.centers.successUpdated'));
       } else {
         await addDoc(collection(db, 'centers'), {
-          ...result.data,
+          ...coreData,
+          ...coordinatesField,
           createdBy: auth.currentUser?.uid ?? '',
           updatedAt: serverTimestamp(),
           createdAt: serverTimestamp(),
@@ -267,25 +318,25 @@ export default function CenterManagement() {
                     {center.district && <p className="text-xs text-gray-500">{center.district}</p>}
                   </TableCell>
                   <TableCell className="capitalize">
-                    {t(`admin.centers.type_${center.type}`)}
+                    {center.type ? t(`admin.centers.type_${center.type}`) : '—'}
                   </TableCell>
                   <TableCell>{center.governorate}</TableCell>
                   <TableCell className="w-48">
                     <CapacityBar
                       totalCapacity={center.totalCapacity}
                       currentOccupancy={center.currentOccupancy}
-                      isActive={center.isActive}
+                      isActive={center.active}
                     />
                   </TableCell>
                   <TableCell>
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                        center.isActive
+                        center.active
                           ? 'bg-emerald-100 text-emerald-800'
                           : 'bg-gray-100 text-gray-700'
                       }`}
                     >
-                      {center.isActive ? t('admin.centers.active') : t('admin.centers.inactive')}
+                      {center.active ? t('admin.centers.active') : t('admin.centers.inactive')}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -406,6 +457,86 @@ export default function CenterManagement() {
               </div>
             </div>
 
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>{t('admin.centers.latitude')}</Label>
+                <Input
+                  type="number"
+                  step="any"
+                  placeholder="33.8938"
+                  value={formState.lat ?? ''}
+                  onChange={(e) =>
+                    setFormState((p) => ({
+                      ...p,
+                      lat: e.target.value ? Number(e.target.value) : undefined,
+                    }))
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t('admin.centers.longitude')}</Label>
+                <Input
+                  type="number"
+                  step="any"
+                  placeholder="35.5018"
+                  value={formState.lng ?? ''}
+                  onChange={(e) =>
+                    setFormState((p) => ({
+                      ...p,
+                      lng: e.target.value ? Number(e.target.value) : undefined,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 -mt-2">{t('admin.centers.coordinatesHint')}</p>
+
+            <div className="space-y-2">
+              <Label>{t('admin.centers.publicPhone')}</Label>
+              <Input
+                value={formState.phone ?? ''}
+                placeholder="+961 1 234 567"
+                onChange={(e) => setFormState((p) => ({ ...p, phone: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('admin.centers.operatingHours')}</Label>
+              <Input
+                value={formState.operatingHours ?? ''}
+                placeholder="Mon–Fri 8:00–17:00"
+                onChange={(e) => setFormState((p) => ({ ...p, operatingHours: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('admin.centers.aidServices')}</Label>
+              <div className="grid grid-cols-2 gap-2 rounded-lg bg-gray-50 p-3">
+                {AID_SERVICES.map((service) => (
+                  <label key={service} className="flex cursor-pointer items-center gap-2 text-sm">
+                    <Checkbox
+                      checked={(formState.aidServices ?? []).includes(service)}
+                      onCheckedChange={() => toggleAidService(service)}
+                    />
+                    {t(`admin.centers.aidService_${service}`)}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
+              <Checkbox
+                id="center-intake"
+                checked={formState.intakeOpen ?? true}
+                onCheckedChange={(checked) =>
+                  setFormState((p) => ({ ...p, intakeOpen: Boolean(checked) }))
+                }
+              />
+              <Label htmlFor="center-intake" className="cursor-pointer">
+                {t('admin.centers.intakeOpen')}
+              </Label>
+            </div>
+
             <div className="space-y-2">
               <Label>{t('admin.centers.facilities')}</Label>
               <div className="grid grid-cols-2 gap-2 rounded-lg bg-gray-50 p-3">
@@ -424,9 +555,9 @@ export default function CenterManagement() {
             <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
               <Checkbox
                 id="center-active"
-                checked={formState.isActive}
+                checked={formState.active}
                 onCheckedChange={(checked) =>
-                  setFormState((p) => ({ ...p, isActive: Boolean(checked) }))
+                  setFormState((p) => ({ ...p, active: Boolean(checked) }))
                 }
               />
               <Label htmlFor="center-active" className="cursor-pointer">

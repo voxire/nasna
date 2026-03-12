@@ -247,7 +247,7 @@ export default function Housing() {
                   <CapacityBar
                     totalCapacity={center.totalCapacity}
                     currentOccupancy={center.currentOccupancy}
-                    isActive={center.isActive}
+                    isActive={center.active}
                   />
                 </div>
               </div>
