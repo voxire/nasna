@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { Github } from 'lucide-react';
 import { resolvePostLoginPath, useAuthStore } from '@/stores/authStore';
 
 function Footer() {
@@ -147,8 +148,19 @@ function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-white/20 pt-5 text-center text-xs text-white/50">
-          © {new Date().getFullYear()} Nasna. {t('footer.allRightsReserved')}
+        <div className="mt-10 border-t border-white/20 pt-5 flex flex-col items-center gap-2 sm:flex-row sm:justify-between text-xs text-white/50">
+          <span>
+            © {new Date().getFullYear()} Nasna. {t('footer.allRightsReserved')}
+          </span>
+          <a
+            href="https://github.com/voxire/nasna"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-white/50 hover:text-white transition-colors no-underline"
+          >
+            <Github className="h-3.5 w-3.5" />
+            {t('footer.openSource')}
+          </a>
         </div>
       </div>
     </footer>
