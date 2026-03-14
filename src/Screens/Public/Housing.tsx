@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { collection, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { collection, limit, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '@/firebase';
 import HousingCard from '@/Components/HousingCard';
 import CapacityBar from '@/Components/CapacityBar';
@@ -35,18 +35,8 @@ export default function Housing() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const housingQuery = query(
-      collection(db, 'housing'),
-      where('status', '==', 'available'),
-      orderBy('createdAt', 'desc'),
-      limit(25),
-    );
-    const centerQuery = query(
-      collection(db, 'centers'),
-      where('isActive', '==', true),
-      orderBy('name'),
-      limit(25),
-    );
+    const housingQuery = query(collection(db, 'housing'), where('status', '==', 'available'), limit(25));
+    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true), limit(25));
 
     const unsubscribeHousing = onSnapshot(
       housingQuery,
@@ -93,9 +83,25 @@ export default function Housing() {
     [governorateFilter],
   );
 
+  const sortedHousing = useMemo(
+    () =>
+      [...housingItems].sort((left, right) => {
+        const leftMs = typeof left.createdAt?.toMillis === 'function' ? left.createdAt.toMillis() : 0;
+        const rightMs =
+          typeof right.createdAt?.toMillis === 'function' ? right.createdAt.toMillis() : 0;
+        return rightMs - leftMs;
+      }),
+    [housingItems],
+  );
+
+  const sortedCenters = useMemo(
+    () => [...centers].sort((left, right) => left.name.localeCompare(right.name)),
+    [centers],
+  );
+
   const filteredHousing = useMemo(
     () =>
-      housingItems.filter((housing) => {
+      sortedHousing.filter((housing) => {
         const matchesGovernorate =
           normalizedGovernorate.length === 0 ||
           [housing.governorate, housing.district].some((field) =>
@@ -106,12 +112,12 @@ export default function Housing() {
         const matchesCapacity = housing.capacity >= minCapacity;
         return matchesGovernorate && matchesType && matchesPrice && matchesCapacity;
       }),
-    [housingItems, normalizedGovernorate, typeFilter, priceFilter, minCapacity],
+    [sortedHousing, normalizedGovernorate, typeFilter, priceFilter, minCapacity],
   );
 
   const filteredCenters = useMemo(
     () =>
-      centers.filter((center) => {
+      sortedCenters.filter((center) => {
         const available = Math.max(0, center.totalCapacity - center.currentOccupancy);
         const matchesArea =
           normalizedGovernorate.length === 0 ||
@@ -120,7 +126,7 @@ export default function Housing() {
           );
         return matchesArea && available >= minCapacity;
       }),
-    [centers, normalizedGovernorate, minCapacity],
+    [sortedCenters, normalizedGovernorate, minCapacity],
   );
 
   if (loading) {
@@ -247,7 +253,7 @@ export default function Housing() {
                   <CapacityBar
                     totalCapacity={center.totalCapacity}
                     currentOccupancy={center.currentOccupancy}
-                    isActive={center.active}
+                    isActive={center.isActive ?? center.active ?? true}
                   />
                 </div>
               </div>

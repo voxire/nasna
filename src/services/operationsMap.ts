@@ -89,8 +89,8 @@ export interface PublicCentersMapData {
 
 export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
   const [centersSnap, housingSnap] = await Promise.all([
-    getDocs(query(collection(db, 'centers'), where('active', '==', true), limit(200))),
-    getDocs(query(collection(db, 'housing'), where('status', '==', 'approved'), limit(500))),
+    getDocs(query(collection(db, 'centers'), where('isActive', '==', true), limit(200))),
+    getDocs(query(collection(db, 'housing'), where('status', '==', 'available'), limit(500))),
   ]);
 
   const centers: CenterMarker[] = centersSnap.docs.map((doc) => {
@@ -101,7 +101,7 @@ export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
       id: doc.id,
       name: (d.name as string) ?? 'Center',
       governorate: (d.governorate as string) ?? '',
-      city: (d.city as string) ?? '',
+      city: ((d.city as string | undefined) ?? (d.district as string | undefined) ?? '') as string,
       address: (d.address as string) ?? '',
       // totalCapacity is the canonical field; fall back to legacy 'capacity' for old docs
       capacity: Number(d.totalCapacity ?? d.capacity ?? 0),
@@ -121,15 +121,17 @@ export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
   >();
   housingSnap.docs.forEach((doc) => {
     const d = doc.data();
-    const area = (d.area as string) ?? 'Unknown';
+    const area = ((d.district as string | undefined) ??
+      (d.governorate as string | undefined) ??
+      'Unknown') as string;
     const current = housingMap.get(area) ?? {
       area,
       listingCount: 0,
       availableSpots: 0,
-      ...getCoordinates(area),
+      ...getCoordinates((d.governorate as string | undefined) ?? area),
     };
     current.listingCount += 1;
-    current.availableSpots += Number(d.availableSpots ?? 0);
+    current.availableSpots += Number(d.capacity ?? 0);
     housingMap.set(area, current);
   });
 
