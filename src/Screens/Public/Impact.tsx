@@ -26,8 +26,12 @@ const DEFAULT_STATS: GlobalStatsDocument = {
   totalCompleted: 0,
   totalPeopleHelped: 0,
   totalPending: 0,
+  totalPendingUrgent: 0,
+  totalStalePending: 0,
   activeNGOs: 0,
   housingAvailable: 0,
+  housingPendingReview: 0,
+  housingReservedCapacity: 0,
   byGovernorate: {},
   byNeed: {},
 };

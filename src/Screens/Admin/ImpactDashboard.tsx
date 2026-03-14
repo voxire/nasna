@@ -22,13 +22,7 @@ import {
 } from 'recharts';
 import { toast } from 'sonner';
 import { db } from '@/firebase';
-import type {
-  GlobalStatsDocument,
-  HousingDocument,
-  MemberDocument,
-  StatsSnapshotDocument,
-  SubmissionDocument,
-} from '@/types';
+import type { GlobalStatsDocument, MemberDocument, StatsSnapshotDocument } from '@/types';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Skeleton } from '@/Components/ui/skeleton';
@@ -39,8 +33,12 @@ const DEFAULT_STATS: GlobalStatsDocument = {
   totalCompleted: 0,
   totalPeopleHelped: 0,
   totalPending: 0,
+  totalPendingUrgent: 0,
+  totalStalePending: 0,
   activeNGOs: 0,
   housingAvailable: 0,
+  housingPendingReview: 0,
+  housingReservedCapacity: 0,
   byGovernorate: {},
   byNeed: {},
 };
@@ -48,10 +46,6 @@ const DEFAULT_STATS: GlobalStatsDocument = {
 export default function ImpactDashboard() {
   const { t } = useTranslation();
   const [stats, setStats] = useState<GlobalStatsDocument>(DEFAULT_STATS);
-  const [pendingUrgentCases, setPendingUrgentCases] = useState(0);
-  const [staleCases, setStaleCases] = useState(0);
-  const [housingPendingReview, setHousingPendingReview] = useState(0);
-  const [reservedHousing, setReservedHousing] = useState(0);
   const [snapshots, setSnapshots] = useState<StatsSnapshotDocument[]>([]);
   const [ngos, setNgos] = useState<(MemberDocument & { id: string })[]>([]);
   const [ngosLoading, setNgosLoading] = useState(true);
@@ -65,32 +59,6 @@ export default function ImpactDashboard() {
             : DEFAULT_STATS,
         );
       }),
-      // ⚠️ CRISIS WORKAROUND: unbounded submissions scan replaced with limit(500).
-      // Replace with derived fields in /stats/global when time permits.
-      // See: docs/superpowers/specs/2026-03-12-phase-4-impact-dashboard-design.md
-      onSnapshot(
-        query(collection(db, 'submissions'), where('status', '==', 'pending'), limit(500)),
-        (snapshot) => {
-          const rows = snapshot.docs.map((document) => document.data() as SubmissionDocument);
-          setPendingUrgentCases(rows.filter((row) => row.aidUrgency === 'High').length);
-          setStaleCases(rows.filter((row) => row.staleFlagged).length);
-        },
-      ),
-      // ⚠️ CRISIS WORKAROUND: replace with derived counter in /stats/global when time permits.
-      onSnapshot(
-        query(collection(db, 'housing'), where('status', '==', 'pending_review'), limit(500)),
-        (snapshot) => {
-          setHousingPendingReview(snapshot.size);
-        },
-      ),
-      // ⚠️ CRISIS WORKAROUND: replace with derived counter in /stats/global when time permits.
-      onSnapshot(
-        query(collection(db, 'housing'), where('status', '==', 'reserved'), limit(500)),
-        (snapshot) => {
-          const rows = snapshot.docs.map((document) => document.data() as HousingDocument);
-          setReservedHousing(rows.reduce((total, row) => total + Number(row.capacity ?? 0), 0));
-        },
-      ),
     ];
 
     // Time-series snapshots (one-time fetch, 90-day window)
@@ -220,14 +188,22 @@ export default function ImpactDashboard() {
   ];
 
   const queueCards = [
-    { id: 'pendingUrgent', label: t('impact.admin.pendingUrgent'), value: pendingUrgentCases },
-    { id: 'stalePending', label: t('impact.admin.stalePending'), value: staleCases },
+    {
+      id: 'pendingUrgent',
+      label: t('impact.admin.pendingUrgent'),
+      value: stats.totalPendingUrgent,
+    },
+    { id: 'stalePending', label: t('impact.admin.stalePending'), value: stats.totalStalePending },
     {
       id: 'housingReview',
       label: t('impact.admin.housingPendingReview'),
-      value: housingPendingReview,
+      value: stats.housingPendingReview,
     },
-    { id: 'reservedHousing', label: t('impact.admin.reservedHousing'), value: reservedHousing },
+    {
+      id: 'reservedHousing',
+      label: t('impact.admin.reservedHousing'),
+      value: stats.housingReservedCapacity,
+    },
   ];
 
   return (

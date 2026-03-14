@@ -214,8 +214,12 @@ export interface GlobalStatsDocument {
   totalCompleted: number;
   totalPeopleHelped: number;
   totalPending: number;
+  totalPendingUrgent: number;
+  totalStalePending: number;
   activeNGOs: number;
   housingAvailable: number;
+  housingPendingReview: number;
+  housingReservedCapacity: number;
   byGovernorate: Record<string, number>;
   byNeed: Record<string, number>;
   lastUpdatedAt?: Timestamp | Date;

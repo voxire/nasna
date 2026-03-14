@@ -71,8 +71,12 @@ async function ensureGlobalStatsDocument() {
       totalCompleted: 0,
       totalPeopleHelped: 0,
       totalPending: 0,
+      totalPendingUrgent: 0,
+      totalStalePending: 0,
       activeNGOs: 0,
       housingAvailable: 0,
+      housingPendingReview: 0,
+      housingReservedCapacity: 0,
       byGovernorate: {},
       byNeed: {},
       lastUpdatedAt: new Date(),
@@ -192,11 +196,19 @@ async function refreshActiveNgoCount() {
 }
 
 async function refreshHousingAvailability() {
-  // status 'available' — 'approved' was migrated to 'available' by backfillV2Data.ts
   // Server-side admin SDK call — housing listings are bounded by real available properties.
   // Unbounded scan is acceptable here.
-  const housingSnapshot = await db.collection('housing').where('status', '==', 'available').get();
-  const housingAvailable = housingSnapshot.docs.reduce(
+  const [availableSnap, pendingSnap, reservedSnap] = await Promise.all([
+    db.collection('housing').where('status', '==', 'available').get(),
+    db.collection('housing').where('status', '==', 'pending_review').get(),
+    db.collection('housing').where('status', '==', 'reserved').get(),
+  ]);
+
+  const housingAvailable = availableSnap.docs.reduce(
+    (total, document) => total + Number((document.data() as HousingRecord).capacity ?? 0),
+    0,
+  );
+  const housingReservedCapacity = reservedSnap.docs.reduce(
     (total, document) => total + Number((document.data() as HousingRecord).capacity ?? 0),
     0,
   );
@@ -204,6 +216,8 @@ async function refreshHousingAvailability() {
   await GLOBAL_STATS_DOC.set(
     {
       housingAvailable,
+      housingPendingReview: pendingSnap.size,
+      housingReservedCapacity,
       lastUpdatedAt: new Date(),
     },
     { merge: true },
@@ -220,6 +234,8 @@ async function rebuildGlobalStats() {
   // Accumulator
   let totalRegistered = 0;
   let totalPending = 0;
+  let totalPendingUrgent = 0;
+  let totalStalePending = 0;
   let totalAssigned = 0;
   let totalCompleted = 0;
   let totalPeopleHelped = 0;
@@ -253,9 +269,13 @@ async function rebuildGlobalStats() {
       totalRegistered++;
 
       const status = submission.status ?? 'pending';
-      if (status === 'pending') totalPending++;
-      else if (status === 'assigned' || status === 'in_progress') totalAssigned++;
-      else if (status === 'completed') {
+      if (status === 'pending') {
+        totalPending++;
+        if (submission.aidUrgency === 'High') totalPendingUrgent++;
+        if (submission.staleFlagged === true) totalStalePending++;
+      } else if (status === 'assigned' || status === 'in_progress') {
+        totalAssigned++;
+      } else if (status === 'completed') {
         totalCompleted++;
         totalPeopleHelped += Number(submission.numberOfPeopleInHousehold ?? 0);
       }
@@ -279,9 +299,17 @@ async function rebuildGlobalStats() {
     (doc) => Number((doc.data() as MemberRecord).currentCaseLoad ?? 0) > 0,
   ).length;
 
-  // Housing: status 'available' — 'approved' was migrated by backfillV2Data.ts
-  const housingSnapshot = await db.collection('housing').where('status', '==', 'available').get();
-  const housingAvailable = housingSnapshot.docs.reduce(
+  // Housing stats
+  const [housingAvailableSnap, housingPendingSnap, housingReservedSnap] = await Promise.all([
+    db.collection('housing').where('status', '==', 'available').get(),
+    db.collection('housing').where('status', '==', 'pending_review').get(),
+    db.collection('housing').where('status', '==', 'reserved').get(),
+  ]);
+  const housingAvailable = housingAvailableSnap.docs.reduce(
+    (total, doc) => total + Number((doc.data() as HousingRecord).capacity ?? 0),
+    0,
+  );
+  const housingReservedCapacity = housingReservedSnap.docs.reduce(
     (total, doc) => total + Number((doc.data() as HousingRecord).capacity ?? 0),
     0,
   );
@@ -290,11 +318,15 @@ async function rebuildGlobalStats() {
     {
       totalRegistered,
       totalPending,
+      totalPendingUrgent,
+      totalStalePending,
       totalAssigned,
       totalCompleted,
       totalPeopleHelped,
       activeNGOs,
       housingAvailable,
+      housingPendingReview: housingPendingSnap.size,
+      housingReservedCapacity,
       byGovernorate,
       byNeed,
       lastUpdatedAt: new Date(),
@@ -352,6 +384,9 @@ export const onNewSubmission = onDocumentCreated(
       {
         totalRegistered: FieldValue.increment(1),
         totalPending: FieldValue.increment(1),
+        ...(submission.aidUrgency === 'High'
+          ? { totalPendingUrgent: FieldValue.increment(1) }
+          : {}),
         [`byGovernorate.${governorate}`]: FieldValue.increment(1),
         ...submissionNeeds.reduce<Record<string, FieldValue>>(
           (acc, need) => ({
@@ -531,12 +566,19 @@ export const onCaseAssigned = onDocumentUpdated(
     const beforeStatus = before.status ?? 'pending';
     const isEverFirstAssignment = !previousAssignedTo; // only increment on first assignment
 
+    const wasHighUrgencyPending =
+      isEverFirstAssignment && beforeStatus === 'pending' && before.aidUrgency === 'High';
+    const wasStalePending =
+      isEverFirstAssignment && beforeStatus === 'pending' && before.staleFlagged === true;
+
     await GLOBAL_STATS_DOC.set(
       {
         ...(isEverFirstAssignment ? { totalAssigned: FieldValue.increment(1) } : {}),
         ...(isEverFirstAssignment && beforeStatus === 'pending'
           ? { totalPending: FieldValue.increment(-1) }
           : {}),
+        ...(wasHighUrgencyPending ? { totalPendingUrgent: FieldValue.increment(-1) } : {}),
+        ...(wasStalePending ? { totalStalePending: FieldValue.increment(-1) } : {}),
         lastUpdatedAt: new Date(),
       },
       { merge: true },
@@ -636,6 +678,9 @@ export const onCaseCompleted = onDocumentUpdated(
     const wasPending = previousStatus === 'pending';
     const wasAssigned = previousStatus === 'assigned' || previousStatus === 'in_progress';
 
+    const wasHighUrgencyPending = wasPending && before.aidUrgency === 'High';
+    const wasStalePending = wasPending && before.staleFlagged === true;
+
     if (nextStatus === 'completed') {
       await GLOBAL_STATS_DOC.set(
         {
@@ -643,6 +688,8 @@ export const onCaseCompleted = onDocumentUpdated(
           totalPeopleHelped: FieldValue.increment(Number(after.numberOfPeopleInHousehold ?? 0)),
           ...(wasAssigned ? { totalAssigned: FieldValue.increment(-1) } : {}),
           ...(wasPending ? { totalPending: FieldValue.increment(-1) } : {}),
+          ...(wasHighUrgencyPending ? { totalPendingUrgent: FieldValue.increment(-1) } : {}),
+          ...(wasStalePending ? { totalStalePending: FieldValue.increment(-1) } : {}),
           lastUpdatedAt: new Date(),
         },
         { merge: true },
@@ -653,6 +700,8 @@ export const onCaseCompleted = onDocumentUpdated(
         {
           ...(wasAssigned ? { totalAssigned: FieldValue.increment(-1) } : {}),
           ...(wasPending ? { totalPending: FieldValue.increment(-1) } : {}),
+          ...(wasHighUrgencyPending ? { totalPendingUrgent: FieldValue.increment(-1) } : {}),
+          ...(wasStalePending ? { totalStalePending: FieldValue.increment(-1) } : {}),
           lastUpdatedAt: new Date(),
         },
         { merge: true },
@@ -717,6 +766,7 @@ export const dailyStaleCaseCheck = onSchedule(
   async () => {
     const staleBefore = Date.now() - STALE_CASE_THRESHOLD_HOURS * 60 * 60 * 1000;
     const allStaleCaseIds: string[] = [];
+    let newStalePendingCount = 0;
     const memberCache = new Map<string, MemberRecord>();
 
     // Process submissions in cursor-paginated batches to bound memory and read cost
@@ -775,6 +825,10 @@ export const dailyStaleCaseCheck = onSchedule(
         }),
       );
 
+      newStalePendingCount += staleDocs.filter(
+        (document) => (document.data() as SubmissionRecord).status === 'pending',
+      ).length;
+
       await Promise.all(
         staleDocs.map(async (document) => {
           await document.ref.set(
@@ -823,6 +877,16 @@ export const dailyStaleCaseCheck = onSchedule(
             }
           }
         }),
+      );
+    }
+
+    if (newStalePendingCount > 0) {
+      await GLOBAL_STATS_DOC.set(
+        {
+          totalStalePending: FieldValue.increment(newStalePendingCount),
+          lastUpdatedAt: new Date(),
+        },
+        { merge: true },
       );
     }
 
