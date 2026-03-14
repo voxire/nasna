@@ -35,7 +35,7 @@ export async function sendNgoNewCaseAlert(options: NgoNewCaseAlertOptions): Prom
   sgMail.setApiKey(apiKey);
 
   const needsList = options.needs.length > 0 ? options.needs.join(', ') : 'unspecified';
-  const subject = `New case in ${options.governorate} — ${options.urgency} urgency`;
+  const subject = `New case in ${options.governorate}, ${options.urgency} urgency`;
 
   await sgMail.send({
     to: options.recipientEmail,

@@ -187,10 +187,10 @@ function OffersManagement() {
                   </TableCell>
                   <TableCell>{item.phone}</TableCell>
                   <TableCell>{item.region}</TableCell>
-                  <TableCell>{item.neighborhood || '—'}</TableCell>
-                  <TableCell>{item.capacity ?? '—'}</TableCell>
+                  <TableCell>{item.neighborhood || '-'}</TableCell>
+                  <TableCell>{item.capacity ?? '-'}</TableCell>
                   <TableCell className="max-w-[200px] truncate text-gray-500 text-xs">
-                    {item.description || '—'}
+                    {item.description || '-'}
                   </TableCell>
                   <TableCell className="text-gray-500 text-xs whitespace-nowrap">
                     {item.createdAt?.toDate().toLocaleDateString()}

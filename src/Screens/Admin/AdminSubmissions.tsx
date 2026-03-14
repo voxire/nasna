@@ -361,13 +361,13 @@ function AdminSubmissions() {
                     <TableCell>{member.floor}</TableCell>
                     <TableCell className="text-xs">
                       {member.locationType === 'center'
-                        ? '—'
+                        ? '-'
                         : member.ageRanges && typeof member.ageRanges === 'object'
                           ? Object.entries(member.ageRanges)
                               .filter(([, v]) => Number(v) > 0)
                               .map(([range, count]) => `${range}: ${count}`)
-                              .join(', ') || '—'
-                          : '—'}
+                              .join(', ') || '-'
+                          : '-'}
                     </TableCell>
                     <TableCell>{member.specialNeeds?.join(', ') || ''}</TableCell>
                     <TableCell>{member.needs?.join(', ') || ''}</TableCell>
@@ -387,7 +387,7 @@ function AdminSubmissions() {
                     <TableCell>
                       {member.assignedTo
                         ? (assignedNgoNames[member.assignedTo] ?? member.assignedTo)
-                        : '—'}
+                        : '-'}
                     </TableCell>
                     <TableCell>{member.comments}</TableCell>
                     <TableCell>{member.registrationDate?.toDate().toLocaleDateString()}</TableCell>

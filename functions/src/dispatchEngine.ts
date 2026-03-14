@@ -464,7 +464,7 @@ export const onNewSubmission = onDocumentCreated(
           id: notificationId,
           recipientUid: memberId,
           title: 'New case in your area',
-          body: `New case in ${governorate} — needs: ${submissionNeeds.join(', ') || 'unspecified'} — ${submission.aidUrgency ?? 'Unknown'} urgency`,
+          body: `New case in ${governorate}, needs: ${submissionNeeds.join(', ') || 'unspecified'}, ${submission.aidUrgency ?? 'Unknown'} urgency`,
           channel: 'email',
           relatedSubmissionId: submissionId,
         });

@@ -2,7 +2,7 @@
   "badge": "Lignes d'aide au Liban",
   "title": "Numéros d'urgence",
   "subtitle": "Appuyez sur un numéro pour appeler immédiatement. Disponible 24h/24 là où indiqué. En cas de danger immédiat, appelez le 112.",
-  "sosTitle": "Numéros critiques — appuyez pour appeler",
+  "sosTitle": "Numéros critiques, appuyez pour appeler",
   "searchPlaceholder": "Rechercher par organisation ou numéro…",
   "all": "Tous",
   "callNow": "Appeler",
@@ -16,7 +16,7 @@
     "humanitarian": "Humanitaire"
   },
   "descriptions": {
-    "police": "Forces de Sécurité Intérieure libanaises — réponse d'urgence immédiate",
+    "police": "Forces de Sécurité Intérieure libanaises, réponse d'urgence immédiate",
     "civilDefense": "Pompiers, sauvetage et intervention d'urgence",
     "redCross": "Services médicaux d'urgence, ambulances et banque de sang",
     "policeAlt": "Ligne d'urgence policière alternative",
@@ -26,14 +26,14 @@
     "abaad": "Soutien aux victimes de violence basée sur le genre",
     "unhcr": "Agence des Nations Unies pour les réfugiés",
     "unicef": "Fonds des Nations Unies pour l'enfance",
-    "wfp": "Programme alimentaire mondial — aide alimentaire",
-    "caritas": "Caritas — secours catholique et développement social",
-    "islamicRelief": "Islamic Relief — aide humanitaire et développement",
-    "worldVision": "Vision Mondiale — organisation humanitaire axée sur l'enfant",
+    "wfp": "Programme alimentaire mondial, aide alimentaire",
+    "caritas": "Caritas, secours catholique et développement social",
+    "islamicRelief": "Islamic Relief, aide humanitaire et développement",
+    "worldVision": "Vision Mondiale, organisation humanitaire axée sur l'enfant",
     "iom": "Organisation internationale pour les migrations",
-    "msf": "Médecins Sans Frontières — soins médicaux d'urgence",
-    "foodBank": "Banque alimentaire libanaise — distribution d'aide alimentaire",
-    "saveChildren": "Save the Children — droits de l'enfant et réponse humanitaire",
-    "amel": "Association Amel — santé, éducation et développement social"
+    "msf": "Médecins Sans Frontières, soins médicaux d'urgence",
+    "foodBank": "Banque alimentaire libanaise, distribution d'aide alimentaire",
+    "saveChildren": "Save the Children, droits de l'enfant et réponse humanitaire",
+    "amel": "Association Amel, santé, éducation et développement social"
   }
 }

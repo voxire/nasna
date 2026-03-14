@@ -269,7 +269,7 @@ export default function AgentSubmissionDetail() {
                       </Badge>
                     ))
                   ) : (
-                    <span className="text-sm text-gray-400">—</span>
+                    <span className="text-sm text-gray-400">-</span>
                   )}
                 </div>
               </div>
@@ -324,7 +324,7 @@ function DetailField({ label, value }: { label: string; value?: string | null })
   return (
     <div>
       <p className="text-xs uppercase tracking-wide text-gray-500">{label}</p>
-      <p className="text-sm text-gray-900 mt-0.5">{value ?? '—'}</p>
+      <p className="text-sm text-gray-900 mt-0.5">{value ?? '-'}</p>
     </div>
   );
 }

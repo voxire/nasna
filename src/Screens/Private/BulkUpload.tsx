@@ -755,10 +755,10 @@ export default function BulkUpload() {
                         className={row.errors.length > 0 ? 'bg-rose-50' : ''}
                       >
                         <TableCell className="text-gray-500">{row.rowIndex}</TableCell>
-                        <TableCell className="font-medium">{row.mapped.fullName || '—'}</TableCell>
-                        <TableCell>{row.mapped.phoneNumber || '—'}</TableCell>
-                        <TableCell>{row.mapped.currentGovernorate || '—'}</TableCell>
-                        <TableCell>{row.mapped.aidUrgency || '—'}</TableCell>
+                        <TableCell className="font-medium">{row.mapped.fullName || '-'}</TableCell>
+                        <TableCell>{row.mapped.phoneNumber || '-'}</TableCell>
+                        <TableCell>{row.mapped.currentGovernorate || '-'}</TableCell>
+                        <TableCell>{row.mapped.aidUrgency || '-'}</TableCell>
                         <TableCell>
                           {row.errors.length === 0 ? (
                             <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">

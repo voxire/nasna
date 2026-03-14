@@ -121,7 +121,7 @@
     "mapColumnsDescription": "Match your file's columns to the required fields. We've pre-matched the ones we could detect.",
     "required": "Required",
     "selectColumn": "Select column…",
-    "notMapped": "— Not mapped —",
+    "notMapped": "- Not mapped -",
     "validateRows": "Validate",
     "startOver": "Start over",
     "validCount": "{{count}} valid rows ready to submit",

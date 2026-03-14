@@ -678,7 +678,7 @@ export default function OperationsMap() {
                         {t(`admin.map.statusLabels.${cluster.markers[0].status}`)}
                       </p>
                       <p className="text-white/75 text-xs mt-0.5">
-                        {cluster.markers[0].governorate || '—'}
+                        {cluster.markers[0].governorate || '-'}
                       </p>
                     </div>
                     <div className="px-4 py-3 space-y-1.5">

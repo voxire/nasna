@@ -318,7 +318,7 @@ export default function CenterManagement() {
                     {center.district && <p className="text-xs text-gray-500">{center.district}</p>}
                   </TableCell>
                   <TableCell className="capitalize">
-                    {center.type ? t(`admin.centers.type_${center.type}`) : '—'}
+                    {center.type ? t(`admin.centers.type_${center.type}`) : '-'}
                   </TableCell>
                   <TableCell>{center.governorate}</TableCell>
                   <TableCell className="w-48">

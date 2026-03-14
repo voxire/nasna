@@ -121,7 +121,7 @@
     "mapColumnsDescription": "طابق أعمدة ملفك مع الحقول المطلوبة. لقد طابقنا تلقائيًا ما أمكن.",
     "required": "مطلوب",
     "selectColumn": "اختر عمودًا…",
-    "notMapped": "— غير معيَّن —",
+    "notMapped": "- غير معيَّن -",
     "validateRows": "التحقق من الصفوف",
     "startOver": "ابدأ من جديد",
     "validCount": "{{count}} صف صالح جاهز للإرسال",

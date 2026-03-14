@@ -121,7 +121,7 @@
     "mapColumnsDescription": "Faites correspondre les colonnes de votre fichier aux champs requis.",
     "required": "Requis",
     "selectColumn": "Sélectionner une colonne…",
-    "notMapped": "— Non mappé —",
+    "notMapped": "- Non mappé -",
     "validateRows": "Valider",
     "startOver": "Recommencer",
     "validCount": "{{count}} lignes valides prêtes à soumettre",

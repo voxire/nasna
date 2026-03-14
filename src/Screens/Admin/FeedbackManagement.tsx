@@ -240,8 +240,8 @@ function FeedbackManagement() {
                       {item.type}
                     </span>
                   </TableCell>
-                  <TableCell>{item.name || '—'}</TableCell>
-                  <TableCell>{item.email || '—'}</TableCell>
+                  <TableCell>{item.name || '-'}</TableCell>
+                  <TableCell>{item.email || '-'}</TableCell>
                   <TableCell className="max-w-[200px] truncate">{item.message}</TableCell>
                   <TableCell className="text-gray-500 text-xs whitespace-nowrap">
                     {item.createdAt?.toDate().toLocaleDateString()}

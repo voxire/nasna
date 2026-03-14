@@ -128,7 +128,7 @@ const STRINGS: Record<BotLang, Record<StringKey, string>> = {
     invalid_menu: 'يرجى اختيار 1 للتسجيل أو 2 للاستفسار عن حالتك.',
     text_only: 'يرجى إرسال رسالة نصية فقط.',
     registered:
-      'تم تسجيلك بنجاح. رقم حالتك هو: {{id}}. احتفظ بهذا الرقم — يمكنك إرساله في أي وقت للاستفسار عن حالتك.',
+      'تم تسجيلك بنجاح. رقم حالتك هو: {{id}}. احتفظ بهذا الرقم، يمكنك إرساله في أي وقت للاستفسار عن حالتك.',
     status_not_found: 'لم يتم العثور على حالة بهذا الرقم. تأكد من الرقم وحاول مجدداً.',
     status_pending: 'قيد الانتظار',
     status_assigned: 'تم التعيين',
@@ -153,7 +153,7 @@ const STRINGS: Record<BotLang, Record<StringKey, string>> = {
     invalid_menu: 'Please choose 1 to register or 2 to check your case.',
     text_only: 'Please send a text message only.',
     registered:
-      'You have been registered successfully. Your case ID is: {{id}}. Keep this number — you can send it anytime to check your case status.',
+      'You have been registered successfully. Your case ID is: {{id}}. Keep this number, you can send it anytime to check your case status.',
     status_not_found: 'No case was found with that ID. Please verify the ID and try again.',
     status_pending: 'Pending',
     status_assigned: 'Assigned',
@@ -178,7 +178,7 @@ const STRINGS: Record<BotLang, Record<StringKey, string>> = {
     invalid_menu: 'Veuillez choisir 1 pour vous inscrire ou 2 pour vérifier votre dossier.',
     text_only: 'Veuillez envoyer un message texte uniquement.',
     registered:
-      "Vous avez été enregistré avec succès. Votre numéro de dossier est : {{id}}. Gardez ce numéro — vous pouvez l'envoyer à tout moment pour vérifier le statut de votre dossier.",
+      "Vous avez été enregistré avec succès. Votre numéro de dossier est : {{id}}. Gardez ce numéro, vous pouvez l'envoyer à tout moment pour vérifier le statut de votre dossier.",
     status_not_found:
       "Aucun dossier trouvé avec cet identifiant. Vérifiez l'identifiant et réessayez.",
     status_pending: 'En attente',

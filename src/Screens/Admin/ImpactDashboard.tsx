@@ -394,11 +394,11 @@ export default function ImpactDashboard() {
                     <tr key={ngo.id} className="border-b last:border-0">
                       <td className="py-2 pe-4 font-medium">{ngo.name}</td>
                       <td className="py-2 pe-4 text-muted-foreground">
-                        {(ngo.coverageGovernorates ?? []).join(', ') || '—'}
+                        {(ngo.coverageGovernorates ?? []).join(', ') || '-'}
                       </td>
                       <td className="py-2 pe-4">{ngo.currentCaseLoad ?? 0}</td>
                       <td className="py-2 text-muted-foreground">
-                        {(ngo.aidTypes ?? []).join(', ') || '—'}
+                        {(ngo.aidTypes ?? []).join(', ') || '-'}
                       </td>
                     </tr>
                   ))}
