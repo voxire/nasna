@@ -8,6 +8,7 @@ import NotFound from './Components/NotFound/NotFound';
 import PrivateRoutes from './Routes/PrivateRoutes';
 import LoadingScreen from './Components/LoadingScreen';
 import { useAuthStore } from './stores/authStore';
+import { trackPageView } from './services/analytics';
 
 export default function App() {
   const location = useLocation();
@@ -20,6 +21,10 @@ export default function App() {
   useEffect(() => {
     initializeAuth();
   }, [initializeAuth]);
+
+  useEffect(() => {
+    trackPageView(location.pathname);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (location.pathname === '/index.html') {

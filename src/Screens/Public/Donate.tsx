@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { functions } from '../../firebase';
 import { httpsCallable } from 'firebase/functions';
 import { toast } from 'sonner';
+import { trackDonationInitiated } from '@/services/analytics';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -78,6 +79,7 @@ function Donate() {
         throw new Error('Missing checkout URL.');
       }
 
+      trackDonationInitiated(amountUsd, validationResult.data.fundingTarget);
       window.location.assign(data.url);
     } catch (error) {
       console.error('Error adding donation: ', error);

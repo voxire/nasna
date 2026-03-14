@@ -33,6 +33,7 @@ import {
   syncQueuedSubmissions,
   type QueuedSubmissionRecord,
 } from '@/services/offlineSubmissionQueue';
+import { trackSubmissionCreated } from '@/services/analytics';
 
 const baseSubmissionSchema = z.object({
   fullName: z.string().min(1),
@@ -357,12 +358,14 @@ function CreateSubmission() {
         await queueSubmission(userUid ?? 'anonymous', submissionPayload);
         await refreshQueuedItems();
         await resetSubmissionState();
+        trackSubmissionCreated(false);
         setLastSyncMessage(t('submission.offlineQueued'));
         toast.success(t('submission.offlineQueued'));
         return;
       }
 
       await submitSubmissionPayload(submissionPayload);
+      trackSubmissionCreated(true);
       toast.success(t('submission.success'));
       await resetSubmissionState();
     } catch (error) {

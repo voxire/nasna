@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { getCookie, setCookie, deleteCookie } from '../../utils/cookies';
 import { useAuthStore } from '@/stores/authStore';
+import { trackLogin } from '@/services/analytics';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import {
@@ -75,6 +76,7 @@ function Login() {
     setGoogleLoading(true);
     try {
       const result = await loginWithGoogle();
+      trackLogin('google');
       toast.success(t('login.toast.success'));
       navigate(result.destination);
     } catch (error: unknown) {
@@ -100,6 +102,7 @@ function Login() {
     try {
       const result = await loginWithPassword(data.email, data.password);
       deleteCookie('nasna_login_attempts');
+      trackLogin('password');
       toast.success(t('login.toast.success'));
       navigate(result.destination);
     } catch (error) {

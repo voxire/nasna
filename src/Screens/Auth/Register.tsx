@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from '@/Components/ui/form';
 import { buildMemberWorkflowDefaults } from '@/lib/v2Defaults';
+import { trackSignUp } from '@/services/analytics';
 
 const registerSchema = z
   .object({
@@ -82,6 +83,7 @@ function Register() {
         updatedAt: new Date(),
       });
       await signOut(auth);
+      trackSignUp();
       toast.success(t('register.toast.success'));
       navigate('/auth/login');
     } catch (error) {

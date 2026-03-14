@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import type { MemberCase } from '@/services/memberCases';
 import { claimMemberCase, listMemberPendingCases } from '@/services/memberCases';
+import { trackCaseClaimed } from '@/services/analytics';
 import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Input } from '@/Components/ui/input';
@@ -90,6 +91,7 @@ export default function Submissions() {
     setClaimingId(caseId);
     try {
       await claimMemberCase(caseId);
+      trackCaseClaimed();
       setCases((current) => current.filter((memberCase) => memberCase.id !== caseId));
       toast.success(t('cases.feed.claimSuccess'));
     } catch (claimError) {

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { addDoc, collection, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase';
+import { trackHousingOfferSubmitted } from '@/services/analytics';
 import type { HousingAmenity, HousingPriceType, HousingType } from '@/types';
 import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
@@ -146,6 +147,7 @@ export default function OfferHousing() {
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       });
+      trackHousingOfferSubmitted();
       toast.success(t('housing.offer.success'));
       setFormState(DEFAULT_FORM);
     } catch (error) {
