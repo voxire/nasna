@@ -59,7 +59,7 @@
     "q1": { "q": "Who can register on Nasna?", "a": "Any individual or family in Lebanon who has been displaced or is in need of humanitarian aid may register. There are no eligibility restrictions to submitting a request." },
     "q2": { "q": "Is Nasna really free?", "a": "Yes. Nasna is 100% free for individuals. We are a non-profit platform funded by partner organizations. You will never be asked to pay anything." },
     "q3": { "q": "What happens to my data?", "a": "Your data is shared only with verified partner organizations to coordinate the delivery of aid to you. It is never sold, and you can request deletion at any time." },
-    "q4": { "q": "What happens after I submit?", "a": "Your submission enters a review queue. A partner organization will contact you — typically within a few business days — to discuss what aid is available in your area." }
+    "q4": { "q": "What happens after I submit?", "a": "Your submission enters a review queue. A partner organization will contact you, typically within a few business days, to discuss what aid is available in your area." }
   },
   "cta": {
     "title": "Ready to Get the Help You Need?",

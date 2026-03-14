@@ -59,7 +59,7 @@
     "q1": { "q": "Qui peut s'inscrire sur Nasna ?", "a": "Tout individu ou famille au Liban déplacé ou ayant besoin d'aide humanitaire peut s'inscrire. Il n'y a aucune restriction d'éligibilité pour soumettre une demande." },
     "q2": { "q": "Nasna est-il vraiment gratuit ?", "a": "Oui. Nasna est 100% gratuit pour les particuliers. Nous sommes une plateforme à but non lucratif financée par des organisations partenaires. Vous ne serez jamais invité à payer quoi que ce soit." },
     "q3": { "q": "Que se passe-t-il avec mes données ?", "a": "Vos données sont partagées uniquement avec des organisations partenaires vérifiées pour coordonner la livraison de l'aide. Elles ne sont jamais vendues et vous pouvez en demander la suppression à tout moment." },
-    "q4": { "q": "Que se passe-t-il après ma soumission ?", "a": "Votre soumission entre dans une file d'attente de révision. Une organisation partenaire vous contactera — généralement dans quelques jours ouvrables — pour discuter de l'aide disponible dans votre région." }
+    "q4": { "q": "Que se passe-t-il après ma soumission ?", "a": "Votre soumission entre dans une file d'attente de révision. Une organisation partenaire vous contactera, généralement dans quelques jours ouvrables, pour discuter de l'aide disponible dans votre région." }
   },
   "cta": {
     "title": "Prêt à obtenir l'aide dont vous avez besoin ?",
