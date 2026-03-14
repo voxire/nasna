@@ -1,6 +1,12 @@
+import { getApps, initializeApp } from 'firebase-admin/app';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
-import { Timestamp } from 'firebase-admin/firestore';
-import { db } from './utils/meta';
+
+if (getApps().length === 0) {
+  initializeApp();
+}
+
+const db = getFirestore();
 
 export type AuditAction =
   | 'case_assigned'
