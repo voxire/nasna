@@ -13,6 +13,7 @@ import {
 import { Globe, LayoutDashboard, LogOut, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { resolvePostLoginPath, useAuthStore } from '@/stores/authStore';
+import { trackClick } from '@/services/analytics';
 
 const NAV_LINKS = [
   { to: '/centers-map', labelKey: 'header.centersMap' },
@@ -73,6 +74,7 @@ function Header({ dashboard = false }: HeaderProps) {
               <Link
                 key={to}
                 to={to}
+                onClick={() => trackClick('nav_' + to.replace('/', ''), to)}
                 className={`text-sm font-medium transition-colors no-underline ${
                   location.pathname === to ? 'text-[#12a89d]' : 'text-gray-600 hover:text-[#12a89d]'
                 }`}
@@ -126,7 +128,13 @@ function Header({ dashboard = false }: HeaderProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {NAV_LINKS.map(({ to, labelKey }) => (
-                  <DropdownMenuItem key={to} onClick={() => navigate(to)}>
+                  <DropdownMenuItem
+                    key={to}
+                    onClick={() => {
+                      trackClick('nav_mobile_' + to.replace('/', ''), to);
+                      navigate(to);
+                    }}
+                  >
                     <span className={location.pathname === to ? 'text-[#12a89d] font-medium' : ''}>
                       {t(labelKey)}
                     </span>

@@ -32,3 +32,7 @@ export function trackDonationInitiated(amountUsd: number, fundingTarget: string)
 export function trackHousingOfferSubmitted() {
   logEvent(analytics, 'housing_offer_submitted');
 }
+
+export function trackClick(label: string, destination?: string) {
+  logEvent(analytics, 'select_content', { content_type: 'button', item_id: label, destination });
+}

@@ -4,6 +4,7 @@ import type { Variants } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/Components/ui/button';
+import { trackClick } from '@/services/analytics';
 import {
   ClipboardList, CheckCircle, HandHelping, BadgeCheck,
   Utensils, Droplets, Home as HomeIcon, Stethoscope, Shirt, Baby,
@@ -154,7 +155,7 @@ function Landing() {
             <Button
               size="lg"
               className="bg-[#12a89d] hover:bg-[#0e9088] text-white font-bold px-10 text-base rounded-full transition-all duration-200 hover:scale-105"
-              onClick={() => navigate('/submit')}
+              onClick={() => { trackClick('hero_cta_register', '/submit'); navigate('/submit'); }}
             >
               {t('landing.hero.cta')}
             </Button>
@@ -162,7 +163,7 @@ function Landing() {
               size="lg"
               variant="outline"
               className="border-white/40 text-white hover:bg-white/10 font-medium px-10 text-base rounded-full bg-transparent transition-all duration-200"
-              onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => { trackClick('hero_cta_how_it_works'); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }); }}
             >
               {t('landing.hero.secondaryCta')}
             </Button>
@@ -203,7 +204,7 @@ function Landing() {
       </section>
 
       {/* ══ CRISIS CONTEXT ═════════════════════════════════════════════════════ */}
-      <section className="bg-gray-950 text-white px-6 py-20">
+      <section className="bg-gray-900 text-white px-6 py-20">
         <div className="max-w-4xl mx-auto">
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
@@ -336,7 +337,7 @@ function Landing() {
       </section>
 
       {/* ══ SECURITY & TRUST ══════════════════════════════════════════════════ */}
-      <section className="bg-gray-950 text-white px-6 py-20">
+      <section className="bg-gray-900 text-white px-6 py-20">
         <div className="max-w-4xl mx-auto">
           <motion.div
             className="text-center mb-12"
@@ -440,7 +441,7 @@ function Landing() {
       </section>
 
       {/* ══ FINAL CTA ══════════════════════════════════════════════════════════ */}
-      <section className="relative px-6 py-28 flex items-center justify-center bg-gray-950">
+      <section className="relative px-6 py-28 flex items-center justify-center bg-gray-900">
         <motion.div
           className="relative z-10 flex flex-col items-center text-center gap-6 max-w-xl"
           initial={{ opacity: 0, y: 40 }}
@@ -455,7 +456,7 @@ function Landing() {
           <Button
             size="lg"
             className="bg-white text-[#12a89d] hover:bg-gray-100 font-bold px-12 text-base rounded-full hover:scale-105 transition-all duration-200"
-            onClick={() => navigate('/submit')}
+            onClick={() => { trackClick('bottom_cta_register', '/submit'); navigate('/submit'); }}
           >
             {t('landing.cta.button')}
           </Button>
