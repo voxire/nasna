@@ -10,151 +10,144 @@ function Footer() {
 
   return (
     <footer className="bg-[#12a89d]">
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="flex flex-col md:flex-row md:items-start gap-10 md:gap-0 md:justify-between">
-          <div className="flex flex-col gap-3">
+      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+        <div className="grid gap-12 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)_minmax(220px,0.7fr)] lg:gap-20">
+          <div className="flex flex-col gap-4">
             <img
               src="/Nasna Logo.png"
               alt="Nasna logo"
               className="h-14 w-auto max-w-[200px] object-contain brightness-0 invert"
             />
-            <p className="text-white/70 text-sm leading-relaxed max-w-[220px]">
-              {t('footer.tagline')}
-            </p>
+            <p className="max-w-[320px] text-sm leading-7 text-white/75">{t('footer.tagline')}</p>
           </div>
 
-          <div className="flex gap-16">
-            <div>
-              <p className="text-white/50 text-[11px] font-semibold uppercase tracking-widest mb-3">
-                {t('footer.navigate')}
-              </p>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link
-                    to="/about"
-                    className="text-white/80 hover:text-white transition-colors no-underline"
-                  >
-                    {t('footer.aboutUs')}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/impact"
-                    className="text-white/80 hover:text-white transition-colors no-underline"
-                  >
-                    {t('footer.impact')}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/housing"
-                    className="text-white/80 hover:text-white transition-colors no-underline"
-                  >
-                    {t('footer.housing')}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/offer-housing"
-                    className="text-white/80 hover:text-white transition-colors no-underline"
-                  >
-                    {t('footer.offerHousing')}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/emergency"
-                    className="text-white/80 hover:text-white transition-colors no-underline"
-                  >
-                    {t('footer.emergency')}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/offer-help"
-                    className="text-white/80 hover:text-white transition-colors no-underline"
-                  >
-                    {t('footer.offerHelp')}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/resources"
-                    className="text-white/80 hover:text-white transition-colors no-underline"
-                  >
-                    {t('footer.resources')}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/feedback"
-                    className="text-white/80 hover:text-white transition-colors no-underline"
-                  >
-                    {t('footer.feedback')}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/terms"
-                    className="text-white/80 hover:text-white transition-colors no-underline"
-                  >
-                    {t('footer.terms & conditions')}
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          <div>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-white/50">
+              {t('footer.navigate')}
+            </p>
+            <ul className="grid gap-x-10 gap-y-3 text-sm sm:grid-cols-2">
+              <li>
+                <Link
+                  to="/about"
+                  className="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  {t('footer.aboutUs')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/impact"
+                  className="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  {t('footer.impact')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/housing"
+                  className="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  {t('footer.housing')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/offer-housing"
+                  className="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  {t('footer.offerHousing')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/emergency"
+                  className="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  {t('footer.emergency')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/offer-help"
+                  className="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  {t('footer.offerHelp')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/resources"
+                  className="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  {t('footer.resources')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/feedback"
+                  className="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  {t('footer.feedback')}
+                </Link>
+              </li>
+              <li className="sm:col-span-2">
+                <Link
+                  to="/terms"
+                  className="text-white/80 hover:text-white transition-colors no-underline"
+                >
+                  {t('footer.terms & conditions')}
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-            <div>
-              <p className="text-white/50 text-[11px] font-semibold uppercase tracking-widest mb-3">
-                {t('footer.account')}
-              </p>
-              <ul className="space-y-2 text-sm">
-                {user ? (
+          <div>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-white/50">
+              {t('footer.account')}
+            </p>
+            <ul className="space-y-3 text-sm">
+              {user ? (
+                <li>
+                  <Link
+                    to={resolvePostLoginPath(role, role === 'admin' || profile?.onboarded === true)}
+                    className="text-white/80 hover:text-white transition-colors no-underline"
+                  >
+                    {role === 'admin' ? t('footer.adminPanel') : t('footer.dashboard')}
+                  </Link>
+                </li>
+              ) : (
+                <>
                   <li>
                     <Link
-                      to={resolvePostLoginPath(
-                        role,
-                        role === 'admin' || profile?.onboarded === true,
-                      )}
+                      to="/auth/login"
                       className="text-white/80 hover:text-white transition-colors no-underline"
                     >
-                      {role === 'admin' ? t('footer.adminPanel') : t('footer.dashboard')}
+                      {t('footer.signIn')}
                     </Link>
                   </li>
-                ) : (
-                  <>
-                    <li>
-                      <Link
-                        to="/auth/login"
-                        className="text-white/80 hover:text-white transition-colors no-underline"
-                      >
-                        {t('footer.signIn')}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/auth/register"
-                        className="text-white/80 hover:text-white transition-colors no-underline"
-                      >
-                        {t('footer.registerNgo')}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/auth/agent"
-                        className="text-white/80 hover:text-white transition-colors no-underline"
-                      >
-                        {t('footer.becomeAgent')}
-                      </Link>
-                    </li>
-                  </>
-                )}
-              </ul>
-            </div>
+                  <li>
+                    <Link
+                      to="/auth/register"
+                      className="text-white/80 hover:text-white transition-colors no-underline"
+                    >
+                      {t('footer.registerNgo')}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/auth/agent"
+                      className="text-white/80 hover:text-white transition-colors no-underline"
+                    >
+                      {t('footer.becomeAgent')}
+                    </Link>
+                  </li>
+                </>
+              )}
+            </ul>
           </div>
         </div>
 
-        <div className="border-t border-white/20 mt-8 pt-5 text-center text-xs text-white/50">
+        <div className="mt-10 border-t border-white/20 pt-5 text-center text-xs text-white/50">
           © {new Date().getFullYear()} Nasna. {t('footer.allRightsReserved')}
         </div>
       </div>
