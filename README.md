@@ -79,10 +79,10 @@ Nasna doesn't replace the people doing the work. It gives them the infrastructur
 
 | Name | Role |
 |------|------|
-| **Abed El-Fattah Amouneh** | Product Manager & Frontend Developer |
-| **Mohammad Homsi** | Full Stack Developer & Tech Lead |
-| **Rami Kronbi** | AI Engineer & Developer |
-| **Lynn Solh** | Multimedia Designer |
+| [**Abed El-Fattah Amouneh**](https://www.linkedin.com/in/abed-amouneh) | Product Manager & Frontend Developer |
+| [**Mohammad Homsi**](https://www.linkedin.com/in/mohamad-homsi/) | Full Stack Developer & Tech Lead |
+| [**Rami Kronbi**](https://www.linkedin.com/in/rami-kronbi/) | AI Engineer & Developer |
+| [**Lynn El Solh**](https://www.linkedin.com/in/lynnelsolh/) | Multimedia Designer |
 
 We welcome contributions from anyone who wants to help. Whether you're a developer, designer, translator, field worker, or someone with domain knowledge in humanitarian aid — reach out and let's talk.
 
