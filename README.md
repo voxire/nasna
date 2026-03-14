@@ -214,7 +214,7 @@ We welcome contributions from anyone who wants to help. Whether you're a develop
 |-----------|---------|---------|
 | Firebase Firestore | 12 | Real-time NoSQL database |
 | Firebase Auth | 12 | Authentication (email/password + Google) |
-| Firebase Cloud Functions | Node.js 20 | Server-side logic & triggers |
+| Firebase Cloud Functions | Node.js 22 | Server-side logic & triggers |
 | Firebase Hosting | - | Static asset delivery + CDN |
 | Stripe | - | Donation payments |
 | SendGrid | - | Email notifications *(pending)* |
@@ -455,10 +455,10 @@ Admins have full access to the platform and manage the entire pipeline.
 
 If you want to run Nasna locally or contribute to the codebase:
 
-**Prerequisites:** Node.js 20+, pnpm 10+, Firebase CLI
+**Prerequisites:** Node.js 22+, pnpm 10+, Firebase CLI
 
 ```bash
-git clone https://github.com/1homsi/nasna.git
+git clone https://github.com/voxire/nasna.git
 cd nasna
 pnpm install
 cp .env.example .env   # fill in your Firebase credentials
@@ -477,8 +477,6 @@ pnpm build
 firebase deploy --only hosting
 firebase deploy --only firestore:rules
 ```
-
-See `CLAUDE.md` at the project root for the full development guide, code conventions, and security rules.
 
 ---
 
