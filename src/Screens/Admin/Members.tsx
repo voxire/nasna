@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Copy } from 'lucide-react';
 import { db } from '../../firebase';
 import {
   collection,
@@ -169,6 +170,17 @@ function Members() {
   const handleCreateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewMember((previous) => ({ ...previous, [name]: value }));
+  };
+
+  const handleCopyPassword = async () => {
+    if (!newMember.password) return;
+    try {
+      await navigator.clipboard.writeText(newMember.password);
+      toast.success('Temporary password copied.');
+    } catch (error) {
+      console.error('Error copying password: ', error);
+      toast.error('Failed to copy temporary password.');
+    }
   };
 
   const resetCreateForm = () => {
@@ -398,14 +410,27 @@ function Members() {
             </div>
             <div className="space-y-1">
               <Label>Temporary password</Label>
-              <Input
-                type="password"
-                name="password"
-                value={newMember.password}
-                onChange={handleCreateChange}
-                minLength={6}
-                required
-              />
+              <div className="relative">
+                <Input
+                  type="text"
+                  name="password"
+                  value={newMember.password}
+                  onChange={handleCreateChange}
+                  minLength={6}
+                  required
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1 h-8 w-8 text-gray-500 hover:text-gray-700"
+                  onClick={() => void handleCopyPassword()}
+                  disabled={!newMember.password}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <label className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 text-sm">
               <Checkbox
