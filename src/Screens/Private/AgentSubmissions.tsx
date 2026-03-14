@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { db } from '../../firebase';
 import { collection, onSnapshot, query, where, limit } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import type { SubmissionDocument } from '../../types';
 import CaseStatusBadge from '@/Components/CaseStatusBadge';
 import { Button } from '@/Components/ui/button';
+import { Skeleton } from '@/Components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -79,14 +80,6 @@ function AgentSubmissions() {
     return unsubscribe;
   }, [authLoading, currentUser, initialized, navigate, profileLoading, role]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[80vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-[#12a89d]" />
-      </div>
-    );
-  }
-
   if (error) {
     return <p className="text-red-500">{error}</p>;
   }
@@ -127,10 +120,44 @@ function AgentSubmissions() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {submissions.length === 0 ? (
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-36" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-28" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-4" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : submissions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-12 text-gray-500">
-                  {t('submission.agent.noSubmissions')}
+                <TableCell colSpan={6} className="py-16 text-center">
+                  <p className="text-sm font-medium text-gray-700 mb-1">
+                    {t('submission.agent.noSubmissions')}
+                  </p>
+                  <p className="text-xs text-gray-500 mb-3">
+                    {t('submission.agent.noSubmissionsHint')}
+                  </p>
+                  <Link
+                    to="/agent/create"
+                    className="text-sm font-medium text-[#12a89d] hover:underline"
+                  >
+                    {t('submission.agent.registerFirst')} →
+                  </Link>
                 </TableCell>
               </TableRow>
             ) : (

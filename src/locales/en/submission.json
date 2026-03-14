@@ -77,6 +77,8 @@
     "phoneNumber": "Phone Number",
     "dateRegistered": "Date Registered",
     "noSubmissions": "No submissions found.",
+    "noSubmissionsHint": "Cases you register will appear here.",
+    "registerFirst": "Register your first family",
     "loadError": "Failed to load submissions",
     "viewDetails": "View details",
     "status": "Status",

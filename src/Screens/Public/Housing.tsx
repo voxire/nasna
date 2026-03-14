@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { collection, limit, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '@/firebase';
 import HousingCard from '@/Components/HousingCard';
+import { Skeleton } from '@/Components/ui/skeleton';
 import CapacityBar from '@/Components/CapacityBar';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -132,7 +133,18 @@ export default function Housing() {
   if (loading) {
     return (
       <div className="mx-auto max-w-6xl px-4 py-10">
-        <p className="text-sm text-gray-500">{t('common.loading')}…</p>
+        <Skeleton className="h-8 w-48 mb-6" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="rounded-xl border border-gray-200 bg-white p-5 space-y-3">
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-9 w-full mt-2" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

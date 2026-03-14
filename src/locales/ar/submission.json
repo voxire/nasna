@@ -77,6 +77,8 @@
     "phoneNumber": "رقم الهاتف",
     "dateRegistered": "تاريخ التسجيل",
     "noSubmissions": "لا توجد طلبات.",
+    "noSubmissionsHint": "ستظهر هنا الحالات التي تسجّلها.",
+    "registerFirst": "سجّل أول عائلة",
     "loadError": "فشل تحميل الطلبات",
     "viewDetails": "عرض التفاصيل",
     "status": "الحالة",

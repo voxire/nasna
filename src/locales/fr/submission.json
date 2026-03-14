@@ -77,6 +77,8 @@
     "phoneNumber": "Numéro de téléphone",
     "dateRegistered": "Date d'inscription",
     "noSubmissions": "Aucune soumission trouvée.",
+    "noSubmissionsHint": "Les cas que vous enregistrez apparaîtront ici.",
+    "registerFirst": "Enregistrer votre première famille",
     "loadError": "Échec du chargement des soumissions",
     "viewDetails": "Voir les détails",
     "status": "Statut",

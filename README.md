@@ -465,6 +465,26 @@ cp .env.example .env   # fill in your Firebase credentials
 pnpm start             # runs at http://localhost:5173
 ```
 
+**Local development with Firebase Emulators (recommended — no production data touched):**
+```bash
+# Terminal 1 — start emulators (data persists between sessions)
+pnpm emulate
+
+# Terminal 2 — seed test users and sample data (run once)
+pnpm emulate:seed
+
+# Terminal 3 — start the app pointed at emulators
+VITE_USE_EMULATOR=true pnpm start
+```
+
+Open `http://localhost:4000` for the Emulator UI and `http://localhost:5173` for the app.
+
+| Account | Password | Role |
+|---------|----------|------|
+| `admin@nasna.test` | `Test1234!` | Admin |
+| `ngo@nasna.test` | `Test1234!` | NGO member |
+| `agent@nasna.test` | `Test1234!` | Field agent |
+
 **Before every commit:**
 ```bash
 pnpm format   # auto-fix Prettier

@@ -9,6 +9,7 @@ import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Skeleton } from '@/Components/ui/skeleton';
 import CaseStatusBadge from '@/Components/CaseStatusBadge';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -149,16 +150,38 @@ export default function Submissions() {
       </div>
 
       {loading ? (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
-          {t('cases.feed.loading')}
+        <div className="grid gap-4 lg:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-4 w-32 mt-1" />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <div className="flex gap-2 pt-2">
+                  <Skeleton className="h-9 w-28" />
+                  <Skeleton className="h-9 w-24" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       ) : error ? (
         <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center text-red-600">
           {error}
         </div>
       ) : filteredCases.length === 0 ? (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
-          {t('cases.feed.noResults')}
+        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center">
+          <p className="text-sm font-medium text-gray-700 mb-1">{t('cases.feed.noResults')}</p>
+          <p className="text-xs text-gray-500 mb-4">{t('cases.feed.noResultsHint')}</p>
+          <Link
+            to="/ngo/profile-coverage"
+            className="text-sm font-medium text-[#12a89d] hover:underline"
+          >
+            {t('cases.feed.updateProfile')} →
+          </Link>
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
