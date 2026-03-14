@@ -42,9 +42,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Read current version from package.json
-          CURRENT=$(node -p "require('./package.json').version")
-          # Split into parts
+          # Get latest release tag from GitHub (default to v0.0.0 if none)
+          LATEST=$(gh release list --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null || echo "v0.0.0")
+          CURRENT=${LATEST#v}
           MAJOR=$(echo $CURRENT | cut -d. -f1)
           MINOR=$(echo $CURRENT | cut -d. -f2)
           PATCH=$(echo $CURRENT | cut -d. -f3)
@@ -56,13 +56,6 @@ jobs:
             NEW_MINOR=$((MINOR + 1))
             NEW_VERSION="$MAJOR.$NEW_MINOR.0"
           fi
-          # Bump version in package.json
-          npm version $NEW_VERSION --no-git-tag-version
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json
-          git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
-          git push
           # Create GitHub release
           gh release create "v$NEW_VERSION" \
             --title "v$NEW_VERSION" \
