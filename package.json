@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "vite",
+    "emulate": "firebase emulators:start --import=./emulator-data --export-on-exit=./emulator-data",
+    "emulate:seed": "pnpm functions:build && node functions/lib/seedEmulator.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",

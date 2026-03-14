@@ -27,3 +27,4 @@ functions/lib
 *.njsproj
 *.sln
 *.sw?
+emulator-data/
