@@ -83,14 +83,14 @@ export default function CaseDetail() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">{memberCase.fullName}</h1>
           <p className="text-sm text-gray-500">
             {memberCase.currentGovernorate} • {memberCase.phoneNumber}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <CaseStatusBadge status={memberCase.status} staleFlagged={memberCase.staleFlagged} />
           <Button variant="outline" asChild>
             <Link to="/ngo/my-cases">{t('cases.detail.backToMyCases')}</Link>

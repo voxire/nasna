@@ -337,7 +337,7 @@ function Home() {
             />
           </div>
           <p className="text-sm font-semibold text-gray-700">{t('home.ageRanges')}</p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {(Object.keys(ageRanges) as Array<keyof AgeRanges>).map((range) => (
               <div key={range} className="space-y-1.5">
                 <Label className="text-xs font-medium text-gray-600">{`${range} (${t('home.numberOfMembers')})`}</Label>

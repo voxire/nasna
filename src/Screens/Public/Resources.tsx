@@ -27,7 +27,7 @@ export default function Resources() {
         {ORGS.map(({ name, url }) => (
           <div
             key={name}
-            className="flex items-center justify-between bg-white rounded-xl border border-gray-200 px-6 py-5"
+            className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-white rounded-xl border border-gray-200 px-6 py-5"
           >
             <span className="font-medium text-gray-900">{name}</span>
             <Button

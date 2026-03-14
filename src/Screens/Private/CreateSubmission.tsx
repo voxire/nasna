@@ -507,20 +507,16 @@ function CreateSubmission() {
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            {[{ name: 'previousGovernorate', label: t('submission.previousGovernorate') }].map(
-              ({ name, label }) => (
-                <div key={name} className="space-y-1.5">
-                  <Label className="text-sm font-medium text-gray-700">{label}</Label>
-                  <Input
-                    value={String(formData[name as keyof SubmissionFormData] ?? '')}
-                    onChange={(e) => handleChange(name, e.target.value)}
-                    required
-                    className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
-                  />
-                </div>
-              ),
-            )}
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-700">
+              {t('submission.previousGovernorate')}
+            </Label>
+            <Input
+              value={formData.previousGovernorate}
+              onChange={(e) => handleChange('previousGovernorate', e.target.value)}
+              required
+              className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
+            />
           </div>
           {isCenterCase ? (
             <div className="space-y-4">
@@ -545,7 +541,7 @@ function CreateSubmission() {
               ) : null}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 { name: 'currentGovernorate', label: t('submission.currentGovernorate') },
                 { name: 'street', label: t('submission.street') },
@@ -584,7 +580,7 @@ function CreateSubmission() {
                 className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {(Object.keys(formData.ageRanges) as Array<keyof AgeRanges>).map((range) => (
                 <div key={range} className="space-y-1.5">
                   <Label className="text-xs font-medium text-gray-600">{`${range} (${t('submission.numberOfMembers')})`}</Label>

@@ -79,12 +79,12 @@ export default function MyCases() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">{t('cases.mine.title')}</h1>
           <p className="text-sm text-gray-500">{t('cases.mine.description')}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button className="bg-[#12a89d] text-white hover:bg-[#0e9088]" asChild>
             <Link to="/ngo/add-case">{t('cases.feed.addCase')}</Link>
           </Button>
