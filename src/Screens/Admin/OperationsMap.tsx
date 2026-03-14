@@ -491,7 +491,7 @@ export default function OperationsMap() {
       where('validated', '==', true),
       limit(200),
     );
-    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true), limit(200));
+    const centerQuery = query(collection(db, 'centers'), where('active', '==', true), limit(200));
     const housingQuery = query(
       collection(db, 'housing'),
       where('status', '==', 'available'),

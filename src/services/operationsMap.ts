@@ -89,7 +89,7 @@ export interface PublicCentersMapData {
 
 export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
   const [centersSnap, housingSnap] = await Promise.all([
-    getDocs(query(collection(db, 'centers'), where('isActive', '==', true), limit(200))),
+    getDocs(query(collection(db, 'centers'), where('active', '==', true), limit(200))),
     getDocs(query(collection(db, 'housing'), where('status', '==', 'available'), limit(500))),
   ]);
 

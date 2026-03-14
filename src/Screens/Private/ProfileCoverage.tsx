@@ -68,7 +68,7 @@ export default function ProfileCoverage() {
   }, []);
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true));
+    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
 
     return onSnapshot(centerQuery, (snapshot) => {
       setCenters(

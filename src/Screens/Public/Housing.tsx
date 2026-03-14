@@ -36,7 +36,7 @@ export default function Housing() {
 
   useEffect(() => {
     const housingQuery = query(collection(db, 'housing'), where('status', '==', 'available'), limit(25));
-    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true), limit(25));
+    const centerQuery = query(collection(db, 'centers'), where('active', '==', true), limit(25));
 
     const unsubscribeHousing = onSnapshot(
       housingQuery,

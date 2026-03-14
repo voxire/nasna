@@ -137,7 +137,7 @@ function CreateMemberCase() {
   const [centers, setCenters] = useState<Array<CenterDocument & { id: string }>>([]);
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true));
+    const centerQuery = query(collection(db, 'centers'), where('active', '==', true));
 
     return onSnapshot(centerQuery, (snapshot) => {
       setCenters(

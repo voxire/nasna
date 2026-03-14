@@ -37,7 +37,7 @@ export default function CenterPicker({
 
   useEffect(() => {
     // limit(100) bounds the query — realistically centers won't exceed this
-    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true), limit(100));
+    const centerQuery = query(collection(db, 'centers'), where('active', '==', true), limit(100));
 
     return onSnapshot(
       centerQuery,

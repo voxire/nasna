@@ -66,7 +66,7 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const centerQuery = query(collection(db, 'centers'), where('isActive', '==', true), limit(100));
+    const centerQuery = query(collection(db, 'centers'), where('active', '==', true), limit(100));
 
     return onSnapshot(centerQuery, (snapshot) => {
       setCenters(
