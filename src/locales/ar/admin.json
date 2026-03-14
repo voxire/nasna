@@ -471,5 +471,27 @@
     "deleteSuccess": "تم حذف العرض.",
     "deleteError": "فشل الحذف.",
     "deleteConfirm": "هل تريد حذف هذا العرض؟"
+  },
+  "auditLog": {
+    "title": "سجل التدقيق",
+    "allActions": "جميع الإجراءات",
+    "time": "الوقت",
+    "action": "الإجراء",
+    "actor": "المنفذ",
+    "target": "الهدف",
+    "details": "التفاصيل",
+    "empty": "لا توجد إدخالات في سجل التدقيق.",
+    "loadError": "فشل تحميل سجل التدقيق.",
+    "loading": "جارٍ التحميل...",
+    "loadMore": "تحميل المزيد",
+    "actions": {
+      "case_assigned": "تعيين حالة",
+      "case_reassigned": "إعادة تعيين حالة",
+      "case_status_changed": "تغيير الحالة",
+      "member_created": "إنشاء عضو",
+      "member_validated": "اعتماد عضو",
+      "member_deleted": "حذف عضو"
+    }
   }
+}
 }

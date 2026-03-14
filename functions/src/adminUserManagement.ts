@@ -1,7 +1,8 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { writeAuditEntry } from './auditLog';
 
 if (getApps().length === 0) {
   initializeApp();
@@ -222,6 +223,16 @@ export const createManagedUser = onCall<CreateManagedUserRequest>(
       throw error;
     }
 
+    await writeAuditEntry({
+      timestamp: Timestamp.now(),
+      action: 'member_created',
+      actorUid: adminUid,
+      actorName: 'Admin',
+      targetId: targetUser.uid,
+      targetType: 'member',
+      meta: { memberName: name, memberRole: role, validated: validateImmediately },
+    });
+
     return {
       uid: targetUser.uid,
       email,
@@ -325,6 +336,8 @@ export const validateManagedUser = onCall<ValidateManagedUserRequest>(
       throw new HttpsError('not-found', 'Managed user profile not found.');
     }
 
+    const memberData = snapshot.data();
+
     await memberRef.set(
       {
         validated: true,
@@ -332,6 +345,19 @@ export const validateManagedUser = onCall<ValidateManagedUserRequest>(
       },
       { merge: true },
     );
+
+    await writeAuditEntry({
+      timestamp: Timestamp.now(),
+      action: 'member_validated',
+      actorUid: adminUid,
+      actorName: 'Admin',
+      targetId: uid,
+      targetType: 'member',
+      meta: {
+        memberName: (memberData?.name as string) ?? null,
+        memberRole: (memberData?.role as string) ?? null,
+      },
+    });
 
     return { uid, validated: true };
   },
@@ -359,11 +385,26 @@ export const deleteManagedUser = onCall<DeleteManagedUserRequest>(
       throw new HttpsError('not-found', 'Managed user profile not found.');
     }
 
+    const deletedData = snapshot.data();
+
     await memberRef.delete();
     await adminAuth.deleteUser(uid).catch((error: { code?: string }) => {
       if (error?.code !== 'auth/user-not-found') {
         throw error;
       }
+    });
+
+    await writeAuditEntry({
+      timestamp: Timestamp.now(),
+      action: 'member_deleted',
+      actorUid: adminUid,
+      actorName: 'Admin',
+      targetId: uid,
+      targetType: 'member',
+      meta: {
+        memberName: (deletedData?.name as string) ?? null,
+        memberRole: (deletedData?.role as string) ?? null,
+      },
     });
 
     return { uid, deleted: true };

@@ -17,6 +17,7 @@ const EmergencyContactsManagement = lazy(
   () => import('../Screens/Admin/EmergencyContactsManagement'),
 );
 const OffersManagement = lazy(() => import('../Screens/Admin/OffersManagement'));
+const AuditLog = lazy(() => import('../Screens/Admin/AuditLog'));
 
 const AdminRoutes: RouteConfig[] = [
   {
@@ -145,6 +146,16 @@ const AdminRoutes: RouteConfig[] = [
       <Admin>
         <LazyBoundary>
           <OffersManagement />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/manage/audit',
+    element: (
+      <Admin>
+        <LazyBoundary>
+          <AuditLog />
         </LazyBoundary>
       </Admin>
     ),

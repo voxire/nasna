@@ -195,6 +195,15 @@ service cloud.firestore {
       allow create: if false;
     }
 
+    // ─── /auditLog ───────────────────────────────────────────────────────────
+    // Written exclusively by Cloud Functions (Admin SDK bypasses these rules).
+    // Admins can read; no client may write.
+
+    match /auditLog/{entryId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
     // ─── /wa_sessions ──────────────────────────────────────────────────────────
 
     match /wa_sessions/{phone} {

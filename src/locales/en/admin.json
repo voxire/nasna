@@ -462,5 +462,26 @@
     "deleteSuccess": "Offer deleted.",
     "deleteError": "Failed to delete.",
     "deleteConfirm": "Delete this offer?"
+  },
+  "auditLog": {
+    "title": "Audit Log",
+    "allActions": "All Actions",
+    "time": "Time",
+    "action": "Action",
+    "actor": "Actor",
+    "target": "Target",
+    "details": "Details",
+    "empty": "No audit entries found.",
+    "loadError": "Failed to load audit log.",
+    "loading": "Loading...",
+    "loadMore": "Load more",
+    "actions": {
+      "case_assigned": "Case Assigned",
+      "case_reassigned": "Case Reassigned",
+      "case_status_changed": "Status Changed",
+      "member_created": "Member Created",
+      "member_validated": "Member Validated",
+      "member_deleted": "Member Deleted"
+    }
   }
 }

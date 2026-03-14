@@ -12,6 +12,24 @@ export type DeliveryMode = 'delivery' | 'pickup' | 'both';
 export type NotificationChannel = 'email' | 'system';
 export type NotificationStatus = 'pending' | 'sent' | 'failed';
 export type HousingStatus = 'pending_review' | 'available' | 'reserved' | 'filled';
+export type AuditAction =
+  | 'case_assigned'
+  | 'case_reassigned'
+  | 'case_status_changed'
+  | 'member_created'
+  | 'member_validated'
+  | 'member_deleted';
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: Timestamp;
+  action: AuditAction;
+  actorUid: string;
+  actorName: string;
+  targetId: string;
+  targetType: 'submission' | 'member';
+  meta: Record<string, string | boolean | number | null>;
+}
 
 export interface AidDeliveryRecord {
   type: string;

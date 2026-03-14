@@ -29,3 +29,4 @@ export {
   updateMemberCoverageProfile,
 } from './memberCaseApi';
 export { whatsappWebhook } from './whatsappWebhook';
+export { onSubmissionAudit } from './auditLog';

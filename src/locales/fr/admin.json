@@ -462,5 +462,26 @@
     "deleteSuccess": "Offre supprimée.",
     "deleteError": "Échec de la suppression.",
     "deleteConfirm": "Supprimer cette offre ?"
+  },
+  "auditLog": {
+    "title": "Journal d'audit",
+    "allActions": "Toutes les actions",
+    "time": "Heure",
+    "action": "Action",
+    "actor": "Acteur",
+    "target": "Cible",
+    "details": "Détails",
+    "empty": "Aucune entrée dans le journal d'audit.",
+    "loadError": "Échec du chargement du journal d'audit.",
+    "loading": "Chargement...",
+    "loadMore": "Charger plus",
+    "actions": {
+      "case_assigned": "Cas attribué",
+      "case_reassigned": "Cas réattribué",
+      "case_status_changed": "Statut modifié",
+      "member_created": "Membre créé",
+      "member_validated": "Membre validé",
+      "member_deleted": "Membre supprimé"
+    }
   }
 }

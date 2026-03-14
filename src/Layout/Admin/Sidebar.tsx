@@ -15,6 +15,7 @@ import {
   House,
   ChartColumn,
   Map,
+  ClipboardList,
 } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import {
@@ -51,6 +52,7 @@ const NAV_ITEMS = [
   { path: '/manage/feedback', label: 'Feedback', icon: MessageSquare },
   { path: '/manage/emergency', label: 'Emergency', icon: ShieldPlus },
   { path: '/manage/offers', label: 'Aid Offers', icon: HandHeart },
+  { path: '/manage/audit', label: 'Audit Log', icon: ClipboardList },
 ];
 
 interface AppSidebarProps {
