@@ -14,7 +14,6 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { buildSubmissionWorkflowDefaults } from '@/lib/v2Defaults';
 import CenterPicker from '@/Components/CenterPicker';
-import { NASNA_WHATSAPP_NUMBER } from '../../config';
 import {
   Select,
   SelectContent,
@@ -455,22 +454,6 @@ function Home() {
           value={honeypot}
           onChange={(e) => setHoneypot(e.target.value)}
         />
-      </div>
-
-      {/* WhatsApp registration CTA */}
-      <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-5">
-        <h2 className="text-base font-semibold text-green-800 mb-1">
-          {t('home.whatsappCta.title')}
-        </h2>
-        <p className="text-sm text-green-700 mb-3">{t('home.whatsappCta.description')}</p>
-        <a
-          href={`https://wa.me/${NASNA_WHATSAPP_NUMBER}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-        >
-          {t('home.whatsappCta.buttonLabel')}
-        </a>
       </div>
 
       {/* Progress bar */}
