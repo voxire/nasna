@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/nasna-logo.png" alt="Nasna Logo" width="120" />
+<img src="public/Nasna Logo.png" alt="Nasna Logo" width="120" />
 
 # ناسنا — Nasna
 
