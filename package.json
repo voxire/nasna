@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "nasna",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "packageManager": "pnpm@10.28.2",
   "type": "module",
   "scripts": {
