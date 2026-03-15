@@ -125,7 +125,7 @@ export default function CentersMap() {
     );
   }
 
-  const totalHousingSpots = housingAreas.reduce((sum, h) => sum + h.availableSpots, 0);
+  const totalHousingSpots = housingAreas.reduce((sum, h) => sum + h.availableCapacity, 0);
 
   const layerControls = [
     {
@@ -269,11 +269,13 @@ export default function CentersMap() {
                   {showCenters &&
                     centers.map((center) => {
                       const pct =
-                        center.capacity > 0 ? center.occupiedCapacity / center.capacity : 0;
+                        center.totalCapacity > 0
+                          ? center.currentOccupancy / center.totalCapacity
+                          : 0;
                       const intakeOpen =
                         center.intakeOpen !== undefined
                           ? center.intakeOpen
-                          : center.occupiedCapacity < center.capacity;
+                          : center.currentOccupancy < center.totalCapacity;
                       const barColor =
                         pct > 0.9 ? '#ef4444' : pct >= 0.75 ? '#facc15' : '#4ade80';
 
@@ -305,7 +307,7 @@ export default function CentersMap() {
                                   <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
                                     <span>{t('centersMap.capacity')}</span>
                                     <span className="font-medium">
-                                      {center.occupiedCapacity}/{center.capacity}
+                                      {center.currentOccupancy}/{center.totalCapacity}
                                     </span>
                                   </div>
                                   <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
@@ -445,7 +447,7 @@ export default function CentersMap() {
                             <div className="px-4 py-3">
                               <p className="text-gray-700">
                                 {t('centersMap.availableSpots')}{' '}
-                                <span className="font-semibold">{area.availableSpots}</span>
+                                <span className="font-semibold">{area.availableCapacity}</span>
                               </p>
                             </div>
                           </div>

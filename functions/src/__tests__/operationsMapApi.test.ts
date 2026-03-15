@@ -108,8 +108,8 @@ describe('operations map helpers', () => {
           governorate: 'Beirut',
           city: 'Beirut',
           address: 'Hamra',
-          capacity: 30,
-          occupiedCapacity: 12,
+          totalCapacity: 30,
+          currentOccupancy: 12,
         },
       ]),
     ).toEqual([
@@ -119,8 +119,8 @@ describe('operations map helpers', () => {
         governorate: 'Beirut',
         city: 'Beirut',
         address: 'Hamra',
-        capacity: 30,
-        occupiedCapacity: 12,
+        totalCapacity: 30,
+        currentOccupancy: 12,
         lat: 33.8938,
         lng: 35.5018,
       },
@@ -128,14 +128,14 @@ describe('operations map helpers', () => {
 
     expect(
       buildHousingAreaSummaries([
-        { area: 'Beirut', availableSpots: 3 },
-        { area: 'Beirut', availableSpots: 2 },
+        { governorate: 'Beirut', district: 'Beirut', capacity: 3, status: 'available' },
+        { governorate: 'Beirut', district: 'Beirut', capacity: 2, status: 'available' },
       ]),
     ).toEqual([
       {
         area: 'Beirut',
         listingCount: 2,
-        availableSpots: 5,
+        availableCapacity: 5,
         lat: 33.8938,
         lng: 35.5018,
       },
@@ -175,14 +175,24 @@ describe('operations map helpers', () => {
             governorate: 'Beirut',
             city: 'Beirut',
             address: 'Hamra',
-            capacity: 30,
-            occupiedCapacity: 12,
+            totalCapacity: 30,
+            currentOccupancy: 12,
+            active: true,
           }),
         },
       ],
     });
     const mockHousingGet = jest.fn().mockResolvedValue({
-      docs: [{ data: () => ({ area: 'Beirut', availableSpots: 4 }) }],
+      docs: [
+        {
+          data: () => ({
+            governorate: 'Beirut',
+            district: 'Beirut',
+            capacity: 4,
+            status: 'available',
+          }),
+        },
+      ],
     });
 
     const memberSecondWhere = jest.fn(() => ({ get: mockMembersGet }));
@@ -195,9 +205,9 @@ describe('operations map helpers', () => {
         case 'members':
           return { where: memberFirstWhere };
         case 'centers':
-          return { where: jest.fn(() => ({ get: mockCentersGet })) };
+          return { limit: jest.fn(() => ({ get: mockCentersGet })) };
         case 'housing':
-          return { where: jest.fn(() => ({ get: mockHousingGet })) };
+          return { limit: jest.fn(() => ({ get: mockHousingGet })) };
         default:
           throw new Error(`Unexpected collection: ${name}`);
       }
@@ -234,8 +244,8 @@ describe('operations map helpers', () => {
           governorate: 'Beirut',
           city: 'Beirut',
           address: 'Hamra',
-          capacity: 30,
-          occupiedCapacity: 12,
+          totalCapacity: 30,
+          currentOccupancy: 12,
           lat: 33.8938,
           lng: 35.5018,
         },
@@ -244,7 +254,7 @@ describe('operations map helpers', () => {
         {
           area: 'Beirut',
           listingCount: 1,
-          availableSpots: 4,
+          availableCapacity: 4,
           lat: 33.8938,
           lng: 35.5018,
         },

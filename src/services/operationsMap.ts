@@ -1,5 +1,5 @@
 import { httpsCallable } from 'firebase/functions';
-import { collection, getDocs, limit, query, where } from 'firebase/firestore';
+import { collection, getDocs, limit, query } from 'firebase/firestore';
 import { db, functions } from '@/firebase';
 
 const GOVERNORATE_COORDINATES: Record<string, { lat: number; lng: number }> = {
@@ -46,8 +46,8 @@ export interface CenterMarker {
   governorate: string;
   city: string;
   address: string;
-  capacity: number;
-  occupiedCapacity: number;
+  totalCapacity: number;
+  currentOccupancy: number;
   lat: number;
   lng: number;
   // new public fields — NOT PII
@@ -60,7 +60,7 @@ export interface CenterMarker {
 export interface HousingAreaSummary {
   area: string;
   listingCount: number;
-  availableSpots: number;
+  availableCapacity: number;
   lat: number;
   lng: number;
 }
@@ -89,49 +89,56 @@ export interface PublicCentersMapData {
 
 export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
   const [centersSnap, housingSnap] = await Promise.all([
-    getDocs(query(collection(db, 'centers'), where('active', '==', true), limit(200))),
-    getDocs(query(collection(db, 'housing'), where('status', '==', 'available'), limit(500))),
+    getDocs(query(collection(db, 'centers'), limit(200))),
+    getDocs(query(collection(db, 'housing'), limit(500))),
   ]);
 
-  const centers: CenterMarker[] = centersSnap.docs.map((doc) => {
-    const d = doc.data();
-    const storedCoords = d.coordinates as { lat: number; lng: number } | undefined;
-    const fallback = getCoordinates(d.governorate as string | undefined);
-    return {
-      id: doc.id,
-      name: (d.name as string) ?? 'Center',
-      governorate: (d.governorate as string) ?? '',
-      city: ((d.city as string | undefined) ?? (d.district as string | undefined) ?? '') as string,
-      address: (d.address as string) ?? '',
-      // totalCapacity is the canonical field; fall back to legacy 'capacity' for old docs
-      capacity: Number(d.totalCapacity ?? d.capacity ?? 0),
-      occupiedCapacity: Number(d.currentOccupancy ?? d.occupiedCapacity ?? 0),
-      lat: storedCoords?.lat ?? fallback.lat,
-      lng: storedCoords?.lng ?? fallback.lng,
-      phone: (d.phone as string | undefined) ?? undefined,
-      aidServices: (d.aidServices as string[] | undefined) ?? [],
-      operatingHours: (d.operatingHours as string | undefined) ?? undefined,
-      intakeOpen: (d.intakeOpen as boolean | undefined) ?? undefined,
-    };
-  });
+  const centers: CenterMarker[] = centersSnap.docs
+    .filter((doc) => {
+      const data = doc.data();
+      return Boolean(data.active ?? data.isActive ?? false);
+    })
+    .map((doc) => {
+      const d = doc.data();
+      const storedCoords = d.coordinates as { lat: number; lng: number } | undefined;
+      const fallback = getCoordinates(d.governorate as string | undefined);
+      return {
+        id: doc.id,
+        name: (d.name as string) ?? 'Center',
+        governorate: (d.governorate as string) ?? '',
+        city: ((d.city as string | undefined) ??
+          (d.district as string | undefined) ??
+          '') as string,
+        address: (d.address as string) ?? '',
+        totalCapacity: Number(d.totalCapacity ?? d.capacity ?? 0),
+        currentOccupancy: Number(d.currentOccupancy ?? d.occupiedCapacity ?? 0),
+        lat: storedCoords?.lat ?? fallback.lat,
+        lng: storedCoords?.lng ?? fallback.lng,
+        phone: (d.phone as string | undefined) ?? undefined,
+        aidServices: (d.aidServices as string[] | undefined) ?? [],
+        operatingHours: (d.operatingHours as string | undefined) ?? undefined,
+        intakeOpen: (d.intakeOpen as boolean | undefined) ?? undefined,
+      };
+    });
 
   const housingMap = new Map<
     string,
-    { area: string; listingCount: number; availableSpots: number; lat: number; lng: number }
+    { area: string; listingCount: number; availableCapacity: number; lat: number; lng: number }
   >();
   housingSnap.docs.forEach((doc) => {
     const d = doc.data();
+    if (!['available', 'approved'].includes((d.status as string | undefined) ?? '')) return;
     const area = ((d.district as string | undefined) ??
       (d.governorate as string | undefined) ??
       'Unknown') as string;
     const current = housingMap.get(area) ?? {
       area,
       listingCount: 0,
-      availableSpots: 0,
+      availableCapacity: 0,
       ...getCoordinates((d.governorate as string | undefined) ?? area),
     };
     current.listingCount += 1;
-    current.availableSpots += Number(d.capacity ?? 0);
+    current.availableCapacity += Number(d.capacity ?? d.availableSpots ?? 0);
     housingMap.set(area, current);
   });
 

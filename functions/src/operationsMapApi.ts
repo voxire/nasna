@@ -40,14 +40,22 @@ interface CenterRecord {
   name?: string;
   governorate?: string;
   city?: string;
+  district?: string;
   address?: string;
+  totalCapacity?: number;
+  currentOccupancy?: number;
   capacity?: number;
   occupiedCapacity?: number;
   active?: boolean;
+  isActive?: boolean;
+  coordinates?: { lat?: number; lng?: number };
 }
 
 interface HousingRecord {
+  governorate?: string;
+  district?: string;
   area?: string;
+  capacity?: number;
   availableSpots?: number;
   status?: string;
 }
@@ -132,31 +140,35 @@ export function buildCenterMarkers(
     id: center.id,
     name: center.name ?? 'Center',
     governorate: center.governorate ?? '',
-    city: center.city ?? '',
+    city: center.city ?? center.district ?? '',
     address: center.address ?? '',
-    capacity: Number(center.capacity ?? 0),
-    occupiedCapacity: Number(center.occupiedCapacity ?? 0),
-    ...getCoordinates(center.governorate),
+    totalCapacity: Number(center.totalCapacity ?? center.capacity ?? 0),
+    currentOccupancy: Number(center.currentOccupancy ?? center.occupiedCapacity ?? 0),
+    ...(center.coordinates?.lat != null && center.coordinates?.lng != null
+      ? { lat: Number(center.coordinates.lat), lng: Number(center.coordinates.lng) }
+      : getCoordinates(center.governorate)),
   }));
 }
 
 export function buildHousingAreaSummaries(housingRecords: HousingRecord[]) {
   const housingAreasMap = new Map<
     string,
-    { area: string; listingCount: number; availableSpots: number; lat: number; lng: number }
+    { area: string; listingCount: number; availableCapacity: number; lat: number; lng: number }
   >();
 
   housingRecords.forEach((housing) => {
-    const area = housing.area ?? 'Unknown';
+    if (!['available', 'approved'].includes(housing.status ?? '')) return;
+
+    const area = housing.area ?? housing.district ?? housing.governorate ?? 'Unknown';
     const current = housingAreasMap.get(area) ?? {
       area,
       listingCount: 0,
-      availableSpots: 0,
-      ...getCoordinates(area),
+      availableCapacity: 0,
+      ...getCoordinates(housing.governorate ?? area),
     };
 
     current.listingCount += 1;
-    current.availableSpots += Number(housing.availableSpots ?? 0);
+    current.availableCapacity += Number(housing.capacity ?? housing.availableSpots ?? 0);
     housingAreasMap.set(area, current);
   });
 
@@ -174,8 +186,8 @@ export const getOperationsMapData = onCall(
       [
         db.collection('submissions').get(),
         db.collection('members').where('role', '==', 'member').where('validated', '==', true).get(),
-        db.collection('centers').where('active', '==', true).get(),
-        db.collection('housing').where('status', '==', 'approved').get(),
+        db.collection('centers').limit(500).get(),
+        db.collection('housing').limit(500).get(),
       ],
     );
 
@@ -190,10 +202,12 @@ export const getOperationsMapData = onCall(
         })),
       ),
       centers: buildCenterMarkers(
-        centerSnapshot.docs.map((document) => ({
-          id: document.id,
-          ...(document.data() as CenterRecord),
-        })),
+        centerSnapshot.docs
+          .map((document) => ({
+            id: document.id,
+            ...(document.data() as CenterRecord),
+          }))
+          .filter((center) => Boolean(center.active ?? center.isActive ?? false)),
       ),
       housingAreas: buildHousingAreaSummaries(
         housingSnapshot.docs.map((document) => document.data() as HousingRecord),

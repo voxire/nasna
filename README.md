@@ -94,8 +94,8 @@ We welcome contributions from anyone who wants to help. Whether you're a develop
 
 ### Public (No login required)
 
-- **Centers Map**: Interactive Leaflet map showing all displacement centers, displacement sites (with pulsing teardrop markers), and approved housing across Lebanon. Layer controls, popups with contact info, directions links.
-- **Housing Directory**: Browse approved housing listings with filters by governorate, price type, and capacity. Each listing shows amenities, availability dates, and a direct WhatsApp contact link.
+- **Centers Map**: Interactive Leaflet map showing all displacement centers, displacement sites (with pulsing teardrop markers), and available housing across Lebanon. Layer controls, popups with contact info, directions links.
+- **Housing Directory**: Browse available housing listings with filters by governorate, price type, and capacity. Each listing shows amenities, availability dates, and a direct WhatsApp contact link.
 - **Offer Housing**: Public form to list an available property. Submitted as pending review and goes to admin moderation before going live.
 - **Emergency Contacts**: Verified directory of emergency numbers (government, health, NGOs, security, legal, utilities) searchable by category and region.
 - **Hotlines**: Quick-access emergency hotline numbers.
@@ -129,7 +129,7 @@ We welcome contributions from anyone who wants to help. Whether you're a develop
 ### Admins (Full platform access)
 
 - **Dispatch Center**: The operations hub. Live queue of all pending submissions with urgency indicators, time-since-submission, stale case highlighting (24h+ without update), and auto-suggested NGOs for each case.
-- **Operations Map**: Full Lebanon map showing every active submission (color-coded by urgency), all displacement centers with live capacity bars, approved housing areas, and NGO coverage zones. Filterable by date, status, urgency, and need type.
+- **Operations Map**: Full Lebanon map showing every active submission (color-coded by urgency), all displacement centers with live capacity bars, available housing areas, and NGO coverage zones. Filterable by date, status, urgency, and need type.
 - **Submissions Management**: Full table of all submissions with search, filter, edit, and status management.
 - **NGO Management**: Review and validate NGO member accounts. View each NGO's coverage profile and current case load.
 - **Agent Management**: List of all field agents with the ability to deactivate accounts.
@@ -252,7 +252,7 @@ Nasna handles real personal data about real people in a crisis. The security mod
 - **No PII in logs**: Console logs never include submission objects, user objects, or anything containing personal data. Only document IDs.
 - **No PII in URLs**: Phone numbers, names, and identifiers never appear in query strings or route parameters.
 - **No auth tokens in localStorage**: Firebase Auth manages sessions natively. No manual token storage.
-- **Role-based Firestore rules**: Agents see only their own submissions. Members see only cases matching their coverage area. The public sees only approved, non-PII data. Admins have full access.
+- **Role-based Firestore rules**: Agents see only their own submissions. Members see only cases matching their coverage area. The public sees only approved or available non-PII data, depending on the collection. Admins have full access.
 - **wa_sessions is Cloud Functions only**: The WhatsApp bot session state collection is never read or written by client code under any circumstances.
 
 ---
