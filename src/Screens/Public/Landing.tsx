@@ -107,7 +107,7 @@ function Landing() {
       <section className="relative min-h-[90vh] flex flex-col items-center justify-center text-white overflow-hidden">
         <div
           className="absolute inset-0"
-          style={{ backgroundImage: 'url("/nabatiye.jpg")', backgroundSize: 'cover', backgroundPosition: 'center 40%' }}
+          style={{ backgroundImage: 'url("/ameen-2.jpeg")', backgroundSize: 'cover', backgroundPosition: 'center 40%' }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/55 to-black/80" />
 
