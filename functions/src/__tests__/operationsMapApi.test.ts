@@ -142,10 +142,116 @@ describe('operations map helpers', () => {
     ]);
   });
 
+  it('falls back to default coordinates for undefined governorate in getCoordinates', () => {
+    expect(getCoordinates(undefined)).toEqual({ lat: 33.8547, lng: 35.8623 });
+  });
+
+  it('buildSubmissionClusters falls back to Unknown when currentGovernorate is missing', () => {
+    const result = buildSubmissionClusters([{ aidUrgency: 'Low', status: 'assigned' }]);
+    expect(result[0].governorate).toBe('Unknown');
+    expect(result[0].count).toBe(1);
+    expect(result[0].urgentCount).toBe(0);
+    expect(result[0].pendingCount).toBe(0);
+  });
+
+  it('buildNgoCoverage handles non-array coverageGovernorates and coverageCenterIds, and missing name', () => {
+    const result = buildNgoCoverage([{ id: 'ngo-2' }]);
+    expect(result[0]).toEqual({
+      id: 'ngo-2',
+      name: 'NGO',
+      governorates: [],
+      centerIds: [],
+      coordinates: [],
+    });
+  });
+
+  it('buildCenterMarkers uses explicit coordinates when provided', () => {
+    const result = buildCenterMarkers([
+      {
+        id: 'center-2',
+        coordinates: { lat: 34.0, lng: 36.0 },
+      },
+    ]);
+    expect(result[0].lat).toBe(34.0);
+    expect(result[0].lng).toBe(36.0);
+  });
+
+  it('buildCenterMarkers uses district fallback for city and capacity/occupiedCapacity fallbacks', () => {
+    const result = buildCenterMarkers([
+      {
+        id: 'center-3',
+        district: 'Hamra',
+        capacity: 20,
+        occupiedCapacity: 5,
+      },
+    ]);
+    expect(result[0].city).toBe('Hamra');
+    expect(result[0].totalCapacity).toBe(20);
+    expect(result[0].currentOccupancy).toBe(5);
+  });
+
+  it('buildCenterMarkers uses default empty strings and zero fallbacks when all fields missing', () => {
+    const result = buildCenterMarkers([{ id: 'center-4' }]);
+    expect(result[0].name).toBe('Center');
+    expect(result[0].governorate).toBe('');
+    expect(result[0].city).toBe('');
+    expect(result[0].address).toBe('');
+    expect(result[0].totalCapacity).toBe(0);
+    expect(result[0].currentOccupancy).toBe(0);
+  });
+
+  it('buildHousingAreaSummaries includes approved status and uses area/district/availableSpots fallbacks', () => {
+    const result = buildHousingAreaSummaries([
+      { area: 'Hamra', availableSpots: 3, status: 'approved' },
+      { district: 'Achrafieh', capacity: 2, status: 'available' },
+      { capacity: 10, status: 'pending' },
+    ]);
+    expect(result).toHaveLength(2);
+    expect(result[0].area).toBe('Hamra');
+    expect(result[0].availableCapacity).toBe(3);
+    expect(result[1].area).toBe('Achrafieh');
+  });
+
+  it('buildHousingAreaSummaries falls back to Unknown when all area fields are missing', () => {
+    const result = buildHousingAreaSummaries([{ status: 'available' }]);
+    expect(result[0].area).toBe('Unknown');
+    expect(result[0].availableCapacity).toBe(0);
+  });
+
   it('rejects non-admin callers', async () => {
     await expect(runOperationsMapData({ auth: { token: { role: 'member' } } })).rejects.toThrow(
       'Admin access is required.',
     );
+  });
+
+  it('filters out inactive centers and supports isActive flag', async () => {
+    const mockSubmissionsGet = jest.fn().mockResolvedValue({ docs: [] });
+    const mockMembersGet = jest.fn().mockResolvedValue({ docs: [] });
+    const mockCentersGet = jest.fn().mockResolvedValue({
+      docs: [
+        { id: 'c-active', data: () => ({ name: 'Active', governorate: 'Beirut', isActive: true }) },
+        { id: 'c-inactive', data: () => ({ name: 'Inactive', governorate: 'Beirut', active: false }) },
+        { id: 'c-neither', data: () => ({ name: 'Neither', governorate: 'Beirut' }) },
+      ],
+    });
+    const mockHousingGet = jest.fn().mockResolvedValue({ docs: [] });
+
+    const memberSecondWhere = jest.fn(() => ({ get: mockMembersGet }));
+    const memberFirstWhere = jest.fn(() => ({ where: memberSecondWhere }));
+
+    mockCollection.mockImplementation((name: string) => {
+      switch (name) {
+        case 'submissions': return { get: mockSubmissionsGet };
+        case 'members': return { where: memberFirstWhere };
+        case 'centers': return { limit: jest.fn(() => ({ get: mockCentersGet })) };
+        case 'housing': return { limit: jest.fn(() => ({ get: mockHousingGet })) };
+        default: throw new Error(`Unexpected collection: ${name}`);
+      }
+    });
+
+    const result = await runOperationsMapData({ auth: { token: { role: 'admin' } } }) as { centers: { id: string }[] };
+    expect(result.centers).toHaveLength(1);
+    expect(result.centers[0].id).toBe('c-active');
   });
 
   it('returns sanitized aggregated map data for admins', async () => {
