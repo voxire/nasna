@@ -4,7 +4,7 @@
 
 # ناسنا Nasna
 
-### *Our People*
+### _Our People_
 
 **A humanitarian aid coordination platform connecting displaced people in Lebanon with the NGOs and resources they need, in real time.**
 
@@ -38,7 +38,7 @@ Nasna (ناسنا) is an Arabic word meaning **"Our People."** It is a full-stac
 
 The platform operates as a **three-sided network**:
 
-- **Displaced families** register their needs, either through field agents on the ground or via WhatsApp self-registration (in development).
+- **Displaced families** register their needs either through field agents on the ground or through self-service public forms. A WhatsApp intake flow also exists in the codebase and can be enabled/configured separately.
 - **NGOs and aid initiatives** receive a live feed of cases that match their coverage area and aid types, claim them, and record aid delivery.
 - **Admins** oversee the entire pipeline, from intake to fulfillment, with real-time dashboards, dispatch tools, and an operations map of Lebanon.
 
@@ -60,16 +60,16 @@ People didn't know which shelter had capacity. NGOs didn't know which families n
 
 ### The Problem, Structured
 
-| Problem | What Nasna does |
-|---------|----------------|
-| Field agents registering families on paper or ad-hoc tools | Structured multi-step form with offline support, works even without internet |
-| NGOs flooding into the same areas, duplicating effort | Coverage profiles match each NGO to the specific areas and needs they serve |
-| No visibility into case status after intake | Live case pipeline: pending → assigned → in progress → completed |
-| Displaced people having no way to register independently | WhatsApp bot (in development) allows self-registration with zero app install |
-| Housing offers not reaching those who need them | Public housing marketplace with admin moderation |
-| No single source of truth for emergency contacts | Verified, categorized, searchable emergency directory |
-| Admins unable to see the full picture | Live operations map showing every case, center, and NGO across Lebanon |
-| No accountability for case fulfillment | Aid delivery recording, case timelines, and stale case detection |
+| Problem                                                    | What Nasna does                                                                                                          |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Field agents registering families on paper or ad-hoc tools | Structured multi-step form with offline support, works even without internet                                             |
+| NGOs flooding into the same areas, duplicating effort      | Coverage profiles match each NGO to the specific areas and needs they serve                                              |
+| No visibility into case status after intake                | Live case pipeline: pending → assigned → in progress → completed                                                         |
+| Displaced people having no way to register independently   | Public self-service intake is available today, and the WhatsApp intake flow can be enabled for zero-install registration |
+| Housing offers not reaching those who need them            | Public housing marketplace with admin moderation                                                                         |
+| No single source of truth for emergency contacts           | Verified, categorized, searchable emergency directory                                                                    |
+| Admins unable to see the full picture                      | Live operations map showing every case, center, and NGO across Lebanon                                                   |
+| No accountability for case fulfillment                     | Aid delivery recording, case timelines, and stale case detection                                                         |
 
 Nasna doesn't replace the people doing the work. It gives them the infrastructure to do it better.
 
@@ -77,12 +77,12 @@ Nasna doesn't replace the people doing the work. It gives them the infrastructur
 
 ## 3. Contributors
 
-| Name | Role |
-|------|------|
+| Name                                                                                                           | Role                                 |
+| -------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | <a href="https://www.linkedin.com/in/abed-amouneh" target="_blank"><strong>Abed El-Fattah Amouneh</strong></a> | Product Manager & Frontend Developer |
-| <a href="https://www.linkedin.com/in/mohamad-homsi/" target="_blank"><strong>Mohammad Homsi</strong></a> | Full Stack Developer & Tech Lead |
-| <a href="https://www.linkedin.com/in/rami-kronbi/" target="_blank"><strong>Rami Kronbi</strong></a> | AI Engineer & Developer |
-| <a href="https://www.linkedin.com/in/lynnelsolh/" target="_blank"><strong>Lynn El Solh</strong></a> | Multimedia Designer |
+| <a href="https://www.linkedin.com/in/mohamad-homsi/" target="_blank"><strong>Mohammad Homsi</strong></a>       | Full Stack Developer & Tech Lead     |
+| <a href="https://www.linkedin.com/in/rami-kronbi/" target="_blank"><strong>Rami Kronbi</strong></a>            | AI Engineer & Developer              |
+| <a href="https://www.linkedin.com/in/lynnelsolh/" target="_blank"><strong>Lynn El Solh</strong></a>            | Multimedia Designer                  |
 
 We welcome contributions from anyone who wants to help. Whether you're a developer, designer, translator, field worker, or someone with domain knowledge in humanitarian aid, reach out and let's talk.
 
@@ -139,23 +139,25 @@ We welcome contributions from anyone who wants to help. Whether you're a develop
 - **Impact Dashboard**: Live statistics with charts (cases over time, by governorate, by need type). CSV export of all submission data.
 - **Feedback Management**: Review, mark as read, and archive public feedback.
 
-### In Development
+### Operationally Configurable
 
-- **WhatsApp Bot**: Self-registration via WhatsApp for displaced people without smartphones or internet. Supports Arabic, English, and French. No app install required.
-- **Email Notifications**: Automated notifications to NGOs on new case matches and to admins on stale cases (architecture built, SendGrid integration pending).
+- **WhatsApp Intake & Notifications**: The codebase includes a WhatsApp webhook flow plus outbound messaging helpers. Production use depends on Meta/WhatsApp configuration and approved templates.
+- **Email Notifications**: The codebase includes SendGrid-backed email helpers. Production delivery depends on SendGrid credentials and sender setup.
 
 ---
 
 ## 5. Users & Personas
 
 ### 👤 The Displaced Person
+
 **Who they are:** A family forced from their home, they may be with relatives, staying at a school turned shelter, or without a fixed location. They likely have no laptop, may be in a stressful or dangerous situation, and need help immediately.
 
-**How they interact with Nasna:** They don't download an app. They don't log in. A field agent registers them, or (when built) they register themselves via WhatsApp in Arabic. They are never exposed to the platform's UI directly. Their privacy is treated as a non-negotiable design requirement, their phone number, location, and household data are protected at every layer.
+**How they interact with Nasna:** They do not need to install an app or create an account. They can be registered by a field agent, use the public intake flow directly, or use the WhatsApp intake flow when that channel is enabled. Their privacy is treated as a non-negotiable design requirement: phone number, location, and household data are protected at every layer.
 
 ---
 
 ### 🧑‍💼 The Field Agent
+
 **Who they are:** A social worker, volunteer coordinator, or community leader working on the ground, often at a school, community center, or in the field. They may have intermittent connectivity, are registering many families quickly, and need a form that doesn't lose their data.
 
 **What they need from Nasna:** A fast, reliable intake form that works offline, catches duplicate registrations, and lets them track what they've submitted. They see only their own cases, nothing else.
@@ -163,6 +165,7 @@ We welcome contributions from anyone who wants to help. Whether you're a develop
 ---
 
 ### 🏢 The NGO / Aid Initiative
+
 **Who they are:** A registered organization, community initiative, or volunteer network that provides specific types of aid (food distribution, medical support, shelter, legal assistance, etc.) in specific parts of Lebanon. They have capacity limits and specific delivery capabilities.
 
 **What they need from Nasna:** To see only the cases they can actually help with, filtered by their area and what they offer. To claim cases and not have them claimed by someone else simultaneously. To record what they delivered. To not be overwhelmed by irrelevant requests.
@@ -170,6 +173,7 @@ We welcome contributions from anyone who wants to help. Whether you're a develop
 ---
 
 ### 👩‍💻 The Admin / Coordinator
+
 **Who they are:** A platform operator or humanitarian coordinator overseeing the entire pipeline. They need to see the big picture, intervene when cases stall, ensure NGOs are validated and appropriate, and report on impact.
 
 **What they need from Nasna:** A real-time view of everything, the dispatch queue, the map, the statistics. Tools to manually assign cases, manage NGO access, moderate housing, and export data for reporting.
@@ -177,6 +181,7 @@ We welcome contributions from anyone who wants to help. Whether you're a develop
 ---
 
 ### 🌍 The Public / General Visitor
+
 **Who they are:** Anyone, a landlord with a spare apartment, a diaspora member looking to donate, a journalist covering the crisis, a person needing emergency contact information.
 
 **What they need from Nasna:** Clear, public-facing information with no barrier to entry. The ability to offer housing, donate, or get emergency numbers without creating an account.
@@ -187,48 +192,47 @@ We welcome contributions from anyone who wants to help. Whether you're a develop
 
 ### Frontend
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| React | 19 | UI framework |
-| Vite | 7 | Build tool & dev server |
-| TypeScript | 5.9 | Type safety |
-| Tailwind CSS | 4 | Utility-first styling |
-| shadcn/ui (Radix UI) | Latest | Accessible component primitives |
-| React Router | 6 | Client-side routing |
-| Redux Toolkit | Latest | Global state management |
-| redux-persist | Latest | State persistence across sessions |
-| React Hook Form | 7 | Form state management |
-| Zod | 4 | Schema validation |
-| react-leaflet / Leaflet | 5 / 1.9 | Interactive maps |
-| Recharts | 3 | Charts and data visualization |
+| Technology              | Version | Purpose                           |
+| ----------------------- | ------- | --------------------------------- |
+| React                   | 19      | UI framework                      |
+| Vite                    | 7       | Build tool & dev server           |
+| TypeScript              | 5.9     | Type safety                       |
+| Tailwind CSS            | 4       | Utility-first styling             |
+| shadcn/ui (Radix UI)    | Latest  | Accessible component primitives   |
+| React Router            | 6       | Client-side routing               |
+| Zustand                 | 5       | Global auth/session state         |
+| React Hook Form         | 7       | Form state management             |
+| Zod                     | 4       | Schema validation                 |
+| react-leaflet / Leaflet | 5 / 1.9 | Interactive maps                  |
+| Recharts                | 3       | Charts and data visualization     |
 | i18next + react-i18next | 25 / 16 | Internationalization (AR, EN, FR) |
-| Sonner | 2 | Toast notifications |
-| Motion / Lottie | 12 / 2 | Animations |
-| date-fns | 2 | Date formatting |
-| idb | 8 | IndexedDB (offline support) |
-| Lucide React | Latest | Icons |
+| Sonner                  | 2       | Toast notifications               |
+| Motion / Lottie         | 12 / 2  | Animations                        |
+| date-fns                | 2       | Date formatting                   |
+| idb                     | 8       | IndexedDB (offline support)       |
+| Lucide React            | Latest  | Icons                             |
 
 ### Backend
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| Firebase Firestore | 12 | Real-time NoSQL database |
-| Firebase Auth | 12 | Authentication (email/password + Google) |
-| Firebase Cloud Functions | Node.js 22 | Server-side logic & triggers |
-| Firebase Hosting | - | Static asset delivery + CDN |
-| Stripe | - | Donation payments |
-| SendGrid | - | Email notifications *(pending)* |
-| Twilio | - | WhatsApp bot *(in development)* |
+| Technology               | Version    | Purpose                                  |
+| ------------------------ | ---------- | ---------------------------------------- |
+| Firebase Firestore       | 12         | Real-time NoSQL database                 |
+| Firebase Auth            | 12         | Authentication (email/password + Google) |
+| Firebase Cloud Functions | Node.js 22 | Server-side logic & triggers             |
+| Firebase Hosting         | -          | Static asset delivery + CDN              |
+| Stripe                   | -          | Donation payments                        |
+| SendGrid                 | -          | Email notifications _(pending)_          |
+| Twilio                   | -          | WhatsApp bot _(in development)_          |
 
 ### Tooling & Infrastructure
 
-| Tool | Purpose |
-|------|---------|
-| pnpm | Package management |
-| Prettier | Code formatting |
-| ESLint | Linting |
-| Jest + Testing Library | Unit and integration tests |
-| GitHub Actions | CI/CD (format check, typecheck, tests, deploy) |
+| Tool                   | Purpose                                                                                       |
+| ---------------------- | --------------------------------------------------------------------------------------------- |
+| pnpm                   | Package management                                                                            |
+| Prettier               | Code formatting                                                                               |
+| ESLint                 | Linting                                                                                       |
+| Jest + Testing Library | Unit and integration tests                                                                    |
+| GitHub Actions         | CI/CD (format check, translation parity, typecheck, tests, dependency review, CodeQL, deploy) |
 
 ### Architecture highlights
 
@@ -236,8 +240,8 @@ We welcome contributions from anyone who wants to help. Whether you're a develop
 - **Cloud Functions for sensitive logic**: Case matching, stats aggregation, scheduled stale-case detection, and all PII-sensitive operations run server-side.
 - **Field masking at the API layer**: The WhatsApp phone number of displaced people is stripped by Cloud Functions before any data is returned to NGO members. Firestore rules alone cannot mask individual fields, so this is enforced in code.
 - **Offline-first for agents**: Forms are saved to IndexedDB if connectivity is lost. A sync queue flushes automatically on reconnect.
-- **`onSnapshot` everywhere**: Dashboards, case feeds, and the dispatch center use Firestore real-time listeners, not periodic polling.
-- **Cursor-based pagination required**: All list views use the `usePaginatedQuery` hook. A full `getDocs()` on unbounded collections is banned.
+- **Real-time where it matters, snapshots where it is safer**: Operational dashboards and queues use Firestore listeners, while capped or map-style views use explicit snapshot reads with limits and manual refresh when appropriate.
+- **Cursor-based pagination for large collections**: Large admin and operational list views use the `usePaginatedQuery` hook. Unbounded reads on large collections are avoided.
 - **Consent is a hard constraint**: `consentGiven` defaults to `false`, is enforced by Zod as `z.literal(true)`, and cannot be removed or made optional anywhere in the codebase.
 - **RTL-aware UI**: Arabic is the primary language. Document direction switches automatically with the selected locale. All layouts must be tested for RTL compatibility.
 
@@ -359,12 +363,12 @@ Personal data in Nasna, names, phone numbers, locations, household compositions,
 
 Every role sees exactly what they need, nothing more.
 
-| Who | What they can access |
-|-----|----------------------|
-| **Public (unauthenticated)** | Approved housing listings, emergency contacts, centers map, public stats |
-| **Field Agent** | Create submissions, read only their own submissions |
-| **NGO Member (validated)** | Pending cases matching their coverage area and aid types, no other cases, no PII fields |
-| **Admin** | Everything |
+| Who                          | What they can access                                                                    |
+| ---------------------------- | --------------------------------------------------------------------------------------- |
+| **Public (unauthenticated)** | Approved housing listings, emergency contacts, centers map, public stats                |
+| **Field Agent**              | Create submissions, read only their own submissions                                     |
+| **NGO Member (validated)**   | Pending cases matching their coverage area and aid types, no other cases, no PII fields |
+| **Admin**                    | Everything                                                                              |
 
 This is enforced by Firestore security rules, not just frontend routing. Bypassing the UI does not bypass the rules.
 
@@ -466,6 +470,7 @@ pnpm start             # runs at http://localhost:5173
 ```
 
 **Local development with Firebase Emulators (recommended — no production data touched):**
+
 ```bash
 # Terminal 1 — start emulators (data persists between sessions)
 pnpm emulate
@@ -479,19 +484,24 @@ VITE_USE_EMULATOR=true pnpm start
 
 Open `http://localhost:4000` for the Emulator UI and `http://localhost:5173` for the app.
 
-| Account | Password | Role |
-|---------|----------|------|
-| `admin@nasna.test` | `Test1234!` | Admin |
-| `ngo@nasna.test` | `Test1234!` | NGO member |
+If you fork the project, update the Firebase auth domain in [src/firebase.ts](src/firebase.ts) to match your own Firebase/Auth setup before testing Google sign-in.
+
+| Account            | Password    | Role        |
+| ------------------ | ----------- | ----------- |
+| `admin@nasna.test` | `Test1234!` | Admin       |
+| `ngo@nasna.test`   | `Test1234!` | NGO member  |
 | `agent@nasna.test` | `Test1234!` | Field agent |
 
 **Before every commit:**
+
 ```bash
 pnpm format   # auto-fix Prettier
+pnpm translations:check
 pnpm tsc      # TypeScript must exit 0
 ```
 
 **Deploy:**
+
 ```bash
 pnpm build
 firebase deploy --only hosting

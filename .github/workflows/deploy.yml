@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -60,5 +63,5 @@ jobs:
           # Create GitHub release
           gh release create "v$NEW_VERSION" \
             --title "v$NEW_VERSION" \
-            --notes "Deployed to production" \
+            --generate-notes \
             --latest
