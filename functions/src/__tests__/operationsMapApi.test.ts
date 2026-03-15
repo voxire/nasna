@@ -230,7 +230,10 @@ describe('operations map helpers', () => {
     const mockCentersGet = jest.fn().mockResolvedValue({
       docs: [
         { id: 'c-active', data: () => ({ name: 'Active', governorate: 'Beirut', isActive: true }) },
-        { id: 'c-inactive', data: () => ({ name: 'Inactive', governorate: 'Beirut', active: false }) },
+        {
+          id: 'c-inactive',
+          data: () => ({ name: 'Inactive', governorate: 'Beirut', active: false }),
+        },
         { id: 'c-neither', data: () => ({ name: 'Neither', governorate: 'Beirut' }) },
       ],
     });
@@ -241,15 +244,22 @@ describe('operations map helpers', () => {
 
     mockCollection.mockImplementation((name: string) => {
       switch (name) {
-        case 'submissions': return { get: mockSubmissionsGet };
-        case 'members': return { where: memberFirstWhere };
-        case 'centers': return { limit: jest.fn(() => ({ get: mockCentersGet })) };
-        case 'housing': return { limit: jest.fn(() => ({ get: mockHousingGet })) };
-        default: throw new Error(`Unexpected collection: ${name}`);
+        case 'submissions':
+          return { get: mockSubmissionsGet };
+        case 'members':
+          return { where: memberFirstWhere };
+        case 'centers':
+          return { limit: jest.fn(() => ({ get: mockCentersGet })) };
+        case 'housing':
+          return { limit: jest.fn(() => ({ get: mockHousingGet })) };
+        default:
+          throw new Error(`Unexpected collection: ${name}`);
       }
     });
 
-    const result = await runOperationsMapData({ auth: { token: { role: 'admin' } } }) as { centers: { id: string }[] };
+    const result = (await runOperationsMapData({ auth: { token: { role: 'admin' } } })) as {
+      centers: { id: string }[];
+    };
     expect(result.centers).toHaveLength(1);
     expect(result.centers[0].id).toBe('c-active');
   });
