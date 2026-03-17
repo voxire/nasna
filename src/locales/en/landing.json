@@ -61,6 +61,17 @@
     "q3": { "q": "What happens to my data?", "a": "Your data is shared only with verified partner organizations to coordinate the delivery of aid to you. It is never sold, and you can request deletion at any time." },
     "q4": { "q": "What happens after I submit?", "a": "Your submission enters a review queue. A partner organization will contact you, typically within a few business days, to discuss what aid is available in your area." }
   },
+  "features": {
+    "eyebrow": "Platform Features",
+    "title": "Everything in One Place",
+    "subtitle": "Built for displaced families, field agents, and NGOs — no account needed.",
+    "feat1": { "title": "Works Offline", "desc": "Register families with no internet connection. Data queues locally and syncs automatically when connectivity returns." },
+    "feat2": { "title": "NGO Live Dashboard", "desc": "Organizations see only the cases that match their coverage area and aid type — no noise, no irrelevant requests." },
+    "feat3": { "title": "Live Lebanon Map", "desc": "Real-time map of every displacement site, shelter center, and NGO coverage zone across Lebanon." },
+    "feat4": { "title": "Emergency Hotlines", "desc": "Every critical contact in Lebanon in one directory — police, Red Cross, mental health, and more. One tap to call." },
+    "feat5": { "title": "Housing Offers", "desc": "Browse available housing for displaced families, or list a property to offer. No account needed." },
+    "feat6": { "title": "Arabic, English, French", "desc": "The full platform is available in all three languages, optimized for right-to-left in Arabic." }
+  },
   "cta": {
     "title": "Ready to Get the Help You Need?",
     "subtitle": "Registration takes less than 5 minutes. Your information helps us get you the right support, faster.",
