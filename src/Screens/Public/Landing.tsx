@@ -10,6 +10,7 @@ import {
   Utensils, Droplets, Home as HomeIcon, Stethoscope, Shirt, Baby,
   Lock, Eye, ShieldCheck, ChevronDown, ArrowDown,
   Building2, Wheat, Pill, Users,
+  WifiOff, LayoutDashboard, Map, PhoneCall, Globe2,
 } from 'lucide-react';
 
 // ─── Animated counter ────────────────────────────────────────────────────────
@@ -91,6 +92,15 @@ function Landing() {
     { icon: <Lock className="h-6 w-6 text-[#12a89d]" />, title: t('landing.security.point1.title'), desc: t('landing.security.point1.desc') },
     { icon: <Eye  className="h-6 w-6 text-[#12a89d]" />, title: t('landing.security.point2.title'), desc: t('landing.security.point2.desc') },
     { icon: <ShieldCheck className="h-6 w-6 text-[#12a89d]" />, title: t('landing.security.point3.title'), desc: t('landing.security.point3.desc') },
+  ];
+
+  const features = [
+    { icon: <WifiOff className="h-6 w-6 text-[#12a89d]" />, title: t('landing.features.feat1.title'), desc: t('landing.features.feat1.desc') },
+    { icon: <LayoutDashboard className="h-6 w-6 text-[#12a89d]" />, title: t('landing.features.feat2.title'), desc: t('landing.features.feat2.desc') },
+    { icon: <Map className="h-6 w-6 text-[#12a89d]" />, title: t('landing.features.feat3.title'), desc: t('landing.features.feat3.desc') },
+    { icon: <PhoneCall className="h-6 w-6 text-[#12a89d]" />, title: t('landing.features.feat4.title'), desc: t('landing.features.feat4.desc') },
+    { icon: <HomeIcon className="h-6 w-6 text-[#12a89d]" />, title: t('landing.features.feat5.title'), desc: t('landing.features.feat5.desc') },
+    { icon: <Globe2 className="h-6 w-6 text-[#12a89d]" />, title: t('landing.features.feat6.title'), desc: t('landing.features.feat6.desc') },
   ];
 
   const faqs = [
@@ -295,8 +305,50 @@ function Landing() {
         </div>
       </section>
 
-      {/* ══ AID CATEGORIES ════════════════════════════════════════════════════ */}
+      {/* ══ FEATURES ══════════════════════════════════════════════════════════ */}
       <section className="bg-gray-50 px-6 py-20">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <span className="text-[#12a89d] text-xs font-bold uppercase tracking-[0.15em]">
+              {t('landing.features.eyebrow')}
+            </span>
+            <h2 className="text-3xl font-black text-gray-900 mt-2">{t('landing.features.title')}</h2>
+            <p className="text-gray-500 text-sm mt-3 max-w-md mx-auto">{t('landing.features.subtitle')}</p>
+          </motion.div>
+
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5"
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+          >
+            {features.map((f) => (
+              <motion.div
+                key={f.title}
+                variants={fadeUp}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className="bg-white border border-gray-100 rounded-2xl p-6 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow cursor-default"
+              >
+                <div className="w-11 h-11 rounded-xl bg-[#12a89d]/10 flex items-center justify-center">
+                  {f.icon}
+                </div>
+                <h3 className="font-bold text-gray-900 text-sm">{f.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ══ AID CATEGORIES ════════════════════════════════════════════════════ */}
+      <section className="bg-white px-6 py-20">
         <div className="max-w-4xl mx-auto">
           <motion.div
             className="text-center mb-12"

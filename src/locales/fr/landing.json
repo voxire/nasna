@@ -61,6 +61,17 @@
     "q3": { "q": "Que se passe-t-il avec mes données ?", "a": "Vos données sont partagées uniquement avec des organisations partenaires vérifiées pour coordonner la livraison de l'aide. Elles ne sont jamais vendues et vous pouvez en demander la suppression à tout moment." },
     "q4": { "q": "Que se passe-t-il après ma soumission ?", "a": "Votre soumission entre dans une file d'attente de révision. Une organisation partenaire vous contactera, généralement dans quelques jours ouvrables, pour discuter de l'aide disponible dans votre région." }
   },
+  "features": {
+    "eyebrow": "Fonctionnalités",
+    "title": "Tout en un seul endroit",
+    "subtitle": "Conçu pour les familles déplacées, les agents de terrain et les ONG — sans compte requis.",
+    "feat1": { "title": "Fonctionne hors ligne", "desc": "Enregistrez des familles sans connexion internet. Les données sont mises en file d'attente et synchronisées automatiquement à la reconnexion." },
+    "feat2": { "title": "Tableau de bord ONG en direct", "desc": "Les organisations ne voient que les cas correspondant à leur zone de couverture et type d'aide — sans bruit ni demandes hors sujet." },
+    "feat3": { "title": "Carte du Liban en direct", "desc": "Carte en temps réel de chaque site de déplacement, centre d'abri et zone de couverture ONG au Liban." },
+    "feat4": { "title": "Lignes d'urgence", "desc": "Tous les contacts essentiels du Liban dans un seul répertoire — police, Croix-Rouge, santé mentale, et plus. Un appui pour appeler." },
+    "feat5": { "title": "Offres de logement", "desc": "Parcourez les logements disponibles pour les familles déplacées, ou proposez un bien. Sans compte requis." },
+    "feat6": { "title": "Arabe, anglais, français", "desc": "La plateforme complète est disponible dans les trois langues, optimisée pour l'arabe de droite à gauche." }
+  },
   "cta": {
     "title": "Prêt à obtenir l'aide dont vous avez besoin ?",
     "subtitle": "L'inscription prend moins de 5 minutes. Vos informations nous aident à vous fournir le bon soutien, plus rapidement.",
