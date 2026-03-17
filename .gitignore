@@ -28,3 +28,6 @@ functions/lib
 *.sln
 *.sw?
 emulator-data/
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
