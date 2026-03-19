@@ -6,9 +6,10 @@
  * start working immediately without touching production.
  *
  * Test accounts (all passwords: Test1234!):
- *   admin@nasna.test   — admin role
- *   ngo@nasna.test     — member role (validated NGO)
- *   agent@nasna.test   — agent role
+ *   admin@nasna.test          — admin role
+ *   ngo@nasna.test            — member role (validated NGO)
+ *   agent@nasna.test          — agent role (assigned to Beirut Community Center)
+ *   agent-nocenter@nasna.test — agent role (no center assigned)
  */
 
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
@@ -49,6 +50,7 @@ async function seed() {
   const adminUid = await createUser('admin@nasna.test', 'Admin User', 'admin');
   const memberUid = await createUser('ngo@nasna.test', 'Test NGO', 'member');
   const agentUid = await createUser('agent@nasna.test', 'Test Agent', 'agent');
+  const agentNoCenterUid = await createUser('agent-nocenter@nasna.test', 'Agent No Center', 'agent');
 
   // ── Member documents ───────────────────────────────────────────────────────
   console.log('\n📄 Writing member documents...');
@@ -95,15 +97,28 @@ async function seed() {
     updatedAt: Timestamp.now(),
   });
 
+  await db.doc(`members/${agentNoCenterUid}`).set({
+    uid: agentNoCenterUid,
+    email: 'agent-nocenter@nasna.test',
+    name: 'Agent No Center',
+    role: 'agent',
+    isAdmin: false,
+    onboarded: true,
+    validated: true,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  });
+
   console.log('  ✓  member documents written');
 
   // ── Centers ────────────────────────────────────────────────────────────────
   console.log('\n🏢 Creating sample centers...');
 
-  await db.collection('centers').add({
+  const beirutCenterRef = await db.collection('centers').add({
     name: 'Beirut Community Center',
+    type: 'community_hall',
     governorate: 'Beirut',
-    city: 'Beirut',
+    district: 'Hamra',
     address: '123 Hamra Street, Beirut',
     totalCapacity: 150,
     currentOccupancy: 42,
@@ -113,14 +128,16 @@ async function seed() {
     aidServices: ['food', 'water', 'medical'],
     operatingHours: '08:00 - 20:00',
     coordinates: { lat: 33.8938, lng: 35.5018 },
+    createdBy: adminUid,
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   });
 
   await db.collection('centers').add({
     name: 'Mount Lebanon Shelter',
+    type: 'school',
     governorate: 'Mount Lebanon',
-    city: 'Baabda',
+    district: 'Baabda',
     address: '45 Main Road, Baabda',
     totalCapacity: 80,
     currentOccupancy: 60,
@@ -130,11 +147,17 @@ async function seed() {
     aidServices: ['shelter', 'clothing'],
     operatingHours: '09:00 - 18:00',
     coordinates: { lat: 33.8101, lng: 35.5972 },
+    createdBy: adminUid,
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   });
 
   console.log('  ✓  2 centers created');
+
+  // ── Assign agent to Beirut center ──────────────────────────────────────────
+  await db.doc(`members/${agentUid}`).update({ centerId: beirutCenterRef.id });
+  console.log(`  ✓  agent@nasna.test assigned to center ${beirutCenterRef.id}`);
+  // agent-nocenter@nasna.test intentionally has no centerId — tests empty state
 
   // ── Submissions ────────────────────────────────────────────────────────────
   console.log('\n📋 Creating sample submissions...');
@@ -240,9 +263,10 @@ async function seed() {
   console.log('  Emulator UI  →  http://localhost:4000');
   console.log('  App          →  http://localhost:5173');
   console.log('');
-  console.log('  admin@nasna.test   / Test1234!  (admin)');
-  console.log('  ngo@nasna.test     / Test1234!  (NGO member)');
-  console.log('  agent@nasna.test   / Test1234!  (field agent)');
+  console.log('  admin@nasna.test              / Test1234!  (admin)');
+  console.log('  ngo@nasna.test                / Test1234!  (NGO member)');
+  console.log('  agent@nasna.test              / Test1234!  (agent — has center assigned)');
+  console.log('  agent-nocenter@nasna.test     / Test1234!  (agent — no center, tests empty state)');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 }
 

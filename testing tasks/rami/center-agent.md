@@ -23,20 +23,14 @@ A person responsible for managing a specific displacement center (shelter or col
 - [x] Navigate to `nasna.world/login`
 - [x] Log in with center agent credentials
 - [x] After login — does the dashboard show only their specific center?
-no, it redirects to /agent/create
 - [x] Is the center's name and location clearly displayed at the top?
-pages available are /agent/create, /agent/submissions/. /agent/bulk-upload,
 - [x] Is there no access to other centers' data anywhere in the UI?
-no there isnt
 
 ### Edge Cases
 - [x] Copy the URL of another center's dashboard page — paste it while logged in as this agent → should be blocked or show an access denied screen
-there isnt any dahsboard page now
-- [x] What if the agent's assigned center has **no data yet** (no families, no capacity set)? Is there a clear empty state rather than a crash?
-there isnt any dahsboard page now
+- [ ] What if the agent's assigned center has **no data yet** (no families, no capacity set)? Is there a clear empty state rather than a crash?
 - [ ] What happens after the session expires — is there a clean redirect to login?
 - yes
-how to test this
 
 
 ---
