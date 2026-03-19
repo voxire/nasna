@@ -66,8 +66,12 @@ function CenterDashboard() {
       <div className="max-w-2xl mx-auto p-6">
         <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
           <Building2 className="h-12 w-12 text-gray-300" />
-          <h2 className="text-xl font-semibold text-gray-700">{t('submission.agent.center.noCenter')}</h2>
-          <p className="text-sm text-gray-500 max-w-sm">{t('submission.agent.center.noCenterHint')}</p>
+          <h2 className="text-xl font-semibold text-gray-700">
+            {t('submission.agent.center.noCenter')}
+          </h2>
+          <p className="text-sm text-gray-500 max-w-sm">
+            {t('submission.agent.center.noCenterHint')}
+          </p>
         </div>
       </div>
     );
@@ -87,7 +91,7 @@ function CenterDashboard() {
   if (!center) return null;
 
   const availableSpots = Math.max(0, center.totalCapacity - center.currentOccupancy);
-  const isActive = center.active && (center.intakeOpen !== false);
+  const isActive = center.active && center.intakeOpen !== false;
 
   const typeLabel: Record<string, string> = {
     school: t('admin.centers.type_school'),
@@ -120,9 +124,7 @@ function CenterDashboard() {
         <div className="flex items-center gap-1.5 text-sm text-gray-500">
           <MapPin className="h-4 w-4 shrink-0" />
           <span>
-            {[center.governorate, center.district, center.address]
-              .filter(Boolean)
-              .join(' · ')}
+            {[center.governorate, center.district, center.address].filter(Boolean).join(' · ')}
           </span>
         </div>
       </div>

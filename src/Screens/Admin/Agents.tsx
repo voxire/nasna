@@ -92,7 +92,9 @@ function Agents() {
             name: (d.data() as CenterDocument).name,
             governorate: (d.data() as CenterDocument).governorate,
           }))
-          .sort((a, b) => a.governorate.localeCompare(b.governorate) || a.name.localeCompare(b.name)),
+          .sort(
+            (a, b) => a.governorate.localeCompare(b.governorate) || a.name.localeCompare(b.name),
+          ),
       );
     });
   }, []);
@@ -315,9 +317,7 @@ function Agents() {
                 <TableHead className="font-semibold text-gray-700">
                   {t('admin.agents.validatedLabel')}
                 </TableHead>
-                <TableHead className="font-semibold text-gray-700">
-                  Assigned Center
-                </TableHead>
+                <TableHead className="font-semibold text-gray-700">Assigned Center</TableHead>
                 <TableHead className="font-semibold text-gray-700">
                   {t('admin.agents.actions')}
                 </TableHead>
@@ -340,9 +340,11 @@ function Agents() {
                     </span>
                   </TableCell>
                   <TableCell className="text-xs text-gray-600">
-                    {agent.centerId
-                      ? (centers.find((c) => c.id === agent.centerId)?.name ?? agent.centerId)
-                      : <span className="text-gray-400 italic">None</span>}
+                    {agent.centerId ? (
+                      (centers.find((c) => c.id === agent.centerId)?.name ?? agent.centerId)
+                    ) : (
+                      <span className="text-gray-400 italic">None</span>
+                    )}
                   </TableCell>
                   <TableCell className="flex gap-2">
                     {!agent.validated && (

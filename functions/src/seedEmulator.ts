@@ -50,7 +50,11 @@ async function seed() {
   const adminUid = await createUser('admin@nasna.test', 'Admin User', 'admin');
   const memberUid = await createUser('ngo@nasna.test', 'Test NGO', 'member');
   const agentUid = await createUser('agent@nasna.test', 'Test Agent', 'agent');
-  const agentNoCenterUid = await createUser('agent-nocenter@nasna.test', 'Agent No Center', 'agent');
+  const agentNoCenterUid = await createUser(
+    'agent-nocenter@nasna.test',
+    'Agent No Center',
+    'agent',
+  );
 
   // ── Member documents ───────────────────────────────────────────────────────
   console.log('\n📄 Writing member documents...');
@@ -266,7 +270,9 @@ async function seed() {
   console.log('  admin@nasna.test              / Test1234!  (admin)');
   console.log('  ngo@nasna.test                / Test1234!  (NGO member)');
   console.log('  agent@nasna.test              / Test1234!  (agent — has center assigned)');
-  console.log('  agent-nocenter@nasna.test     / Test1234!  (agent — no center, tests empty state)');
+  console.log(
+    '  agent-nocenter@nasna.test     / Test1234!  (agent — no center, tests empty state)',
+  );
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 }
 
