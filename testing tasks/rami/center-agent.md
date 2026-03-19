@@ -40,11 +40,11 @@ A person responsible for managing a specific displacement center (shelter or col
 **Goal:** Can the center agent accurately update how full their center is?
 
 ### Happy Path
-- [ ] Find the capacity and occupancy inputs in the dashboard
-- [ ] Enter a **total capacity** value (e.g., 80) and save — does it update immediately?
-- [ ] Enter a **current occupancy** value (e.g., 45) and save — does it update?
-- [ ] Does the system correctly calculate and display **available spots** (capacity − occupancy)?
-- [ ] Refresh the page — do the entered values persist?
+- [x] Find the capacity and occupancy inputs in the dashboard
+- [x] Enter a **total capacity** value (e.g., 80) and save — does it update immediately?
+- [x] Enter a **current occupancy** value (e.g., 45) and save — does it update?
+- [x] Does the system correctly calculate and display **available spots** (capacity − occupancy)?
+- [x] Refresh the page — do the entered values persist?
 - [ ] Does the updated data reflect on the public-facing map? (check map to verify)
 
 ### Edge Cases

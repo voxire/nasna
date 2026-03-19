@@ -122,7 +122,17 @@
       "available": "Places disponibles",
       "details": "Détails",
       "capacityNotSet": "La capacité n'a pas encore été configurée. Contactez un administrateur.",
-      "noDetails": "Aucun détail de contact ou de service n'a encore été ajouté."
+      "noDetails": "Aucun détail de contact ou de service n'a encore été ajouté.",
+      "edit": "Modifier",
+      "save": "Enregistrer",
+      "saving": "Enregistrement...",
+      "cancel": "Annuler",
+      "intakeOpenLabel": "Accepte actuellement de nouveaux arrivants",
+      "saveSuccess": "Centre mis à jour avec succès.",
+      "saveError": "Impossible d'enregistrer les modifications. Veuillez réessayer.",
+      "errorCapacityInvalid": "La capacité totale doit être un nombre entier supérieur ou égal à 0.",
+      "errorOccupancyInvalid": "L'occupation actuelle doit être un nombre entier supérieur ou égal à 0.",
+      "errorOccupancyExceedsCapacity": "L'occupation ne peut pas dépasser la capacité totale."
     }
   },
   "copyPhone": "Copier le numero",

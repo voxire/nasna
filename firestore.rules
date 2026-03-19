@@ -117,6 +117,10 @@ service cloud.firestore {
       // NOTE: field is `active` (not `isActive`) — matches the data written by CenterManagement.
       allow read: if resource.data.active == true || isAdmin();
       allow write: if isAdmin();
+      // Agents may update only occupancy/intake fields on their assigned center.
+      allow update: if isAgent()
+        && get(/databases/$(database)/documents/members/$(request.auth.uid)).data.centerId == centerId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalCapacity', 'currentOccupancy', 'intakeOpen', 'updatedAt']);
     }
 
     // ─── /housing ───────────────────────────────────────────────────────────

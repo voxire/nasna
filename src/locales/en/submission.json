@@ -122,7 +122,17 @@
       "available": "Available Spots",
       "details": "Details",
       "capacityNotSet": "Capacity has not been configured yet. Contact an admin to set it up.",
-      "noDetails": "No contact or service details have been added yet."
+      "noDetails": "No contact or service details have been added yet.",
+      "edit": "Edit",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "intakeOpenLabel": "Currently accepting new arrivals",
+      "saveSuccess": "Center updated successfully.",
+      "saveError": "Failed to save changes. Please try again.",
+      "errorCapacityInvalid": "Total capacity must be a whole number of 0 or more.",
+      "errorOccupancyInvalid": "Current occupancy must be a whole number of 0 or more.",
+      "errorOccupancyExceedsCapacity": "Occupancy cannot exceed total capacity."
     }
   },
   "copyPhone": "Copy phone number",

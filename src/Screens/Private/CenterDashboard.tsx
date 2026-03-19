@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { useAuthStore } from '@/stores/authStore';
 import type { CenterDocument } from '@/types';
 import CapacityBar from '@/Components/CapacityBar';
 import { Skeleton } from '@/Components/ui/skeleton';
-import { Building2, MapPin, Phone, Clock, Info } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Building2, MapPin, Phone, Clock, Info, Pencil } from 'lucide-react';
+import { toast } from 'sonner';
+import { serverTimestamp } from 'firebase/firestore';
 
 interface CenterRow extends CenterDocument {
   id: string;
@@ -18,6 +23,11 @@ function CenterDashboard() {
   const [center, setCenter] = useState<CenterRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editCapacity, setEditCapacity] = useState('');
+  const [editOccupancy, setEditOccupancy] = useState('');
+  const [editIntakeOpen, setEditIntakeOpen] = useState(true);
 
   useEffect(() => {
     const centerId = profile?.centerId;
@@ -49,6 +59,53 @@ function CenterDashboard() {
       cancelled = true;
     };
   }, [profile?.centerId, t]);
+
+  const openEdit = () => {
+    if (!center) return;
+    setEditCapacity(String(center.totalCapacity));
+    setEditOccupancy(String(center.currentOccupancy));
+    setEditIntakeOpen(center.intakeOpen !== false);
+    setEditing(true);
+  };
+
+  const handleSave = async () => {
+    if (!center || !profile?.centerId) return;
+    const capacity = parseInt(editCapacity, 10);
+    const occupancy = parseInt(editOccupancy, 10);
+    if (isNaN(capacity) || capacity < 0) {
+      toast.error(t('submission.agent.center.errorCapacityInvalid'));
+      return;
+    }
+    if (isNaN(occupancy) || occupancy < 0) {
+      toast.error(t('submission.agent.center.errorOccupancyInvalid'));
+      return;
+    }
+    if (occupancy > capacity) {
+      toast.error(t('submission.agent.center.errorOccupancyExceedsCapacity'));
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, 'centers', profile.centerId), {
+        totalCapacity: capacity,
+        currentOccupancy: occupancy,
+        intakeOpen: editIntakeOpen,
+        updatedAt: serverTimestamp(),
+      });
+      setCenter((prev) =>
+        prev
+          ? { ...prev, totalCapacity: capacity, currentOccupancy: occupancy, intakeOpen: editIntakeOpen }
+          : prev,
+      );
+      setEditing(false);
+      toast.success(t('submission.agent.center.saveSuccess'));
+    } catch (err) {
+      console.error('CenterDashboard: failed to save:', err);
+      toast.error(t('submission.agent.center.saveError'));
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -131,10 +188,77 @@ function CenterDashboard() {
 
       {/* Capacity card */}
       <div className="rounded-xl border border-gray-200 bg-white p-5 space-y-4 shadow-sm">
-        <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-          {t('submission.agent.center.capacity')}
-        </h2>
-        {center.totalCapacity === 0 ? (
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+            {t('submission.agent.center.capacity')}
+          </h2>
+          {!editing && (
+            <Button size="sm" variant="outline" className="gap-1.5" onClick={openEdit}>
+              <Pencil className="h-3.5 w-3.5" />
+              {t('submission.agent.center.edit')}
+            </Button>
+          )}
+        </div>
+
+        {editing ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="editCapacity">
+                  {t('submission.agent.center.totalCapacity')}
+                </Label>
+                <Input
+                  id="editCapacity"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  value={editCapacity}
+                  onChange={(e) => setEditCapacity(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="editOccupancy">
+                  {t('submission.agent.center.currentOccupancy')}
+                </Label>
+                <Input
+                  id="editOccupancy"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  value={editOccupancy}
+                  onChange={(e) => setEditOccupancy(e.target.value)}
+                />
+              </div>
+            </div>
+            <label className="flex items-center gap-3 rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm cursor-pointer select-none">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded accent-[#12a89d]"
+                checked={editIntakeOpen}
+                onChange={(e) => setEditIntakeOpen(e.target.checked)}
+              />
+              {t('submission.agent.center.intakeOpenLabel')}
+            </label>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditing(false)}
+                disabled={saving}
+              >
+                {t('submission.agent.center.cancel')}
+              </Button>
+              <Button
+                size="sm"
+                className="bg-[#12a89d] hover:bg-[#0e9088] text-white"
+                onClick={() => void handleSave()}
+                disabled={saving}
+              >
+                {saving ? t('submission.agent.center.saving') : t('submission.agent.center.save')}
+              </Button>
+            </div>
+          </div>
+        ) : center.totalCapacity === 0 ? (
           <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700">
             <Info className="h-4 w-4 shrink-0" />
             <span>{t('submission.agent.center.capacityNotSet')}</span>
