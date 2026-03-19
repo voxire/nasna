@@ -90,32 +90,35 @@ export interface PublicCentersMapData {
 export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
   const [centersSnap, housingSnap] = await Promise.all([
     getDocs(query(collection(db, 'centers'), where('active', '==', true), limit(200))),
-    getDocs(query(collection(db, 'housing'), where('status', 'in', ['available', 'approved']), limit(500))),
+    getDocs(
+      query(
+        collection(db, 'housing'),
+        where('status', 'in', ['available', 'approved']),
+        limit(500),
+      ),
+    ),
   ]);
 
-  const centers: CenterMarker[] = centersSnap.docs
-    .map((doc) => {
-      const d = doc.data();
-      const storedCoords = d.coordinates as { lat: number; lng: number } | undefined;
-      const fallback = getCoordinates(d.governorate as string | undefined);
-      return {
-        id: doc.id,
-        name: (d.name as string) ?? 'Center',
-        governorate: (d.governorate as string) ?? '',
-        city: ((d.city as string | undefined) ??
-          (d.district as string | undefined) ??
-          '') as string,
-        address: (d.address as string) ?? '',
-        totalCapacity: Number(d.totalCapacity ?? d.capacity ?? 0),
-        currentOccupancy: Number(d.currentOccupancy ?? d.occupiedCapacity ?? 0),
-        lat: storedCoords?.lat ?? fallback.lat,
-        lng: storedCoords?.lng ?? fallback.lng,
-        phone: (d.phone as string | undefined) ?? undefined,
-        aidServices: (d.aidServices as string[] | undefined) ?? [],
-        operatingHours: (d.operatingHours as string | undefined) ?? undefined,
-        intakeOpen: (d.intakeOpen as boolean | undefined) ?? undefined,
-      };
-    });
+  const centers: CenterMarker[] = centersSnap.docs.map((doc) => {
+    const d = doc.data();
+    const storedCoords = d.coordinates as { lat: number; lng: number } | undefined;
+    const fallback = getCoordinates(d.governorate as string | undefined);
+    return {
+      id: doc.id,
+      name: (d.name as string) ?? 'Center',
+      governorate: (d.governorate as string) ?? '',
+      city: ((d.city as string | undefined) ?? (d.district as string | undefined) ?? '') as string,
+      address: (d.address as string) ?? '',
+      totalCapacity: Number(d.totalCapacity ?? d.capacity ?? 0),
+      currentOccupancy: Number(d.currentOccupancy ?? d.occupiedCapacity ?? 0),
+      lat: storedCoords?.lat ?? fallback.lat,
+      lng: storedCoords?.lng ?? fallback.lng,
+      phone: (d.phone as string | undefined) ?? undefined,
+      aidServices: (d.aidServices as string[] | undefined) ?? [],
+      operatingHours: (d.operatingHours as string | undefined) ?? undefined,
+      intakeOpen: (d.intakeOpen as boolean | undefined) ?? undefined,
+    };
+  });
 
   const housingMap = new Map<
     string,
