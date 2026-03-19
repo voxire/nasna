@@ -120,7 +120,9 @@
       "totalCapacity": "Capacité totale",
       "currentOccupancy": "Occupation actuelle",
       "available": "Places disponibles",
-      "details": "Détails"
+      "details": "Détails",
+      "capacityNotSet": "La capacité n'a pas encore été configurée. Contactez un administrateur.",
+      "noDetails": "Aucun détail de contact ou de service n'a encore été ajouté."
     }
   },
   "copyPhone": "Copier le numero",

@@ -28,8 +28,8 @@ A person responsible for managing a specific displacement center (shelter or col
 
 ### Edge Cases
 - [x] Copy the URL of another center's dashboard page — paste it while logged in as this agent → should be blocked or show an access denied screen
-- [ ] What if the agent's assigned center has **no data yet** (no families, no capacity set)? Is there a clear empty state rather than a crash?
-- [ ] What happens after the session expires — is there a clean redirect to login?
+- [x] What if the agent's assigned center has **no data yet** (no families, no capacity set)? Is there a clear empty state rather than a crash?
+- [x] What happens after the session expires — is there a clean redirect to login?
 - yes
 
 

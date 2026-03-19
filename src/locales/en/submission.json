@@ -120,7 +120,9 @@
       "totalCapacity": "Total Capacity",
       "currentOccupancy": "Current Occupancy",
       "available": "Available Spots",
-      "details": "Details"
+      "details": "Details",
+      "capacityNotSet": "Capacity has not been configured yet. Contact an admin to set it up.",
+      "noDetails": "No contact or service details have been added yet."
     }
   },
   "copyPhone": "Copy phone number",
