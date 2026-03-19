@@ -18,3 +18,4 @@
 - Bug fixes discovered during a task get their own commit, never bundled with the feature
 - Never commit `.md` files — documentation and notes stay out of version control
 - Exception: `CLAUDE.md` itself is the only `.md` file that may be committed
+- Exception: all `.md` files under `testing tasks/` may be committed so teammates can access them
