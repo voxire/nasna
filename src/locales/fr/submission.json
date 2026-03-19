@@ -141,6 +141,13 @@
       "errorOccupancyExceedsCapacity": "L'occupation ne peut pas dépasser la capacité totale."
     }
   },
+  "status": {
+    "pending": "En attente",
+    "assigned": "Assigné",
+    "in_progress": "En cours",
+    "completed": "Terminé",
+    "cancelled": "Annulé"
+  },
   "copyPhone": "Copier le numero",
   "phoneCopied": "Numero copie",
   "bulk": {

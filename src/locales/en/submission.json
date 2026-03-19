@@ -143,6 +143,13 @@
   },
   "copyPhone": "Copy phone number",
   "phoneCopied": "Phone number copied",
+  "status": {
+    "pending": "Pending",
+    "assigned": "Assigned",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
   "bulk": {
     "title": "Bulk Upload",
     "description": "Upload a CSV file to register multiple families at once.",

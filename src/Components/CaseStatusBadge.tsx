@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import type { SubmissionStatus } from '@/types';
 
@@ -14,23 +15,20 @@ const STATUS_STYLES: Record<string, string> = {
   cancelled: 'bg-rose-100 text-rose-800 border-rose-200',
 };
 
-function toLabel(status?: string) {
-  return (status ?? 'pending').replace('_', ' ');
-}
-
 export default function CaseStatusBadge({
   status = 'pending',
   staleFlagged = false,
 }: CaseStatusBadgeProps) {
+  const { t } = useTranslation();
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium capitalize',
+        'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium',
         STATUS_STYLES[status] ?? STATUS_STYLES.pending,
       )}
     >
-      {toLabel(status)}
-      {staleFlagged ? ' • stale' : ''}
+      {t(`submission.status.${status}`, { defaultValue: status.replace('_', ' ') })}
+      {staleFlagged ? ` • ${t('submission.stale', { defaultValue: 'stale' })}` : ''}
     </span>
   );
 }

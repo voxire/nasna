@@ -143,6 +143,13 @@
   },
   "copyPhone": "نسخ رقم الهاتف",
   "phoneCopied": "تم نسخ الرقم",
+  "status": {
+    "pending": "قيد الانتظار",
+    "assigned": "تم التعيين",
+    "in_progress": "قيد التنفيذ",
+    "completed": "مكتمل",
+    "cancelled": "ملغى"
+  },
   "bulk": {
     "title": "رفع جماعي",
     "description": "ارفع ملف CSV لتسجيل عدة أسر دفعة واحدة.",
