@@ -161,11 +161,7 @@ export function subscribePublicCentersMapData(
   }
 
   void getDocs(
-    query(
-      collection(db, 'housing'),
-      where('status', 'in', ['available', 'approved']),
-      limit(500),
-    ),
+    query(collection(db, 'housing'), where('status', 'in', ['available', 'approved']), limit(500)),
   )
     .then((housingSnap) => {
       const housingMap = new Map<string, HousingAreaSummary>();

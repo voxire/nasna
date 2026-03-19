@@ -517,7 +517,9 @@ async function seed() {
   console.log('');
   console.log('  admin@nasna.test              / Test1234!  (admin)');
   console.log('  ngo@nasna.test                / Test1234!  (NGO member)');
-  console.log('  agent@nasna.test              / Test1234!  (agent — "Hamra Aid Hub [AGENT CENTER]", cap 111/11)');
+  console.log(
+    '  agent@nasna.test              / Test1234!  (agent — "Hamra Aid Hub [AGENT CENTER]", cap 111/11)',
+  );
   console.log(
     '  agent-nocenter@nasna.test     / Test1234!  (agent — "Tripoli North Shelter [EMPTY CENTER]", cap 333/0)',
   );
