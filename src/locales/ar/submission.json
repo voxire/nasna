@@ -150,6 +150,20 @@
     "completed": "مكتمل",
     "cancelled": "ملغى"
   },
+  "timeline": {
+    "caseRegistered": "تسجيل الحالة",
+    "assignedToNgo": "تعيين لمنظمة",
+    "notAssigned": "غير معيّن",
+    "latestUpdate": "آخر تحديث",
+    "currentStatus": "الحالة الراهنة",
+    "aidDelivery": "تسليم المساعدات",
+    "markedDelivered": "تم التسليم",
+    "notDeliveredYet": "لم يُسلّم بعد",
+    "staleFlag": "علامة الركود",
+    "needsReview": "يحتاج مراجعة",
+    "clear": "لا توجد مشكلة",
+    "notYetRecorded": "لم يُسجّل بعد"
+  },
   "bulk": {
     "title": "رفع جماعي",
     "description": "ارفع ملف CSV لتسجيل عدة أسر دفعة واحدة.",

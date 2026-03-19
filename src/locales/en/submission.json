@@ -150,6 +150,20 @@
     "completed": "Completed",
     "cancelled": "Cancelled"
   },
+  "timeline": {
+    "caseRegistered": "Case registered",
+    "assignedToNgo": "Assigned to NGO",
+    "notAssigned": "Not assigned",
+    "latestUpdate": "Latest update",
+    "currentStatus": "Current status",
+    "aidDelivery": "Aid delivery",
+    "markedDelivered": "Marked delivered",
+    "notDeliveredYet": "Not delivered yet",
+    "staleFlag": "Stale flag",
+    "needsReview": "Needs review",
+    "clear": "Clear",
+    "notYetRecorded": "Not yet recorded"
+  },
   "bulk": {
     "title": "Bulk Upload",
     "description": "Upload a CSV file to register multiple families at once.",

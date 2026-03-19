@@ -13,6 +13,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { Separator } from '@/Components/ui/separator';
 import { useAuthStore } from '@/stores/authStore';
+import {
+  LEBANON_GOVERNORATE_TRANSLATION_KEYS,
+  type LebanonGovernorate,
+} from '@/lib/governorates';
 
 interface SubmissionWithId extends SubmissionDocument {
   id: string;
@@ -210,11 +214,31 @@ export default function AgentSubmissionDetail() {
             <CardContent className="grid gap-4 md:grid-cols-2">
               <DetailField
                 label={t('submission.agent.detail.governorate')}
-                value={submission.currentGovernorate}
+                value={
+                  LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                    submission.currentGovernorate as LebanonGovernorate
+                  ]
+                    ? t(
+                        LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                          submission.currentGovernorate as LebanonGovernorate
+                        ],
+                      )
+                    : submission.currentGovernorate
+                }
               />
               <DetailField
                 label={t('submission.previousGovernorate')}
-                value={submission.previousGovernorate}
+                value={
+                  LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                    submission.previousGovernorate as LebanonGovernorate
+                  ]
+                    ? t(
+                        LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                          submission.previousGovernorate as LebanonGovernorate
+                        ],
+                      )
+                    : submission.previousGovernorate
+                }
               />
               <DetailField
                 label={t('submission.agent.detail.locationType')}

@@ -148,6 +148,20 @@
     "completed": "Terminé",
     "cancelled": "Annulé"
   },
+  "timeline": {
+    "caseRegistered": "Dossier enregistré",
+    "assignedToNgo": "Assigné à une ONG",
+    "notAssigned": "Non assigné",
+    "latestUpdate": "Dernière mise à jour",
+    "currentStatus": "Statut actuel",
+    "aidDelivery": "Livraison de l'aide",
+    "markedDelivered": "Livraison confirmée",
+    "notDeliveredYet": "Pas encore livré",
+    "staleFlag": "Indicateur de stagnation",
+    "needsReview": "À réviser",
+    "clear": "Aucun problème",
+    "notYetRecorded": "Pas encore enregistré"
+  },
   "copyPhone": "Copier le numero",
   "phoneCopied": "Numero copie",
   "bulk": {
