@@ -45,15 +45,15 @@ A person responsible for managing a specific displacement center (shelter or col
 - [x] Enter a **current occupancy** value (e.g., 45) and save — does it update?
 - [x] Does the system correctly calculate and display **available spots** (capacity − occupancy)?
 - [x] Refresh the page — do the entered values persist?
-- [ ] Does the updated data reflect on the public-facing map? (check map to verify)
+- [x] Does the updated data reflect on the public-facing map? (check map to verify)
 
 ### Edge Cases
-- [ ] Enter **occupancy greater than capacity** (e.g., capacity = 80, occupancy = 100) — does the system warn or block this?
-- [ ] Enter **0 for capacity** — does the center show as full/closed on the map?
-- [ ] Enter a **negative number** (e.g., -5) — is there input validation blocking this?
-- [ ] Leave the capacity field **blank** and save — does it default to 0 or show an error?
-- [ ] Enter a **decimal number** (e.g., 12.5) — is this accepted or does it round/reject?
-- [ ] Enter **extremely large number** (e.g., 999999) — does the UI display it correctly?
+- [x] Enter **occupancy greater than capacity** (e.g., capacity = 80, occupancy = 100) — does the system warn or block this?
+- [x] Enter **0 for capacity** — does the center show as full/closed on the map?
+- [x] Enter a **negative number** (e.g., -5) — is there input validation blocking this?
+- [x] Leave the capacity field **blank** and save — does it default to 0 or show an error?
+- [x] Enter a **decimal number** (e.g., 12.5) — is this accepted or does it round/reject?
+- [x] Enter **extremely large number** (e.g., 999999) — does the UI display it correctly?
 
 ### Mobile Check
 - [ ] Open the capacity update form on a phone
