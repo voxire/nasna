@@ -79,7 +79,7 @@ A person responsible for managing a specific displacement center (shelter or col
 ### Edge Cases
 - [x] What if **no families are registered** at this center yet? Is there a clear empty state?
 - [x] What if a family record has **missing fields** (no name, no date)? Does it display without crashing?
-- [ ] If there are 50+ families — does the list paginate or infinite scroll without breaking?
+- [x] If there are 50+ families — does the list paginate or infinite scroll without breaking?
 - [x] Can the agent search for a family by name? If yes, does it work correctly?
 
 ### Mobile Check
