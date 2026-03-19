@@ -94,7 +94,12 @@ function CenterDashboard() {
       });
       setCenter((prev) =>
         prev
-          ? { ...prev, totalCapacity: capacity, currentOccupancy: occupancy, intakeOpen: editIntakeOpen }
+          ? {
+              ...prev,
+              totalCapacity: capacity,
+              currentOccupancy: occupancy,
+              intakeOpen: editIntakeOpen,
+            }
           : prev,
       );
       setEditing(false);
@@ -204,9 +209,7 @@ function CenterDashboard() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="editCapacity">
-                  {t('submission.agent.center.totalCapacity')}
-                </Label>
+                <Label htmlFor="editCapacity">{t('submission.agent.center.totalCapacity')}</Label>
                 <Input
                   id="editCapacity"
                   type="number"

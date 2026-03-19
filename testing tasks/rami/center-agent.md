@@ -61,8 +61,8 @@ A person responsible for managing a specific displacement center (shelter or col
 - [ ] Is the Save button reachable without scrolling off-screen?
 
 ### RTL / Arabic Check
-- [ ] Are field labels (Capacity, Occupancy, Available) in Arabic when Arabic mode is on?
-- [ ] Do number inputs still accept input correctly in RTL layout (no reversed typing)?
+- [x] Are field labels (Capacity, Occupancy, Available) in Arabic when Arabic mode is on?
+- [x] Do number inputs still accept input correctly in RTL layout (no reversed typing)?
 
 ---
 
