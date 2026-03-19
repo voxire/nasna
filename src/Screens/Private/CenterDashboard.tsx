@@ -23,13 +23,6 @@ interface FamilyRow extends SubmissionDocument {
   id: string;
 }
 
-/** Mask full name to "FirstName L." */
-function maskName(fullName: string): string {
-  const parts = fullName.trim().split(/\s+/);
-  if (parts.length <= 1) return fullName;
-  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
-}
-
 function CenterDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -376,7 +369,7 @@ function CenterDashboard() {
       {/* Families registered at this center */}
       {(() => {
         const filtered = families.filter((f) =>
-          maskName(f.fullName ?? '').toLowerCase().includes(searchQuery.toLowerCase()),
+          (f.fullName ?? '').toLowerCase().includes(searchQuery.toLowerCase()),
         );
         return (
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
@@ -432,7 +425,7 @@ function CenterDashboard() {
                     className="w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-gray-50 transition-colors"
                   >
                     <span className="text-sm font-medium text-gray-800 w-28 truncate">
-                      {maskName(family.fullName ?? '')}
+                      {family.fullName ?? '—'}
                     </span>
                     <span className="text-xs text-gray-500">
                       {t('submission.agent.center.householdSize', {

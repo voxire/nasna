@@ -22,15 +22,6 @@ interface SubmissionWithId extends SubmissionDocument {
   id: string;
 }
 
-/** Mask full name to "FirstName L." for PII protection */
-function maskName(fullName: string): string {
-  const parts = fullName.trim().split(/\s+/);
-  if (parts.length <= 1) return fullName;
-  const firstName = parts[0];
-  const lastInitial = parts[parts.length - 1][0];
-  return `${firstName} ${lastInitial}.`;
-}
-
 const AGE_RANGE_KEYS: (keyof AgeRanges)[] = ['0-3', '4-12', '13-18', '19-60', '60+'];
 
 export default function AgentSubmissionDetail() {
@@ -145,7 +136,7 @@ export default function AgentSubmissionDetail() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">{maskName(submission.fullName)}</h1>
+            <h1 className="text-2xl font-bold text-gray-800">{submission.fullName}</h1>
             <p className="text-sm text-gray-500">{submission.currentGovernorate}</p>
           </div>
         </div>
@@ -164,7 +155,7 @@ export default function AgentSubmissionDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
-              <DetailField label={t('submission.fullName')} value={maskName(submission.fullName)} />
+              <DetailField label={t('submission.fullName')} value={submission.fullName} />
               <DetailField
                 label={t('submission.gender')}
                 value={t(`submission.${submission.gender === 'Male' ? 'male' : 'female'}`)}
