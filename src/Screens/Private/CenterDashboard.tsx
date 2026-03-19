@@ -80,7 +80,7 @@ function CenterDashboard() {
     const q = query(
       collection(db, 'submissions'),
       where('centerId', '==', centerId),
-      orderBy('registrationDate', 'desc'),
+      orderBy('createdAt', 'desc'),
     );
     return onSnapshot(
       q,
@@ -416,7 +416,7 @@ function CenterDashboard() {
                 <p className="text-xs">{t('submission.agent.center.familiesEmptyHint')}</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 overflow-y-auto max-h-[480px]">
                 {filtered.map((family) => (
                   <button
                     key={family.id}
@@ -424,12 +424,12 @@ function CenterDashboard() {
                     onClick={() => navigate(`/agent/submissions/${family.id}`)}
                     className="w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-gray-50 transition-colors"
                   >
-                    <span className="text-sm font-medium text-gray-800 w-28 truncate">
-                      {family.fullName ?? '—'}
+                    <span className="text-sm font-medium text-gray-800 flex-1 min-w-0 truncate">
+                      {family.fullName || '—'}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 shrink-0">
                       {t('submission.agent.center.householdSize', {
-                        count: family.numberOfPeopleInHousehold,
+                        count: family.numberOfPeopleInHousehold ?? 0,
                       })}
                     </span>
                     <span className="text-xs text-gray-400 ml-auto shrink-0">

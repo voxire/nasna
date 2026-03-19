@@ -77,10 +77,10 @@ A person responsible for managing a specific displacement center (shelter or col
 - [x] Is the family's contact information appropriately visible (or masked per privacy rules)?
 
 ### Edge Cases
-- [ ] What if **no families are registered** at this center yet? Is there a clear empty state?
-- [ ] What if a family record has **missing fields** (no name, no date)? Does it display without crashing?
+- [x] What if **no families are registered** at this center yet? Is there a clear empty state?
+- [x] What if a family record has **missing fields** (no name, no date)? Does it display without crashing?
 - [ ] If there are 50+ families — does the list paginate or infinite scroll without breaking?
-- [ ] Can the agent search for a family by name? If yes, does it work correctly?
+- [x] Can the agent search for a family by name? If yes, does it work correctly?
 
 ### Mobile Check
 - [ ] Is the families list scrollable on a phone without horizontal overflow?

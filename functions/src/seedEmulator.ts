@@ -163,6 +163,28 @@ async function seed() {
   console.log(`  ✓  agent@nasna.test assigned to center ${beirutCenterRef.id}`);
   // agent-nocenter@nasna.test intentionally has no centerId — tests empty state
 
+  // Create a third center for the empty-state agent (Tripoli — no submissions)
+  const tripoliCenterRef = await db.collection('centers').add({
+    name: 'Tripoli North Shelter',
+    type: 'school',
+    governorate: 'North Lebanon',
+    district: 'Tripoli',
+    address: '8 Al Mina Road, Tripoli',
+    totalCapacity: 60,
+    currentOccupancy: 0,
+    active: true,
+    intakeOpen: true,
+    phone: '+9616123456',
+    aidServices: ['food'],
+    operatingHours: '08:00 - 18:00',
+    coordinates: { lat: 34.4367, lng: 35.8497 },
+    createdBy: adminUid,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  });
+  await db.doc(`members/${agentNoCenterUid}`).update({ centerId: tripoliCenterRef.id });
+  console.log(`  ✓  agent-nocenter@nasna.test assigned to empty center ${tripoliCenterRef.id}`);
+
   // ── Submissions ────────────────────────────────────────────────────────────
   console.log('\n📋 Creating sample submissions...');
 
@@ -299,6 +321,83 @@ async function seed() {
 
   console.log('  ✓  3 submissions created (general) + 3 center-scoped');
 
+  // Malformed submission — missing fullName and registrationDate (tests graceful rendering)
+  await db.collection('submissions').add({
+    fullName: '',
+    phoneNumber: '',
+    emailAddress: '',
+    gender: 'male',
+    currentGovernorate: 'Beirut',
+    previousGovernorate: '',
+    street: '',
+    building: '',
+    floor: '',
+    city: '',
+    ageRanges: {},
+    specialNeeds: [],
+    needs: [],
+    aidUrgency: 'low',
+    consentGiven: true,
+    comments: '',
+    numberOfPeopleInHousehold: 0,
+    status: 'pending',
+    locationType: 'at_center',
+    centerId: beirutCenterRef.id,
+    agent: agentUid,
+    // registrationDate intentionally omitted — tests graceful "—" rendering
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  });
+  console.log('  ✓  1 malformed submission (no name, no date, no household size)');
+
+  // 50 bulk submissions for pagination / scroll testing
+  const BULK_NAMES = [
+    'Sara Hassan', 'Omar Khalil', 'Rania Njeim', 'Bilal Haddad', 'Dina Moussa',
+    'Mahmoud Saleh', 'Lina Khoury', 'Amer Fakih', 'Hana Zahreddine', 'Tariq Nassar',
+    'Maya Awad', 'Fadi Daher', 'Nour Chamoun', 'Ziad Rizk', 'Sana Bou Khalil',
+    'Jad Gemayel', 'Rana Hamdan', 'Karim Slim', 'Hiba Traboulsi', 'Wassim Mrad',
+    'Ola Barakat', 'Chadi Feghali', 'Mirna Tannous', 'Alaa Kteish', 'Rima Ghanem',
+    'Elias Sarkis', 'Nadine Lahoud', 'Georges Abou Nasr', 'Joumana Bassil', 'Tony Zgheib',
+    'Mona Frem', 'Samir Khoury', 'Carla Bou Jaoude', 'Naji El Hajj', 'Lara Aoun',
+    'Rachid Makhoul', 'Suzanne Haddad', 'Ibrahim Farhat', 'Claudine Azar', 'Hassan Berri',
+    'Viviane Sassine', 'Bechara Tueni', 'Ghada Mikati', 'Marwan Hamade', 'Hind Frangieh',
+    'Elie Sfeir', 'Pascale Gemayel', 'Antoine Lahad', 'Noura Jumblatt', 'Zeina Murr',
+  ];
+  const STATUSES = ['pending', 'assigned', 'in_progress', 'completed'] as const;
+  const NEEDS_POOL = [['food'], ['shelter'], ['medical'], ['food', 'water'], ['clothing']];
+  const bulkBatch = db.batch();
+  for (let i = 0; i < BULK_NAMES.length; i++) {
+    const ref = db.collection('submissions').doc();
+    bulkBatch.set(ref, {
+      fullName: BULK_NAMES[i],
+      phoneNumber: `+96170${String(200 + i).padStart(4, '0')}`,
+      emailAddress: '',
+      gender: i % 2 === 0 ? 'female' : 'male',
+      currentGovernorate: 'Beirut',
+      previousGovernorate: i % 3 === 0 ? 'South Lebanon' : 'North Lebanon',
+      street: `Street ${i + 1}`,
+      building: String(i + 1),
+      floor: '1',
+      city: 'Beirut',
+      ageRanges: {},
+      specialNeeds: [],
+      needs: NEEDS_POOL[i % NEEDS_POOL.length],
+      aidUrgency: i % 3 === 0 ? 'high' : 'medium',
+      consentGiven: true,
+      comments: '',
+      numberOfPeopleInHousehold: (i % 6) + 1,
+      status: STATUSES[i % STATUSES.length],
+      locationType: 'at_center',
+      centerId: beirutCenterRef.id,
+      agent: agentUid,
+      registrationDate: Timestamp.fromDate(new Date(Date.now() - i * 12 * 60 * 60 * 1000)),
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    });
+  }
+  await bulkBatch.commit();
+  console.log('  ✓  50 bulk submissions for pagination testing');
+
   // ── Emergency contacts ─────────────────────────────────────────────────────
   console.log('\n🆘 Creating emergency contacts...');
 
@@ -330,7 +429,7 @@ async function seed() {
   console.log('\n📊 Initialising global stats...');
 
   await db.doc('stats/global').set({
-    totalSubmissions: 6,
+    totalSubmissions: 60,
     totalCompleted: 0,
     totalPeopleHelped: 0,
     totalActiveNgos: 1,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { db } from '../../firebase';
-import { collection, onSnapshot, query, where, limit } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import type { SubmissionDocument } from '../../types';
@@ -58,7 +58,6 @@ function AgentSubmissions() {
     const submissionQuery = query(
       collection(db, 'submissions'),
       where('agent', '==', agentUid),
-      limit(20),
     );
     const unsubscribe = onSnapshot(
       submissionQuery,
