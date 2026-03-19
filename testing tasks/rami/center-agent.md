@@ -71,10 +71,10 @@ A person responsible for managing a specific displacement center (shelter or col
 **Goal:** Can the agent see which families are registered at their center?
 
 ### Happy Path
-- [ ] Navigate to the families or registrations list within the center dashboard
-- [ ] Are families listed with: name, registration date, household size?
-- [ ] Click a family entry — does a detail view open?
-- [ ] Is the family's contact information appropriately visible (or masked per privacy rules)?
+- [x] Navigate to the families or registrations list within the center dashboard
+- [x] Are families listed with: name, registration date, household size?
+- [x] Click a family entry — does a detail view open?
+- [x] Is the family's contact information appropriately visible (or masked per privacy rules)?
 
 ### Edge Cases
 - [ ] What if **no families are registered** at this center yet? Is there a clear empty state?

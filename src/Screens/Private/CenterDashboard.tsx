@@ -1,24 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { useAuthStore } from '@/stores/authStore';
-import type { CenterDocument } from '@/types';
+import type { CenterDocument, SubmissionDocument } from '@/types';
 import CapacityBar from '@/Components/CapacityBar';
+import CaseStatusBadge from '@/Components/CaseStatusBadge';
 import { Skeleton } from '@/Components/ui/skeleton';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Building2, MapPin, Phone, Clock, Info, Pencil } from 'lucide-react';
+import { Building2, MapPin, Phone, Clock, Info, Pencil, Search, Users, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { serverTimestamp } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 interface CenterRow extends CenterDocument {
   id: string;
 }
 
+interface FamilyRow extends SubmissionDocument {
+  id: string;
+}
+
+/** Mask full name to "FirstName L." */
+function maskName(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length <= 1) return fullName;
+  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+}
+
 function CenterDashboard() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const profile = useAuthStore((state) => state.profile);
   const [center, setCenter] = useState<CenterRow | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,6 +42,9 @@ function CenterDashboard() {
   const [editCapacity, setEditCapacity] = useState('');
   const [editOccupancy, setEditOccupancy] = useState('');
   const [editIntakeOpen, setEditIntakeOpen] = useState(true);
+  const [families, setFamilies] = useState<FamilyRow[]>([]);
+  const [familiesLoading, setFamiliesLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const centerId = profile?.centerId;
@@ -59,6 +76,31 @@ function CenterDashboard() {
       cancelled = true;
     };
   }, [profile?.centerId, t]);
+
+  // ── Families (submissions at this center) ────────────────────────────────
+  useEffect(() => {
+    const centerId = profile?.centerId;
+    if (!centerId) {
+      setFamiliesLoading(false);
+      return;
+    }
+    const q = query(
+      collection(db, 'submissions'),
+      where('centerId', '==', centerId),
+      orderBy('registrationDate', 'desc'),
+    );
+    return onSnapshot(
+      q,
+      (snap) => {
+        setFamilies(snap.docs.map((d) => ({ id: d.id, ...(d.data() as SubmissionDocument) })));
+        setFamiliesLoading(false);
+      },
+      (err) => {
+        console.error('CenterDashboard families:', err);
+        setFamiliesLoading(false);
+      },
+    );
+  }, [profile?.centerId]);
 
   const openEdit = () => {
     if (!center) return;
@@ -330,6 +372,95 @@ function CenterDashboard() {
             <p className="text-sm text-gray-400 italic">{t('submission.agent.center.noDetails')}</p>
           )}
       </div>
+
+      {/* Families registered at this center */}
+      {(() => {
+        const filtered = families.filter((f) =>
+          maskName(f.fullName ?? '').toLowerCase().includes(searchQuery.toLowerCase()),
+        );
+        return (
+          <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-gray-400" />
+                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  {t('submission.agent.center.families')}
+                </h2>
+                {!familiesLoading && (
+                  <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                    {families.length}
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                <Input
+                  className="pl-8 h-8 text-sm w-44"
+                  placeholder={t('submission.agent.center.familiesSearch')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Body */}
+            {familiesLoading ? (
+              <div className="divide-y divide-gray-100">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="flex items-center gap-4 px-5 py-3">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-4 w-8 ml-auto" />
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </div>
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 py-10 text-gray-400">
+                <Users className="h-8 w-8" />
+                <p className="text-sm font-medium">{t('submission.agent.center.familiesEmpty')}</p>
+                <p className="text-xs">{t('submission.agent.center.familiesEmptyHint')}</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {filtered.map((family) => (
+                  <button
+                    key={family.id}
+                    type="button"
+                    onClick={() => navigate(`/agent/submissions/${family.id}`)}
+                    className="w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="text-sm font-medium text-gray-800 w-28 truncate">
+                      {maskName(family.fullName ?? '')}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {t('submission.agent.center.householdSize', {
+                        count: family.numberOfPeopleInHousehold,
+                      })}
+                    </span>
+                    <span className="text-xs text-gray-400 ml-auto shrink-0">
+                      {family.registrationDate
+                        ? new Date(
+                            family.registrationDate.seconds * 1000,
+                          ).toLocaleDateString(undefined, {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          })
+                        : '—'}
+                    </span>
+                    <div className="shrink-0">
+                      <CaseStatusBadge status={family.status} />
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-gray-300 shrink-0" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }

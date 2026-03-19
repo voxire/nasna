@@ -132,6 +132,12 @@
       "saveError": "فشل حفظ التغييرات. حاول مجدداً.",
       "errorCapacityInvalid": "يجب أن تكون الطاقة الكلية رقماً صحيحاً أكبر من أو يساوي 0.",
       "errorOccupancyInvalid": "يجب أن يكون الإشغال الحالي رقماً صحيحاً أكبر من أو يساوي 0.",
+      "families": "العائلات المسجّلة",
+      "familiesSearch": "بحث بالاسم…",
+      "familiesEmpty": "لا توجد عائلات مسجّلة بعد.",
+      "familiesEmptyHint": "ستظهر هنا العائلات المخصّصة لهذا المركز.",
+      "householdSize": "{{count}} شخص",
+      "householdSize_other": "{{count}} أشخاص",
       "errorOccupancyExceedsCapacity": "لا يمكن أن يتجاوز الإشغال الطاقة الكلية."
     }
   },

@@ -215,7 +215,89 @@ async function seed() {
     updatedAt: Timestamp.now(),
   });
 
-  console.log('  ✓  3 submissions created');
+  // Center-scoped submissions (visible on the agent's CenterDashboard)
+  await db.collection('submissions').add({
+    fullName: 'Layla Mansour',
+    phoneNumber: '+9613101001',
+    emailAddress: '',
+    gender: 'female',
+    currentGovernorate: 'Beirut',
+    previousGovernorate: 'South Lebanon',
+    street: 'Hamra St',
+    building: '12',
+    floor: '3',
+    city: 'Beirut',
+    ageRanges: {},
+    specialNeeds: [],
+    needs: ['food', 'shelter'],
+    aidUrgency: 'high',
+    consentGiven: true,
+    comments: '',
+    numberOfPeopleInHousehold: 5,
+    status: 'pending',
+    locationType: 'at_center',
+    centerId: beirutCenterRef.id,
+    agent: agentUid,
+    registrationDate: Timestamp.now(),
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  });
+
+  await db.collection('submissions').add({
+    fullName: 'Khalid Rahhal',
+    phoneNumber: '+9613102002',
+    emailAddress: '',
+    gender: 'male',
+    currentGovernorate: 'Beirut',
+    previousGovernorate: 'Bekaa',
+    street: 'Verdun St',
+    building: '7',
+    floor: '1',
+    city: 'Beirut',
+    ageRanges: {},
+    specialNeeds: [],
+    needs: ['medical', 'food'],
+    aidUrgency: 'medium',
+    consentGiven: true,
+    comments: '',
+    numberOfPeopleInHousehold: 3,
+    status: 'assigned',
+    locationType: 'at_center',
+    centerId: beirutCenterRef.id,
+    agent: agentUid,
+    registrationDate: Timestamp.fromDate(new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)),
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  });
+
+  await db.collection('submissions').add({
+    fullName: 'Nadia Saad',
+    phoneNumber: '+9613103003',
+    emailAddress: '',
+    gender: 'female',
+    currentGovernorate: 'Beirut',
+    previousGovernorate: 'North Lebanon',
+    street: 'Bliss St',
+    building: '3',
+    floor: '2',
+    city: 'Beirut',
+    ageRanges: {},
+    specialNeeds: ['mobility'],
+    needs: ['medical'],
+    aidUrgency: 'high',
+    consentGiven: true,
+    comments: 'Requires wheelchair access',
+    numberOfPeopleInHousehold: 2,
+    status: 'in_progress',
+    locationType: 'at_center',
+    centerId: beirutCenterRef.id,
+    agent: agentUid,
+    registrationDate: Timestamp.fromDate(new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)),
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  });
+
+  console.log('  ✓  3 submissions created (general) + 3 center-scoped');
 
   // ── Emergency contacts ─────────────────────────────────────────────────────
   console.log('\n🆘 Creating emergency contacts...');
@@ -248,7 +330,7 @@ async function seed() {
   console.log('\n📊 Initialising global stats...');
 
   await db.doc('stats/global').set({
-    totalSubmissions: 3,
+    totalSubmissions: 6,
     totalCompleted: 0,
     totalPeopleHelped: 0,
     totalActiveNgos: 1,

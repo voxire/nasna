@@ -132,7 +132,13 @@
       "saveError": "Failed to save changes. Please try again.",
       "errorCapacityInvalid": "Total capacity must be a whole number of 0 or more.",
       "errorOccupancyInvalid": "Current occupancy must be a whole number of 0 or more.",
-      "errorOccupancyExceedsCapacity": "Occupancy cannot exceed total capacity."
+      "errorOccupancyExceedsCapacity": "Occupancy cannot exceed total capacity.",
+      "families": "Registered Families",
+      "familiesSearch": "Search by name…",
+      "familiesEmpty": "No families registered yet.",
+      "familiesEmptyHint": "Families assigned to this center will appear here.",
+      "householdSize": "{{count}} person",
+      "householdSize_other": "{{count}} people"
     }
   },
   "copyPhone": "Copy phone number",

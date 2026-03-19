@@ -132,6 +132,12 @@
       "saveError": "Impossible d'enregistrer les modifications. Veuillez réessayer.",
       "errorCapacityInvalid": "La capacité totale doit être un nombre entier supérieur ou égal à 0.",
       "errorOccupancyInvalid": "L'occupation actuelle doit être un nombre entier supérieur ou égal à 0.",
+      "families": "Familles enregistrées",
+      "familiesSearch": "Rechercher par nom…",
+      "familiesEmpty": "Aucune famille enregistrée pour l'instant.",
+      "familiesEmptyHint": "Les familles affectées à ce centre apparaîtront ici.",
+      "householdSize": "{{count}} personne",
+      "householdSize_other": "{{count}} personnes",
       "errorOccupancyExceedsCapacity": "L'occupation ne peut pas dépasser la capacité totale."
     }
   },
