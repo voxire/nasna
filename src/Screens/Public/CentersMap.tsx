@@ -275,10 +275,11 @@ export default function CentersMap() {
                         center.totalCapacity > 0
                           ? center.currentOccupancy / center.totalCapacity
                           : 0;
+                      const notFull = center.currentOccupancy < center.totalCapacity;
                       const intakeOpen =
                         center.intakeOpen !== undefined
-                          ? center.intakeOpen
-                          : center.currentOccupancy < center.totalCapacity;
+                          ? center.intakeOpen && notFull
+                          : notFull;
                       const barColor =
                         pct > 0.9 ? '#ef4444' : pct >= 0.75 ? '#facc15' : '#4ade80';
 

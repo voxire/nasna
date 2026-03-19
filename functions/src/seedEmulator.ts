@@ -14,7 +14,6 @@
 
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
 process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
-process.env.FIREBASE_STORAGE_EMULATOR_HOST = 'localhost:9199';
 
 import * as admin from 'firebase-admin';
 import { Timestamp } from 'firebase-admin/firestore';
@@ -42,8 +41,31 @@ async function createUser(email: string, displayName: string, role: string) {
   return uid;
 }
 
+async function clearCollection(name: string) {
+  const snap = await db.collection(name).get();
+  if (snap.empty) return;
+  const batches: Promise<FirebaseFirestore.WriteResult[]>[] = [];
+  const docs = snap.docs;
+  for (let i = 0; i < docs.length; i += 500) {
+    const batch = db.batch();
+    docs.slice(i, i + 500).forEach((d) => batch.delete(d.ref));
+    batches.push(batch.commit());
+  }
+  await Promise.all(batches);
+  console.log(`  🗑  Cleared ${docs.length} docs from "${name}"`);
+}
+
 async function seed() {
   console.log('\n🌱 Seeding Firebase Emulator...\n');
+
+  // ── Wipe collections so reseeding is always idempotent ─────────────────────
+  console.log('🧹 Clearing existing data...');
+  await Promise.all([
+    clearCollection('centers'),
+    clearCollection('submissions'),
+    clearCollection('emergencyContacts'),
+  ]);
+  await db.doc('stats/global').delete();
 
   // ── Users ──────────────────────────────────────────────────────────────────
   console.log('👤 Creating users...');
@@ -118,9 +140,12 @@ async function seed() {
   // ── Centers ────────────────────────────────────────────────────────────────
   console.log('\n🏢 Creating sample centers...');
 
-  // agent@nasna.test's center — distinctive name + capacity so it's instantly
-  // recognisable on the map (look for "111 capacity / 11 occupied")
-  const beirutCenterRef = await db.collection('centers').add({
+  // Fixed document IDs — safe to reseed multiple times without duplicates.
+  // agent@nasna.test's center: distinctive capacity 11/111
+  const BEIRUT_CENTER_ID = 'center-hamra-aid-hub';
+  const TRIPOLI_CENTER_ID = 'center-tripoli-north-shelter';
+
+  await db.doc(`centers/${BEIRUT_CENTER_ID}`).set({
     name: 'Hamra Aid Hub [AGENT CENTER]',
     type: 'community_hall',
     governorate: 'Beirut',
@@ -139,8 +164,8 @@ async function seed() {
     updatedAt: Timestamp.now(),
   });
 
-  // A second center — clearly NOT the agent's (full / intake closed)
-  await db.collection('centers').add({
+  // A second center — clearly NOT the agent's (nearly full / intake closed)
+  await db.doc('centers/center-baabda-shelter').set({
     name: 'Baabda Shelter [OTHER CENTER]',
     type: 'school',
     governorate: 'Mount Lebanon',
@@ -159,15 +184,8 @@ async function seed() {
     updatedAt: Timestamp.now(),
   });
 
-  console.log('  ✓  2 centers created');
-
-  // ── Assign agent to Beirut center ──────────────────────────────────────────
-  await db.doc(`members/${agentUid}`).update({ centerId: beirutCenterRef.id });
-  console.log(`  ✓  agent@nasna.test assigned to center ${beirutCenterRef.id}`);
-  // agent-nocenter@nasna.test intentionally has no centerId — tests empty state
-
-  // Third center for the empty-state agent (Tripoli — no submissions)
-  const tripoliCenterRef = await db.collection('centers').add({
+  // Third center for the empty-state agent (Tripoli — no submissions, 0/333)
+  await db.doc(`centers/${TRIPOLI_CENTER_ID}`).set({
     name: 'Tripoli North Shelter [EMPTY CENTER]',
     type: 'school',
     governorate: 'North Lebanon',
@@ -185,8 +203,14 @@ async function seed() {
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   });
-  await db.doc(`members/${agentNoCenterUid}`).update({ centerId: tripoliCenterRef.id });
-  console.log(`  ✓  agent-nocenter@nasna.test assigned to empty center ${tripoliCenterRef.id}`);
+
+  console.log('  ✓  3 centers created (fixed IDs)');
+
+  // ── Assign agents to their centers ─────────────────────────────────────────
+  await db.doc(`members/${agentUid}`).update({ centerId: BEIRUT_CENTER_ID });
+  console.log(`  ✓  agent@nasna.test assigned to ${BEIRUT_CENTER_ID}`);
+  await db.doc(`members/${agentNoCenterUid}`).update({ centerId: TRIPOLI_CENTER_ID });
+  console.log(`  ✓  agent-nocenter@nasna.test assigned to ${TRIPOLI_CENTER_ID}`);
 
   // ── Submissions ────────────────────────────────────────────────────────────
   console.log('\n📋 Creating sample submissions...');
@@ -261,7 +285,7 @@ async function seed() {
     numberOfPeopleInHousehold: 5,
     status: 'pending',
     locationType: 'at_center',
-    centerId: beirutCenterRef.id,
+    centerId: BEIRUT_CENTER_ID,
     agent: agentUid,
     registrationDate: Timestamp.now(),
     createdAt: Timestamp.now(),
@@ -288,7 +312,7 @@ async function seed() {
     numberOfPeopleInHousehold: 3,
     status: 'assigned',
     locationType: 'at_center',
-    centerId: beirutCenterRef.id,
+    centerId: BEIRUT_CENTER_ID,
     agent: agentUid,
     registrationDate: Timestamp.fromDate(new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)),
     createdAt: Timestamp.now(),
@@ -315,7 +339,7 @@ async function seed() {
     numberOfPeopleInHousehold: 2,
     status: 'in_progress',
     locationType: 'at_center',
-    centerId: beirutCenterRef.id,
+    centerId: BEIRUT_CENTER_ID,
     agent: agentUid,
     registrationDate: Timestamp.fromDate(new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)),
     createdAt: Timestamp.now(),
@@ -345,7 +369,7 @@ async function seed() {
     numberOfPeopleInHousehold: 0,
     status: 'pending',
     locationType: 'at_center',
-    centerId: beirutCenterRef.id,
+    centerId: BEIRUT_CENTER_ID,
     agent: agentUid,
     // registrationDate intentionally omitted — tests graceful "—" rendering
     createdAt: Timestamp.now(),
@@ -431,7 +455,7 @@ async function seed() {
       numberOfPeopleInHousehold: (i % 6) + 1,
       status: STATUSES[i % STATUSES.length],
       locationType: 'at_center',
-      centerId: beirutCenterRef.id,
+      centerId: BEIRUT_CENTER_ID,
       agent: agentUid,
       registrationDate: Timestamp.fromDate(new Date(Date.now() - i * 12 * 60 * 60 * 1000)),
       createdAt: Timestamp.now(),

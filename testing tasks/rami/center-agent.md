@@ -94,12 +94,12 @@ A person responsible for managing a specific displacement center (shelter or col
 
 ### Happy Path
 - [x] Set capacity to 100 and occupancy to 50 → open the public map → does the center show 50 available spots?
-- [ ] Set occupancy to 100 (full) → check the map → does the center display as full?
-- [ ] Update occupancy to 0 (empty) → check the map → does it reflect as fully available?
+- [x] Set occupancy to 100 (full) → check the map → does the center display as full?
+- [x] Update occupancy to 0 (empty) → check the map → does it reflect as fully available?
 
 ### Edge Cases
-- [ ] How long does it take for the map to reflect a change? Is there a noticeable delay?
-- [ ] If you update and immediately open the map — does it show stale data or fresh data?
+- [x] How long does it take for the map to reflect a change? Is there a noticeable delay?
+- [x] If you update and immediately open the map — does it show stale data or fresh data?
 
 ---
 
