@@ -118,14 +118,16 @@ async function seed() {
   // ── Centers ────────────────────────────────────────────────────────────────
   console.log('\n🏢 Creating sample centers...');
 
+  // agent@nasna.test's center — distinctive name + capacity so it's instantly
+  // recognisable on the map (look for "111 capacity / 11 occupied")
   const beirutCenterRef = await db.collection('centers').add({
-    name: 'Beirut Community Center',
+    name: 'Hamra Aid Hub [AGENT CENTER]',
     type: 'community_hall',
     governorate: 'Beirut',
     district: 'Hamra',
     address: '123 Hamra Street, Beirut',
-    totalCapacity: 150,
-    currentOccupancy: 42,
+    totalCapacity: 111,
+    currentOccupancy: 11,
     active: true,
     intakeOpen: true,
     phone: '+9611234567',
@@ -137,14 +139,15 @@ async function seed() {
     updatedAt: Timestamp.now(),
   });
 
+  // A second center — clearly NOT the agent's (full / intake closed)
   await db.collection('centers').add({
-    name: 'Mount Lebanon Shelter',
+    name: 'Baabda Shelter [OTHER CENTER]',
     type: 'school',
     governorate: 'Mount Lebanon',
     district: 'Baabda',
     address: '45 Main Road, Baabda',
-    totalCapacity: 80,
-    currentOccupancy: 60,
+    totalCapacity: 222,
+    currentOccupancy: 200,
     active: true,
     intakeOpen: false,
     phone: '+9614567890',
@@ -163,14 +166,14 @@ async function seed() {
   console.log(`  ✓  agent@nasna.test assigned to center ${beirutCenterRef.id}`);
   // agent-nocenter@nasna.test intentionally has no centerId — tests empty state
 
-  // Create a third center for the empty-state agent (Tripoli — no submissions)
+  // Third center for the empty-state agent (Tripoli — no submissions)
   const tripoliCenterRef = await db.collection('centers').add({
-    name: 'Tripoli North Shelter',
+    name: 'Tripoli North Shelter [EMPTY CENTER]',
     type: 'school',
     governorate: 'North Lebanon',
     district: 'Tripoli',
     address: '8 Al Mina Road, Tripoli',
-    totalCapacity: 60,
+    totalCapacity: 333,
     currentOccupancy: 0,
     active: true,
     intakeOpen: true,
@@ -490,9 +493,9 @@ async function seed() {
   console.log('');
   console.log('  admin@nasna.test              / Test1234!  (admin)');
   console.log('  ngo@nasna.test                / Test1234!  (NGO member)');
-  console.log('  agent@nasna.test              / Test1234!  (agent — has center assigned)');
+  console.log('  agent@nasna.test              / Test1234!  (agent — "Hamra Aid Hub [AGENT CENTER]", cap 111/11)');
   console.log(
-    '  agent-nocenter@nasna.test     / Test1234!  (agent — no center, tests empty state)',
+    '  agent-nocenter@nasna.test     / Test1234!  (agent — "Tripoli North Shelter [EMPTY CENTER]", cap 333/0)',
   );
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 }

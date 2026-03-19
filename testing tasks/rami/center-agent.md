@@ -93,7 +93,7 @@ A person responsible for managing a specific displacement center (shelter or col
 **Goal:** Does what the agent enters reflect accurately on the public-facing map?
 
 ### Happy Path
-- [ ] Set capacity to 100 and occupancy to 50 → open the public map → does the center show 50 available spots?
+- [x] Set capacity to 100 and occupancy to 50 → open the public map → does the center show 50 available spots?
 - [ ] Set occupancy to 100 (full) → check the map → does the center display as full?
 - [ ] Update occupancy to 0 (empty) → check the map → does it reflect as fully available?
 
