@@ -422,7 +422,7 @@ function CenterDashboard() {
                     key={family.id}
                     type="button"
                     onClick={() => navigate(`/agent/submissions/${family.id}`)}
-                    className="w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-gray-50 transition-colors"
+                    className="w-full flex items-center gap-4 px-5 py-3 text-start hover:bg-gray-50 transition-colors"
                   >
                     <span className="text-sm font-medium text-gray-800 flex-1 min-w-0 truncate">
                       {family.fullName || '—'}

@@ -137,7 +137,17 @@ export default function AgentSubmissionDetail() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-800">{submission.fullName}</h1>
-            <p className="text-sm text-gray-500">{submission.currentGovernorate}</p>
+            <p className="text-sm text-gray-500">
+              {LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                submission.currentGovernorate as LebanonGovernorate
+              ]
+                ? t(
+                    LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                      submission.currentGovernorate as LebanonGovernorate
+                    ],
+                  )
+                : submission.currentGovernorate}
+            </p>
           </div>
         </div>
         <CaseStatusBadge status={submission.status} staleFlagged={submission.staleFlagged} />
