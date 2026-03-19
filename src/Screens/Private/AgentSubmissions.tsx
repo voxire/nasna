@@ -58,10 +58,7 @@ function AgentSubmissions() {
       return;
     }
 
-    const submissionQuery = query(
-      collection(db, 'submissions'),
-      where('agent', '==', agentUid),
-    );
+    const submissionQuery = query(collection(db, 'submissions'), where('agent', '==', agentUid));
     const unsubscribe = onSnapshot(
       submissionQuery,
       (snapshot) => {
@@ -201,8 +198,8 @@ function AgentSubmissions() {
         {!loading && submissions.length > PAGE_SIZE && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
             <p className="text-xs text-gray-500">
-              {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, submissions.length)}{' '}
-              / {submissions.length}
+              {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, submissions.length)} /{' '}
+              {submissions.length}
             </p>
             <div className="flex items-center gap-1">
               <Button

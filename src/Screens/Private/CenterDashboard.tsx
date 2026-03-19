@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { collection, doc, getDoc, onSnapshot, orderBy, query, updateDoc, where } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
 import { db } from '@/firebase';
 import { useAuthStore } from '@/stores/authStore';
 import type { CenterDocument, SubmissionDocument } from '@/types';
@@ -10,7 +19,17 @@ import { Skeleton } from '@/Components/ui/skeleton';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Building2, MapPin, Phone, Clock, Info, Pencil, Search, Users, ChevronRight } from 'lucide-react';
+import {
+  Building2,
+  MapPin,
+  Phone,
+  Clock,
+  Info,
+  Pencil,
+  Search,
+  Users,
+  ChevronRight,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { serverTimestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -434,13 +453,14 @@ function CenterDashboard() {
                     </span>
                     <span className="text-xs text-gray-400 ml-auto shrink-0">
                       {family.registrationDate
-                        ? new Date(
-                            family.registrationDate.seconds * 1000,
-                          ).toLocaleDateString(undefined, {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          })
+                        ? new Date(family.registrationDate.seconds * 1000).toLocaleDateString(
+                            undefined,
+                            {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                            },
+                          )
                         : '—'}
                     </span>
                     <div className="shrink-0">

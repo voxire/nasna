@@ -13,10 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { Separator } from '@/Components/ui/separator';
 import { useAuthStore } from '@/stores/authStore';
-import {
-  LEBANON_GOVERNORATE_TRANSLATION_KEYS,
-  type LebanonGovernorate,
-} from '@/lib/governorates';
+import { LEBANON_GOVERNORATE_TRANSLATION_KEYS, type LebanonGovernorate } from '@/lib/governorates';
 
 interface SubmissionWithId extends SubmissionDocument {
   id: string;
@@ -60,8 +57,7 @@ export default function AgentSubmissionDetail() {
 
         // Allow access if this agent submitted it OR if it belongs to their assigned center
         const isOwnSubmission = data.agent === agentUid;
-        const isCenterSubmission =
-          data.centerId != null && data.centerId === profile?.centerId;
+        const isCenterSubmission = data.centerId != null && data.centerId === profile?.centerId;
 
         if (!isOwnSubmission && !isCenterSubmission) {
           setAccessDenied(true);
