@@ -1,5 +1,5 @@
 import { httpsCallable } from 'firebase/functions';
-import { collection, getDocs, limit, query } from 'firebase/firestore';
+import { collection, getDocs, limit, query, where } from 'firebase/firestore';
 import { db, functions } from '@/firebase';
 
 const GOVERNORATE_COORDINATES: Record<string, { lat: number; lng: number }> = {
@@ -89,15 +89,11 @@ export interface PublicCentersMapData {
 
 export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
   const [centersSnap, housingSnap] = await Promise.all([
-    getDocs(query(collection(db, 'centers'), limit(200))),
-    getDocs(query(collection(db, 'housing'), limit(500))),
+    getDocs(query(collection(db, 'centers'), where('active', '==', true), limit(200))),
+    getDocs(query(collection(db, 'housing'), where('status', 'in', ['available', 'approved']), limit(500))),
   ]);
 
   const centers: CenterMarker[] = centersSnap.docs
-    .filter((doc) => {
-      const data = doc.data();
-      return Boolean(data.active ?? data.isActive ?? false);
-    })
     .map((doc) => {
       const d = doc.data();
       const storedCoords = d.coordinates as { lat: number; lng: number } | undefined;
@@ -127,7 +123,6 @@ export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
   >();
   housingSnap.docs.forEach((doc) => {
     const d = doc.data();
-    if (!['available', 'approved'].includes((d.status as string | undefined) ?? '')) return;
     const area = ((d.district as string | undefined) ??
       (d.governorate as string | undefined) ??
       'Unknown') as string;
