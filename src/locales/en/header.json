@@ -14,5 +14,6 @@
   "logout": "Logout",
   "createSubmission": "Create Submission",
   "mySubmissions": "My Submissions",
-  "bulkUpload": "Bulk Upload"
+  "bulkUpload": "Bulk Upload",
+  "myCenter": "My Center"
 }

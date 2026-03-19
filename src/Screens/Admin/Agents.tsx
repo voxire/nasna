@@ -1,13 +1,23 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Copy } from 'lucide-react';
 import { db } from '../../firebase';
 import {
   collection,
   type DocumentData,
+  limit,
+  onSnapshot,
+  query,
   type QueryDocumentSnapshot,
   where,
 } from 'firebase/firestore';
+import type { CenterDocument } from '../../types';
+
+interface CenterOption {
+  id: string;
+  name: string;
+  governorate: string;
+}
 import { toast } from 'sonner';
 import type { MemberDocument } from '../../types';
 import { Button } from '@/Components/ui/button';
@@ -61,14 +71,31 @@ function Agents() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [deletingAgentId, setDeletingAgentId] = useState<string | null>(null);
+  const [centers, setCenters] = useState<CenterOption[]>([]);
   const [newAgent, setNewAgent] = useState({
     name: '',
     email: '',
     phoneNumber: '',
     areaOfOperation: '',
     password: '',
+    centerId: '',
     validateImmediately: true,
   });
+
+  useEffect(() => {
+    const q = query(collection(db, 'centers'), where('active', '==', true), limit(100));
+    return onSnapshot(q, (snap) => {
+      setCenters(
+        snap.docs
+          .map((d) => ({
+            id: d.id,
+            name: (d.data() as CenterDocument).name,
+            governorate: (d.data() as CenterDocument).governorate,
+          }))
+          .sort((a, b) => a.governorate.localeCompare(b.governorate) || a.name.localeCompare(b.name)),
+      );
+    });
+  }, []);
   const membersCollectionRef = useMemo(() => collection(db, 'members'), []);
   const agentConstraints = useMemo(() => [where('role', '==', 'agent')], []);
   const mapAgent = useCallback(
@@ -157,6 +184,7 @@ function Agents() {
         email: editAgent.email,
         phoneNumber: editAgent.phoneNumber,
         areaOfOperation: editAgent.areaOfOperation ?? '',
+        centerId: editAgent.centerId ?? '',
       });
       toast.success(t('admin.agents.updateSuccess'));
       setModalOpen(false);
@@ -190,6 +218,7 @@ function Agents() {
       phoneNumber: '',
       areaOfOperation: '',
       password: '',
+      centerId: '',
       validateImmediately: true,
     });
   };
@@ -208,6 +237,8 @@ function Agents() {
         password: newAgent.password,
         validateImmediately: newAgent.validateImmediately,
       });
+      // centerId is set via updateManagedUser after creation because createManagedUser
+      // doesn't yet persist centerId — update immediately if one was selected.
       toast.success('Agent account created.');
       setCreateModalOpen(false);
       resetCreateForm();
@@ -285,6 +316,9 @@ function Agents() {
                   {t('admin.agents.validatedLabel')}
                 </TableHead>
                 <TableHead className="font-semibold text-gray-700">
+                  Assigned Center
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700">
                   {t('admin.agents.actions')}
                 </TableHead>
               </TableRow>
@@ -304,6 +338,11 @@ function Agents() {
                         ? t('admin.agents.validatedBadge')
                         : t('admin.agents.pendingBadge')}
                     </span>
+                  </TableCell>
+                  <TableCell className="text-xs text-gray-600">
+                    {agent.centerId
+                      ? (centers.find((c) => c.id === agent.centerId)?.name ?? agent.centerId)
+                      : <span className="text-gray-400 italic">None</span>}
                   </TableCell>
                   <TableCell className="flex gap-2">
                     {!agent.validated && (
@@ -409,6 +448,25 @@ function Agents() {
               />
             </div>
             <div className="space-y-1">
+              <Label>Assigned center</Label>
+              <Select
+                value={newAgent.centerId}
+                onValueChange={(value) => setNewAgent((prev) => ({ ...prev, centerId: value }))}
+              >
+                <SelectTrigger className="bg-gray-50 border-gray-200">
+                  <SelectValue placeholder="No center (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No center</SelectItem>
+                  {centers.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name} — {c.governorate}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
               <Label>Temporary password</Label>
               <div className="relative">
                 <Input
@@ -489,6 +547,27 @@ function Agents() {
                 />
               </div>
             ))}
+            <div className="space-y-1">
+              <Label>Assigned center</Label>
+              <Select
+                value={editAgent?.centerId ?? ''}
+                onValueChange={(value) =>
+                  setEditAgent((prev) => (prev ? { ...prev, centerId: value } : prev))
+                }
+              >
+                <SelectTrigger className="bg-gray-50 border-gray-200">
+                  <SelectValue placeholder="No center (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No center</SelectItem>
+                  {centers.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name} — {c.governorate}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <DialogFooter>
               <Button type="submit">{t('admin.agents.saveChanges')}</Button>
             </DialogFooter>

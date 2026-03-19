@@ -108,6 +108,19 @@
       "comments": "Commentaires",
       "noComments": "Aucun commentaire.",
       "household": "Taille du ménage"
+    },
+    "center": {
+      "noCenter": "Aucun centre assigné",
+      "noCenterHint": "Contactez un administrateur pour être assigné à un centre de déplacement.",
+      "notFound": "Centre introuvable. Il a peut-être été supprimé.",
+      "loadError": "Impossible de charger les données du centre.",
+      "intakeOpen": "Accepte des arrivées",
+      "intakeClosed": "Complet / Fermé",
+      "capacity": "Capacité",
+      "totalCapacity": "Capacité totale",
+      "currentOccupancy": "Occupation actuelle",
+      "available": "Places disponibles",
+      "details": "Détails"
     }
   },
   "copyPhone": "Copier le numero",

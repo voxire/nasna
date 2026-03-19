@@ -29,6 +29,7 @@ interface UpdateManagedUserPayload {
   phoneNumber: string;
   contactPersonName?: string;
   areaOfOperation?: string;
+  centerId?: string;
 }
 
 export async function createManagedUser(payload: CreateManagedUserPayload) {

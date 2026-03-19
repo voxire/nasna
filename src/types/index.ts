@@ -62,6 +62,7 @@ export interface MemberDocument {
   coverageGovernorates?: string[];
   coverageCenterIds?: string[];
   aidTypes?: string[];
+  centerId?: string;
   currentCaseLoad?: number;
   maxCaseLoad?: number;
   deliveryMode?: DeliveryMode;

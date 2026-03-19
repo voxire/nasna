@@ -108,6 +108,19 @@
       "comments": "Comments",
       "noComments": "No comments.",
       "household": "Household Size"
+    },
+    "center": {
+      "noCenter": "No center assigned",
+      "noCenterHint": "Contact an administrator to get assigned to a displacement center.",
+      "notFound": "Center not found. It may have been removed.",
+      "loadError": "Failed to load center data.",
+      "intakeOpen": "Accepting Arrivals",
+      "intakeClosed": "Full / Closed",
+      "capacity": "Capacity",
+      "totalCapacity": "Total Capacity",
+      "currentOccupancy": "Current Occupancy",
+      "available": "Available Spots",
+      "details": "Details"
     }
   },
   "copyPhone": "Copy phone number",

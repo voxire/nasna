@@ -32,6 +32,7 @@ interface UpdateManagedUserRequest {
   phoneNumber: string;
   contactPersonName?: string;
   areaOfOperation?: string;
+  centerId?: string;
 }
 
 interface ValidateManagedUserRequest {
@@ -297,18 +298,21 @@ export const updateManagedUser = onCall<UpdateManagedUserRequest>(
       isAdmin: false,
     });
 
-    await memberRef.set(
-      {
-        name,
-        contactPersonName: role === 'member' ? contactPersonName : '',
-        email,
-        phoneNumber,
-        areaOfOperation: role === 'agent' ? areaOfOperation : '',
-        role,
-        updatedAt: new Date(),
-      },
-      { merge: true },
-    );
+    const updatePayload: Record<string, unknown> = {
+      name,
+      contactPersonName: role === 'member' ? contactPersonName : '',
+      email,
+      phoneNumber,
+      areaOfOperation: role === 'agent' ? areaOfOperation : '',
+      role,
+      updatedAt: new Date(),
+    };
+
+    if (role === 'agent') {
+      updatePayload['centerId'] = request.data?.centerId?.trim() ?? null;
+    }
+
+    await memberRef.set(updatePayload, { merge: true });
 
     return { uid, email, role };
   },
