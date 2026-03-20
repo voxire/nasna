@@ -153,9 +153,10 @@ export function subscribePublicCentersMapData(
   let latestCenters: CenterMarker[] = [];
   let housingReady = false;
   let centersReady = false;
+  let isClosed = false;
 
   function emit() {
-    if (housingReady && centersReady) {
+    if (!isClosed && housingReady && centersReady) {
       callback({ centers: latestCenters, housingAreas });
     }
   }
@@ -164,6 +165,9 @@ export function subscribePublicCentersMapData(
     query(collection(db, 'housing'), where('status', 'in', ['available', 'approved']), limit(500)),
   )
     .then((housingSnap) => {
+      if (isClosed) {
+        return;
+      }
       const housingMap = new Map<string, HousingAreaSummary>();
       housingSnap.docs.forEach((doc) => {
         const d = doc.data();
@@ -184,17 +188,33 @@ export function subscribePublicCentersMapData(
       housingReady = true;
       emit();
     })
-    .catch((err: unknown) => onError(err instanceof Error ? err : new Error(String(err))));
+    .catch((err: unknown) => {
+      if (isClosed) {
+        return;
+      }
+      onError(err instanceof Error ? err : new Error(String(err)));
+    });
 
   const unsubscribe = onSnapshot(
     query(collection(db, 'centers'), where('active', '==', true), limit(200)),
     (centersSnap) => {
+      if (isClosed) {
+        return;
+      }
       latestCenters = centersSnap.docs.map(mapCenterDoc);
       centersReady = true;
       emit();
     },
-    (err) => onError(err),
+    (err) => {
+      if (isClosed) {
+        return;
+      }
+      onError(err);
+    },
   );
 
-  return unsubscribe;
+  return () => {
+    isClosed = true;
+    unsubscribe();
+  };
 }

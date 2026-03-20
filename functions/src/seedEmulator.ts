@@ -9,7 +9,7 @@
  *   admin@nasna.test          — admin role
  *   ngo@nasna.test            — member role (validated NGO)
  *   agent@nasna.test          — agent role (assigned to Beirut Community Center)
- *   agent-nocenter@nasna.test — agent role (no center assigned)
+ *   agent-nocenter@nasna.test — agent role (assigned to Tripoli North Shelter, which starts empty)
  */
 
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
@@ -210,7 +210,7 @@ async function seed() {
   await db.doc(`members/${agentUid}`).update({ centerId: BEIRUT_CENTER_ID });
   console.log(`  ✓  agent@nasna.test assigned to ${BEIRUT_CENTER_ID}`);
   await db.doc(`members/${agentNoCenterUid}`).update({ centerId: TRIPOLI_CENTER_ID });
-  console.log(`  ✓  agent-nocenter@nasna.test assigned to ${TRIPOLI_CENTER_ID}`);
+  console.log(`  ✓  agent-nocenter@nasna.test assigned to empty-state center ${TRIPOLI_CENTER_ID}`);
 
   // ── Submissions ────────────────────────────────────────────────────────────
   console.log('\n📋 Creating sample submissions...');
