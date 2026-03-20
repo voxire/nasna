@@ -168,7 +168,7 @@ function Login() {
                         type="email"
                         placeholder="you@example.com"
                         autoComplete="off"
-                        className="border-gray-200 focus-visible:ring-[#12a89d]"
+                        className="border-gray-200 focus-visible:ring-[#12a89d] h-11"
                         {...field}
                       />
                     </FormControl>
@@ -198,7 +198,7 @@ function Login() {
                         type="password"
                         placeholder="••••••••"
                         autoComplete="off"
-                        className="border-gray-200 focus-visible:ring-[#12a89d]"
+                        className="border-gray-200 focus-visible:ring-[#12a89d] h-11"
                         {...field}
                       />
                     </FormControl>
@@ -208,7 +208,7 @@ function Login() {
               />
               <Button
                 type="submit"
-                className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white h-10"
+                className="w-full bg-[#12a89d] hover:bg-[#0e9088] text-white h-11"
                 disabled={loading}
               >
                 {loading ? t('login.buttons.loading') : t('login.buttons.signIn')}
@@ -228,7 +228,7 @@ function Login() {
           <Button
             type="button"
             variant="outline"
-            className="w-full h-10 gap-2"
+            className="w-full h-11 gap-2"
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
           >
