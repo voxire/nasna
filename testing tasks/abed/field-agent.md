@@ -21,16 +21,16 @@ A trained volunteer or NGO worker who goes into the field and registers displace
 
 ### Happy Path
 - [ ] Navigate to `nasna.world/login`
-- [ ] Enter valid field agent credentials
-- [ ] Click Sign In — does it redirect to the correct dashboard view?
-- [ ] Is the UI clearly scoped to field agent actions (not admin or NGO)?
+- [ ] Enter valid field agent credentials ⚠️ Credentials needed from team — not tested
+- [ ] Click Sign In — does it redirect to the correct dashboard view? ⚠️ Needs credentials
+- [ ] Is the UI clearly scoped to field agent actions (not admin or NGO)? ⚠️ Needs credentials
 
 ### Edge Cases
-- [ ] Enter a **wrong password** — is there a clear, readable error message?
-- [ ] Enter an **email that doesn't exist** — is the message distinct from "wrong password"?
-- [ ] Submit with **email field empty** — does it validate before sending the request?
-- [ ] Submit with **password field empty** — same check
-- [ ] Try logging in with an **NGO account** on a field agent login — what happens?
+- [x] Enter a **wrong password** — is there a clear, readable error message? ✅ Toast: "Invalid credentials. Please try again." Note: form fields are cleared on failure — user must re-type email.
+- [x] Enter an **email that doesn't exist** — is the message distinct from "wrong password"? ✅ Same generic "Invalid credentials" message for both — intentional security behavior (does not reveal whether email exists).
+- [x] Submit with **email field empty** — does it validate before sending the request? ✅ Inline "Invalid input" error appears, no network call made.
+- [x] Submit with **password field empty** — same check ✅ Same inline "Invalid input" error.
+- [ ] Try logging in with an **NGO account** on a field agent login — what happens? ⚠️ Needs credentials
 
 ### Mobile Check
 - [ ] Open the login page on your phone
@@ -38,6 +38,8 @@ A trained volunteer or NGO worker who goes into the field and registers displace
 - [ ] Does the keyboard dismiss cleanly after a successful login?
 
 ---
+
+> **Note:** Scenarios 2 and 3 require valid field agent credentials. All items below are pending until credentials are provided by the team.
 
 ## Scenario 2 — Submitting on Behalf of a Family
 
