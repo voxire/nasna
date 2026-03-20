@@ -170,6 +170,7 @@ export default function UserManagement() {
   const [form, setForm] = useState<UserFormState>(DEFAULT_FORM);
   const [saving, setSaving] = useState(false);
   const [statusBusyId, setStatusBusyId] = useState<string | null>(null);
+  const [promotingUserId, setPromotingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribeUsers = onSnapshot(
@@ -325,6 +326,27 @@ export default function UserManagement() {
     }
   };
 
+  const handleMakeAdmin = async (user: UserRow) => {
+    setPromotingUserId(user.id);
+    try {
+      await updateManagedUser({
+        uid: user.id,
+        role: 'admin',
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+      });
+      toast.success(t('admin.userManagement.makeAdminSuccess'));
+    } catch (error) {
+      console.error('Promote user to admin:', error);
+      toast.error(
+        error instanceof Error ? error.message : t('admin.userManagement.makeAdminError'),
+      );
+    } finally {
+      setPromotingUserId(null);
+    }
+  };
+
   const getRoleLabel = (user: UserRow) => t(`admin.userManagement.roles.${inferUserKind(user)}`);
 
   const getAssignmentLabel = (user: UserRow) => {
@@ -434,6 +456,17 @@ export default function UserManagement() {
                         <Button size="sm" variant="outline" onClick={() => openEdit(user)}>
                           {t('admin.userManagement.edit')}
                         </Button>
+                        {inferUserKind(user) !== 'admin' &&
+                          inferUserKind(user) !== 'super_admin' && (
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              disabled={promotingUserId === user.id}
+                              onClick={() => handleMakeAdmin(user)}
+                            >
+                              {t('admin.userManagement.makeAdmin')}
+                            </Button>
+                          )}
                         <Button
                           size="sm"
                           variant={isActive ? 'destructive' : 'secondary'}
