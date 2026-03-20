@@ -238,7 +238,7 @@ function Home() {
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.previousGovernorate')}</Label>
           <Select value={previousGovernorate} onValueChange={setPreviousGovernorate}>
-            <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue placeholder="Select governorate" /></SelectTrigger>
             <SelectContent>
               {GOVERNORATES.map((g) => (
                 <SelectItem key={g.value} value={g.value}>{t(g.key)}</SelectItem>
@@ -267,7 +267,7 @@ function Home() {
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-gray-700">{t('home.currentGovernorate')}</Label>
               <Select value={currentGovernorate} onValueChange={setCurrentGovernorate}>
-                <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue placeholder="Select governorate" /></SelectTrigger>
                 <SelectContent>
                   {GOVERNORATES.map((g) => (
                     <SelectItem key={g.value} value={g.value}>{t(g.key)}</SelectItem>
