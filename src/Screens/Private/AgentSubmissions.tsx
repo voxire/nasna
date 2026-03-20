@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/Components/ui/table';
+import { LEBANON_GOVERNORATE_TRANSLATION_KEYS, type LebanonGovernorate } from '@/lib/governorates';
 import { useAuthStore } from '@/stores/authStore';
 
 const PAGE_SIZE = 20;
@@ -136,7 +137,13 @@ function AgentSubmissions() {
                 {t('submission.agent.phoneNumber')}
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
+                {t('submission.agent.governorate')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
                 {t('submission.agent.status')}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                {t('submission.agent.urgency')}
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
                 {t('submission.agent.assignedNgo')}
@@ -158,7 +165,13 @@ function AgentSubmissions() {
                     <Skeleton className="h-4 w-28" />
                   </TableCell>
                   <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
                     <Skeleton className="h-5 w-20 rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-16 rounded-full" />
                   </TableCell>
                   <TableCell>
                     <Skeleton className="h-4 w-32" />
@@ -173,7 +186,7 @@ function AgentSubmissions() {
               ))
             ) : submissions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="py-16 text-center">
+                <TableCell colSpan={8} className="py-16 text-center">
                   <p className="text-sm font-medium text-gray-700 mb-1">
                     {t('submission.agent.noSubmissions')}
                   </p>
@@ -197,11 +210,37 @@ function AgentSubmissions() {
                 >
                   <TableCell className="font-medium">{submission.fullName}</TableCell>
                   <TableCell>{submission.phoneNumber}</TableCell>
+                  <TableCell className="text-sm text-gray-600">
+                    {LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                      submission.currentGovernorate as LebanonGovernorate
+                    ]
+                      ? t(
+                          LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                            submission.currentGovernorate as LebanonGovernorate
+                          ],
+                        )
+                      : submission.currentGovernorate}
+                  </TableCell>
                   <TableCell>
                     <CaseStatusBadge
                       status={(submission.status as string) ?? 'pending'}
                       staleFlagged={submission.staleFlagged ?? false}
                     />
+                  </TableCell>
+                  <TableCell>
+                    {submission.aidUrgency ? (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          submission.aidUrgency === 'High'
+                            ? 'text-red-600 bg-red-50'
+                            : submission.aidUrgency === 'Medium'
+                              ? 'text-yellow-600 bg-yellow-50'
+                              : 'text-green-600 bg-green-50'
+                        }`}
+                      >
+                        {t(`submission.${submission.aidUrgency.toLowerCase()}`)}
+                      </span>
+                    ) : null}
                   </TableCell>
                   <TableCell className="text-sm text-gray-600">
                     {submission.assignedToOrgName || t('submission.agent.unassigned')}

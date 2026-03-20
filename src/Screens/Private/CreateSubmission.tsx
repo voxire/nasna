@@ -441,15 +441,20 @@ function CreateSubmission() {
           {[
             { name: 'fullName', label: t('submission.fullName') },
             { name: 'phoneNumber', label: t('submission.phoneNumber') },
-            { name: 'emailAddress', label: t('submission.emailAddress'), type: 'email' },
-          ].map(({ name, label, type }) => (
+            {
+              name: 'emailAddress',
+              label: t('submission.emailAddress'),
+              type: 'email',
+              optional: true,
+            },
+          ].map(({ name, label, type, optional }) => (
             <div key={name} className="space-y-1.5">
               <Label className="text-sm font-medium text-gray-700">{label}</Label>
               <Input
                 type={type ?? 'text'}
                 value={String(formData[name as keyof SubmissionFormData] ?? '')}
                 onChange={(e) => handleChange(name, e.target.value)}
-                required
+                required={!optional}
                 className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]"
               />
             </div>

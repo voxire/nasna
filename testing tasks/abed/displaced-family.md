@@ -55,20 +55,20 @@ A displaced person or family member who heard about Nasna and wants to register 
 **Goal:** Can a family complete the full registration without hitting any issues?
 
 ### Happy Path
-- [ ] Navigate to `nasna.world/submit`
-- [ ] Fill in all required fields: Full Name, Phone Number, Gender
-- [ ] Select Current Governorate from the dropdown
-- [ ] Fill in City, Street, Building, Floor
-- [ ] Select Previous Governorate (where they were displaced from)
-- [ ] Fill in Number of People in Household
-- [ ] Add age ranges for household members (totaling the correct count)
-- [ ] Select Aid Urgency: High / Medium / Low
-- [ ] Select at least 2 Immediate Needs (Food, Water, etc.)
-- [ ] Select any Special Needs if applicable (Pregnancy, Disability, etc.)
+- [x] Navigate to `nasna.world/submit`
+- [x] Fill in all required fields: Full Name, Phone Number, Gender
+- [x] Select Current Governorate from the dropdown
+- [x] Fill in City, Street, Building, Floor
+- [x] Select Previous Governorate (where they were displaced from)
+- [x] Fill in Number of People in Household
+- [x] Add age ranges for household members (totaling the correct count)
+- [x] Select Aid Urgency: High / Medium / Low
+- [x] Select at least 2 Immediate Needs (Food, Water, etc.)
+- [x] Select any Special Needs if applicable (Pregnancy, Disability, etc.)
 - [ ] Optionally add a comment
-- [ ] Check the consent checkbox
-- [ ] Click **Submit** — does it navigate to a confirmation screen?
-- [ ] Does the confirmation screen show a proper thank-you message?
+- [x] Check the consent checkbox
+- [x] Click **Submit** — does it navigate to a confirmation screen? ✅ Navigates to `/confirmation`
+- [x] Does the confirmation screen show a proper thank-you message? ✅ "Thank you for sharing your information!"
 
 ### Edge Cases
 - [ ] Submit with **phone number left empty** — does a validation error appear immediately?
@@ -103,24 +103,24 @@ A displaced person or family member who heard about Nasna and wants to register 
 **Goal:** Can a family member quickly find and call an emergency number?
 
 ### Happy Path
-- [ ] Navigate to `nasna.world/hotlines`
-- [ ] Do hotlines load with categories (Civil Defense, Red Cross, etc.)?
-- [ ] Is each entry showing: organization name + phone number?
-- [ ] On desktop: clicking a number — does it open a `tel:` prompt?
+- [x] Navigate to `nasna.world/hotlines`
+- [x] Do hotlines load with categories (Civil Defense, Red Cross, etc.)? ✅ Emergency / Mental Health / Protection / Humanitarian categories present
+- [x] Is each entry showing: organization name + phone number? ✅ Plus description and 24/7 badge
+- [x] On desktop: clicking a number — does it open a `tel:` prompt? ✅ All numbers are proper `tel:` links
 - [ ] On mobile: tapping a number — does it offer to place a call?
 
 ### Edge Cases
 - [ ] Simulate a network error (airplane mode) and reload — is there an error state instead of a blank screen?
-- [ ] Are there any entries with a missing name or empty phone number? Do they display gracefully?
-- [ ] If there's a search or filter — try filtering by category. Does it narrow results correctly?
+- [x] Are there any entries with a missing name or empty phone number? Do they display gracefully? ✅ All entries complete, no empty fields observed
+- [x] If there's a search or filter — try filtering by category. Does it narrow results correctly? ✅ "Emergency" filter shows only emergency cards; search by name works correctly
 
 ### Mobile Check
 - [ ] Are phone numbers large enough to tap comfortably on a small screen?
 - [ ] Does the page load fast enough to be useful in an emergency situation?
 
 ### RTL / Arabic Check
-- [ ] Do organization names translate to Arabic?
-- [ ] Do phone numbers stay left-to-right even in RTL mode? (numbers should never be reversed)
+- [x] Do organization names translate to Arabic? ⚠️ Organization names (Police / ISF, Civil Defense, Lebanese Red Cross, Embrace Lebanon) remain in English — no Arabic translations provided. May be intentional for proper names, but worth confirming.
+- [x] Do phone numbers stay left-to-right even in RTL mode? (numbers should never be reversed) ✅ Numbers display correctly LTR in Arabic mode
 
 ---
 
@@ -129,13 +129,13 @@ A displaced person or family member who heard about Nasna and wants to register 
 **Goal:** Can a displaced family find available housing offers?
 
 ### Happy Path
-- [ ] Find the Housing link in the navigation
-- [ ] Does the housing list load with available units?
-- [ ] Does each listing show: location, available capacity, contact info?
-- [ ] Can you browse multiple listings without the page breaking?
+- [x] Find the Housing link in the navigation ✅ "Housing" link present in top nav
+- [ ] Does the housing list load with available units? ⚠️ No approved listings in the system at time of testing — see empty state check below
+- [ ] Does each listing show: location, available capacity, contact info? ⚠️ Cannot verify — no listings available
+- [ ] Can you browse multiple listings without the page breaking? ⚠️ Cannot verify — no listings available
 
 ### Edge Cases
-- [ ] What happens if there are no available housing offers? Is there a clear "nothing available" empty state?
+- [x] What happens if there are no available housing offers? Is there a clear "nothing available" empty state? ✅ Both "Approved Housing Offers" and "Active Centers" sections show clear messages: "No approved housing listings matched the current filters." / "No centers matched the current filters."
 - [ ] What if a listing has missing data (no address or no contact)? Does it display without crashing?
 
 ---
@@ -154,5 +154,70 @@ Expected:
 Actual:
 Device / Browser: [e.g., iPhone 15, Safari]
 Language: [Arabic / English]
+Screenshot: [attach]
+```
+
+---
+
+## Bugs Found
+
+```
+Bug #1
+Persona: Displaced Family
+Scenario: Scenario 2 — Registration Form
+Steps to reproduce:
+1. Navigate to nasna.world/submit
+2. Fill in Full Name, Phone, Email, Gender, all Location fields EXCEPT Building and Floor
+3. Click "Next Step"
+Expected: Either the form advances (Building/Floor are optional) OR the missing fields are highlighted in red with labels
+Actual: A generic toast appears — "Ensure all required fields are complete." — with no indication of which fields are missing. Building and Floor have no asterisk or "required" label, so users assume they are optional.
+Device / Browser: Desktop, Chrome
+Language: English
+Screenshot: [attach]
+```
+
+```
+Bug #2
+Persona: Displaced Family
+Scenario: Scenario 2 — Registration Form
+Steps to reproduce:
+1. Navigate to nasna.world/submit, fill all Step 1 fields correctly
+2. On Step 2, fill Immediate Needs, Urgency, and Consent but leave Special Needs unchecked
+3. Click "Send Request"
+Expected: Form submits — Special Needs is labeled as "if applicable" in the test plan and carries no asterisk in the UI
+Actual: Submission is blocked with a generic toast "Ensure all required fields are complete." Special Needs must have at least one selection, but this is not communicated to the user anywhere. A user with no special needs cannot submit.
+Device / Browser: Desktop, Chrome
+Language: English
+Screenshot: [attach]
+```
+
+```
+Bug #3
+Persona: Displaced Family
+Scenario: Scenario 2 — Registration Form
+Steps to reproduce:
+1. Navigate to nasna.world/submit
+2. Fill any required field incorrectly or leave it empty
+3. Click "Next Step" or "Send Request"
+Expected: The specific field(s) with missing/invalid data are highlighted (red border, error label beneath) so the user knows exactly what to fix
+Actual: Only a generic toast appears briefly at the top of the viewport ("Ensure all required fields are complete.") with no field-level feedback. The toast disappears after a few seconds. Users must manually scan the entire form to find the problem.
+Device / Browser: Desktop, Chrome
+Language: English
+Screenshot: [attach]
+```
+
+```
+Bug #4
+Persona: Displaced Family
+Scenario: Scenario 2 — Registration Form
+Steps to reproduce:
+1. Navigate to nasna.world/submit
+2. Open the Previous Governorate dropdown without selecting anything
+3. Close it without choosing a value
+4. Click "Next Step"
+Expected: Placeholder text in the trigger ("Select governorate" or similar) so users know it is required and unselected
+Actual: The SelectTrigger shows blank/empty when no governorate is chosen. There is no placeholder hint. Users may not notice the field is empty. It also lacks a required indicator (*).
+Device / Browser: Desktop, Chrome
+Language: English
 Screenshot: [attach]
 ```

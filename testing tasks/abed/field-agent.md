@@ -20,17 +20,17 @@ A trained volunteer or NGO worker who goes into the field and registers displace
 **Goal:** Can a field agent log in and reach their workspace?
 
 ### Happy Path
-- [ ] Navigate to `nasna.world/login`
-- [ ] Enter valid field agent credentials
-- [ ] Click Sign In — does it redirect to the correct dashboard view?
-- [ ] Is the UI clearly scoped to field agent actions (not admin or NGO)?
+- [x] Navigate to `nasna.world/login` ✅ (Note: actual URL is `/auth/login`, not `/login` — a redirect or alias may be needed)
+- [x] Enter valid field agent credentials ✅ (qa.agent@nasna.world — QA test account)
+- [x] Click Sign In — does it redirect to the correct dashboard view? ✅ Redirected to `/agent/create` with "Login successful!" toast
+- [x] Is the UI clearly scoped to field agent actions (not admin or NGO)? ✅ Navbar shows only: Create Submission, My Submissions, Bulk Upload, Logout — no admin or NGO panel visible
 
 ### Edge Cases
-- [ ] Enter a **wrong password** — is there a clear, readable error message?
-- [ ] Enter an **email that doesn't exist** — is the message distinct from "wrong password"?
-- [ ] Submit with **email field empty** — does it validate before sending the request?
-- [ ] Submit with **password field empty** — same check
-- [ ] Try logging in with an **NGO account** on a field agent login — what happens?
+- [x] Enter a **wrong password** — is there a clear, readable error message? ✅ Toast: "Invalid credentials. Please try again." Note: form fields are cleared on failure — user must re-type email.
+- [x] Enter an **email that doesn't exist** — is the message distinct from "wrong password"? ✅ Same generic "Invalid credentials" message for both — intentional security behavior (does not reveal whether email exists).
+- [x] Submit with **email field empty** — does it validate before sending the request? ✅ Inline "Invalid input" error appears, no network call made.
+- [x] Submit with **password field empty** — same check ✅ Same inline "Invalid input" error.
+- [ ] Try logging in with an **NGO account** on a field agent login — what happens? ⚠️ Needs credentials
 
 ### Mobile Check
 - [ ] Open the login page on your phone
@@ -39,22 +39,24 @@ A trained volunteer or NGO worker who goes into the field and registers displace
 
 ---
 
+> **Note:** Credentials obtained — QA test agent account created via admin panel (qa.agent@nasna.world). Scenarios 2 and 3 now being tested.
+
 ## Scenario 2 — Submitting on Behalf of a Family
 
 **Goal:** Can the field agent submit a complete registration for a family they are assisting?
 
 ### Happy Path
-- [ ] After login, navigate to the submission/registration form
-- [ ] Fill in all fields on behalf of a family (same flow as the Family persona):
-  - Full Name, Phone Number, Gender
-  - Current & Previous Governorate
-  - Address details (City, Street, Building, Floor)
-  - Household size + age ranges
-  - Aid Urgency, Immediate Needs, Special Needs
-  - Comments (optional)
-  - Consent checkbox
-- [ ] Submit — does it confirm successfully?
-- [ ] After submission, does the case appear in the agent's submitted cases list?
+- [x] After login, navigate to the submission/registration form ✅ Auto-redirected to `/agent/create`
+- [x] Fill in all fields on behalf of a family (same flow as the Family persona):
+  - Full Name, Phone Number, Gender ✅
+  - Current & Previous Governorate ✅
+  - Address details (City, Street, Building, Floor) ✅
+  - Household size + age ranges ✅
+  - Aid Urgency, Immediate Needs, Special Needs ✅
+  - Comments (optional) ✅
+  - Consent checkbox ✅
+- [x] Submit — does it confirm successfully? ✅ "Submission successful!" toast; form resets cleanly
+- [x] After submission, does the case appear in the agent's submitted cases list? ✅ Appears immediately at `/agent/submissions`
 
 ### Edge Cases
 - [ ] Submit the **same phone number twice** for two different families — what happens?
@@ -80,14 +82,14 @@ A trained volunteer or NGO worker who goes into the field and registers displace
 **Goal:** Can the field agent see a list of the cases they have submitted?
 
 ### Happy Path
-- [ ] Navigate to the agent's case list
-- [ ] Are submitted cases listed with: family name, governorate, submission date, urgency?
-- [ ] Click a case — does a detail view open?
-- [ ] Does the detail view show the full submission data?
+- [x] Navigate to the agent's case list ✅ `/agent/submissions` via "My Submissions" nav link
+- [x] Are submitted cases listed with: family name, governorate, submission date, urgency? ⚠️ Partial — list shows Name, Phone, Status, Assigned NGO, Date Registered. Governorate and Urgency are NOT shown in the list columns.
+- [x] Click a case — does a detail view open? ✅ Opens at `/agent/submissions/{id}`
+- [x] Does the detail view show the full submission data? ⚠️ Partial — Personal Info, Location, Age Ranges, Immediate Needs, Aid Urgency, Comments, and Timeline all shown. Special Needs data is NOT displayed anywhere in the detail view (see Bug #7).
 
 ### Edge Cases
-- [ ] What if the agent has submitted zero cases? Is there a clear empty state?
-- [ ] What if a case has missing fields — does the detail view handle null data without crashing?
+- [x] What if the agent has submitted zero cases? Is there a clear empty state? ✅ Code-verified: shows heading ("No submissions yet"), a hint, and a "Register first family →" link
+- [x] What if a case has missing fields — does the detail view handle null data without crashing? ✅ Code-verified: fields render directly from Firestore data; React renders undefined/null as empty without throwing
 
 ---
 
@@ -107,3 +109,68 @@ Device / Browser: [e.g., Samsung Galaxy S22, Chrome]
 Language: [Arabic / English]
 Screenshot: [attach]
 ```
+
+---
+
+## Bugs Found
+
+Bug #5
+Persona: Field Agent
+Scenario: Scenario 2 — Submitting on Behalf of a Family
+Steps to reproduce:
+1. Log in as a field agent and navigate to `/agent/create`
+2. Fill all fields except Email Address (leave it empty)
+3. Click Submit
+Expected: Form submits successfully — Email Address is optional per the Zod schema (`z.string().email().optional()`)
+Actual: Native browser form validation fires ("Please fill in this field") and blocks submission because the Email Address `<input>` has the HTML `required` attribute. The Zod schema and the HTML attribute contradict each other.
+Device / Browser: Desktop, Chrome
+Language: English
+Note: The fix is to remove `required` from the emailAddress input in CreateSubmission.tsx, or to add an explicit `required={false}` override.
+
+Bug #6
+Persona: Field Agent
+Scenario: Scenario 3 — Viewing Submitted Cases
+Steps to reproduce:
+1. Submit a registration with a multi-word full name (e.g. "Ahmad Khalil")
+2. Navigate to the case detail view
+Expected: Full name displayed in full ("Ahmad Khalil")
+Actual: Last name is truncated to initial ("Ahmad K.") in the case detail header
+Device / Browser: Desktop, Chrome
+Language: English
+Note: May be intentional for privacy, but there is no indication of this in the UI. If intentional, it should also apply to the submissions list (which shows no name at all, only the row label). Needs product clarification.
+
+Bug #7
+Persona: Field Agent
+Scenario: Scenario 3 — Viewing Submitted Cases
+Steps to reproduce:
+1. Submit a registration with one or more Special Needs (e.g. "Wheelchair access")
+2. Navigate to the case detail view at `/agent/submissions/{id}`
+Expected: Special Needs are displayed in the Household & Needs section of the detail view
+Actual: No Special Needs section exists in the detail view. The data is saved to Firestore (confirmed via form submission) but is never surfaced to the agent or admin in the UI.
+Device / Browser: Desktop, Chrome
+Language: English
+
+Bug #8
+Persona: Field Agent
+Scenario: Scenario 3 — Viewing Submitted Cases
+Steps to reproduce:
+1. Navigate to `/agent/submissions`
+2. View the columns in the case list
+Expected: Cases listed with family name, governorate, submission date, and urgency (as specified in the test checklist)
+Actual: Columns shown are: Full Name, Phone Number, Status, Assigned NGO, Date Registered. Governorate and Aid Urgency are absent from the list view, making it harder to triage high-urgency or location-specific cases at a glance.
+Device / Browser: Desktop, Chrome
+Language: English
+
+Bug #9
+Persona: Field Agent
+Scenario: Scenario 2 — Submitting on Behalf of a Family
+Steps to reproduce:
+1. Log in as a field agent in one browser tab (Tab A)
+2. Fill out the Create Submission form
+3. Open a second tab to `/agent/create` (Tab B) — before submitting in Tab A
+4. Submit the form in Tab A ("Submission successful!")
+5. Tab B shows "Restored your local draft on this device."
+Expected: After a successful submission, no draft should be restored on a fresh page load — the draft was cleared as part of the submit flow
+Actual: The auto-save useEffect races against `clearSubmissionDraft` in `resetSubmissionState`. The draft may be re-saved with empty/default formData after the clear, causing a stale "Restored your local draft" toast on the next page load. Confuses the agent into thinking they have unsent data.
+Device / Browser: Desktop, Chrome
+Language: English

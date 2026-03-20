@@ -310,6 +310,30 @@ export default function AgentSubmissionDetail() {
                 </div>
               </div>
 
+              {submission.specialNeeds && submission.specialNeeds.length > 0 ? (
+                <>
+                  <Separator />
+
+                  {/* Special Needs */}
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
+                      {t('submission.agent.detail.specialNeeds')}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {submission.specialNeeds.map((need) => (
+                        <Badge
+                          key={need}
+                          variant="secondary"
+                          className="bg-amber-50 text-amber-700 border-amber-200"
+                        >
+                          {need}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : null}
+
               <Separator />
 
               {/* Urgency */}

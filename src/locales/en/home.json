@@ -76,6 +76,10 @@
   "locationCenter": "Staying in a center",
   "center": "Center",
   "invalidEmail": "Please enter a valid email address.",
+  "validation": {
+    "requiredField": "This field is required.",
+    "selectGovernorate": "Select governorate"
+  },
   "whatsappCta": {
     "title": "Register via WhatsApp",
     "description": "Prefer to register from your phone? Send us a message on WhatsApp and our bot will guide you through registration in Arabic, English, or French.",
