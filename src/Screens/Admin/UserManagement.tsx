@@ -132,17 +132,6 @@ function buildCreatePayload(form: UserFormState) {
     };
   }
 
-  if (form.role === 'admin') {
-    return {
-      role: 'admin' as const,
-      name: form.name,
-      email: form.email,
-      phoneNumber: form.phoneNumber,
-      password: form.password,
-      validateImmediately: true,
-    };
-  }
-
   return {
     role: 'agent' as const,
     name: form.name,
@@ -553,13 +542,12 @@ export default function UserManagement() {
                     centerId: value === 'center_agent' ? current.centerId : '',
                   }))
                 }
-                disabled={editTarget?.role === 'super_admin'}
+                disabled={editTarget?.role === 'super_admin' || editTarget?.role === 'admin'}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">{t('admin.userManagement.roles.admin')}</SelectItem>
                   <SelectItem value="ngo">{t('admin.userManagement.roles.ngo')}</SelectItem>
                   <SelectItem value="field_agent">
                     {t('admin.userManagement.roles.field_agent')}

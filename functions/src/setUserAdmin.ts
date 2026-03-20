@@ -17,25 +17,26 @@ async function main() {
     process.exit(1);
   }
 
-  const enableAdmin = modeArg !== 'off';
-  const role = enableAdmin ? 'admin' : 'agent';
+  const enableSuperAdmin = modeArg !== 'off';
+  const role = enableSuperAdmin ? 'super_admin' : 'agent';
 
   await adminAuth.setCustomUserClaims(uid, {
     role,
-    isAdmin: enableAdmin,
+    isAdmin: enableSuperAdmin,
   });
 
   await db.collection('members').doc(uid).set(
     {
       role,
-      isAdmin: enableAdmin,
+      active: true,
+      isAdmin: enableSuperAdmin,
       updatedAt: new Date(),
     },
     { merge: true },
   );
 
   console.log(
-    `${enableAdmin ? 'Promoted' : 'Demoted'} ${uid} ${enableAdmin ? 'to admin' : 'from admin'}`,
+    `${enableSuperAdmin ? 'Promoted' : 'Demoted'} ${uid} ${enableSuperAdmin ? 'to super admin' : 'from super admin'}`,
   );
 }
 
