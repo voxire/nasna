@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
-  getPublicCentersMapData,
+  subscribePublicCentersMapData,
   type CenterMarker,
   type HousingAreaSummary,
 } from '@/services/operationsMap';
@@ -90,19 +90,20 @@ export default function CentersMap() {
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
 
   useEffect(() => {
-    void (async () => {
-      setLoading(true);
-      try {
-        const data = await getPublicCentersMapData();
+    setLoading(true);
+    const unsubscribe = subscribePublicCentersMapData(
+      (data) => {
         setCenters(data.centers);
         setHousingAreas(data.housingAreas);
-      } catch {
+        setLoading(false);
+      },
+      () => {
         setError(t('centersMap.loadError'));
         toast.error(t('centersMap.loadError'));
-      } finally {
         setLoading(false);
-      }
-    })();
+      },
+    );
+    return unsubscribe;
   }, [t]);
 
   if (loading) {
@@ -274,10 +275,11 @@ export default function CentersMap() {
                         center.totalCapacity > 0
                           ? center.currentOccupancy / center.totalCapacity
                           : 0;
+                      const notFull = center.currentOccupancy < center.totalCapacity;
                       const intakeOpen =
                         center.intakeOpen !== undefined
-                          ? center.intakeOpen
-                          : center.currentOccupancy < center.totalCapacity;
+                          ? center.intakeOpen && notFull
+                          : notFull;
                       const barColor =
                         pct > 0.9 ? '#ef4444' : pct >= 0.75 ? '#facc15' : '#4ade80';
 

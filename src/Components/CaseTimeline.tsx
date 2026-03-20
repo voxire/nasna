@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { Timestamp } from 'firebase/firestore';
 
 interface CaseTimelineProps {
@@ -9,8 +10,8 @@ interface CaseTimelineProps {
   staleFlagged?: boolean;
 }
 
-function formatDate(value?: Timestamp | Date | string | null) {
-  if (!value) return 'Not yet recorded';
+function formatDate(value?: Timestamp | Date | string | null, fallback?: string) {
+  if (!value) return fallback ?? '';
   const date =
     typeof value === 'string' ? new Date(value) : value instanceof Date ? value : value.toDate();
   return date.toLocaleString();
@@ -24,13 +25,39 @@ export default function CaseTimeline({
   aidDelivered,
   staleFlagged,
 }: CaseTimelineProps) {
+  const { t } = useTranslation();
+
   const items = [
-    { label: 'Case registered', value: formatDate(registrationDate) },
-    { label: 'Assigned to NGO', value: assignedAt ? formatDate(assignedAt) : 'Not assigned' },
-    { label: 'Latest update', value: formatDate(updatedAt) },
-    { label: 'Current status', value: status ? status.replace('_', ' ') : 'pending' },
-    { label: 'Aid delivery', value: aidDelivered ? 'Marked delivered' : 'Not delivered yet' },
-    { label: 'Stale flag', value: staleFlagged ? 'Needs review' : 'Clear' },
+    {
+      label: t('submission.timeline.caseRegistered'),
+      value: formatDate(registrationDate, t('submission.timeline.notYetRecorded')),
+    },
+    {
+      label: t('submission.timeline.assignedToNgo'),
+      value: assignedAt
+        ? formatDate(assignedAt, t('submission.timeline.notYetRecorded'))
+        : t('submission.timeline.notAssigned'),
+    },
+    {
+      label: t('submission.timeline.latestUpdate'),
+      value: formatDate(updatedAt, t('submission.timeline.notYetRecorded')),
+    },
+    {
+      label: t('submission.timeline.currentStatus'),
+      value: status
+        ? t(`submission.status.${status}`, { defaultValue: status.replace('_', ' ') })
+        : t('submission.status.pending'),
+    },
+    {
+      label: t('submission.timeline.aidDelivery'),
+      value: aidDelivered
+        ? t('submission.timeline.markedDelivered')
+        : t('submission.timeline.notDeliveredYet'),
+    },
+    {
+      label: t('submission.timeline.staleFlag'),
+      value: staleFlagged ? t('submission.timeline.needsReview') : t('submission.timeline.clear'),
+    },
   ];
 
   return (
@@ -40,7 +67,7 @@ export default function CaseTimeline({
           <div className="mt-1 h-2.5 w-2.5 rounded-full bg-[#12a89d]" />
           <div>
             <p className="text-sm font-medium text-gray-800">{item.label}</p>
-            <p className="text-sm text-gray-500 capitalize">{item.value}</p>
+            <p className="text-sm text-gray-500">{item.value}</p>
           </div>
         </div>
       ))}

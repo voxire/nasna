@@ -84,6 +84,7 @@ function PrivateNavbar() {
         {role === 'agent' ? (
           <nav className="mr-4 hidden items-center gap-2 lg:flex">
             {[
+              { href: '/agent/center', label: t('header.myCenter') },
               { href: '/agent/create', label: t('header.createSubmission') },
               { href: '/agent/submissions', label: t('header.mySubmissions') },
               { href: '/agent/bulk-upload', label: t('header.bulkUpload') },

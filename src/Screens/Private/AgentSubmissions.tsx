@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { db } from '../../firebase';
-import { collection, onSnapshot, query, where, limit } from 'firebase/firestore';
+import { collection, limit, onSnapshot, query, where } from 'firebase/firestore';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ChevronRight, ChevronLeft } from 'lucide-react';
 import type { SubmissionDocument } from '../../types';
 import CaseStatusBadge from '@/Components/CaseStatusBadge';
 import { Button } from '@/Components/ui/button';
@@ -18,8 +18,22 @@ import {
 } from '@/Components/ui/table';
 import { useAuthStore } from '@/stores/authStore';
 
+const PAGE_SIZE = 20;
+
 interface SubmissionRow extends SubmissionDocument {
   id: string;
+}
+
+function getSubmissionTimestamp(submission: SubmissionDocument) {
+  if (submission.registrationDate?.toDate) {
+    return submission.registrationDate.toDate().getTime();
+  }
+
+  if (submission.createdAt instanceof Date) {
+    return submission.createdAt.getTime();
+  }
+
+  return 0;
 }
 
 function AgentSubmissions() {
@@ -28,6 +42,7 @@ function AgentSubmissions() {
   const [submissions, setSubmissions] = useState<SubmissionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
   const currentUser = useAuthStore((state) => state.firebaseUser);
   const role = useAuthStore((state) => state.role);
   const initialized = useAuthStore((state) => state.initialized);
@@ -58,15 +73,17 @@ function AgentSubmissions() {
     const submissionQuery = query(
       collection(db, 'submissions'),
       where('agent', '==', agentUid),
-      limit(20),
+      limit(200),
     );
     const unsubscribe = onSnapshot(
       submissionQuery,
       (snapshot) => {
-        const data = snapshot.docs.map((d) => ({
-          id: d.id,
-          ...(d.data() as SubmissionDocument),
-        }));
+        const data = snapshot.docs
+          .map((d) => ({
+            id: d.id,
+            ...(d.data() as SubmissionDocument),
+          }))
+          .sort((a, b) => getSubmissionTimestamp(b) - getSubmissionTimestamp(a));
         setSubmissions(data);
         setLoading(false);
       },
@@ -79,6 +96,17 @@ function AgentSubmissions() {
 
     return unsubscribe;
   }, [authLoading, currentUser, initialized, navigate, profileLoading, role]);
+
+  const totalPages = Math.max(1, Math.ceil(submissions.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setPage((currentPage) => Math.min(currentPage, totalPages));
+  }, [totalPages]);
+
+  const paginated = useMemo(
+    () => submissions.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [submissions, page],
+  );
 
   if (error) {
     return <p className="text-red-500">{error}</p>;
@@ -161,7 +189,7 @@ function AgentSubmissions() {
                 </TableCell>
               </TableRow>
             ) : (
-              submissions.map((submission) => (
+              paginated.map((submission) => (
                 <TableRow
                   key={submission.id}
                   className="hover:bg-gray-50 cursor-pointer"
@@ -189,6 +217,38 @@ function AgentSubmissions() {
             )}
           </TableBody>
         </Table>
+
+        {!loading && submissions.length > PAGE_SIZE && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
+            <p className="text-xs text-gray-500">
+              {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, submissions.length)} /{' '}
+              {submissions.length}
+            </p>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-7 w-7"
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-xs text-gray-600 px-2">
+                {page} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-7 w-7"
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

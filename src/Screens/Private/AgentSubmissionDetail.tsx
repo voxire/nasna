@@ -12,18 +12,19 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { Separator } from '@/Components/ui/separator';
+import { useAuthStore } from '@/stores/authStore';
+import { LEBANON_GOVERNORATE_TRANSLATION_KEYS, type LebanonGovernorate } from '@/lib/governorates';
 
 interface SubmissionWithId extends SubmissionDocument {
   id: string;
 }
 
-/** Mask full name to "FirstName L." for PII protection */
 function maskName(fullName: string): string {
   const parts = fullName.trim().split(/\s+/);
   if (parts.length <= 1) return fullName;
   const firstName = parts[0];
-  const lastInitial = parts[parts.length - 1][0];
-  return `${firstName} ${lastInitial}.`;
+  const lastInitial = parts[parts.length - 1]?.[0];
+  return lastInitial ? `${firstName} ${lastInitial}.` : firstName;
 }
 
 const AGE_RANGE_KEYS: (keyof AgeRanges)[] = ['0-3', '4-12', '13-18', '19-60', '60+'];
@@ -31,6 +32,7 @@ const AGE_RANGE_KEYS: (keyof AgeRanges)[] = ['0-3', '4-12', '13-18', '19-60', '6
 export default function AgentSubmissionDetail() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const profile = useAuthStore((state) => state.profile);
   const [submission, setSubmission] = useState<SubmissionWithId | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +63,11 @@ export default function AgentSubmissionDetail() {
 
         const data = snapshot.data() as SubmissionDocument;
 
-        if (data.agent !== agentUid) {
+        // Allow access if this agent submitted it OR if it belongs to their assigned center
+        const isOwnSubmission = data.agent === agentUid;
+        const isCenterSubmission = data.centerId != null && data.centerId === profile?.centerId;
+
+        if (!isOwnSubmission && !isCenterSubmission) {
           setAccessDenied(true);
           setLoading(false);
           return;
@@ -135,7 +141,17 @@ export default function AgentSubmissionDetail() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-gray-800">{maskName(submission.fullName)}</h1>
-            <p className="text-sm text-gray-500">{submission.currentGovernorate}</p>
+            <p className="text-sm text-gray-500">
+              {LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                submission.currentGovernorate as LebanonGovernorate
+              ]
+                ? t(
+                    LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                      submission.currentGovernorate as LebanonGovernorate
+                    ],
+                  )
+                : submission.currentGovernorate}
+            </p>
           </div>
         </div>
         <CaseStatusBadge status={submission.status} staleFlagged={submission.staleFlagged} />
@@ -203,11 +219,31 @@ export default function AgentSubmissionDetail() {
             <CardContent className="grid gap-4 md:grid-cols-2">
               <DetailField
                 label={t('submission.agent.detail.governorate')}
-                value={submission.currentGovernorate}
+                value={
+                  LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                    submission.currentGovernorate as LebanonGovernorate
+                  ]
+                    ? t(
+                        LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                          submission.currentGovernorate as LebanonGovernorate
+                        ],
+                      )
+                    : submission.currentGovernorate
+                }
               />
               <DetailField
                 label={t('submission.previousGovernorate')}
-                value={submission.previousGovernorate}
+                value={
+                  LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                    submission.previousGovernorate as LebanonGovernorate
+                  ]
+                    ? t(
+                        LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                          submission.previousGovernorate as LebanonGovernorate
+                        ],
+                      )
+                    : submission.previousGovernorate
+                }
               />
               <DetailField
                 label={t('submission.agent.detail.locationType')}

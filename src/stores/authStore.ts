@@ -55,7 +55,7 @@ function resolveRole(profile: MemberDocument | null, claimedRole?: unknown): Use
 export function resolvePostLoginPath(role: UserRole | null, onboarded: boolean) {
   if (role === 'admin') return '/manage';
   if (!onboarded) return '/auth/onboarding';
-  if (role === 'agent') return '/agent/create';
+  if (role === 'agent') return '/agent/center';
   return '/ngo/submissions';
 }
 

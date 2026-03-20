@@ -21,6 +21,7 @@ interface CreateManagedUserRequest {
   password: string;
   contactPersonName?: string;
   areaOfOperation?: string;
+  centerId?: string;
   validateImmediately?: boolean;
 }
 
@@ -32,6 +33,7 @@ interface UpdateManagedUserRequest {
   phoneNumber: string;
   contactPersonName?: string;
   areaOfOperation?: string;
+  centerId?: string;
 }
 
 interface ValidateManagedUserRequest {
@@ -96,6 +98,7 @@ function buildManagedMemberData({
   phoneNumber,
   contactPersonName,
   areaOfOperation,
+  centerId,
   validated,
 }: {
   uid: string;
@@ -105,6 +108,7 @@ function buildManagedMemberData({
   phoneNumber: string;
   contactPersonName: string;
   areaOfOperation: string;
+  centerId: string;
   validated: boolean;
 }) {
   return {
@@ -114,6 +118,7 @@ function buildManagedMemberData({
     email,
     phoneNumber,
     areaOfOperation: role === 'agent' ? areaOfOperation : '',
+    centerId: role === 'agent' ? centerId || null : null,
     kindOfHelp: '',
     initiativeOrNgo: '',
     role,
@@ -153,6 +158,7 @@ export const createManagedUser = onCall<CreateManagedUserRequest>(
     const password = request.data?.password ?? '';
     const contactPersonName = request.data?.contactPersonName?.trim() ?? '';
     const areaOfOperation = request.data?.areaOfOperation?.trim() ?? '';
+    const centerId = request.data?.centerId?.trim() ?? '';
     const validateImmediately = request.data?.validateImmediately !== false;
 
     if (role !== 'member' && role !== 'agent') {
@@ -213,6 +219,7 @@ export const createManagedUser = onCall<CreateManagedUserRequest>(
             phoneNumber,
             contactPersonName,
             areaOfOperation,
+            centerId,
             validated: validateImmediately,
           }),
         );
@@ -297,18 +304,21 @@ export const updateManagedUser = onCall<UpdateManagedUserRequest>(
       isAdmin: false,
     });
 
-    await memberRef.set(
-      {
-        name,
-        contactPersonName: role === 'member' ? contactPersonName : '',
-        email,
-        phoneNumber,
-        areaOfOperation: role === 'agent' ? areaOfOperation : '',
-        role,
-        updatedAt: new Date(),
-      },
-      { merge: true },
-    );
+    const updatePayload: Record<string, unknown> = {
+      name,
+      contactPersonName: role === 'member' ? contactPersonName : '',
+      email,
+      phoneNumber,
+      areaOfOperation: role === 'agent' ? areaOfOperation : '',
+      role,
+      updatedAt: new Date(),
+    };
+
+    if (role === 'agent') {
+      updatePayload['centerId'] = request.data?.centerId?.trim() ?? null;
+    }
+
+    await memberRef.set(updatePayload, { merge: true });
 
     return { uid, email, role };
   },

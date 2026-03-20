@@ -1,5 +1,5 @@
 import { httpsCallable } from 'firebase/functions';
-import { collection, getDocs, limit, query, where } from 'firebase/firestore';
+import { collection, getDocs, limit, onSnapshot, query, where } from 'firebase/firestore';
 import { db, functions } from '@/firebase';
 
 const GOVERNORATE_COORDINATES: Record<string, { lat: number; lng: number }> = {
@@ -99,26 +99,7 @@ export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
     ),
   ]);
 
-  const centers: CenterMarker[] = centersSnap.docs.map((doc) => {
-    const d = doc.data();
-    const storedCoords = d.coordinates as { lat: number; lng: number } | undefined;
-    const fallback = getCoordinates(d.governorate as string | undefined);
-    return {
-      id: doc.id,
-      name: (d.name as string) ?? 'Center',
-      governorate: (d.governorate as string) ?? '',
-      city: ((d.city as string | undefined) ?? (d.district as string | undefined) ?? '') as string,
-      address: (d.address as string) ?? '',
-      totalCapacity: Number(d.totalCapacity ?? d.capacity ?? 0),
-      currentOccupancy: Number(d.currentOccupancy ?? d.occupiedCapacity ?? 0),
-      lat: storedCoords?.lat ?? fallback.lat,
-      lng: storedCoords?.lng ?? fallback.lng,
-      phone: (d.phone as string | undefined) ?? undefined,
-      aidServices: (d.aidServices as string[] | undefined) ?? [],
-      operatingHours: (d.operatingHours as string | undefined) ?? undefined,
-      intakeOpen: (d.intakeOpen as boolean | undefined) ?? undefined,
-    };
-  });
+  const centers: CenterMarker[] = centersSnap.docs.map(mapCenterDoc);
 
   const housingMap = new Map<
     string,
@@ -141,4 +122,99 @@ export async function getPublicCentersMapData(): Promise<PublicCentersMapData> {
   });
 
   return { centers, housingAreas: Array.from(housingMap.values()) };
+}
+
+function mapCenterDoc(doc: { id: string; data: () => Record<string, unknown> }): CenterMarker {
+  const d = doc.data();
+  const storedCoords = d.coordinates as { lat: number; lng: number } | undefined;
+  const fallback = getCoordinates(d.governorate as string | undefined);
+  return {
+    id: doc.id,
+    name: (d.name as string) ?? 'Center',
+    governorate: (d.governorate as string) ?? '',
+    city: ((d.city as string | undefined) ?? (d.district as string | undefined) ?? '') as string,
+    address: (d.address as string) ?? '',
+    totalCapacity: Number(d.totalCapacity ?? d.capacity ?? 0),
+    currentOccupancy: Number(d.currentOccupancy ?? d.occupiedCapacity ?? 0),
+    lat: storedCoords?.lat ?? fallback.lat,
+    lng: storedCoords?.lng ?? fallback.lng,
+    phone: (d.phone as string | undefined) ?? undefined,
+    aidServices: (d.aidServices as string[] | undefined) ?? [],
+    operatingHours: (d.operatingHours as string | undefined) ?? undefined,
+    intakeOpen: (d.intakeOpen as boolean | undefined) ?? undefined,
+  };
+}
+
+export function subscribePublicCentersMapData(
+  callback: (data: PublicCentersMapData) => void,
+  onError: (error: Error) => void,
+): () => void {
+  let housingAreas: HousingAreaSummary[] = [];
+  let latestCenters: CenterMarker[] = [];
+  let housingReady = false;
+  let centersReady = false;
+  let isClosed = false;
+
+  function emit() {
+    if (!isClosed && housingReady && centersReady) {
+      callback({ centers: latestCenters, housingAreas });
+    }
+  }
+
+  void getDocs(
+    query(collection(db, 'housing'), where('status', 'in', ['available', 'approved']), limit(500)),
+  )
+    .then((housingSnap) => {
+      if (isClosed) {
+        return;
+      }
+      const housingMap = new Map<string, HousingAreaSummary>();
+      housingSnap.docs.forEach((doc) => {
+        const d = doc.data();
+        const area = ((d.district as string | undefined) ??
+          (d.governorate as string | undefined) ??
+          'Unknown') as string;
+        const current = housingMap.get(area) ?? {
+          area,
+          listingCount: 0,
+          availableCapacity: 0,
+          ...getCoordinates((d.governorate as string | undefined) ?? area),
+        };
+        current.listingCount += 1;
+        current.availableCapacity += Number(d.capacity ?? d.availableSpots ?? 0);
+        housingMap.set(area, current);
+      });
+      housingAreas = Array.from(housingMap.values());
+      housingReady = true;
+      emit();
+    })
+    .catch((err: unknown) => {
+      if (isClosed) {
+        return;
+      }
+      onError(err instanceof Error ? err : new Error(String(err)));
+    });
+
+  const unsubscribe = onSnapshot(
+    query(collection(db, 'centers'), where('active', '==', true), limit(200)),
+    (centersSnap) => {
+      if (isClosed) {
+        return;
+      }
+      latestCenters = centersSnap.docs.map(mapCenterDoc);
+      centersReady = true;
+      emit();
+    },
+    (err) => {
+      if (isClosed) {
+        return;
+      }
+      onError(err);
+    },
+  );
+
+  return () => {
+    isClosed = true;
+    unsubscribe();
+  };
 }
