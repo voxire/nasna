@@ -236,11 +236,10 @@ function Agents() {
         email: newAgent.email,
         phoneNumber: newAgent.phoneNumber,
         areaOfOperation: newAgent.areaOfOperation,
+        centerId: newAgent.centerId,
         password: newAgent.password,
         validateImmediately: newAgent.validateImmediately,
       });
-      // centerId is set via updateManagedUser after creation because createManagedUser
-      // doesn't yet persist centerId — update immediately if one was selected.
       toast.success('Agent account created.');
       setCreateModalOpen(false);
       resetCreateForm();

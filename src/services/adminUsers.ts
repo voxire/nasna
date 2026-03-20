@@ -11,6 +11,7 @@ interface CreateManagedUserPayload {
   password: string;
   contactPersonName?: string;
   areaOfOperation?: string;
+  centerId?: string;
   validateImmediately?: boolean;
 }
 

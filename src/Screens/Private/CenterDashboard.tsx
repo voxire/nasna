@@ -1,15 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  collection,
-  doc,
-  getDoc,
-  onSnapshot,
-  orderBy,
-  query,
-  updateDoc,
-  where,
-} from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { useAuthStore } from '@/stores/authStore';
 import type { CenterDocument, SubmissionDocument } from '@/types';
@@ -51,12 +42,23 @@ function CenterDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [editCapacity, setEditCapacity] = useState('');
   const [editOccupancy, setEditOccupancy] = useState('');
   const [editIntakeOpen, setEditIntakeOpen] = useState(true);
   const [families, setFamilies] = useState<FamilyRow[]>([]);
   const [familiesLoading, setFamiliesLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const getSubmissionTimestamp = (submission: SubmissionDocument) => {
+    const createdAt = submission.createdAt;
+    if (createdAt && typeof createdAt === 'object' && 'seconds' in createdAt) {
+      return Number(createdAt.seconds) * 1000;
+    }
+    const registrationDate = submission.registrationDate;
+    if (registrationDate && typeof registrationDate === 'object' && 'seconds' in registrationDate) {
+      return Number(registrationDate.seconds) * 1000;
+    }
+    return 0;
+  };
 
   useEffect(() => {
     const centerId = profile?.centerId;
@@ -96,15 +98,14 @@ function CenterDashboard() {
       setFamiliesLoading(false);
       return;
     }
-    const q = query(
-      collection(db, 'submissions'),
-      where('centerId', '==', centerId),
-      orderBy('createdAt', 'desc'),
-    );
+    const q = query(collection(db, 'submissions'), where('centerId', '==', centerId));
     return onSnapshot(
       q,
       (snap) => {
-        setFamilies(snap.docs.map((d) => ({ id: d.id, ...(d.data() as SubmissionDocument) })));
+        const nextFamilies = snap.docs
+          .map((d) => ({ id: d.id, ...(d.data() as SubmissionDocument) }))
+          .sort((left, right) => getSubmissionTimestamp(right) - getSubmissionTimestamp(left));
+        setFamilies(nextFamilies);
         setFamiliesLoading(false);
       },
       (err) => {
@@ -116,7 +117,6 @@ function CenterDashboard() {
 
   const openEdit = () => {
     if (!center) return;
-    setEditCapacity(String(center.totalCapacity));
     setEditOccupancy(String(center.currentOccupancy));
     setEditIntakeOpen(center.intakeOpen !== false);
     setEditing(true);
@@ -124,24 +124,18 @@ function CenterDashboard() {
 
   const handleSave = async () => {
     if (!center || !profile?.centerId) return;
-    const capacity = parseInt(editCapacity, 10);
     const occupancy = parseInt(editOccupancy, 10);
-    if (isNaN(capacity) || capacity < 0) {
-      toast.error(t('submission.agent.center.errorCapacityInvalid'));
-      return;
-    }
     if (isNaN(occupancy) || occupancy < 0) {
       toast.error(t('submission.agent.center.errorOccupancyInvalid'));
       return;
     }
-    if (occupancy > capacity) {
+    if (occupancy > center.totalCapacity) {
       toast.error(t('submission.agent.center.errorOccupancyExceedsCapacity'));
       return;
     }
     setSaving(true);
     try {
       await updateDoc(doc(db, 'centers', profile.centerId), {
-        totalCapacity: capacity,
         currentOccupancy: occupancy,
         intakeOpen: editIntakeOpen,
         updatedAt: serverTimestamp(),
@@ -150,7 +144,6 @@ function CenterDashboard() {
         prev
           ? {
               ...prev,
-              totalCapacity: capacity,
               currentOccupancy: occupancy,
               intakeOpen: editIntakeOpen,
             }
@@ -263,15 +256,10 @@ function CenterDashboard() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="editCapacity">{t('submission.agent.center.totalCapacity')}</Label>
-                <Input
-                  id="editCapacity"
-                  type="number"
-                  inputMode="numeric"
-                  min={0}
-                  value={editCapacity}
-                  onChange={(e) => setEditCapacity(e.target.value)}
-                />
+                <Label>{t('submission.agent.center.totalCapacity')}</Label>
+                <div className="flex h-10 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-600">
+                  {center.totalCapacity}
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="editOccupancy">
