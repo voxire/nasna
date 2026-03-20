@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/Components/ui/table';
+import { LEBANON_GOVERNORATE_TRANSLATION_KEYS, type LebanonGovernorate } from '@/lib/governorates';
 import { useAuthStore } from '@/stores/authStore';
 
 interface SubmissionRow extends SubmissionDocument {
@@ -182,7 +183,15 @@ function AgentSubmissions() {
                   <TableCell className="font-medium">{submission.fullName}</TableCell>
                   <TableCell>{submission.phoneNumber}</TableCell>
                   <TableCell className="text-sm text-gray-600">
-                    {submission.currentGovernorate}
+                    {LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                      submission.currentGovernorate as LebanonGovernorate
+                    ]
+                      ? t(
+                          LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                            submission.currentGovernorate as LebanonGovernorate
+                          ],
+                        )
+                      : submission.currentGovernorate}
                   </TableCell>
                   <TableCell>
                     <CaseStatusBadge
@@ -201,7 +210,7 @@ function AgentSubmissions() {
                               : 'text-green-600 bg-green-50'
                         }`}
                       >
-                        {submission.aidUrgency}
+                        {t(`submission.${submission.aidUrgency.toLowerCase()}`)}
                       </span>
                     ) : null}
                   </TableCell>

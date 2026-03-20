@@ -109,7 +109,6 @@ function Home() {
       fullName &&
       trimmedPhone &&
       (isCenterCase ? hasRequiredCenterFields : hasRequiredAddress) &&
-      specialNeeds.length &&
       needs.length &&
       aidUrgency &&
       consentGiven
@@ -190,12 +189,16 @@ function Home() {
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.fullName')}</Label>
           <Input value={fullName} onChange={(e) => setFullName(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
-          {showStep1Errors && !fullName && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
+          {showStep1Errors && !fullName && (
+            <p className="text-xs text-red-500 mt-1">{t('home.validation.requiredField')}</p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.phoneNumber')}</Label>
           <Input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(removeEmojis(e.target.value))} maxLength={20} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
-          {showStep1Errors && !phoneNumber && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
+          {showStep1Errors && !phoneNumber && (
+            <p className="text-xs text-red-500 mt-1">{t('home.validation.requiredField')}</p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.emailAddress')}</Label>
@@ -243,14 +246,18 @@ function Home() {
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.previousGovernorate')}</Label>
           <Select value={previousGovernorate} onValueChange={setPreviousGovernorate}>
-            <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue placeholder="Select governorate" /></SelectTrigger>
+            <SelectTrigger className="bg-gray-50 border-gray-200">
+              <SelectValue placeholder={t('home.validation.selectGovernorate')} />
+            </SelectTrigger>
             <SelectContent>
               {GOVERNORATES.map((g) => (
                 <SelectItem key={g.value} value={g.value}>{t(g.key)}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-          {showStep1Errors && !previousGovernorate && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
+          {showStep1Errors && !previousGovernorate && (
+            <p className="text-xs text-red-500 mt-1">{t('home.validation.requiredField')}</p>
+          )}
         </div>
         {isCenterCase ? (
           <div className="space-y-4">
@@ -273,14 +280,18 @@ function Home() {
             <div className="space-y-1.5">
               <Label className="text-sm font-medium text-gray-700">{t('home.currentGovernorate')}</Label>
               <Select value={currentGovernorate} onValueChange={setCurrentGovernorate}>
-                <SelectTrigger className="bg-gray-50 border-gray-200"><SelectValue placeholder="Select governorate" /></SelectTrigger>
+                <SelectTrigger className="bg-gray-50 border-gray-200">
+                  <SelectValue placeholder={t('home.validation.selectGovernorate')} />
+                </SelectTrigger>
                 <SelectContent>
                   {GOVERNORATES.map((g) => (
                     <SelectItem key={g.value} value={g.value}>{t(g.key)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {showStep1Errors && !currentGovernorate && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
+              {showStep1Errors && !currentGovernorate && (
+                <p className="text-xs text-red-500 mt-1">{t('home.validation.requiredField')}</p>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -290,19 +301,25 @@ function Home() {
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium text-gray-700">{t('home.street')}</Label>
                 <Input value={street} onChange={(e) => setStreet(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
-                {showStep1Errors && !street && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
+                {showStep1Errors && !street && (
+                  <p className="text-xs text-red-500 mt-1">{t('home.validation.requiredField')}</p>
+                )}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium text-gray-700">{t('home.building')}<span className="text-red-500 ml-0.5">*</span></Label>
                 <Input value={building} onChange={(e) => setBuilding(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
-                {showStep1Errors && !building && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
+                {showStep1Errors && !building && (
+                  <p className="text-xs text-red-500 mt-1">{t('home.validation.requiredField')}</p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium text-gray-700">{t('home.floor')}<span className="text-red-500 ml-0.5">*</span></Label>
                 <Input value={floor} onChange={(e) => setFloor(removeEmojis(e.target.value))} maxLength={10} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
-                {showStep1Errors && !floor && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
+                {showStep1Errors && !floor && (
+                  <p className="text-xs text-red-500 mt-1">{t('home.validation.requiredField')}</p>
+                )}
               </div>
             </div>
           </>
@@ -366,7 +383,7 @@ function Home() {
       ) : null}
 
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-4 space-y-4">
-        <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.needs.special.title')}<span className="text-red-500 ml-0.5">*</span></h2>
+        <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide">{t('home.needs.special.title')}</h2>
         <div className="grid grid-cols-1 gap-2">
           {[
             t('home.needs.special.need1'), t('home.needs.special.need2'),
@@ -386,8 +403,6 @@ function Home() {
             </div>
           ))}
         </div>
-        {showStep2Errors && specialNeeds.length === 0 && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
-
         <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide pt-2">{t('home.needs.immediate.title')}</h2>
         <div className="grid grid-cols-1 gap-2">
           {[
@@ -408,7 +423,9 @@ function Home() {
             </div>
           ))}
         </div>
-        {showStep2Errors && needs.length === 0 && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
+        {showStep2Errors && needs.length === 0 && (
+          <p className="text-xs text-red-500 mt-1">{t('home.validation.requiredField')}</p>
+        )}
 
         <div className="space-y-1.5 pt-2">
           <Label className="text-sm font-medium text-gray-700">{t('home.aidUrgency')}</Label>
@@ -420,7 +437,9 @@ function Home() {
               <SelectItem value="Low">{t('home.low')}</SelectItem>
             </SelectContent>
           </Select>
-          {showStep2Errors && !aidUrgency && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
+          {showStep2Errors && !aidUrgency && (
+            <p className="text-xs text-red-500 mt-1">{t('home.validation.requiredField')}</p>
+          )}
         </div>
 
         <div className="space-y-1.5">

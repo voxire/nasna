@@ -76,6 +76,10 @@
   "locationCenter": "Hébergé dans un centre",
   "center": "Centre",
   "invalidEmail": "Veuillez entrer une adresse e-mail valide.",
+  "validation": {
+    "requiredField": "Ce champ est obligatoire.",
+    "selectGovernorate": "Sélectionnez un gouvernorat"
+  },
   "whatsappCta": {
     "title": "S'inscrire via WhatsApp",
     "description": "Vous préférez vous inscrire depuis votre téléphone ? Envoyez-nous un message sur WhatsApp et notre bot vous guidera à travers l'inscription en arabe, anglais ou français.",
