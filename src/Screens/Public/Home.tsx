@@ -62,6 +62,8 @@ function Home() {
   const [consentGiven, setConsentGiven] = useState(false);
   const [honeypot, setHoneypot] = useState('');
   const [centers, setCenters] = useState<Array<CenterDocument & { id: string }>>([]);
+  const [showStep1Errors, setShowStep1Errors] = useState(false);
+  const [showStep2Errors, setShowStep2Errors] = useState(false);
 
   const navigate = useNavigate();
 
@@ -171,6 +173,7 @@ function Home() {
         toast.error(t('home.toast.errorAddingMember'));
       }
     } else {
+      setShowStep2Errors(true);
       toast.error(t('home.toast.fillRequiredFields'));
     }
   };
@@ -187,10 +190,12 @@ function Home() {
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.fullName')}</Label>
           <Input value={fullName} onChange={(e) => setFullName(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+          {showStep1Errors && !fullName && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
         </div>
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.phoneNumber')}</Label>
           <Input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(removeEmojis(e.target.value))} maxLength={20} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+          {showStep1Errors && !phoneNumber && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
         </div>
         <div className="space-y-1.5">
           <Label className="text-sm font-medium text-gray-700">{t('home.emailAddress')}</Label>
@@ -245,6 +250,7 @@ function Home() {
               ))}
             </SelectContent>
           </Select>
+          {showStep1Errors && !previousGovernorate && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
         </div>
         {isCenterCase ? (
           <div className="space-y-4">
@@ -274,6 +280,7 @@ function Home() {
                   ))}
                 </SelectContent>
               </Select>
+              {showStep1Errors && !currentGovernorate && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -283,16 +290,19 @@ function Home() {
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium text-gray-700">{t('home.street')}</Label>
                 <Input value={street} onChange={(e) => setStreet(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+                {showStep1Errors && !street && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium text-gray-700">{t('home.building')}<span className="text-red-500 ml-0.5">*</span></Label>
                 <Input value={building} onChange={(e) => setBuilding(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+                {showStep1Errors && !building && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
               </div>
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium text-gray-700">{t('home.floor')}<span className="text-red-500 ml-0.5">*</span></Label>
                 <Input value={floor} onChange={(e) => setFloor(removeEmojis(e.target.value))} maxLength={10} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+                {showStep1Errors && !floor && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
               </div>
             </div>
           </>
@@ -308,8 +318,10 @@ function Home() {
               : Boolean(fullName && phoneNumber && currentGovernorate && previousGovernorate && street && building && floor && !emailError);
 
             if (pageOneValid) {
+              setShowStep1Errors(false);
               setPage(2);
             } else {
+              setShowStep1Errors(true);
               toast.error(emailError ? t('home.toast.validEmailRequired') : t('home.toast.fillRequiredFields'));
             }
           }}
@@ -374,6 +386,7 @@ function Home() {
             </div>
           ))}
         </div>
+        {showStep2Errors && specialNeeds.length === 0 && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
 
         <h2 className="text-base font-semibold text-[#12a89d] uppercase tracking-wide pt-2">{t('home.needs.immediate.title')}</h2>
         <div className="grid grid-cols-1 gap-2">
@@ -395,6 +408,7 @@ function Home() {
             </div>
           ))}
         </div>
+        {showStep2Errors && needs.length === 0 && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
 
         <div className="space-y-1.5 pt-2">
           <Label className="text-sm font-medium text-gray-700">{t('home.aidUrgency')}</Label>
@@ -406,6 +420,7 @@ function Home() {
               <SelectItem value="Low">{t('home.low')}</SelectItem>
             </SelectContent>
           </Select>
+          {showStep2Errors && !aidUrgency && <p className="text-xs text-red-500 mt-1">This field is required.</p>}
         </div>
 
         <div className="space-y-1.5">
