@@ -25,7 +25,10 @@ function GuestRoute({ children }: GuestRouteProps) {
   if (firebaseUser) {
     return (
       <Navigate
-        to={resolvePostLoginPath(role, role === 'admin' || profile?.onboarded === true)}
+        to={resolvePostLoginPath(
+          role,
+          role === 'admin' || role === 'super_admin' || profile?.onboarded === true,
+        )}
         replace
       />
     );

@@ -66,6 +66,9 @@ function Login() {
       case 'auth/invalid-credential':
         toast.error(t('login.toast.invalidCredential'));
         break;
+      case 'auth/account-inactive':
+        toast.error(t('login.toast.accountInactive'));
+        break;
       default:
         toast.error(t('login.toast.genericError'));
         break;
@@ -85,6 +88,8 @@ function Login() {
         const email = (error as { customData?: { email?: string } })?.customData?.email ?? '';
         if (email) form.setValue('email', email);
         toast.error(t('login.toast.accountExistsDifferentCredential'), { duration: 7000 });
+      } else if (code === 'auth/account-inactive') {
+        toast.error(t('login.toast.accountInactive'));
       } else if (code !== 'auth/popup-closed-by-user') {
         toast.error(t('login.toast.genericError'));
       }

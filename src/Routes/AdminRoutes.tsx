@@ -12,6 +12,8 @@ const OperationsMap = lazy(() => import('../Screens/Admin/OperationsMap'));
 const AdminSubmissions = lazy(() => import('../Screens/Admin/AdminSubmissions'));
 const Members = lazy(() => import('../Screens/Admin/Members'));
 const Agents = lazy(() => import('../Screens/Admin/Agents'));
+const UserManagement = lazy(() => import('../Screens/Admin/UserManagement'));
+const PlatformSettings = lazy(() => import('../Screens/Admin/PlatformSettings'));
 const FeedbackManagement = lazy(() => import('../Screens/Admin/FeedbackManagement'));
 const EmergencyContactsManagement = lazy(
   () => import('../Screens/Admin/EmergencyContactsManagement'),
@@ -154,6 +156,156 @@ const AdminRoutes: RouteConfig[] = [
     path: '/manage/audit',
     element: (
       <Admin>
+        <LazyBoundary>
+          <AuditLog />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/manage',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <Dashboard />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/users',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <UserManagement />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/settings',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <PlatformSettings />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/impact',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <ImpactDashboard />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/dispatch',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <DispatchCenter />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/centers',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <CenterManagement />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/housing',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <HousingReview />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/map',
+    element: (
+      <Admin allowedRoles={['super_admin']} fullBleed>
+        <LazyBoundary>
+          <OperationsMap />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/submissions',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <AdminSubmissions />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/ngo',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <Members />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/agents',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <Agents />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/feedback',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <FeedbackManagement />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/emergency',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <EmergencyContactsManagement />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/offers',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
+        <LazyBoundary>
+          <OffersManagement />
+        </LazyBoundary>
+      </Admin>
+    ),
+  },
+  {
+    path: '/super/audit',
+    element: (
+      <Admin allowedRoles={['super_admin']}>
         <LazyBoundary>
           <AuditLog />
         </LazyBoundary>

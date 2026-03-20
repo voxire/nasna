@@ -11,7 +11,7 @@ if (getApps().length === 0) {
 const adminAuth = getAuth();
 const db = getFirestore();
 
-type ManagedRole = 'member' | 'agent';
+type ManagedRole = 'member' | 'agent' | 'admin';
 
 interface CreateManagedUserRequest {
   role: ManagedRole;
@@ -22,6 +22,7 @@ interface CreateManagedUserRequest {
   contactPersonName?: string;
   areaOfOperation?: string;
   centerId?: string;
+  assignedNgoId?: string;
   validateImmediately?: boolean;
 }
 
@@ -34,6 +35,7 @@ interface UpdateManagedUserRequest {
   contactPersonName?: string;
   areaOfOperation?: string;
   centerId?: string;
+  assignedNgoId?: string;
 }
 
 interface ValidateManagedUserRequest {
@@ -44,6 +46,11 @@ interface DeleteManagedUserRequest {
   uid: string;
 }
 
+interface SetManagedUserStatusRequest {
+  uid: string;
+  active: boolean;
+}
+
 type MemberProfile = {
   role?: string;
   isAdmin?: boolean;
@@ -51,15 +58,31 @@ type MemberProfile = {
 };
 
 async function assertAdmin(uid: string, tokenRole?: string) {
-  if (tokenRole === 'admin') {
+  if (tokenRole === 'admin' || tokenRole === 'super_admin') {
     return;
   }
 
   const profileSnapshot = await db.collection('members').doc(uid).get();
   const profile = profileSnapshot.data() as MemberProfile | undefined;
 
-  if (!profileSnapshot.exists || (profile?.role !== 'admin' && profile?.isAdmin !== true)) {
+  if (
+    !profileSnapshot.exists ||
+    (profile?.role !== 'admin' && profile?.role !== 'super_admin' && profile?.isAdmin !== true)
+  ) {
     throw new HttpsError('permission-denied', 'Admin access is required.');
+  }
+}
+
+async function assertSuperAdmin(uid: string, tokenRole?: string) {
+  if (tokenRole === 'super_admin') {
+    return;
+  }
+
+  const profileSnapshot = await db.collection('members').doc(uid).get();
+  const profile = profileSnapshot.data() as MemberProfile | undefined;
+
+  if (!profileSnapshot.exists || profile?.role !== 'super_admin') {
+    throw new HttpsError('permission-denied', 'Super admin access is required.');
   }
 }
 
@@ -99,7 +122,9 @@ function buildManagedMemberData({
   contactPersonName,
   areaOfOperation,
   centerId,
+  assignedNgoId,
   validated,
+  active,
 }: {
   uid: string;
   role: ManagedRole;
@@ -109,7 +134,9 @@ function buildManagedMemberData({
   contactPersonName: string;
   areaOfOperation: string;
   centerId: string;
+  assignedNgoId: string;
   validated: boolean;
+  active: boolean;
 }) {
   return {
     uid,
@@ -119,6 +146,7 @@ function buildManagedMemberData({
     phoneNumber,
     areaOfOperation: role === 'agent' ? areaOfOperation : '',
     centerId: role === 'agent' ? centerId || null : null,
+    assignedNgoId: role === 'agent' ? assignedNgoId || null : null,
     kindOfHelp: '',
     initiativeOrNgo: '',
     role,
@@ -133,7 +161,8 @@ function buildManagedMemberData({
     deliveryMode: 'both',
     onboarded: true,
     consentGiven: true,
-    isAdmin: false,
+    isAdmin: role === 'admin',
+    active,
     validated,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -159,10 +188,15 @@ export const createManagedUser = onCall<CreateManagedUserRequest>(
     const contactPersonName = request.data?.contactPersonName?.trim() ?? '';
     const areaOfOperation = request.data?.areaOfOperation?.trim() ?? '';
     const centerId = request.data?.centerId?.trim() ?? '';
+    const assignedNgoId = request.data?.assignedNgoId?.trim() ?? '';
     const validateImmediately = request.data?.validateImmediately !== false;
 
-    if (role !== 'member' && role !== 'agent') {
+    if (role !== 'member' && role !== 'agent' && role !== 'admin') {
       throw new HttpsError('invalid-argument', 'A valid role is required.');
+    }
+
+    if (role === 'admin') {
+      await assertSuperAdmin(adminUid, request.auth?.token.role as string | undefined);
     }
 
     if (!name || !email || !phoneNumber || password.length < 6) {
@@ -175,6 +209,13 @@ export const createManagedUser = onCall<CreateManagedUserRequest>(
 
     if (role === 'agent' && !areaOfOperation) {
       throw new HttpsError('invalid-argument', 'An area of operation is required for agents.');
+    }
+
+    if (role === 'agent' && !centerId && !assignedNgoId) {
+      throw new HttpsError(
+        'invalid-argument',
+        'Agents must be assigned to either a center or an NGO.',
+      );
     }
 
     await assertUniquePhoneNumber(phoneNumber);
@@ -204,7 +245,7 @@ export const createManagedUser = onCall<CreateManagedUserRequest>(
     try {
       await adminAuth.setCustomUserClaims(targetUser.uid, {
         role,
-        isAdmin: false,
+        isAdmin: role === 'admin',
       });
 
       await db
@@ -220,7 +261,9 @@ export const createManagedUser = onCall<CreateManagedUserRequest>(
             contactPersonName,
             areaOfOperation,
             centerId,
-            validated: validateImmediately,
+            assignedNgoId,
+            validated: role === 'admin' ? true : validateImmediately,
+            active: true,
           }),
         );
     } catch (error) {
@@ -267,9 +310,21 @@ export const updateManagedUser = onCall<UpdateManagedUserRequest>(
     const phoneNumber = request.data?.phoneNumber?.trim();
     const contactPersonName = request.data?.contactPersonName?.trim() ?? '';
     const areaOfOperation = request.data?.areaOfOperation?.trim() ?? '';
+    const centerId = request.data?.centerId?.trim() ?? '';
+    const assignedNgoId = request.data?.assignedNgoId?.trim() ?? '';
 
-    if (!uid || (role !== 'member' && role !== 'agent') || !name || !email || !phoneNumber) {
+    if (
+      !uid ||
+      (role !== 'member' && role !== 'agent' && role !== 'admin') ||
+      !name ||
+      !email ||
+      !phoneNumber
+    ) {
       throw new HttpsError('invalid-argument', 'Managed user update is incomplete.');
+    }
+
+    if (role === 'admin') {
+      await assertSuperAdmin(adminUid, request.auth?.token.role as string | undefined);
     }
 
     if (role === 'member' && !contactPersonName) {
@@ -278,6 +333,13 @@ export const updateManagedUser = onCall<UpdateManagedUserRequest>(
 
     if (role === 'agent' && !areaOfOperation) {
       throw new HttpsError('invalid-argument', 'An area of operation is required for agents.');
+    }
+
+    if (role === 'agent' && !centerId && !assignedNgoId) {
+      throw new HttpsError(
+        'invalid-argument',
+        'Agents must be assigned to either a center or an NGO.',
+      );
     }
 
     await assertUniquePhoneNumber(phoneNumber, uid);
@@ -301,7 +363,7 @@ export const updateManagedUser = onCall<UpdateManagedUserRequest>(
 
     await adminAuth.setCustomUserClaims(uid, {
       role,
-      isAdmin: false,
+      isAdmin: role === 'admin',
     });
 
     const updatePayload: Record<string, unknown> = {
@@ -310,13 +372,12 @@ export const updateManagedUser = onCall<UpdateManagedUserRequest>(
       email,
       phoneNumber,
       areaOfOperation: role === 'agent' ? areaOfOperation : '',
+      assignedNgoId: role === 'agent' ? assignedNgoId || null : null,
+      centerId: role === 'agent' ? centerId || null : null,
       role,
+      isAdmin: role === 'admin',
       updatedAt: new Date(),
     };
-
-    if (role === 'agent') {
-      updatePayload['centerId'] = request.data?.centerId?.trim() ?? null;
-    }
 
     await memberRef.set(updatePayload, { merge: true });
 
@@ -418,5 +479,47 @@ export const deleteManagedUser = onCall<DeleteManagedUserRequest>(
     });
 
     return { uid, deleted: true };
+  },
+);
+
+export const setManagedUserStatus = onCall<SetManagedUserStatusRequest>(
+  { region: 'europe-west1' },
+  async (request) => {
+    const adminUid = request.auth?.uid;
+
+    if (!adminUid) {
+      throw new HttpsError('unauthenticated', 'Authentication is required.');
+    }
+
+    await assertSuperAdmin(adminUid, request.auth?.token.role as string | undefined);
+
+    const uid = request.data?.uid?.trim();
+    const active = request.data?.active;
+
+    if (!uid || typeof active !== 'boolean') {
+      throw new HttpsError('invalid-argument', 'uid and active are required.');
+    }
+
+    if (uid === adminUid && active === false) {
+      throw new HttpsError('failed-precondition', 'You cannot deactivate your own account.');
+    }
+
+    const memberRef = db.collection('members').doc(uid);
+    const snapshot = await memberRef.get();
+    if (!snapshot.exists) {
+      throw new HttpsError('not-found', 'Managed user profile not found.');
+    }
+
+    await memberRef.set(
+      {
+        active,
+        updatedAt: new Date(),
+      },
+      { merge: true },
+    );
+
+    await adminAuth.updateUser(uid, { disabled: !active });
+
+    return { uid, active };
   },
 );

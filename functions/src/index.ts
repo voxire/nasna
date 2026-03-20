@@ -2,6 +2,7 @@ export { checkSubmissionDuplicates } from './checkSubmissionDuplicates';
 export {
   createManagedUser,
   deleteManagedUser,
+  setManagedUserStatus,
   updateManagedUser,
   validateManagedUser,
 } from './adminUserManagement';

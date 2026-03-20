@@ -16,9 +16,19 @@ service cloud.firestore {
     function isAdmin() {
       return isSignedIn()
         && (
-          request.auth.token.role == 'admin'
+          request.auth.token.role == 'super_admin'
+          || request.auth.token.role == 'admin'
           || authProfile().isAdmin == true
+          || authProfile().role == 'super_admin'
           || authProfile().role == 'admin'
+        );
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn()
+        && (
+          request.auth.token.role == 'super_admin'
+          || authProfile().role == 'super_admin'
         );
     }
 
@@ -160,6 +170,10 @@ service cloud.firestore {
       allow read: if isAdmin()
         || (isSignedIn() && resource.data.recipientUid == request.auth.uid);
       allow write: if isAdmin();
+    }
+
+    match /platformSettings/{settingsId} {
+      allow read, write: if isSuperAdmin();
     }
 
     // ─── /stats ─────────────────────────────────────────────────────────────

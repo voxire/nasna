@@ -91,7 +91,10 @@ function Header({ dashboard = false }: HeaderProps) {
                   size="icon"
                   onClick={() =>
                     navigate(
-                      resolvePostLoginPath(role, role === 'admin' || profile?.onboarded === true),
+                      resolvePostLoginPath(
+                        role,
+                        role === 'admin' || role === 'super_admin' || profile?.onboarded === true,
+                      ),
                     )
                   }
                 >

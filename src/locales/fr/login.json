@@ -27,6 +27,7 @@
     "wrongPassword": "Mot de passe incorrect. Veuillez réessayer.",
     "invalidEmailFormat": "Format d'e-mail non valide.",
     "invalidCredential": "Informations d'identification non valides. Veuillez réessayer.",
+    "accountInactive": "Ce compte est inactif. Veuillez contacter un super administrateur.",
     "genericError": "Une erreur est survenue. Veuillez réessayer.",
     "emailPasswordRequired": "L'e-mail et le mot de passe sont requis.",
     "success": "Connexion réussie !",

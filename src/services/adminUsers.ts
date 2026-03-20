@@ -1,7 +1,7 @@
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/firebase';
 
-type ManagedRole = 'member' | 'agent';
+type ManagedRole = 'member' | 'agent' | 'admin';
 
 interface CreateManagedUserPayload {
   role: ManagedRole;
@@ -12,6 +12,7 @@ interface CreateManagedUserPayload {
   contactPersonName?: string;
   areaOfOperation?: string;
   centerId?: string;
+  assignedNgoId?: string;
   validateImmediately?: boolean;
 }
 
@@ -31,6 +32,7 @@ interface UpdateManagedUserPayload {
   contactPersonName?: string;
   areaOfOperation?: string;
   centerId?: string;
+  assignedNgoId?: string;
 }
 
 export async function createManagedUser(payload: CreateManagedUserPayload) {
@@ -66,5 +68,14 @@ export async function deleteManagedUser(uid: string) {
     'deleteManagedUser',
   );
   const result = await callable({ uid });
+  return result.data;
+}
+
+export async function setManagedUserStatus(uid: string, active: boolean) {
+  const callable = httpsCallable<
+    { uid: string; active: boolean },
+    { uid: string; active: boolean }
+  >(functions, 'setManagedUserStatus');
+  const result = await callable({ uid, active });
   return result.data;
 }

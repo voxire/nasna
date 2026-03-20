@@ -44,15 +44,22 @@ let authUnsubscribe: (() => void) | null = null;
 let authResolutionVersion = 0;
 
 function resolveRole(profile: MemberDocument | null, claimedRole?: unknown): UserRole | null {
-  if (claimedRole === 'admin' || claimedRole === 'member' || claimedRole === 'agent') {
+  if (
+    claimedRole === 'super_admin' ||
+    claimedRole === 'admin' ||
+    claimedRole === 'member' ||
+    claimedRole === 'agent'
+  ) {
     return claimedRole;
   }
 
+  if (profile?.role === 'super_admin') return 'super_admin';
   if (profile?.isAdmin) return 'admin';
   return profile?.role ?? null;
 }
 
 export function resolvePostLoginPath(role: UserRole | null, onboarded: boolean) {
+  if (role === 'super_admin') return '/super/manage';
   if (role === 'admin') return '/manage';
   if (!onboarded) return '/auth/onboarding';
   if (role === 'agent') return '/agent/center';
@@ -68,7 +75,7 @@ async function resolveAuthUser(firebaseUser: User): Promise<AuthResolution> {
   const tokenResult = await firebaseUser.getIdTokenResult();
   const profile = await fetchProfile(firebaseUser.uid);
   const role = resolveRole(profile, tokenResult.claims['role']);
-  const isAdmin = role === 'admin';
+  const isAdmin = role === 'admin' || role === 'super_admin';
   const isOnboarded = isAdmin || profile?.onboarded === true;
 
   return {
@@ -118,6 +125,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         const resolved = await resolveAuthUser(firebaseUser);
         if (currentVersion !== authResolutionVersion) return;
+
+        if (resolved.profile?.active === false) {
+          await signOut(auth);
+          if (currentVersion !== authResolutionVersion) return;
+          set({
+            firebaseUser: null,
+            profile: null,
+            role: null,
+            loading: false,
+            profileLoading: false,
+            initialized: true,
+          });
+          return;
+        }
 
         set({
           firebaseUser: resolved.firebaseUser,
@@ -179,6 +200,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const credential = await signInWithEmailAndPassword(auth, email, password);
       const resolved = await resolveAuthUser(credential.user);
 
+      if (resolved.profile?.active === false) {
+        await signOut(auth);
+        throw Object.assign(new Error('Account is inactive.'), { code: 'auth/account-inactive' });
+      }
+
       set({
         firebaseUser: resolved.firebaseUser,
         profile: resolved.profile,
@@ -206,6 +232,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const resolved = await resolveAuthUser(result.user);
+
+      if (resolved.profile?.active === false) {
+        await signOut(auth);
+        throw Object.assign(new Error('Account is inactive.'), { code: 'auth/account-inactive' });
+      }
 
       set({
         firebaseUser: resolved.firebaseUser,

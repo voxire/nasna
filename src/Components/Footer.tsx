@@ -110,10 +110,15 @@ function Footer() {
               {user ? (
                 <li>
                   <Link
-                    to={resolvePostLoginPath(role, role === 'admin' || profile?.onboarded === true)}
+                    to={resolvePostLoginPath(
+                      role,
+                      role === 'admin' || role === 'super_admin' || profile?.onboarded === true,
+                    )}
                     className="text-white/80 hover:text-white transition-colors no-underline"
                   >
-                    {role === 'admin' ? t('footer.adminPanel') : t('footer.dashboard')}
+                    {role === 'admin' || role === 'super_admin'
+                      ? t('footer.adminPanel')
+                      : t('footer.dashboard')}
                   </Link>
                 </li>
               ) : (
