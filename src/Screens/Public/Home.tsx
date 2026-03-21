@@ -297,6 +297,9 @@ function Home() {
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium text-gray-700">{t('home.city')}</Label>
                 <Input value={city} onChange={(e) => setCity(removeEmojis(e.target.value))} maxLength={100} autoComplete="off" className="bg-gray-50 border-gray-200 focus-visible:ring-[#12a89d]" />
+                {showStep1Errors && !city && (
+                  <p className="text-xs text-red-500 mt-1">{t('home.validation.requiredField')}</p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium text-gray-700">{t('home.street')}</Label>
@@ -462,6 +465,9 @@ function Home() {
           />
           <Label htmlFor="consent" className="text-xs text-gray-700 font-normal cursor-pointer">{t('home.consent')}</Label>
         </div>
+        {showStep2Errors && !consentGiven && (
+          <p className="text-xs text-red-500 mt-1">{t('home.validation.requiredField')}</p>
+        )}
       </div>
 
       <div className="flex justify-between items-center mt-5">
