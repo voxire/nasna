@@ -273,6 +273,12 @@ function CreateSubmission() {
     await clearSubmissionDraft(draftKey);
   };
 
+  const releaseDraftSuppression = () => {
+    window.setTimeout(() => {
+      suppressDraftRef.current = false;
+    }, 0);
+  };
+
   const buildSubmissionPayload = useCallback(
     (validatedData: z.output<typeof submissionSchema>) => ({
       ...validatedData,
@@ -323,6 +329,7 @@ function CreateSubmission() {
 
     const result = submissionSchema.safeParse(payload);
     if (!result.success) {
+      suppressDraftRef.current = false;
       const consentError = result.error.issues.find((i) => i.path.includes('consentGiven'));
       const centerError = result.error.issues.find((i) => i.path.includes('centerId'));
       if (consentError) {
@@ -386,6 +393,7 @@ function CreateSubmission() {
       }
     } finally {
       setLoading(false);
+      releaseDraftSuppression();
     }
   };
 
