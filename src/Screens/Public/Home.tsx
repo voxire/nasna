@@ -332,7 +332,7 @@ function Home() {
           onClick={() => {
             const pageOneValid = isCenterCase
               ? Boolean(fullName && phoneNumber && previousGovernorate && selectedCenter && !emailError)
-              : Boolean(fullName && phoneNumber && currentGovernorate && previousGovernorate && street && building && floor && !emailError);
+              : Boolean(fullName && phoneNumber && currentGovernorate && previousGovernorate && city && street && building && floor && !emailError);
 
             if (pageOneValid) {
               setShowStep1Errors(false);
