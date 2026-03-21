@@ -1,18 +1,25 @@
 import { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from '@/Components/ui/sidebar';
 import AppSidebar from './Sidebar';
 import PageTransition from '../../Components/PageTransition';
 import AdminBreadcrumb from './Navbar';
 import { useAuthStore } from '@/stores/authStore';
+import type { UserRole } from '@/types';
 
 interface AdminProps {
   children: ReactNode;
   fullBleed?: boolean;
+  allowedRoles?: UserRole[];
 }
 
-function Admin({ children, fullBleed = false }: AdminProps) {
+function Admin({
+  children,
+  fullBleed = false,
+  allowedRoles = ['admin', 'super_admin'],
+}: AdminProps) {
+  const location = useLocation();
   const loading = useAuthStore((state) => state.loading);
   const profileLoading = useAuthStore((state) => state.profileLoading);
   const initialized = useAuthStore((state) => state.initialized);
@@ -31,7 +38,10 @@ function Admin({ children, fullBleed = false }: AdminProps) {
     return <Navigate to="/auth/login" replace />;
   }
 
-  if (role !== 'admin') {
+  if (!role || !allowedRoles.includes(role)) {
+    if (location.pathname.startsWith('/super')) {
+      return <Navigate to="/manage" replace />;
+    }
     return <Navigate to="/" replace />;
   }
 

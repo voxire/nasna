@@ -39,6 +39,7 @@ import {
   DialogDescription,
 } from '@/Components/ui/dialog';
 import { usePaginatedQuery } from '@/hooks/usePaginatedQuery';
+import { LEBANON_GOVERNORATES, LEBANON_GOVERNORATE_TRANSLATION_KEYS } from '@/lib/governorates';
 
 const PAGE_SIZE = 10;
 
@@ -69,6 +70,9 @@ function AdminSubmissions() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [urgencyFilter, setUrgencyFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [governorateFilter, setGovernorateFilter] = useState('');
+  const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc');
   const [assignedNgoNames, setAssignedNgoNames] = useState<Record<string, string>>({});
   const [editMember, setEditMember] = useState<EditState>({
     ageRanges: {},
@@ -100,6 +104,7 @@ function AdminSubmissions() {
   } = usePaginatedQuery<SubmissionRow>({
     collectionRef: submissionsCollectionRef,
     orderByField: 'registrationDate',
+    orderDirection: sortDirection,
     pageSize: PAGE_SIZE,
     mapDoc: mapSubmission,
   });
@@ -163,8 +168,22 @@ function AdminSubmissions() {
     if (urgencyFilter && urgencyFilter !== 'all') {
       result = result.filter((submission) => submission.aidUrgency === urgencyFilter);
     }
+    if (statusFilter && statusFilter !== 'all') {
+      result = result.filter((submission) => (submission.status ?? 'pending') === statusFilter);
+    }
+    if (governorateFilter && governorateFilter !== 'all') {
+      result = result.filter((submission) => submission.currentGovernorate === governorateFilter);
+    }
     return result;
-  }, [assignedNgoNames, deletedIds, searchQuery, submissions, urgencyFilter]);
+  }, [
+    assignedNgoNames,
+    deletedIds,
+    governorateFilter,
+    searchQuery,
+    statusFilter,
+    submissions,
+    urgencyFilter,
+  ]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -172,6 +191,14 @@ function AdminSubmissions() {
 
   const handleUrgencyFilter = (value: string) => {
     setUrgencyFilter(value);
+  };
+
+  const handleStatusFilter = (value: string) => {
+    setStatusFilter(value);
+  };
+
+  const handleGovernorateFilter = (value: string) => {
+    setGovernorateFilter(value);
   };
 
   const handleEditClick = (member: SubmissionRow) => {
@@ -282,6 +309,44 @@ function AdminSubmissions() {
             <SelectItem value="Low">{t('admin.submissions.low')}</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={statusFilter} onValueChange={handleStatusFilter}>
+          <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
+            <SelectValue placeholder={t('admin.submissions.status')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('admin.submissions.all')}</SelectItem>
+            <SelectItem value="pending">{t('admin.dispatch.pending')}</SelectItem>
+            <SelectItem value="assigned">{t('admin.dispatch.assigned')}</SelectItem>
+            <SelectItem value="in_progress">{t('admin.dispatch.inProgress')}</SelectItem>
+            <SelectItem value="completed">{t('admin.dispatch.completed')}</SelectItem>
+            <SelectItem value="cancelled">{t('admin.dispatch.cancelled')}</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={governorateFilter} onValueChange={handleGovernorateFilter}>
+          <SelectTrigger className="w-[180px] bg-gray-50 border-gray-200">
+            <SelectValue placeholder={t('admin.submissions.currentGov')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('admin.submissions.all')}</SelectItem>
+            {LEBANON_GOVERNORATES.map((governorate) => (
+              <SelectItem key={governorate} value={governorate}>
+                {t(LEBANON_GOVERNORATE_TRANSLATION_KEYS[governorate])}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={sortDirection}
+          onValueChange={(value: 'desc' | 'asc') => setSortDirection(value)}
+        >
+          <SelectTrigger className="w-[170px] bg-gray-50 border-gray-200">
+            <SelectValue placeholder={t('admin.submissions.sortBy')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="desc">{t('admin.submissions.newestFirst')}</SelectItem>
+            <SelectItem value="asc">{t('admin.submissions.oldestFirst')}</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {loading ? (
@@ -334,6 +399,9 @@ function AdminSubmissions() {
                     {t('admin.submissions.aidUrgency')}
                   </TableHead>
                   <TableHead className="font-semibold text-gray-700">
+                    {t('admin.submissions.status')}
+                  </TableHead>
+                  <TableHead className="font-semibold text-gray-700">
                     {t('admin.submissions.assignedNgo')}
                   </TableHead>
                   <TableHead className="font-semibold text-gray-700">
@@ -354,8 +422,20 @@ function AdminSubmissions() {
                     <TableCell>{member.phoneNumber}</TableCell>
                     <TableCell>{member.emailAddress}</TableCell>
                     <TableCell>{member.gender}</TableCell>
-                    <TableCell>{member.currentGovernorate}</TableCell>
-                    <TableCell>{member.previousGovernorate}</TableCell>
+                    <TableCell>
+                      {t(
+                        LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                          member.currentGovernorate as keyof typeof LEBANON_GOVERNORATE_TRANSLATION_KEYS
+                        ] ?? member.currentGovernorate,
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {t(
+                        LEBANON_GOVERNORATE_TRANSLATION_KEYS[
+                          member.previousGovernorate as keyof typeof LEBANON_GOVERNORATE_TRANSLATION_KEYS
+                        ] ?? member.previousGovernorate,
+                      )}
+                    </TableCell>
                     <TableCell>{member.street}</TableCell>
                     <TableCell>{member.building}</TableCell>
                     <TableCell>{member.floor}</TableCell>
@@ -381,7 +461,12 @@ function AdminSubmissions() {
                               : 'bg-green-100 text-green-700'
                         }`}
                       >
-                        {member.aidUrgency}
+                        {t(`admin.submissions.${member.aidUrgency?.toLowerCase()}`)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
+                        {t(`admin.map.statusLabels.${member.status ?? 'pending'}`)}
                       </span>
                     </TableCell>
                     <TableCell>

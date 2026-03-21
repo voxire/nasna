@@ -6,6 +6,7 @@
  * start working immediately without touching production.
  *
  * Test accounts (all passwords: Test1234!):
+ *   superadmin@nasna.test     — super admin role
  *   admin@nasna.test          — admin role
  *   ngo@nasna.test            — member role (validated NGO)
  *   agent@nasna.test          — agent role (assigned to Beirut Community Center)
@@ -69,6 +70,11 @@ async function seed() {
 
   // ── Users ──────────────────────────────────────────────────────────────────
   console.log('👤 Creating users...');
+  const superAdminUid = await createUser(
+    'superadmin@nasna.test',
+    'Super Admin User',
+    'super_admin',
+  );
   const adminUid = await createUser('admin@nasna.test', 'Admin User', 'admin');
   const memberUid = await createUser('ngo@nasna.test', 'Test NGO', 'member');
   const agentUid = await createUser('agent@nasna.test', 'Test Agent', 'agent');
@@ -81,12 +87,25 @@ async function seed() {
   // ── Member documents ───────────────────────────────────────────────────────
   console.log('\n📄 Writing member documents...');
 
+  await db.doc(`members/${superAdminUid}`).set({
+    uid: superAdminUid,
+    email: 'superadmin@nasna.test',
+    name: 'Super Admin User',
+    role: 'super_admin',
+    isAdmin: true,
+    active: true,
+    onboarded: true,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  });
+
   await db.doc(`members/${adminUid}`).set({
     uid: adminUid,
     email: 'admin@nasna.test',
     name: 'Admin User',
     role: 'admin',
     isAdmin: true,
+    active: true,
     onboarded: true,
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
@@ -99,6 +118,7 @@ async function seed() {
     contactPersonName: 'Test Contact',
     role: 'member',
     isAdmin: false,
+    active: true,
     onboarded: true,
     validated: true,
     phoneNumber: '+9611234567',
@@ -117,6 +137,7 @@ async function seed() {
     name: 'Test Agent',
     role: 'agent',
     isAdmin: false,
+    active: true,
     onboarded: true,
     validated: true,
     createdAt: Timestamp.now(),
@@ -129,6 +150,7 @@ async function seed() {
     name: 'Agent No Center',
     role: 'agent',
     isAdmin: false,
+    active: true,
     onboarded: true,
     validated: true,
     createdAt: Timestamp.now(),

@@ -27,6 +27,7 @@
     "wrongPassword": "Incorrect password. Please try again.",
     "invalidEmailFormat": "Invalid email format.",
     "invalidCredential": "Invalid credentials. Please try again.",
+    "accountInactive": "This account is inactive. Please contact a super admin.",
     "genericError": "An error occurred. Please try again.",
     "emailPasswordRequired": "Email and password are required.",
     "success": "Login successful!",

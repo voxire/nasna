@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,32 +10,56 @@ import {
   BreadcrumbSeparator,
 } from '@/Components/ui/breadcrumb';
 
-const ROUTE_LABELS: Record<string, string> = {
-  '/manage': 'Home',
-  '/manage/dispatch': 'Dispatch Center',
-  '/manage/centers': 'Centers',
-  '/manage/housing': 'Housing Review',
-  '/manage/impact': 'Impact Dashboard',
-  '/manage/operations-map': 'Operations Map',
-  '/admin/map': 'Operations Map',
-  '/manage/submissions': 'Submissions',
-  '/manage/ngo': 'NGO / Initiative',
-  '/manage/agents': 'Agents',
-  '/manage/feedback': 'Feedback',
-  '/manage/emergency': 'Emergency',
-  '/manage/offers': 'Aid Offers',
-};
-
 export default function AdminBreadcrumb() {
   const location = useLocation();
-  const label = ROUTE_LABELS[location.pathname] ?? 'Dashboard';
-  const isHome = location.pathname === '/manage';
+  const { t } = useTranslation();
+
+  const routeLabels = useMemo<Record<string, string>>(
+    () => ({
+      '/manage': t('admin.nav.home'),
+      '/manage/dispatch': t('admin.nav.dispatch'),
+      '/manage/centers': t('admin.nav.centers'),
+      '/manage/housing': t('admin.nav.housing'),
+      '/manage/impact': t('admin.nav.impact'),
+      '/manage/operations-map': t('admin.nav.operationsMap'),
+      '/admin/map': t('admin.nav.operationsMap'),
+      '/manage/submissions': t('admin.nav.submissions'),
+      '/manage/ngo': t('admin.nav.ngos'),
+      '/manage/agents': t('admin.nav.agents'),
+      '/manage/feedback': t('admin.nav.feedback'),
+      '/manage/emergency': t('admin.nav.emergency'),
+      '/manage/offers': t('admin.nav.offers'),
+      '/manage/audit': t('admin.nav.audit'),
+      '/super/manage': t('admin.nav.home'),
+      '/super/users': t('admin.nav.userManagement'),
+      '/super/impact': t('admin.nav.impact'),
+      '/super/settings': t('admin.nav.settings'),
+      '/super/dispatch': t('admin.nav.dispatch'),
+      '/super/centers': t('admin.nav.centers'),
+      '/super/housing': t('admin.nav.housing'),
+      '/super/map': t('admin.nav.operationsMap'),
+      '/super/submissions': t('admin.nav.submissions'),
+      '/super/ngo': t('admin.nav.ngos'),
+      '/super/agents': t('admin.nav.agents'),
+      '/super/feedback': t('admin.nav.feedback'),
+      '/super/emergency': t('admin.nav.emergency'),
+      '/super/offers': t('admin.nav.offers'),
+      '/super/audit': t('admin.nav.audit'),
+    }),
+    [t],
+  );
+
+  const isSuperAdminPath = location.pathname.startsWith('/super');
+  const homePath = isSuperAdminPath ? '/super/manage' : '/manage';
+  const homeLabel = isSuperAdminPath ? t('admin.nav.superAdminPanel') : t('admin.nav.adminPanel');
+  const label = routeLabels[location.pathname] ?? t('admin.nav.dashboard');
+  const isHome = location.pathname === homePath;
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/manage">Dashboard</BreadcrumbLink>
+          <BreadcrumbLink href={homePath}>{homeLabel}</BreadcrumbLink>
         </BreadcrumbItem>
         {!isHome && (
           <>

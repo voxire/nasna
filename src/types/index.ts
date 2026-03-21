@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 
-export type UserRole = 'admin' | 'member' | 'agent';
+export type UserRole = 'super_admin' | 'admin' | 'member' | 'agent';
 export type SupportedLanguage = 'en' | 'ar' | 'fr';
 export type AidUrgency = 'High' | 'Medium' | 'Low';
 export type Gender = 'Male' | 'Female';
@@ -53,6 +53,7 @@ export interface MemberDocument {
   email: string;
   phoneNumber: string;
   areaOfOperation?: string;
+  assignedNgoId?: string | null;
   kindOfHelp?: string;
   initiativeOrNgo?: string;
   role: UserRole;
@@ -69,6 +70,7 @@ export interface MemberDocument {
   onboarded?: boolean;
   consentGiven: boolean;
   isAdmin: boolean;
+  active?: boolean;
   validated: boolean;
   createdAt: Date;
   updatedAt: Date;
