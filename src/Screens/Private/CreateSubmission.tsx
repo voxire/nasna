@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { auth, db, functions } from '../../firebase';
 import { addDoc, collection, limit, onSnapshot, query, where } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
@@ -137,6 +137,7 @@ function CreateSubmission() {
   const [syncingQueue, setSyncingQueue] = useState(false);
   const [draftReady, setDraftReady] = useState(false);
   const [lastSyncMessage, setLastSyncMessage] = useState('');
+  const suppressDraftRef = useRef(false);
 
   const userUid = auth.currentUser?.uid;
   const draftKey = useMemo(() => `submission-draft:${userUid ?? 'anonymous'}`, [userUid]);
@@ -184,12 +185,13 @@ function CreateSubmission() {
       }
 
       await refreshQueuedItems();
+      suppressDraftRef.current = false;
       setDraftReady(true);
     })();
   }, [draftKey, refreshQueuedItems, userUid]);
 
   useEffect(() => {
-    if (!draftReady || !userUid) return;
+    if (!draftReady || !userUid || suppressDraftRef.current) return;
 
     void saveSubmissionDraft(draftKey, {
       formData,
@@ -271,6 +273,12 @@ function CreateSubmission() {
     await clearSubmissionDraft(draftKey);
   };
 
+  const releaseDraftSuppression = () => {
+    window.setTimeout(() => {
+      suppressDraftRef.current = false;
+    }, 0);
+  };
+
   const buildSubmissionPayload = useCallback(
     (validatedData: z.output<typeof submissionSchema>) => ({
       ...validatedData,
@@ -305,6 +313,7 @@ function CreateSubmission() {
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
+    suppressDraftRef.current = true;
 
     const payload =
       isCenterCase && selectedCenter
@@ -320,6 +329,7 @@ function CreateSubmission() {
 
     const result = submissionSchema.safeParse(payload);
     if (!result.success) {
+      suppressDraftRef.current = false;
       const consentError = result.error.issues.find((i) => i.path.includes('consentGiven'));
       const centerError = result.error.issues.find((i) => i.path.includes('centerId'));
       if (consentError) {
@@ -383,6 +393,7 @@ function CreateSubmission() {
       }
     } finally {
       setLoading(false);
+      releaseDraftSuppression();
     }
   };
 
