@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Github } from 'lucide-react';
 import { resolvePostLoginPath, useAuthStore } from '@/stores/authStore';
+import { VoxireCredit } from '@/Components/VoxireCredit';
 
 function Footer() {
   const { t } = useTranslation();
@@ -168,6 +169,7 @@ function Footer() {
           </a>
         </div>
       </div>
+      <VoxireCredit />
     </footer>
   );
 }
