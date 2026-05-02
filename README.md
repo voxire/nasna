@@ -512,7 +512,7 @@ firebase deploy --only firestore:rules
 
 <div align="center">
 
-Built with care for the people of Lebanon.
+Built with care for the people of Lebanon by [Voxire](https://voxire.com) — digital agency in Beirut, Lebanon.
 
 **[nasna.world](https://nasna.world)**
 
