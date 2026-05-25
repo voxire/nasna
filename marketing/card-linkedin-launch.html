@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1200px; height: 628px; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+  .card {
+    width: 1200px;
+    height: 628px;
+    background: #0d1b2a;
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Left content panel */
+  .left {
+    width: 560px;
+    padding: 56px 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(18,168,157,0.15);
+    border: 1.5px solid rgba(18,168,157,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .logo-img img { width: 100%; height: 100%; object-fit: cover; }
+
+  .logo-text {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #12a89d;
+    text-transform: uppercase;
+  }
+
+  .main-content { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 32px 0; }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #12a89d;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 48px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  h1 span { color: #12a89d; }
+
+  .subtitle {
+    font-size: 17px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.6;
+    max-width: 420px;
+  }
+
+  .bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .url {
+    font-size: 15px;
+    font-weight: 700;
+    color: #12a89d;
+    letter-spacing: 0.5px;
+  }
+
+  .tag {
+    background: rgba(18,168,157,0.12);
+    border: 1px solid rgba(18,168,157,0.3);
+    color: #12a89d;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+
+  /* Right image panel */
+  .right {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .right img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left top;
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+
+  /* Gradient overlay on left edge of image */
+  .right::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 200px; height: 100%;
+    background: linear-gradient(to right, #0d1b2a, transparent);
+    z-index: 1;
+  }
+
+  /* Teal top accent line */
+  .accent-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(to right, #12a89d, transparent);
+  }
+
+  /* Stats bar */
+  .stats {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(18,168,157,0.1);
+    border-top: 1px solid rgba(18,168,157,0.2);
+    display: flex;
+    padding: 0 52px;
+    z-index: 3;
+  }
+
+  .stat {
+    padding: 14px 0;
+    margin-right: 48px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .stat-num {
+    font-size: 22px;
+    font-weight: 800;
+    color: #12a89d;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.3;
+  }
+
+  .dot {
+    width: 4px; height: 4px;
+    background: rgba(18,168,157,0.4);
+    border-radius: 50%;
+    margin-right: 48px;
+    align-self: center;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="accent-line"></div>
+
+  <div class="left">
+    <div class="logo-row">
+      <div class="logo-img">
+        <img src="https://nasna.world/logo.png" onerror="this.style.display='none'" />
+      </div>
+      <span class="logo-text">Nasna · ناسنا</span>
+    </div>
+
+    <div class="main-content">
+      <div class="eyebrow">🇱🇧 Now Live · 2026</div>
+      <h1>Help Starts<br><span>Here.</span></h1>
+      <p class="subtitle">Connecting displaced families in Lebanon with the NGOs and resources they need — in real time.</p>
+    </div>
+
+    <div class="bottom-row">
+      <span class="url">nasna.world</span>
+      <span class="tag">Free · Open · Live</span>
+    </div>
+  </div>
+
+  <div class="right">
+    <img src="https://nasna.world/og-image.png" onerror="this.src=''" />
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-num">39</span>
+      <span class="stat-label">Aid<br>Centers</span>
+    </div>
+    <div class="dot"></div>
+    <div class="stat">
+      <span class="stat-num">37</span>
+      <span class="stat-label">Displacement<br>Sites Mapped</span>
+    </div>
+    <div class="dot"></div>
+    <div class="stat">
+      <span class="stat-num">3</span>
+      <span class="stat-label">Languages<br>AR · EN · FR</span>
+    </div>
+    <div class="dot"></div>
+    <div class="stat">
+      <span class="stat-num">100%</span>
+      <span class="stat-label">Free for<br>NGOs</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
